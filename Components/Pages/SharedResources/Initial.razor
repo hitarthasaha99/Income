@@ -1,0 +1,40 @@
+﻿@page "/"
+@using Income.Common
+@inject NavigationManager NavigationManager
+@inject PreloadService preloadService
+
+<div class="login-bg"></div>
+
+@code {
+    private CommonQuaries CommonQuaries = new CommonQuaries();
+    private CommonFunction function = new();
+    private CommonService commonService = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        preloadService.Show(SpinnerColor.Light, "We are setting up things ready for you.... Please Wait .........");
+        var user_details = await CommonQuaries.GetUserDetailsAsync();
+        if (user_details == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            preloadService.Hide();
+            return;
+        }
+        else
+        {
+            SessionStorage.full_name = user_details.full_name;
+            SessionStorage.__user_id = user_details.user_id;
+            SessionStorage.surveyId = user_details.surveyId;
+            SessionStorage.auth_token = user_details.user_token;
+            SessionStorage.user_role = user_details.user_role;
+            SessionStorage.survey_code = user_details.survey_code;
+            SessionStorage.survey_type = user_details.surveyType;
+            SessionStorage.tenant_id = user_details.tenant_id;
+            SessionStorage.user_name = user_details.username;
+            SessionStorage.role_name = function.GetUserRoleName(SessionStorage.user_role);
+            preloadService.Hide();
+            NavigationManager.NavigateTo("/dashboard/fsulist");
+            return;
+        }
+    }
+}

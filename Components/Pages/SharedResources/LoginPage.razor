@@ -1,0 +1,162 @@
+﻿@page "/login"
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject IJSRuntime jsRuntime
+
+<div  class="login-bg">
+    <div class="login-card">
+        <div class="d-flex align-center justify-content-between">
+            <img src="images/nsso75logo.svg" class="login-logo" />
+            <span class="badge text-bg-light-primary rounded-pill mb-2 h-25">@version_code</span>
+       </div>
+        <div class="mb-3">
+            <span class="badge text-bg-light-primary rounded-pill">National Household Travel Survey</span>
+        </div>
+        <h2>Welcome</h2>
+        <h5>Login</h5>
+        <div class="mb-3">
+            <label class="form-label">User ID *</label>
+            <input type="text" class="form-control" placeholder="Enter User ID" @bind="UserDetails.username">
+            <ValidationComponent @ref="user_id" field_name="User ID" field_value="@UserDetails.username" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password *</label>
+            <PasswordInput @bind-Value="@UserDetails.password" class="m-0" placeholder="Enter Password" Style="margin: 0 !important"/>
+            <ValidationComponent @ref="pass" field_name="Password" field_value="@UserDetails.password" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
+        </div>
+        <button class="btn btn-primary w-100" disabled="@is_busy" onclick="@Login">@(is_busy ? "Please Wait..." : "Login")<Spinner style="margin-left: 10px;" Type="SpinnerType.Grow" Size="SpinnerSize.Small" Visible="@is_busy"/></button>
+    </div>
+</div>
+
+<ConfirmDialog @ref="data_deletion_ref" />
+
+@code {
+    private ValidationComponent user_id = new();
+    private ValidationComponent pass = new();
+    public Tbl_User_Details UserDetails { get; set; } = new Tbl_User_Details();
+    public CommonConfig commonConfig { get; private set; } = new CommonConfig();
+    private Network_Service_Model network_Service_Model = new();
+    private CommonQuaries CommonQuaries = new CommonQuaries();
+    private CommonService commonService = new();
+    private CommonFunction commonFunction = new();
+    private CommonFunction funcs = new();
+    private bool is_busy = false;
+    public bool is_error { get; set; } = false;
+    DeviceInfoService deviceInfoService = new DeviceInfoService();
+    ConfirmDialog data_deletion_ref = default;
+    string version_code = "v " + VersionTracking.CurrentVersion;
+
+    public async Task Login()
+    {
+        try
+        {
+            // Check network connectivity
+            if (funcs.checkHasInternet() == false)
+            {
+                toastService.ShowWarning("No internet connection! please try again once back online");
+                return;
+            }
+            // Validate user input
+            int field_validation = await jsRuntime.InvokeAsync<int>("__FieldValidate", commonConfig.LoginRequiredFileds(), JsonConvert.SerializeObject(UserDetails));
+            if (field_validation == 0)
+            {
+                is_error = true;
+                StateHasChanged();
+                return;
+            }
+            is_error = false;
+            StateHasChanged();
+            var deleteduserinfo = await CommonQuaries.GetDeletedUserDetailsAsync();
+            if (UserDetails.username.ToUpper() != deleteduserinfo?.username?.ToUpper())
+            {  // delete old user data if user is not same as deleted user
+                // Delete all block data for the user
+                // Take confirmation before deletion
+                var options = new ConfirmDialogOptions
+                    {
+                        YesButtonText = "Yes! Delete",
+                        YesButtonColor = ButtonColor.Danger,
+                        NoButtonText = "Cancel",
+                        IsVerticallyCentered = true,
+                        Dismissable = false
+                    };
+
+                var confirmation = await data_deletion_ref.ShowAsync(
+                    title: "Login Alert!",
+                    message1: "Last user has data in this device, the data will be deleted. Do you want to login?",
+                    confirmDialogOptions: options
+                );
+
+                if (confirmation)
+                {
+                    await CommonQuaries.DeleteAllBlockData();
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            is_busy = true;
+            StateHasChanged();
+            UserDetails.deviceInfo = deviceInfoService.GetDeviceID();
+           // var data = JsonConvert.SerializeObject(UserDetails);
+            var response = await commonService.LoginService(UserDetails);
+            if (response == null)
+            {
+                // Show error message
+                is_busy = false;
+                StateHasChanged();
+                toastService.ShowError("Network error. Please try again.");
+                return;
+            }
+            if (response.userToken == null)
+            {
+                is_busy = false;
+                StateHasChanged();
+                toastService.ShowError(response.message);
+                return;
+            }
+            // Save user details to local storage
+            commonFunction.DecodeJWT(!string.IsNullOrEmpty(response.userToken.token) ? response.userToken.token : "");
+            // Save user details to database
+            Tbl_User_Details? tbl_User_Details = new();
+            tbl_User_Details.id = Guid.NewGuid();
+            tbl_User_Details.username = UserDetails.username;
+            tbl_User_Details.password = UserDetails.password;
+            tbl_User_Details.user_token = response.userToken.token;
+            tbl_User_Details.full_name = SessionStorage.full_name;
+            tbl_User_Details.surveyId = SessionStorage.surveyId;
+            tbl_User_Details.surveyType = SessionStorage.survey_type;
+            tbl_User_Details.survey_code = SessionStorage.survey_code;
+            tbl_User_Details.user_role = SessionStorage.user_role;
+            tbl_User_Details.tenant_id = SessionStorage.tenant_id;
+            tbl_User_Details.user_id = SessionStorage.__user_id;
+            tbl_User_Details.is_Deleted = false;
+            var user_response = await CommonQuaries.InsertUser(tbl_User_Details);
+            if (user_response == null)
+            {
+                // Show error message
+                is_busy = false;
+                StateHasChanged();
+                toastService.ShowError("Failed to save user details.");
+                return;
+            }
+            SessionStorage.__user_id = new(response.userId);
+            SessionStorage.auth_token = response.userToken.token;
+            // Navigate to dashboard
+            is_busy = false;
+            StateHasChanged();
+            toastService.ShowSuccess("Login successful");
+            NavigationManager.NavigateTo("/dashboard/fsulist", replace: true);
+            return;
+        }
+        catch (Exception ex)
+        {
+            // Handle exception
+            toastService.ShowError("An error occurred during login: " + ex.Message);
+            is_busy = false;
+            StateHasChanged();
+            return;
+        }
+    }
+}

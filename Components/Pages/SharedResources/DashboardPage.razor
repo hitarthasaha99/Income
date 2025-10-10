@@ -1,0 +1,21 @@
+﻿@page "/dashboard"
+@using Microsoft.AspNetCore.Components.Routing
+@using Income.Components.Layout
+
+@* <Router AppAssembly="@GetType().Assembly">
+    <Found Context="routeData">
+        <LayoutView Layout="@typeof(DashboardLayout)">
+            <p></p>
+        </LayoutView>
+    </Found>
+</Router> *@
+
+<Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(MauiProgram).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.DashboardLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+    </Router>
+    <BlazoredToasts />
+</Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState>

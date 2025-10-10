@@ -1,0 +1,7 @@
+﻿@inherits LayoutComponentBase
+@inject IToastService toastService
+<div class="page">
+    @Body
+    <BlazoredToasts />
+    <Preload LoadingText="Loading..." />
+</div>
