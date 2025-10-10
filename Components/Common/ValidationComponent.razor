@@ -1,0 +1,112 @@
+﻿@inject IJSRuntime jsRuntime
+
+<p class="mb-1 mt-1 text-white bg-danger p-2 rounded" hidden="@(!is_visible)"><i class="bi bi-exclamation-triangle me-2"></i> @field_placeholder</p>
+
+@code {
+    [Parameter]
+    public string field_name { get; set; } = string.Empty;
+    [Parameter]
+    public string field_value { get; set; } = string.Empty;
+    [Parameter]
+    public string field_type { get; set; } = string.Empty;
+    [Parameter]
+    public bool is_error { get; set; } = false;
+    [Parameter]
+    public string? reg_exp { get; set; } = string.Empty;
+    [Parameter]
+    public string custom_message { get; set; } = string.Empty;
+    [Parameter]
+    public string min_val { get; set; } = string.Empty;
+    [Parameter]
+    public string max_val { get; set; } = string.Empty;
+    [Parameter]
+    public bool is_enable { get; set; } = true;
+
+    public bool is_visible { get; set; } = false;
+    public string field_placeholder { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Validate(is_error, field_value, field_type, reg_exp, custom_message);
+        return;
+    }
+
+    public async Task Validate(bool param, string field_val, string field_type_val, string? reg_exp_val = "", string customMsg = "", string field_data_type = "")
+    {
+        try
+        {
+            is_error = param;
+            field_value = field_val;
+            field_type = field_type_val;
+            reg_exp = reg_exp_val;
+            custom_message = customMsg;
+            if (!param || !is_enable)
+            {
+                is_visible = false; // If no error, ensure visibility
+                field_placeholder = ""; // Clear the placeholder text
+                StateHasChanged(); // Ensure UI updates
+                return;
+            }
+
+            bool status = await jsRuntime.InvokeAsync<bool>("__ReturnValidationStatus", field_type, field_data_type == "int" ? int.TryParse(field_value, out int result) ? result : 0 : field_value, reg_exp, min_val, max_val);
+            ReturnValidationStatus(status);
+            return;
+        }
+        catch(Exception ex)
+        {
+            return;
+        }
+    }
+
+    public void ReturnValidationStatus(bool status)
+    {
+        is_visible = status;
+        if (!status)
+        {
+            is_visible = false; // If no error, ensure visibility
+            field_placeholder = ""; // Clear the placeholder text
+            StateHasChanged(); // Ensure UI updates
+            return;
+        }
+
+        switch (field_type)
+        {
+        case CommonConstants.VALIDATION_TYPE_DEFAULT:
+        field_placeholder = !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter " + field_name;
+        break;
+        case CommonConstants.VALIDATION_TYPE_SELECT:
+        field_placeholder = !string.IsNullOrEmpty(custom_message) ? custom_message : "Please select " + field_name;
+        break;
+        case CommonConstants.VALIDATION_TYPE_REG_EXP:
+        field_placeholder = string.IsNullOrEmpty(field_value)
+            ? !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter " + field_name
+            : !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter valid " + field_name;
+        break;
+        case CommonConstants.VALIDATION_TYPE_REG_EXP_NOT_REQUIRED:
+        if (!string.IsNullOrEmpty(field_value))
+        {
+            field_placeholder = !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter valid " + field_name;
+        }
+        break;
+        case CommonConstants.VALIDATION_TYPE_MIN_MAX:
+        field_placeholder = string.IsNullOrEmpty(field_value)
+            ? !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter " + field_name
+            : !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter valid " + field_name;
+        return;
+        case CommonConstants.VALIDATION_TYPE_MAX:
+        field_placeholder = string.IsNullOrEmpty(field_value)
+            ? !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter " + field_name
+            : !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter valid " + field_name;
+        return;
+        case CommonConstants.VALIDATION_TYPE_MIN:
+        field_placeholder = string.IsNullOrEmpty(field_value)
+            ? !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter " + field_name
+            : !string.IsNullOrEmpty(custom_message) ? custom_message : "Please enter valid " + field_name;
+        return;
+        default:
+        return;
+        }
+
+        StateHasChanged();  // Ensure UI updates after placeholder is set
+    }
+}

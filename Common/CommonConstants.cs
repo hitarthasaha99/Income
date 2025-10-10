@@ -105,6 +105,7 @@ namespace Income.Common
 
     enum CommonEnum
     {
+        fsu_list_page,
         sch_0_0_block_1,
         sch_0_0_block_2,
         sch_0_0_block_3,

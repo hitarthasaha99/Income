@@ -52,9 +52,9 @@ namespace Income.Common
         /// Endpoints
         /// </summary>
         public const string LOGIN_API = "v1/UtilityMaster/AuthenticateSurveyUserAsync";
-        public const string FETCH_FSU_LIST_BY_USER_ID = "v1/TravelSurvey/GetFsuListByUserId?v_userid=";
-        public const string FETCH_SAVED_RESPONSES_BY_FSU_ID = "v1/TravelSurvey/GetTravelResponseDetailsByFsuIdAndStatus/";
-        public const string SAVE_SUBMITTED_RESPONSE = "v1/TravelSurvey/UpSertTravelResponseAsync";
+        public const string FETCH_FSU_LIST_BY_USER_ID = "TourismSurvey/GetFsuListByUserId?v_userid=";
+        public const string FETCH_SAVED_RESPONSES_BY_FSU_ID = "GetTourismResponseDetailsByFsuIdAndStatus/";
+        public const string SAVE_SUBMITTED_RESPONSE = "UpSertTourismResponseAsync";
         public static string CHECK_CAPI_VERSION = $"v1/UtilityMaster/GetCapiApkVersionByUsername?survey_id={SessionStorage.surveyId}";
         public static string LOGOUT_API = "v1/UtilityMaster/LogoutUser?v_userName=";
 

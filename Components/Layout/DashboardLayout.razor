@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using Income.Database.Models.Common
+@using Income.Database.Queries
+@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject IToastService ToastService
 @inject PreloadService preloadService
@@ -53,18 +55,18 @@
 </div>
 
 <BlazoredToasts />
-<Preload LoadingText="We are preareing things ready for you...." />
+<Preload LoadingText="Loading...." />
 <Modal IsServiceModal="true" />
 
 @code {
-    private CommonQuaries CommonQuaries = new CommonQuaries();
+    private CommonQueries CommonQueries = new CommonQueries();
     string version_code = "V" + VersionTracking.CurrentVersion;
     string full_name = SessionStorage.full_name;
     string short_code = "";
-    CommonService common = new CommonService();
+    NetworkService common = new NetworkService();
     CommonFunction commonfuncs = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         try
         {
@@ -119,18 +121,18 @@
             return;
         }
         preloadService.Show(SpinnerColor.Light, "Logout in progress...");
-        var deleteduserinfo = await CommonQuaries.GetUserDetailsAsync();
+        Tbl_User_Details? deleteduserinfo = await CommonQueries.GetUserDetailsAsync()!;
         if (deleteduserinfo == null)
         {
             preloadService.Hide();
             ToastService.ShowError("Error occured while deleting user data. unable to logout! please try again.");
             return;
         }
-        var LogoutResponce = await common.LogoutService(deleteduserinfo.username);
-        if (LogoutResponce!= null && LogoutResponce.IsSuccessStatusCode)
+        var LogoutResponse = await common.LogoutService(deleteduserinfo.username);
+        if (LogoutResponse!= null && LogoutResponse.IsSuccessStatusCode)
         {
             SessionStorage.ClearSession();
-            var response = await CommonQuaries.DeleteUserData();
+            var response = await CommonQueries.DeleteUserData();
             if (response == 0)
             {
                 preloadService.Hide();

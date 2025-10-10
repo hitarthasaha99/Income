@@ -215,25 +215,25 @@ namespace Income.Common
             }
         }
 
-        public bool IsUpdateAvailable(apk_version_model version_Model)
-        {
-            try
-            {
-                var verison = VersionTracking.CurrentVersion;
-                var splitted_verison = verison.Split(".");
-                int major_verion = int.TryParse(splitted_verison[0].ToString(), out int major) ? major : 0;
-                int minor_verion = int.TryParse(splitted_verison[2].ToString(), out int minor) ? minor : 0;
-                if (version_Model.apk_major_version > major_verion || version_Model.apk_minor_version > minor_verion)
-                {
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
+        //public bool IsUpdateAvailable(apk_version_model version_Model)
+        //{
+        //    try
+        //    {
+        //        var verison = VersionTracking.CurrentVersion;
+        //        var splitted_verison = verison.Split(".");
+        //        int major_verion = int.TryParse(splitted_verison[0].ToString(), out int major) ? major : 0;
+        //        int minor_verion = int.TryParse(splitted_verison[2].ToString(), out int minor) ? minor : 0;
+        //        if (version_Model.apk_major_version > major_verion || version_Model.apk_minor_version > minor_verion)
+        //        {
+        //            return true;
+        //        }
+        //        return false;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return false;
+        //    }
+        //}
 
         public void CloseApp()
         {

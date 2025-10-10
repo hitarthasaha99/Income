@@ -1,0 +1,802 @@
+@page "/dashboard/fsulist"
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject PreloadService preloadService
+@inject NetworkService commonService;
+@inject IToastService toastService
+
+<div>
+    <div class="d-flex justify-content-between my-2">
+        <p style="font-weight: bold; font-size: 25px;">FSU List</p>
+        <div>
+            <NavLink class="btn btn-outline-dark" onclick="@Fsu_Load">Reload <i class="bi bi-arrow-clockwise"></i></NavLink>
+        </div>
+    </div>
+    <div class="card-style2 w-100">
+        <div class="table-card w-100">
+            <div class="table-responsive">
+                <input class="form-control w-25 float-end my-2 me-2" placeholder="Search..." @oninput="@((ChangeEventArgs e) => HandleSearch(e))" />
+                <table class="table mb-0">
+                    <thead class="text-uppercase">
+                        <tr>
+                            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                            {
+                                <th><input class="form-check-input" type="checkbox" style="width: 20px; height: 20px" checked="@(tbl_Fsu_List.Count == selected_guid.Count)" onchange="@((ChangeEventArgs args) => _handleCheckbox(args, null))"/></th>
+                            }
+                            <th>subround</th>
+                            <th>fsu id</th>
+                            <th>location details</th>
+                            <th>frame population</th>
+                            <th>status</th>
+                            <th>action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (temp_fsu_list?.Count > 0)
+                        {
+                            @foreach (var item in temp_fsu_list)
+                            {
+                                <tr>
+                                    @if(SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                                    {
+                                        <td><input class="form-check-input" type="checkbox" style="width: 20px; height: 20px" onchange="@((ChangeEventArgs args) => _handleCheckbox(args, item))" checked="@((selected_guid.Contains(item.fsu_id) ? true : false))" /></td>
+                                    }
+                                    <td>@item.subrnd</td>
+                                    <td>@item.fsu_id</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i style="font-size: 20px;" class="bi bi-geo-alt-fill text-danger"></i>
+                                            <div class="ms-2" style="font-size: 12px;">
+                                                <p class="m-0"><span class="text-secondary fst-italic">Village/ Town - @item.fsuname</span></p>
+                                                <div class="d-flex">
+                                                    <p class="m-0"><span class="text-secondary fst-italic">IV Unit</span> - <span class="text-primary">@item.iv_unit</span></p>
+                                                    <p class="ms-3 mb-0"><span class="text-secondary fst-italic">Block</span> - <span class="text-primary">@item.block</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@item.framepop</td>
+                                    <td>
+                                        <span class="badge rounded-pill bg-warning text-dark" style="font-size: 15px;">@item.completed_hhd / @item.total_hhd</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                            <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">NHTS0.0</NavLink>
+                                            <NavLink @onclick="@(() => HandleSelection("sch25.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">NHTS25.0</NavLink>
+@*                                             <NavLink @onclick="@(() => HandleRefresh(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
+ *@                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td class="text-center" colspan="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_DS ? 7 : 6))"><div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i> No Data Found</div></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @* <div class="d-flex justify-content-between  p-3">
+                    <p class="@((temp_fsu_list.Count == 0 ? "d-none" : "")) mb-0">Showing 1 to @temp_fsu_list.Count of @tbl_Fsu_List.Count entries</p>
+                    <button class="btn btn-sm btn-outline-primary" onclick="@(() => HandleFinalSubmisssion())" disabled="@((selected_guid.Count == 0 || temp_fsu_list.Count == 0))" hidden="@(SessionStorage.user_role != CommonConstants.USER_CODE_DS)">Final Submit<i class="bi bi-patch-check-fill ms-1"></i></button>
+                </div> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+<ConfirmDialog @ref="dialog" />
+
+@code {
+    List<Tbl_Fsu_List> tbl_Fsu_List = new();
+    List<Tbl_Fsu_List> temp_fsu_list = new();
+    CommonQueries commonQueries = new();
+    DBQueries dB = new();
+    CommonFunction funcs = new();
+    [Inject] ModalService ModalService { get; set; } = default;
+    private ConfirmDialog dialog = default;
+    bool canProceed = false;
+    List<int> selected_guid { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+            {
+                block_uri = "/dashboard/fsulist",
+                block_title = "FSU List",
+                block_code = CommonEnum.fsu_list_page.ToString(),
+            };
+        await commonQueries.InsertVisitedBlock(vb);
+        preloadService.Show(SpinnerColor.Light, "Checking for updates, Please hang on....");
+        var app_version = await commonService.GetAsync(CommonConfig.CommonAPIPostAddress,CommonConfig.CHECK_CAPI_VERSION);
+        if (!string.IsNullOrEmpty(app_version))
+        {
+            try
+            {
+                apk_version_model version_Model = JsonConvert.DeserializeObject<apk_version_model>(app_version);
+                #if !DEBUG
+                if (version_Model != null)
+                {
+                    var update = funcs.IsUpdateAvailable(version_Model);
+                    if (update == true)
+                    {
+                        preloadService.Hide();
+                        var modalOption = new ModalOption
+                            {
+                                Title = "Update Available!",
+                                Message = $"In order to use this app you must download the latest {version_Model.apk_major_version}.{version_Model.apk_minor_version} version.",
+                                Type = ModalType.Info,
+                                IsVerticallyCentered = true
+                            };
+                        await ModalService.ShowAsync(modalOption, Quit);
+                        return;
+                    }
+                }
+                #endif
+            }
+            catch(Exception ex)
+            {
+                toastService.ShowError($"{app_version}. {ex}");
+            }
+        }
+        Fsu_Load();
+        return;
+    }
+
+    void _handleCheckbox(ChangeEventArgs args, Tbl_Fsu_List? fsu_obj)
+    {
+        var action = args.Value.ToString() == "True" ? true : false;
+        if (fsu_obj == null)
+        {
+            selected_guid = [];
+            if (action == true)
+            {
+                foreach(var item in temp_fsu_list)
+                {
+                    selected_guid.Add(item.fsu_id);
+                }
+            }
+        }
+        else
+        {
+            if (action == true)
+            {
+                var is_exist = selected_guid.Contains(fsu_obj.fsu_id);
+                if (!is_exist)
+                {
+                    selected_guid.Add(fsu_obj.fsu_id);
+                }
+            }
+            else
+            {
+                selected_guid.Remove(fsu_obj.fsu_id);
+            }
+        }
+        StateHasChanged();
+        return;
+    }
+
+    void Quit()
+    {
+        funcs.CloseApp();
+        return;
+    }
+
+    // async Task HandleRefresh(Tbl_Fsu_List fsu)
+    // {
+    //     try
+    //     {
+    //         if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+    //         {
+    //             bool confirmation = await dialog.ShowAsync(
+    //                                 title: "Confirmation Required",
+    //                                 message1: "Downloading Fsu data may overwrite existing records and impact Local information.",
+    //                                 message2: "Are you sure you want to continue with the download?"
+    //                                 );
+
+    //             if (confirmation)
+    //             {
+    //                 canProceed = true;
+    //             }
+    //             else
+    //             {
+    //                 return;
+    //             }
+    //         }
+    //         else if (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+    //         {
+    //             canProceed = true;
+    //         }
+    //         if (!canProceed)
+    //         {
+    //             toastService.ShowWarning("You are not authorized to download this data.");
+    //             return;
+    //         }
+    //         if (!funcs.checkHasInternet())
+    //         {
+    //             toastService.ShowWarning("No Internet Connection. Please try again when you're back online!");
+    //             return;
+    //         }
+
+    //         preloadService.Show(SpinnerColor.Light, "Fetching data from central database for offline access. Please wait...");
+
+    //         var saved_response = await commonService.GetAsync($"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{fsu.fsu_id}/{fsu.lookupFsuSubmitStatus}");
+
+    //         if (string.IsNullOrEmpty(saved_response))
+    //         {
+    //             toastService.ShowError($"No data found on server for  this FSU. Synchronization failed.");
+    //             return;
+    //         }
+
+    //         try
+    //         {
+    //             var decoded = JsonConvert.DeserializeObject<saved_response_top_layer>(saved_response);
+    //             if (decoded == null || decoded.result == null || string.IsNullOrEmpty(decoded?.result?.submitted_json_data))
+    //             {
+    //                 toastService.ShowError($"No submission data found in server response for FSU: {fsu.fsu}.");
+    //                 return;
+    //             }
+
+    //             var savedData = JsonConvert.DeserializeObject<bind_layer>(decoded.result.submitted_json_data);
+    //             if (savedData == null)
+    //             {
+    //                 toastService.ShowError($"Failed to parse server data for FSU: {fsu.fsu}.");
+    //                 return;
+    //             }
+
+    //             // SCH00 blocks
+    //             await dB.SaveBlock1(savedData.TravelSch00block0);
+    //             await dB.SaveFileData(savedData.TravelSch00block3List);
+    //             await dB.SaveSCH0Block4_1(savedData.TravelSch00Block4aList);
+    //             await dB.SaveSCH0Block4_2(savedData.TravelSch00Block4bList);
+    //             await dB.SaveSCH0Block4_3(savedData.TravelSch00Block4cList);
+    //             await dB.SaveSCH0Block5(savedData.TravelSch00Block5aList);
+    //             await commonQueries.UpdateFsuDownloadStatus(fsu.fsu_id);
+    //             // SCH25 blocks
+    //             if (savedData.TravelSch25datumDto?.Count > 0)
+    //             {
+    //                 // foreach (var sch25 in savedData.TravelSch25datumDto)
+    //                 // {
+    //                 //     await sCH_25_Quaries.SaveHhdStatus(sch25.hhd_id ?? 0, sch25.hhd_status ?? 0, decoded.result.fsu_id);
+    //                 //     await dB.Update_SCH0_0_Block_5AHHD_Status(sch25.hhd_status ?? 0, sch25.hhd_id ?? 0, decoded.result.fsu_id);
+    //                 //     await sCH_25_Quaries.SaveBlock2(sch25.block_2);
+    //                 //     await sCH_25_Quaries.SaveBlock1(sch25.block_1);
+    //                 //     await sCH_25_Quaries.SaveBlock3(sch25.block_3);
+    //                 //     await sCH_25_Quaries.SaveBlock4(sch25.block_4);
+    //                 //     await sCH_25_Quaries.SaveBlock4_1(sch25.block_4_1);
+    //                 //     await sCH_25_Quaries.SaveBlock4_1_item(sch25.block_4_1_Item_3);
+    //                 //     await sCH_25_Quaries.saving_5_1_data(sch25.block_5_1);
+    //                 //     await sCH_25_Quaries.saving_5_2_data(sch25.block_5_2);
+    //                 //     await sCH_25_Quaries.SaveBlock6_1(sch25.block_6_1);
+    //                 //     await sCH_25_Quaries.SaveBlock6_2(sch25.block_6_2);
+    //                 //     await sCH_25_Quaries.SaveBlock7(sch25.block_7);
+    //                 //     await sCH_25_Quaries.SaveBlock8(sch25.block_8);
+    //                 //     await sCH_25_Quaries.SaveBlock8_1(sch25.block_8_1);
+    //                 //     await sCH_25_Quaries.SaveBlock9_1(sch25.block_9_1);
+    //                 //     await sCH_25_Quaries.UpsertWarningAsync(sch25.warning);
+    //                 //     await sCH_25_Quaries.UpsertComments(sch25.comments);
+
+    //                 //     if (sch25.block_9?.Count > 0)
+    //                 //     {
+    //                 //         foreach (var block9 in sch25.block_9)
+    //                 //         {
+    //                 //             await sCH_25_Quaries.SaveBlock9(block9);
+    //                 //         }
+    //                 //     }
+    //                 // }
+    //             }
+
+    //             toastService.ShowSuccess($"FSU data synchronization completed successfully");
+    //         }
+    //         catch (Exception ex)
+    //         {
+    //             Console.WriteLine($"Error processing response for the FSU : {ex}");
+    //             toastService.ShowError($"Error syncing FSU . Please check logs.");
+    //         }
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         toastService.ShowError($"Unexpected error: {ex.Message}");
+    //     }
+    //     finally
+    //     {
+    //         preloadService.Hide();
+    //         StateHasChanged();
+    //     }
+    // }
+
+
+
+    async Task HandleSelection(string block_name, int fsu_id)
+    {
+        SessionStorage.SelectedFSUId = fsu_id;
+        if (block_name == "sch0.0")
+        {
+            var data = await dB.FetchBlock1();
+            if (data == null || data.Block_1_18 == 0)
+            { 
+                toastService.ShowError("Please download the required data before proceeding.");
+                return;
+
+            }
+        }
+        else if (block_name == "sch25.0")
+        {
+            var data = await dB.GetSelectedBlock5List(fsu_id);
+            var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
+            if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
+            {
+                toastService.ShowError("Please ensure the Selection Done and the data is downloaded Sucessfully.");
+                return;
+            }
+
+        }
+        SessionStorage.selected_hhd_seq = 0;
+        SessionStorage.selected_hhd_id = 0;
+        string page_name = block_name == "sch0.0" ? "block0_1" : "su_list_page";
+        NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
+        return;
+    }
+
+    // async Task HandleFinalSubmisssion()
+    // {
+    //     try
+    //     {
+    //         if (!funcs.checkHasInternet())
+    //         {
+    //             toastService.ShowWarning("No Internet Connection, Please try again once when you came back online!");
+    //             return;
+    //         }
+    //         foreach (var fsu_id in selected_guid)
+    //         {
+    //             SessionStorage.SelectedFSUId = fsu_id;
+
+    //             var data = await dB.GetSelectedBlock5List(fsu_id);
+    //             var FsuData = await commonQuaries.FetchFsuListByFsuId(fsu_id);
+    //             if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
+    //             {
+    //                 toastService.ShowError($"Please ensure the Selection Done and the data is downloaded Sucessfully for fsu id {fsu_id}");
+    //                 continue;
+    //             }
+
+    //             var pending_comment_respone = await commonQueries.IsDSHasPendingCommentWarning(fsu_id);
+    //             if (pending_comment_respone == true)
+    //             {
+    //                 toastService.ShowError($"Warining Or Comment Validation pending for fsu id {fsu_id}");
+    //                 continue;
+    //             }
+
+    //             var Block5List = await dB.GetSelectedBlock5List(fsu_id);
+    //             if (Block5List == null || Block5List.Count == 0)
+    //             {
+    //                 toastService.ShowError($"FSU ID: {fsu_id} has no Selected household, Please complete survey before Final submit");
+    //                 continue;
+    //             }
+
+    //             bool isValid = true;
+    //             foreach (var item in Block5List.Where(x => x.status_travel != "SUBSTITUTED"))
+    //             {
+    //                 var status = await sCH_25_Quaries.FetchStatusManager(item.Block_5A_3);
+    //                 if (status?.hhd_status != 31)
+    //                 {
+    //                     toastService.ShowError($"FSU ID: {fsu_id} has not completed all the households. Please complete all households before Final submit ");
+    //                     isValid = false;
+    //                     break; // stop checking households
+    //                 }
+    //             }
+
+    //             if (!isValid)
+    //                 continue; // skip this FSU, go to next one
+
+    //             var submission_data = await commonQuaries.Fetch_SubmissionDataFinalSubmit(Block5List, 32);
+    //             if (submission_data == null)
+    //             {
+    //                 toastService.ShowError("We had faced some error while collecting data from local database. Please try again!");
+    //                 continue;
+    //             }
+
+    //             preloadService.Show(SpinnerColor.Light, "We are saving your responses! Please hang on.");
+    //             toastService.ShowSuccess("Data retrieved successfully from local database!");
+
+    //             var response = await travelService.PostAsync(CommonConfig.SAVE_SUBMITTED_RESPONSE, submission_data);
+    //             if (response != null)
+    //             {
+    //                 toastService.ShowSuccess("Final submitted successfully!");
+    //                 preloadService.Show(SpinnerColor.Light, "DB Cleaning in-progress! Please hang on.");
+    //                 var stat = await commonQuaries.ClearUnusedData();
+    //                 if (stat != CommonConstants.SUCCESS_TEXT)
+    //                 {
+    //                     toastService.ShowError(stat);
+    //                 }
+    //             }
+    //             else
+    //             {
+    //                 toastService.ShowError("Error while submitting data to server, Please connect with administrator!");
+    //             }
+    //         }
+    //         preloadService.Hide();
+
+    //         return;
+    //     }
+    //     catch(Exception)
+    //     {
+    //         toastService.ShowError($"Facing Error while running final submission process. Please Connect with adminstartor!");
+    //         preloadService.Hide();
+    //         return;
+    //     }    
+    // }
+
+
+    async Task Fsu_Load()
+    {
+        try
+        {
+            if (funcs.checkHasInternet())
+            {
+                List<string> saved_fsu_responses = new List<string>();
+                preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
+                
+                List<Tbl_Sch_0_0_Block_5> OldFsuWiseBlockData = new List<Tbl_Sch_0_0_Block_5>();
+                var response = await commonService.GetAsync(CommonConfig.APITOURISMURL,$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
+                if (response != null)
+                {
+                    var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(response);
+                    //CheckFSUSubstitution(fsu_list);
+                    preloadService.Hide();
+                    CheckFSUUpdateListingDone(fsu_list);
+                    preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
+
+                    if (fsu_list != null && fsu_list.Count > 0)
+                    {
+                        tbl_Fsu_List = new();
+                        temp_fsu_list = new();
+                        foreach (var item in fsu_list)
+                        { 
+                            var OldFsuData = await dB.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(item.fsu_id);
+                            CheckDownloadNeed(item,OldFsuData,item.fsuHouses);
+
+                            await UpdateFsu(item.fsuHouses);
+                            var houses = item.fsuHouses != null && item.fsuHouses.Count > 0 ? item.fsuHouses.Count : 0;
+                            var saved_response = await commonService.GetAsync(CommonConfig.APITOURISMURL,$"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{item.fsu_id}/{item.lookupFsuSubmitStatus}");
+                            if (!string.IsNullOrEmpty(saved_response))
+                            {
+                                // saved_fsu_responses.Add(saved_response);
+                                // var deserializedHouses = JsonConvert.DeserializeObject<saved_response_top_layer>(saved_response);
+                                // if (deserializedHouses?.result?.submitted_json_data != null)
+                                // {
+                                //     var bindLayer = JsonConvert.DeserializeObject<bind_layer>(deserializedHouses.result.submitted_json_data);
+                                //     List<Tbl_Sch_0_0_Block_5> dataList = bindLayer?.TravelSch00Block5aList?.ToList() ?? new List<Tbl_Sch_0_0_Block_5>();
+                                //     int count = 0;
+                                //     foreach (var Item in dataList)
+                                //     {
+                                //         if (Item.is_selected_travel == true && Item.status_travel != "SUBSTITUTED")
+                                //         {
+                                //             count++;
+                                //         }
+                                //     }
+                                //     item.total_hhd = count;
+                                // }
+                                // else
+                                // {
+                                //     item.total_hhd = 0;
+                                // }
+                            }
+                            else
+                            {
+                                item.total_hhd = 0;
+                            }
+                            if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2))
+                            {
+                                item.completed_hhd = (item.total_hhd.GetValueOrDefault(0) - (item.submittedbyEnumaretorToSuperviosr.GetValueOrDefault(0) + item.submiitedbySuperviosrToDs.GetValueOrDefault(0) + item.returntoSuperviosrbyDS.GetValueOrDefault(0)));
+                            }
+                            else if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO))
+                            {
+                                item.completed_hhd = (item.submittedbyEnumaretorToSuperviosr.GetValueOrDefault(0) + item.returntoSuperviosrbyDS.GetValueOrDefault(0));
+                            }
+                            else if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                            {
+                                item.completed_hhd = (item.submiitedbySuperviosrToDs.GetValueOrDefault(0));
+                            }
+                            else
+                            {
+                                item.completed_hhd = item.total_hhd.GetValueOrDefault(0);
+                            }
+                           // item.completed_hhd = int.TryParse(item.completed_hhd?.ToString(), out int result) ? result : 0;
+                            item.fsu_houses = item.fsuHouses != null ? JsonConvert.SerializeObject(item.fsuHouses) : "";
+                            tbl_Fsu_List.Add(item);
+                            temp_fsu_list.Add(item);
+                        }
+                        // preloadService.Show(SpinnerColor.Light, "We are preparing your local database, Please hang on....");
+                        await commonQueries.SaveFsuList(fsu_list);
+
+                    }
+                    else
+                    {
+                        tbl_Fsu_List = new List<Tbl_Fsu_List>();
+                        temp_fsu_list = new List<Tbl_Fsu_List>();
+                        toastService.ShowError($"FSU not found! Please connect with administrator.");
+                    }
+                    StateHasChanged();
+                    preloadService.Hide();
+                    return;
+                }
+                else
+                {
+                    preloadService.Hide();
+                    return;
+                }
+            }
+            else
+            {
+                tbl_Fsu_List = new List<Tbl_Fsu_List>();
+                temp_fsu_list = new List<Tbl_Fsu_List>();
+                toastService.ShowWarning("No Internet Connection, Please try again once when you came back online!");
+                var fsus = await commonQueries.FetchFsuList();
+                if (fsus != null && fsus.Count > 0)
+                {
+                    foreach (var item in fsus)
+                    {
+
+                        List<Tbl_Sch_0_0_Block_5> dataList = await  dB.FetchSCH0Block5Data() ?? new List<Tbl_Sch_0_0_Block_5>();
+                        int count = 0;
+                        foreach (var Item in dataList)
+                        {
+                            if (Item.is_selected_travel == true && Item.status_travel != "SUBSTITUTED")
+                            {
+                                count++;
+                            }
+                        }
+                        item.total_hhd = count;
+                        var houses = item.fsu_houses != null ? JsonConvert.DeserializeObject<List<fsu_houses>>(item.fsu_houses) : new();
+                        if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2))
+                        {
+                            item.completed_hhd = (item.total_hhd - (item.submittedbyEnumaretorToSuperviosr + item.submiitedbySuperviosrToDs + item.returntoSuperviosrbyDS));
+                        }
+                        else if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO))
+                        {
+                            item.completed_hhd = (item.submittedbyEnumaretorToSuperviosr + item.returntoSuperviosrbyDS);
+                        }
+                        else if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                        {
+                            item.completed_hhd = (item.submiitedbySuperviosrToDs);
+                        }
+                        else
+                        {
+                            item.completed_hhd = 0;
+                        }
+                        item.completed_hhd = int.TryParse(item.completed_hhd?.ToString(), out int result) ? result : item.total_hhd;
+                        tbl_Fsu_List.Add(item);
+                        temp_fsu_list.Add(item);
+                    }
+                }
+                StateHasChanged();
+                preloadService.Hide();
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError(ex.Message);
+            preloadService.Hide();
+            tbl_Fsu_List = new List<Tbl_Fsu_List>();
+            temp_fsu_list = new List<Tbl_Fsu_List>();
+            StateHasChanged();
+            return;
+        }
+    }
+
+    void HandleSearch(ChangeEventArgs e)
+    {
+        try
+        {
+            temp_fsu_list = new();
+            string text = e.Value.ToString();
+
+            if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
+            {
+                foreach (var item in tbl_Fsu_List)
+                {
+                    temp_fsu_list.Add(item);
+                }
+                StateHasChanged();
+                return;
+            }
+            else
+            {
+                foreach (var item in tbl_Fsu_List)
+                {
+                    if (
+                        item.subrnd.ToString().Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                        item.fsu_id.ToString().Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                        (item.fsuname?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                        (item.iv_unit?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                        (item.block?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                        (item.framepop?.ToString().Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                        item.completed_hhd.ToString().Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                        item.total_hhd.ToString().Contains(text, StringComparison.OrdinalIgnoreCase)
+                    )
+                    {
+                        temp_fsu_list.Add(item);
+                    }
+                }
+                StateHasChanged();
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Error while searching: {ex.Message}");
+            temp_fsu_list = new List<Tbl_Fsu_List>(tbl_Fsu_List);
+            StateHasChanged();
+            return;
+        }
+    }
+    // private async void CheckFSUSubstitution(List<Tbl_Fsu_List>? result)
+    // {
+    //     try
+    //     {
+    //         List<string> substitutedFSUList = [];
+    //         List<string> fsuWithSCH0Block1Data = [];
+    //         var localFSUList = await commonQueries.FetchFsuList();
+    //         if (result != null && result.Count > 0)
+    //         {
+    //             foreach (var fsu in result)
+    //             {
+    //                 var localFSUData = localFSUList.FirstOrDefault(x => x.fsu_id == fsu.fsu_id);
+    //                 //If FSU substitution count from API > local count, then show message
+    //                 if (localFSUData?.isSubstituteDone.GetValueOrDefault() < fsu.isSubstituteDone)
+    //                 {
+    //                     localFSUData.isSubstituteDone = fsu.isSubstituteDone;
+    //                     await commonQueries.SaveFsuList(new List<Tbl_Fsu_List> { localFSUData });
+    //                     substitutedFSUList.Add(fsu.fsu_id.ToString());
+    //                     var sch0bl1Data = await dB.Get_Block_0_1_By_hhd_id(fsu.fsu_id);
+    //                     if (sch0bl1Data != null)
+    //                     {
+    //                         fsuWithSCH0Block1Data.Add(fsu.fsu_id.ToString());
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         if (substitutedFSUList.Count > 0)
+    //         {
+    //             string fsuSubstitutionMessage = $"FSU substitution done for {string.Join(",", substitutedFSUList)}.";
+    //             string downloadSCH0Message = fsuWithSCH0Block1Data.Count > 0 ? $"Download SCH0.0 again for {string.Join(",", fsuWithSCH0Block1Data)}." : string.Empty;
+    //             if (!string.IsNullOrEmpty(downloadSCH0Message))
+    //             {
+    //                 fsuSubstitutionMessage += "\n" + downloadSCH0Message;
+    //             }
+    //             toastService.ShowInfo($"{fsuSubstitutionMessage}");
+    //         }
+    //         //Show message for update listing for FSUs where listing is already done
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //     }
+    // }
+
+    private async void CheckFSUUpdateListingDone(List<Tbl_Fsu_List>? result)
+    {
+        if (result == null || result.Count == 0)
+            return;
+
+        try
+        {
+            var substitutedFSUList = new List<string>();
+            var fsuWithSCH0Block1Data = new List<string>();
+
+            var localFSUList = await commonQueries.FetchFsuList();
+            var localFsuLookup = localFSUList.ToDictionary(x => x.fsu_id); // Fast lookup
+
+            var fsusToUpdate = new List<Tbl_Fsu_List>();
+
+            foreach (var fsu in result)
+            {
+                if (localFsuLookup.TryGetValue(fsu.fsu_id, out var localFSUData) &&
+                    localFSUData.updatelistingcount.GetValueOrDefault(0) < fsu.updatelistingcount)
+                {
+                    localFSUData.updatelistingcount = fsu.updatelistingcount;
+                    fsusToUpdate.Add(localFSUData);
+                    substitutedFSUList.Add(fsu.fsu_id.ToString());
+
+                    // Optionally check and track SCH0 block1 data here
+                    // if (await HasBlock1Data(fsu.fsu_id))
+                    //     fsuWithSCH0Block1Data.Add(fsu.fsu_id.ToString());
+                }
+            }
+
+            if (fsusToUpdate.Count > 0)
+            {
+                await commonQueries.SaveFsuList(fsusToUpdate);
+
+                string message = $"Update Listing done for FSU: {string.Join(",", substitutedFSUList)}.";
+
+                if (substitutedFSUList.Count > 0)
+                {
+                    message += $"\nDownload Again for: {string.Join(",", substitutedFSUList)}.";
+                }
+
+                var confirmation = await dialog.ShowAsync(
+                    title: "FSU Update Listing Found!",
+                    message1: message,
+                    message2: "Do you want to proceed?"
+                );
+
+                if (confirmation)
+                {  
+                    foreach (var fsu in fsusToUpdate)
+                    {
+                        //await HandleRefresh(fsu);
+                    }
+                    return;
+                }
+                else
+                {
+                    #if WINDOWS
+                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+                    #elif ANDROID
+                    var activity = Platform.CurrentActivity;
+                    activity?.FinishAffinity();
+                    #else
+                    #endif
+                    return;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            //.ShowError($"Something went wrong: {ex.Message}");
+            return;
+        }
+    }
+
+    private async Task UpdateFsu(List<fsu_houses>? FsuHouseList = null)
+        {
+            try
+            {
+                if (FsuHouseList != null && FsuHouseList.Count>0)
+                {
+                    foreach (var item in FsuHouseList)
+                    {
+                       await dB.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
+                        //await dB.SaveHhdStatus(item.hhd_id , item.lookup_submit_status,item.fsu_id);
+                    }
+                }
+                return;
+            }
+            catch (Exception ex)
+            {
+                // await AppShell.Current.DisplayAlert("Error", ex.Message, "ok");
+                return;
+            }
+        }
+
+
+   private void CheckDownloadNeed( Tbl_Fsu_List FsuData , List<Tbl_Sch_0_0_Block_5>? oldData , List<fsu_houses>? FsuHouseData )
+   {
+     try
+     {   if(FsuHouseData == null || FsuHouseData.Count == 0 || oldData == null || oldData.Count == 0)
+         {
+             return;
+         }
+         foreach(var Item in FsuHouseData)
+         {
+           var  RefinedData = oldData.FirstOrDefault(x=> x.fsu_id == Item.fsu_id && x.Block_5A_3 == Item.hhd_id);
+            if(RefinedData != null)
+            {
+                if(RefinedData.hhdStatus != Item.lookup_submit_status)
+                {
+                  FsuData.NeedDownload = true;
+                  return;
+                }
+            }
+          }
+          
+     }
+     catch(Exception )
+     {
+     }
+   }
+}

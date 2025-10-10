@@ -19,7 +19,7 @@ namespace Income
             builder.Services.AddBlazoredToast();
             builder.Services.AddBlazorBootstrap();
             builder.Services.AddSingleton(new HttpClient());
-            builder.Services.AddSingleton<Income.Services.CommonService>();
+            builder.Services.AddSingleton<Income.Services.NetworkService>();
             //builder.Services.AddSingleton<Income.Services.IncomeService>();
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

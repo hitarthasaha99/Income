@@ -1,4 +1,6 @@
 ﻿@page "/login"
+@using Income.Components.Common
+@using Income.Database.Models.Common
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject IJSRuntime jsRuntime
@@ -10,7 +12,7 @@
             <span class="badge text-bg-light-primary rounded-pill mb-2 h-25">@version_code</span>
        </div>
         <div class="mb-3">
-            <span class="badge text-bg-light-primary rounded-pill">National Household Travel Survey</span>
+            <span class="badge text-bg-light-primary rounded-pill">National Household Income Survey</span>
         </div>
         <h2>Welcome</h2>
         <h5>Login</h5>
@@ -36,8 +38,8 @@
     public Tbl_User_Details UserDetails { get; set; } = new Tbl_User_Details();
     public CommonConfig commonConfig { get; private set; } = new CommonConfig();
     private Network_Service_Model network_Service_Model = new();
-    private CommonQuaries CommonQuaries = new CommonQuaries();
-    private CommonService commonService = new();
+    private CommonQueries CommonQueries = new CommonQueries();
+    private NetworkService commonService = new();
     private CommonFunction commonFunction = new();
     private CommonFunction funcs = new();
     private bool is_busy = false;
@@ -66,7 +68,7 @@
             }
             is_error = false;
             StateHasChanged();
-            var deleteduserinfo = await CommonQuaries.GetDeletedUserDetailsAsync();
+            var deleteduserinfo = await CommonQueries.GetDeletedUserDetailsAsync();
             if (UserDetails.username.ToUpper() != deleteduserinfo?.username?.ToUpper())
             {  // delete old user data if user is not same as deleted user
                 // Delete all block data for the user
@@ -88,7 +90,7 @@
 
                 if (confirmation)
                 {
-                    await CommonQuaries.DeleteAllBlockData();
+                    await CommonQueries.DeleteAllBlockData();
                 }
                 else
                 {
@@ -132,7 +134,7 @@
             tbl_User_Details.tenant_id = SessionStorage.tenant_id;
             tbl_User_Details.user_id = SessionStorage.__user_id;
             tbl_User_Details.is_Deleted = false;
-            var user_response = await CommonQuaries.InsertUser(tbl_User_Details);
+            var user_response = await CommonQueries.InsertUser(tbl_User_Details);
             if (user_response == null)
             {
                 // Show error message

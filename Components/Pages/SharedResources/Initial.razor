@@ -1,19 +1,19 @@
 ﻿@page "/"
-@using Income.Common
+@using Income.Database.Queries
 @inject NavigationManager NavigationManager
 @inject PreloadService preloadService
 
 <div class="login-bg"></div>
 
 @code {
-    private CommonQuaries CommonQuaries = new CommonQuaries();
+    private CommonQueries CommonQueries = new CommonQueries();
     private CommonFunction function = new();
-    private CommonService commonService = new();
+    private NetworkService commonService = new();
 
     protected override async Task OnInitializedAsync()
     {
         preloadService.Show(SpinnerColor.Light, "We are setting up things ready for you.... Please Wait .........");
-        var user_details = await CommonQuaries.GetUserDetailsAsync();
+        var user_details = await CommonQueries.GetUserDetailsAsync()!;
         if (user_details == null)
         {
             NavigationManager.NavigateTo("/login");
