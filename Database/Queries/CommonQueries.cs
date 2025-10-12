@@ -164,6 +164,25 @@ namespace Income.Database.Queries
                 return null;
             }
         }
+        public async Task<Tbl_Fsu_List?> FetchFsuByFsuId(int fsu_id)
+        {
+            try
+            {
+                var items = await _database.QueryAsync<Tbl_Fsu_List>("SELECT * FROM Tbl_Fsu_List WHERE fsu_id=?", fsu_id);
+                if (items != null && items.Count > 0)
+                {
+                    return items.First();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         public async Task<List<Tbl_Fsu_List>>? FetchFsuListByFsuId(int fsu_id)
         {
             try
@@ -475,12 +494,12 @@ namespace Income.Database.Queries
             {
                 await _database.DeleteAllAsync<Tbl_User_Details>();
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_0_1>();
-                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_2>();
+                await _database.DeleteAllAsync<Tbl_Sch_0_0_FieldOperation>();
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_3>();
-                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_4_1>();
-                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_4_2>();
-                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_4_3>();
-                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_5>();               
+                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_2_1>();
+                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_2_2>();
+                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_5>();
+                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_7>();               
                 await _database.DeleteAllAsync<Tbl_Fsu_List>();
                 await _database.DeleteAllAsync<Tbl_Visited_Blocks>();
                 await _database.ExecuteAsync("COMMIT");

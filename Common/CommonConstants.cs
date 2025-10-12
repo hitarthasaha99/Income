@@ -13,6 +13,9 @@ namespace Income.Common
         public const string DatabaseFilename = "Income.db3";
         public const string LocalDirname = "Income";
 
+        public const string DateTimeFormat = "dd MMM, yyyy HH:mm:ss";
+        public const string DateTimeFormat2 = "dd_MMM_yyyy";
+        public const string DateFormat = "dd/MM/yyyy";
 
         public const string VALIDATION_TYPE_DEFAULT = "DEFAULT";
         public const string VALIDATION_TYPE_SELECT = "SELECT";
@@ -136,13 +139,6 @@ namespace Income.Common
             new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_GENDER, title = "Male"},
             new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_GENDER, title = "Female"},
             new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_GENDER, title = "Transgender"},
-        };
-
-        public List<Tbl_Lookup> LOOKUP_CONST_TRANSPORT_PASS = new List<Tbl_Lookup>
-        {
-            new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_TRANSPORT_PASS, title = "Rail Pass"},
-            new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_TRANSPORT_PASS, title = "Bus Pass"},
-            new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_TRANSPORT_PASS, title = "Both"},
         };
 
         public List<Tbl_Lookup> LOOKUP_CONST_MARITAL_STATUS = new List<Tbl_Lookup>
@@ -327,21 +323,21 @@ namespace Income.Common
             return "Unknown Role";
         }
 
-        public static int GetFilteredCount(List<Tbl_Sch_0_0_Block_5> list, int sss)
+        public static int GetFilteredCount(List<Tbl_Sch_0_0_Block_7> list, int sss)
         {
             return list.Count(entry => entry.SSS == sss);
         }
 
-        public static int GetFilteredCountOnInitialySelected(List<Tbl_Sch_0_0_Block_5> list, int sss, bool isInitialySelected = true)
+        public static int GetFilteredCountOnInitialySelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)
         {
             return list.Count(entry => entry.SSS == sss && entry.isInitialySelected == isInitialySelected && entry.SubstitutionCount == 0 && entry.status != "CASUALTY");
         }
-        public static int GetFilteredCountOnSelected(List<Tbl_Sch_0_0_Block_5> list, int sss, bool isInitialySelected = true)
+        public static int GetFilteredCountOnSelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)
         {
             return list.Count(entry => entry.SSS == sss && entry.isInitialySelected == isInitialySelected);
         }
 
-        public static int GetFilteredSubstitution(List<Tbl_Sch_0_0_Block_5> list, int sss)
+        public static int GetFilteredSubstitution(List<Tbl_Sch_0_0_Block_7> list, int sss)
         {
             var counter = 0;
             var initialSelectedList = list.Where(entry => entry.SSS == sss && entry.isInitialySelected == true && entry.SubstitutionCount != 0).ToList();
@@ -368,7 +364,7 @@ namespace Income.Common
             return counter;
         }
 
-        public static int GetFilteredSubstitutionTravel(List<Tbl_Sch_0_0_Block_5> list)
+        public static int GetFilteredSubstitutionTravel(List<Tbl_Sch_0_0_Block_7> list)
         {
             var counter = 0;
             var initialSelectedList = list.Where(entry => entry.is_initially_selected_travel == true && entry.SubstitutionCount != 0).ToList();
@@ -394,9 +390,5 @@ namespace Income.Common
             }
             return counter;
         }
-
-        public const string DateTimeFormat = "dd MMM, yyyy HH:mm:ss";
-        public const string DateTimeFormat2 = "dd_MMM_yyyy";
-        public const string DateFormat = "dd/MM/yyyy";
     }
 }

@@ -50,6 +50,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="FluentValidation" Version="12.0.0" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
@@ -62,10 +64,6 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.11" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.9.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Components\Pages\SCH0_0\" />
     </ItemGroup>
 
 </Project>

@@ -48,14 +48,14 @@ namespace Income.Database
             await _database.CreateTableAsync<Tbl_User_Details>().ConfigureAwait(false);
             await _database.CreateTableAsync<Tbl_Fsu_List>().ConfigureAwait(false);
             await _database.CreateTableAsync<Tbl_Sch_0_0_Block_0_1>().ConfigureAwait(false);
-            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_2>().ConfigureAwait(false);
+            await _database.CreateTableAsync<Tbl_Sch_0_0_FieldOperation>().ConfigureAwait(false);
             await _database.CreateTableAsync<Tbl_Sch_0_0_Block_3>().ConfigureAwait(false);
-            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_4_1>().ConfigureAwait(false);
-            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_4_2A>().ConfigureAwait(false);
+            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_2_1>().ConfigureAwait(false);
+            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_4>().ConfigureAwait(false);
+            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_7>().ConfigureAwait(false);
+            await _database.CreateTableAsync<Tbl_Visited_Blocks>().ConfigureAwait(false);
+            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_2_2>().ConfigureAwait(false);
             await _database.CreateTableAsync<Tbl_Sch_0_0_Block_5>().ConfigureAwait(false);
-            //await _database.CreateTableAsync<Tbl_Visited_Blocks>().ConfigureAwait(false);
-            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_4_2>().ConfigureAwait(false);
-            await _database.CreateTableAsync<Tbl_Sch_0_0_Block_4_3>().ConfigureAwait(false);
 
             // Run indexes
             await CreateIndexesAsync();

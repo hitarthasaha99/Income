@@ -63,8 +63,8 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
-                                            <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">NHTS0.0</NavLink>
-                                            <NavLink @onclick="@(() => HandleSelection("sch25.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">NHTS25.0</NavLink>
+                                            <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
+                                            <NavLink @onclick="@(() => HandleSelection("sch25.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">HIS26</NavLink>
 @*                                             <NavLink @onclick="@(() => HandleRefresh(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
  *@                                        </div>
                                     </td>
@@ -111,37 +111,37 @@
             };
         await commonQueries.InsertVisitedBlock(vb);
         preloadService.Show(SpinnerColor.Light, "Checking for updates, Please hang on....");
-        var app_version = await commonService.GetAsync(CommonConfig.CommonAPIPostAddress,CommonConfig.CHECK_CAPI_VERSION);
-        if (!string.IsNullOrEmpty(app_version))
-        {
-            try
-            {
-                apk_version_model version_Model = JsonConvert.DeserializeObject<apk_version_model>(app_version);
-                #if !DEBUG
-                if (version_Model != null)
-                {
-                    var update = funcs.IsUpdateAvailable(version_Model);
-                    if (update == true)
-                    {
-                        preloadService.Hide();
-                        var modalOption = new ModalOption
-                            {
-                                Title = "Update Available!",
-                                Message = $"In order to use this app you must download the latest {version_Model.apk_major_version}.{version_Model.apk_minor_version} version.",
-                                Type = ModalType.Info,
-                                IsVerticallyCentered = true
-                            };
-                        await ModalService.ShowAsync(modalOption, Quit);
-                        return;
-                    }
-                }
-                #endif
-            }
-            catch(Exception ex)
-            {
-                toastService.ShowError($"{app_version}. {ex}");
-            }
-        }
+        // var app_version = await commonService.GetAsync(CommonConfig.CHECK_CAPI_VERSION);
+        // if (!string.IsNullOrEmpty(app_version))
+        // {
+        //     try
+        //     {
+        //         apk_version_model version_Model = JsonConvert.DeserializeObject<apk_version_model>(app_version);
+        //         #if !DEBUG
+        //         if (version_Model != null)
+        //         {
+        //             var update = funcs.IsUpdateAvailable(version_Model);
+        //             if (update == true)
+        //             {
+        //                 preloadService.Hide();
+        //                 var modalOption = new ModalOption
+        //                     {
+        //                         Title = "Update Available!",
+        //                         Message = $"In order to use this app you must download the latest {version_Model.apk_major_version}.{version_Model.apk_minor_version} version.",
+        //                         Type = ModalType.Info,
+        //                         IsVerticallyCentered = true
+        //                     };
+        //                 await ModalService.ShowAsync(modalOption, Quit);
+        //                 return;
+        //             }
+        //         }
+        //         #endif
+        //     }
+        //     catch(Exception ex)
+        //     {
+        //         toastService.ShowError($"{app_version}. {ex}");
+        //     }
+        // }
         Fsu_Load();
         return;
     }
@@ -312,33 +312,39 @@
 
     async Task HandleSelection(string block_name, int fsu_id)
     {
-        SessionStorage.SelectedFSUId = fsu_id;
-        if (block_name == "sch0.0")
+        try
         {
-            var data = await dB.FetchBlock1();
-            if (data == null || data.Block_1_18 == 0)
-            { 
-                toastService.ShowError("Please download the required data before proceeding.");
-                return;
-
-            }
-        }
-        else if (block_name == "sch25.0")
-        {
-            var data = await dB.GetSelectedBlock5List(fsu_id);
-            var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
-            if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
+            SessionStorage.SelectedFSUId = fsu_id;
+            if (block_name == "sch0.0")
             {
-                toastService.ShowError("Please ensure the Selection Done and the data is downloaded Sucessfully.");
-                return;
+                var data = await dB.FetchBlock1();
+                // if (data == null || data.Block_1_18 == 0)
+                // {
+                //     toastService.ShowError("Please download the required data before proceeding.");
+                //     return;
+                // }
             }
+            else if (block_name == "sch25.0")
+            {
+                var data = await dB.GetSelectedBlock5List(fsu_id);
+                var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
+                if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
+                {
+                    toastService.ShowError("Please ensure the Selection Done and the data is downloaded Sucessfully.");
+                    return;
+                }
 
+            }
+            SessionStorage.selected_hhd_seq = 0;
+            SessionStorage.selected_hhd_id = 0;
+            string page_name = block_name == "sch0.0" ? "block0_1" : "su_list_page";
+            NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
         }
-        SessionStorage.selected_hhd_seq = 0;
-        SessionStorage.selected_hhd_id = 0;
-        string page_name = block_name == "sch0.0" ? "block0_1" : "su_list_page";
-        NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
-        return;
+        catch(Exception ex)
+        {
+            toastService.ShowError($"Error while navigating to block: {ex.Message}");
+            return;
+        }    
     }
 
     // async Task HandleFinalSubmisssion()
@@ -439,7 +445,7 @@
                 List<string> saved_fsu_responses = new List<string>();
                 preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
                 
-                List<Tbl_Sch_0_0_Block_5> OldFsuWiseBlockData = new List<Tbl_Sch_0_0_Block_5>();
+                List<Tbl_Sch_0_0_Block_7> OldFsuWiseBlockData = new List<Tbl_Sch_0_0_Block_7>();
                 var response = await commonService.GetAsync(CommonConfig.APITOURISMURL,$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
                 if (response != null)
                 {
@@ -534,13 +540,13 @@
                 tbl_Fsu_List = new List<Tbl_Fsu_List>();
                 temp_fsu_list = new List<Tbl_Fsu_List>();
                 toastService.ShowWarning("No Internet Connection, Please try again once when you came back online!");
-                var fsus = await commonQueries.FetchFsuList();
+                var fsus = await commonQueries.FetchFsuList()!;
                 if (fsus != null && fsus.Count > 0)
                 {
                     foreach (var item in fsus)
                     {
 
-                        List<Tbl_Sch_0_0_Block_5> dataList = await  dB.FetchSCH0Block5Data() ?? new List<Tbl_Sch_0_0_Block_5>();
+                        List<Tbl_Sch_0_0_Block_7> dataList = await  dB.FetchSCH0Block5Data() ?? new List<Tbl_Sch_0_0_Block_7>();
                         int count = 0;
                         foreach (var Item in dataList)
                         {
@@ -774,7 +780,7 @@
         }
 
 
-   private void CheckDownloadNeed( Tbl_Fsu_List FsuData , List<Tbl_Sch_0_0_Block_5>? oldData , List<fsu_houses>? FsuHouseData )
+   private void CheckDownloadNeed( Tbl_Fsu_List FsuData , List<Tbl_Sch_0_0_Block_7>? oldData , List<fsu_houses>? FsuHouseData )
    {
      try
      {   if(FsuHouseData == null || FsuHouseData.Count == 0 || oldData == null || oldData.Count == 0)
@@ -795,7 +801,7 @@
           }
           
      }
-     catch(Exception )
+     catch(Exception ex)
      {
      }
    }

@@ -20,7 +20,7 @@ namespace Income.Database.Models.Common
         public string? block { get; set; }
         public int? total_hhd { get; set; }
         public int? completed_hhd { get; set; }
-        public double? framepop { get; set; }
+        public int? framepop { get; set; }
         public bool? is_selection_done { get; set; }
         public Guid? fsu_survey_id { get; set; }
         public int? lookup_fsu_submit_status { get; set; }

@@ -32,7 +32,7 @@ namespace Income.Common
             }
         }
 
-        public List<Tbl_Sch_0_0_Block_5> SSWOR(List<Tbl_Sch_0_0_Block_5> items, int numberOfSelections = 20)
+        public List<Tbl_Sch_0_0_Block_7> SSWOR(List<Tbl_Sch_0_0_Block_7> items, int numberOfSelections = 20)
         {
             // Check if the number of selections is valid
             if (numberOfSelections > items.Count)
@@ -45,7 +45,7 @@ namespace Income.Common
             return items.GetRange(0, numberOfSelections);
         }
 
-        static void Shuffle(List<Tbl_Sch_0_0_Block_5> list)
+        static void Shuffle(List<Tbl_Sch_0_0_Block_7> list)
         {
             Random random = new Random();
             int n = list.Count;
@@ -54,7 +54,7 @@ namespace Income.Common
                 // Pick a random index from 0 to i
                 int j = random.Next(0, i + 1);
                 // Swap list[i] with the element at random index
-                Tbl_Sch_0_0_Block_5 temp = list[i];
+                Tbl_Sch_0_0_Block_7 temp = list[i];
                 list[i] = list[j];
                 list[j] = temp;
             }

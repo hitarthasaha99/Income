@@ -1,5 +1,7 @@
 ﻿using Income.Database.Models.Common;
 using SQLite;
+using System.ComponentModel.DataAnnotations;
+using MaxLengthAttribute = System.ComponentModel.DataAnnotations.MaxLengthAttribute;
 
 namespace Income.Database.Models.SCH0_0
 {
@@ -68,18 +70,25 @@ namespace Income.Database.Models.SCH0_0
         //public int Block_1_13 { get; set; }
         //frame population / households
         //approx.present population
+        [Required(ErrorMessage = "Approx. present population is required")]
+        [Range(1, int.MaxValue, ErrorMessage = "Population must be greater than zero")]
         public int? Block_1_14 { get; set; }
 
         //total number of hgs/sbs formed (D)
         public int? Block_1_15 { get; set; }
 
-        //approx population of SU
-        public int? Block_1_16 { get; set; }
-        //No of sub division of SU to be formed D1
-        public int? Block_1_17 { get; set; }
+        ////approx population of SU
+        //public int? Block_1_16 { get; set; }
+        ////No of sub division of SU to be formed D1
+        //public int? Block_1_17 { get; set; }
         //survey code
-        public int? Block_1_18 { get; set; }
+        [Required(ErrorMessage = "Survey code is required")]
+        public int? Block_1_16 { get; set; }
         //reason for substitution of original sample (code) (for codes 4 – 7 in item 17)
-        public int? Block_1_19 { get; set; }
+        public int? Block_1_17 { get; set; }
+        //remarks
+        [MaxLength(2000)]
+        public string? remarks { get; set; } = null;
+
     }
 }

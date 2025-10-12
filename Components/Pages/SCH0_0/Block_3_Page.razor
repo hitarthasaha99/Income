@@ -1,0 +1,225 @@
+﻿@page "/dashboard/sch0.0/block_3"
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+
+<div class="my-2">
+    <CommonContentHeader 
+        SelectedFsuId="@SelectedFsuId"
+        survey_time="@survey_time" 
+    />
+    <div class="card card-style2">
+        <div class="card-header">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">[Block 3]</span>Sketch map of sub-units (SU) formation
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="card p-4 d-flex align-items-center">
+                @if(!string.IsNullOrEmpty(file.file_image_source))
+                {
+                    <img src="@file.file_image_source" alt="sketch map" title="Sketch Map" height="400" width="800" class="mb-2" />
+                }
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    <button class="btn btn-sm btn-outline-primary d-flex  align-items-center me-2" @onclick="@(() => FileHandler("CAMERA"))"><i class="bi bi-camera me-2"></i><span>Open Camera</span></button>
+                    <button class="btn btn-sm btn-primary d-flex align-items-center me-2" @onclick="@(() => FileHandler("GALLERY"))"><i class="bi bi-card-image me-2"></i><span>Choose from gallery</span></button>
+                    @if (!string.IsNullOrEmpty(file.file_image_source))
+                     {
+                        <button class="btn btn-sm btn-danger d-flex align-items-center" @onclick="DeleteFile"><i class="bi bi-trash me-2"></i><span>Delete</span></button>
+                     }
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-3">
+        <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1" ></i>Back</NavLink>
+        <div class="d-flex">
+            @* <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit("SAVE"))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink> *@
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit("NEXT"))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+        </div>
+    </div>
+
+    <div class="mt-1">
+        <p class="m-0" style="color: white;">Test</p>
+    </div>
+</div>
+
+@code {
+    Tbl_Sch_0_0_Block_3? file = new();
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    CommonQueries CommonQueries = new CommonQueries();
+    DBQueries SCH_0_0_Querie = new();
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/sch0.0/block_3",
+            block_title = "Sch 0.0 Block 3",
+            block_code = CommonEnum.sch_0_0_block_3.ToString(),
+        };
+        await CommonQueries.InsertVisitedBlock(vb);
+        Tbl_Sch_0_0_Block_3? response = await SCH_0_0_Querie.GetFileData(CommonEnum.sch_0_0_block_3.ToString());
+        if (response != null)
+        {
+            file = response;
+            var base64string = file.Image_File != null ? Convert.ToBase64String(file.Image_File): "";
+            //Now create ImageSource from the stream again
+            file.file_image_source = $"data:{file.file_type};base64,{base64string}"; //Provide a fresh MemoryStream each time
+            StateHasChanged();
+        }
+        return;
+    }
+    async Task FileHandler(string type)
+    {
+        try
+        {
+            if (type == "CAMERA")
+            {
+                var cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
+                if (cameraStatus != PermissionStatus.Granted)
+                {
+                    await Shell.Current.DisplayAlert("Permission Denied", "Camera permission is required", "OK");
+                    return;
+                }
+                var photo = await MediaPicker.CapturePhotoAsync();
+                if (photo != null)
+                {
+                    file = new();
+                    var stream = await photo.OpenReadAsync();
+                    long fileSize = stream.Length;
+                    if (fileSize > CommonConstants.MAX_FILE_SIZE)
+                    {
+                        toastService.ShowError("File Size exceeds allowed file size. (5MB)");
+                        return;
+                    }
+                    file.id = Guid.NewGuid();
+                    file.block_name = CommonEnum.sch_0_0_block_3.ToString();
+                    file.file_name = photo.FileName;
+                    file.file_type = photo.ContentType;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        await stream.CopyToAsync(ms);  //Copy the stream to the memory stream
+                        file.file_byte = ms.ToArray();     // Convert memory stream to byte array
+                        ms.Seek(0, SeekOrigin.Begin);
+                        var base64string = Convert.ToBase64String(file.file_byte);
+                        //Now create ImageSource from the stream again
+                        file.file_image_source = $"data:{file.file_type};base64,{base64string}"; //Provide a fresh MemoryStream each time
+                    }
+                }
+                StateHasChanged();
+                return;
+            }
+            else
+            {
+                var photo = await FilePicker.PickAsync(new PickOptions
+                {
+                    FileTypes = FilePickerFileType.Images // Filter for image files
+                });
+                if (photo != null)
+                {
+                    file = new();
+                    var stream = await photo.OpenReadAsync();
+                    long fileSize = stream.Length;
+                    if (fileSize > CommonConstants.MAX_FILE_SIZE)
+                    {
+                        toastService.ShowError("File Size exceeds allowed file size. (5MB)");
+                        return;
+                    }
+                    file.id = Guid.NewGuid();
+                    file.block_name = CommonEnum.sch_0_0_block_3.ToString();
+                    file.file_name = photo.FileName;
+                    file.file_type = photo.ContentType;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        await stream.CopyToAsync(ms);  //Copy the stream to the memory stream
+                        file.file_byte = ms.ToArray();     // Convert memory stream to byte array
+                        ms.Seek(0, SeekOrigin.Begin);
+                        var base64string = Convert.ToBase64String(file.file_byte);
+                        //Now create ImageSource from the stream again
+                        file.file_image_source = $"data:{file.file_type};base64,{base64string}"; //Provide a fresh MemoryStream each time
+                    }
+                }
+                StateHasChanged();
+                return;
+            }
+        }
+        catch(Exception ex)
+        {
+            toastService.ShowError(ex.ToString());
+            return;
+        }
+    }
+
+    async Task HandleSubmit(string type)
+    {
+
+        NavigationManager.NavigateTo("/dashboard/sch0.0/block_4_1");
+        // try
+        // {
+        //     if (string.IsNullOrEmpty(file.file_image_source))
+        //     {
+        //         toastService.ShowError("Please select a file");
+        //         return;
+        //     }
+        //     var status = await SCH_0_0_Quarie.SaveFileData(file);
+        //     if (status != 1)
+        //     {
+        //         toastService.ShowError("Getting Error while saving file, please try agian!");
+        //         return;
+        //     }
+        //     if (type == "NEXT")
+        //     {
+        //         NavigationManager.NavigateTo("/dashboard/sch0.0/block_4_2");
+        //     }
+        //     return;
+        // }
+        // catch (Exception ex)
+        // {
+        //     toastService.ShowError(ex.ToString());
+        //     return;
+        // }
+    }
+
+    async Task DeleteFile()
+    {
+        try
+        {
+            if (file != null)
+            {
+                // Clear all file properties
+                file.file_image_source = null;
+                file.file_byte = null;
+                file.file_name = null;
+                file.file_type = null;
+                file.id = Guid.Empty;
+
+                // Optionally, you can delete from DB if already saved
+                // await SCH_0_0_Querie.DeleteFileData(file.id);
+
+                toastService.ShowSuccess("File deleted successfully.");
+                StateHasChanged();
+            }
+            else
+            {
+                toastService.ShowWarning("No file to delete.");
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Error deleting file: " + ex.Message);
+        }
+    }
+
+}

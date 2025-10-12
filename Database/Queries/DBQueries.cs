@@ -13,15 +13,15 @@ namespace Income.Database.Queries
     {
         ToastService toastService = new();
 
-        public async Task<int?> SaveSCH0Block4_1(List<Tbl_Sch_0_0_Block_4_1> tbl_Sch_0_0_Block_4_1)
+        public async Task<int?> SaveSCH0Block2_1(List<Tbl_Sch_0_0_Block_2_1> tbl_Sch_0_0_Block_2_1)
         {
             try
             {
-                if (tbl_Sch_0_0_Block_4_1 != null && tbl_Sch_0_0_Block_4_1.Count > 0)
+                if (tbl_Sch_0_0_Block_2_1 != null && tbl_Sch_0_0_Block_2_1.Count > 0)
                 {
-                    foreach (var item in tbl_Sch_0_0_Block_4_1)
+                    foreach (var item in tbl_Sch_0_0_Block_2_1)
                     {
-                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4_1>().Where(x => x.id == item.id).ToListAsync();
+                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_2_1>().Where(x => x.id == item.id).ToListAsync();
                         if (check_existence != null && check_existence.Count > 0)
                         {
                             await _database.UpdateAsync(item);
@@ -46,11 +46,11 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_4_1>?> FetchSCH0Block4_1Data()
+        public async Task<List<Tbl_Sch_0_0_Block_2_1>?> FetchSCH0Block2_1Data()
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_4_1> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_4_1>("SELECT * FROM Tbl_Sch_0_0_Block_4_1 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_2_1> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_1>("SELECT * FROM Tbl_Sch_0_0_Block_2_1 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)
@@ -60,7 +60,7 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveSCH0Block4_2(List<Tbl_Sch_0_0_Block_4_2> tbl_Sch_0_0_Block_4_2)
+        public async Task<int?> SaveSCH0Block4_2(List<Tbl_Sch_0_0_Block_2_2> tbl_Sch_0_0_Block_4_2)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace Income.Database.Queries
                 {
                     foreach (var item in tbl_Sch_0_0_Block_4_2)
                     {
-                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4_2>().Where(x => x.id == item.id).ToListAsync();
+                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_2_2>().Where(x => x.id == item.id).ToListAsync();
                         if (check_existence != null && check_existence.Count > 0)
                         {
                             await _database.UpdateAsync(item);
@@ -93,11 +93,11 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_4_2>?> FetchSCH0Block4_2Data()
+        public async Task<List<Tbl_Sch_0_0_Block_2_2>?> FetchSCH0Block4_2Data()
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_4_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_4_2>("SELECT * FROM Tbl_Sch_0_0_Block_4_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_4_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)
@@ -107,12 +107,12 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveBlock4_2A(Tbl_Sch_0_0_Block_4_2A tbl_Sch_0_0_Block_4_2A)
+        public async Task<int?> SaveBlock4_2A(Tbl_Sch_0_0_Block_4 tbl_Sch_0_0_Block_4_2A)
         {
             try
             {
                 int status = new();
-                var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4_2A>().Where(x => x.id == tbl_Sch_0_0_Block_4_2A.id).ToListAsync();
+                var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4>().Where(x => x.id == tbl_Sch_0_0_Block_4_2A.id).ToListAsync();
                 if (check_existence != null && check_existence.Count > 0)
                 {
                     status = await _database.UpdateAsync(tbl_Sch_0_0_Block_4_2A);
@@ -130,11 +130,11 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<Tbl_Sch_0_0_Block_4_2A?> GetBlock4_2A()
+        public async Task<Tbl_Sch_0_0_Block_4?> GetBlock4_2A()
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_4_2A>("SELECT * FROM Tbl_Sch_0_0_Block_4_2A WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_4>("SELECT * FROM Tbl_Sch_0_0_Block_4_2A WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return response != null && response.Count > 0 ? response.FirstOrDefault() : null;
             }
             catch (Exception ex)
@@ -144,7 +144,7 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveSCH0Block4_3(List<Tbl_Sch_0_0_Block_4_3> tbl_Sch_0_0_Block_4_3)
+        public async Task<int?> SaveSCH0Block4_3(List<Tbl_Sch_0_0_Block_5> tbl_Sch_0_0_Block_4_3)
         {
             try
             {
@@ -152,7 +152,7 @@ namespace Income.Database.Queries
                 {
                     foreach (var item in tbl_Sch_0_0_Block_4_3)
                     {
-                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4_3>().Where(x => x.id == item.id).ToListAsync();
+                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_5>().Where(x => x.id == item.id).ToListAsync();
                         if (check_existence != null && check_existence.Count > 0)
                         {
                             await _database.UpdateAsync(item);
@@ -177,11 +177,11 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_4_3>?> FetchSCH0Block4_3Data()
+        public async Task<List<Tbl_Sch_0_0_Block_5>?> FetchSCH0Block4_3Data()
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_4_3> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_4_3>("SELECT * FROM Tbl_Sch_0_0_Block_4_3 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_5> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_5>("SELECT * FROM Tbl_Sch_0_0_Block_4_3 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)
@@ -191,7 +191,7 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveSCH0Block5(List<Tbl_Sch_0_0_Block_5> tbl_Sch_0_0_Block_5)
+        public async Task<int?> SaveSCH0Block5(List<Tbl_Sch_0_0_Block_7> tbl_Sch_0_0_Block_5)
         {
             try
             {
@@ -199,7 +199,7 @@ namespace Income.Database.Queries
                 {
                     foreach (var item in tbl_Sch_0_0_Block_5)
                     {
-                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_5>().Where(x => x.id == item.id).ToListAsync();
+                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.id == item.id).ToListAsync();
                         if (check_existence != null && check_existence.Count > 0)
                         {
                             await _database.UpdateAsync(item);
@@ -224,11 +224,11 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_5>?> FetchSCH0Block5Data()
+        public async Task<List<Tbl_Sch_0_0_Block_7>?> FetchSCH0Block5Data()
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_5> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_5>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_7> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)
@@ -263,7 +263,7 @@ namespace Income.Database.Queries
         //        return null;
         //    }
         //}
-        public static int GetEducationFilteredSubstitution(List<Tbl_Sch_0_0_Block_5> block_5_reponse)
+        public static int GetEducationFilteredSubstitution(List<Tbl_Sch_0_0_Block_7> block_5_reponse)
         {
             var counter = 0;
             var initialSelectedList = block_5_reponse.Where(entry => entry.is_initially_selected_travel == true && entry.substitution_count_travel != 0).ToList();
@@ -306,54 +306,54 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_0_1>("SELECT * FROM Tbl_Sch_0_0_Block_0_1 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_0_1>("SELECT * FROM Tbl_Sch_0_0_Block_0_1 WHERE fsu_id = ?", SessionStorage.SelectedFSUId);
                 if (response != null && response.Count > 0)
                 {
                     return response.FirstOrDefault();
                 }
                 else
                 {
-                    return new Tbl_Sch_0_0_Block_0_1();
+                    return null;
                 }
             }
             catch (Exception ex)
             {
                 toastService.ShowError($"Error While saving SCH 0 Block 1: {ex.Message}");
-                return new Tbl_Sch_0_0_Block_0_1();
+                return null;
             }
         }
 
-        public async Task<Tbl_Sch_0_0_Block_2?> FetchBlock2()
+        public async Task<Tbl_Sch_0_0_FieldOperation?> FetchBlock2()
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_2>("SELECT * FROM Tbl_Sch_0_0_Block_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_FieldOperation>("SELECT * FROM Tbl_Sch_0_0_Block_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 if (response != null && response.Count > 0)
                 {
                     return response.FirstOrDefault();
                 }
                 else
                 {
-                    return new Tbl_Sch_0_0_Block_2();
+                    return new Tbl_Sch_0_0_FieldOperation();
                 }
             }
             catch (Exception ex)
             {
                 toastService.ShowError($"Error While saving SCH 0 Block 1: {ex.Message}");
-                return new Tbl_Sch_0_0_Block_2();
+                return new Tbl_Sch_0_0_FieldOperation();
             }
         }
 
-        public async Task<Tbl_Sch_0_0_Block_5> GetBlock5Data(int hhd_id = 0)
+        public async Task<Tbl_Sch_0_0_Block_7> GetBlock5Data(int hhd_id = 0)
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_5>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_5>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND tenant_id = ? AND Block_5A_3 = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id, SessionStorage.selected_hhd_id);
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND tenant_id = ? AND Block_5A_3 = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id, SessionStorage.selected_hhd_id);
                 return data_set != null && data_set.Count > 0 ? data_set.FirstOrDefault() : new();
             }
             catch (Exception ex)
             {
-                return new Tbl_Sch_0_0_Block_5();
+                return new Tbl_Sch_0_0_Block_7();
             }
         }
 
@@ -401,16 +401,16 @@ namespace Income.Database.Queries
             }
         }
 
-        public Task<Tbl_Sch_0_0_Block_5> FetchCasualtyOrOriginalHouseHold(int FSUID, int ID)
+        public Task<Tbl_Sch_0_0_Block_7> FetchCasualtyOrOriginalHouseHold(int FSUID, int ID)
         {
-            return _database.Table<Tbl_Sch_0_0_Block_5>().Where(x => x.fsu_id == FSUID && x.Block_5A_3 == ID).FirstOrDefaultAsync();
+            return _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.fsu_id == FSUID && x.Block_5A_3 == ID).FirstOrDefaultAsync();
         }
 
         //find a household with a higher and smaller serial number
-        public async Task<Tbl_Sch_0_0_Block_5?> FetchHouseholdWithHigherSerialNumber(int FSUID, int casualtyHouseholdId)
+        public async Task<Tbl_Sch_0_0_Block_7?> FetchHouseholdWithHigherSerialNumber(int FSUID, int casualtyHouseholdId)
         {
             // Step 1: Get the casualty household
-            var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_5>()
+            var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_7>()
                 .Where(h => h.fsu_id == FSUID && h.Block_5A_3 == casualtyHouseholdId)
                 .FirstOrDefaultAsync();
 
@@ -418,7 +418,7 @@ namespace Income.Database.Queries
                 return null;
 
             // Step 2: Get all eligible households
-            var filteredData = await _database.Table<Tbl_Sch_0_0_Block_5>()
+            var filteredData = await _database.Table<Tbl_Sch_0_0_Block_7>()
                 .Where(h => h.fsu_id == FSUID
                     && (h.is_selected_travel == null || h.is_selected_travel == false)
                     && (h.is_casualty_travel == null || h.is_casualty_travel == false)
@@ -443,14 +443,14 @@ namespace Income.Database.Queries
             return nextHousehold;
         }
 
-        public async Task<int?> SaveUpdateSCH0Block5(Tbl_Sch_0_0_Block_5 tbl_Sch_0_0_Block_5)
+        public async Task<int?> SaveUpdateSCH0Block5(Tbl_Sch_0_0_Block_7 tbl_Sch_0_0_Block_5)
         {
             try
             {
                 if (tbl_Sch_0_0_Block_5 != null)
                 {
 
-                    var check_existence = await _database.Table<Tbl_Sch_0_0_Block_5>().Where(x => x.id == tbl_Sch_0_0_Block_5.id).ToListAsync();
+                    var check_existence = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.id == tbl_Sch_0_0_Block_5.id).ToListAsync();
                     if (check_existence != null)
                     {
                         await _database.UpdateAsync(tbl_Sch_0_0_Block_5);
@@ -476,16 +476,16 @@ namespace Income.Database.Queries
         }
 
         // Added By testing 16/6/25
-        public Task<Tbl_Sch_0_0_Block_4_2> GetSelectedSubUnit(string fsuID)
+        public Task<Tbl_Sch_0_0_Block_2_2> GetSelectedSubUnit(string fsuID)
         {
             var fsuId = Convert.ToInt32(fsuID);
-            return _database.FindAsync<Tbl_Sch_0_0_Block_4_2>(x => x.fsu_id == fsuId && x.IsChecked == true);
+            return _database.FindAsync<Tbl_Sch_0_0_Block_2_2>(x => x.fsu_id == fsuId && x.IsChecked == true);
         }
 
         // Added By testing 16/6/25
-        public Task<List<Tbl_Sch_0_0_Block_5>> Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(int fsu_id)
+        public Task<List<Tbl_Sch_0_0_Block_7>> Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(int fsu_id)
         {
-            return _database.Table<Tbl_Sch_0_0_Block_5>()
+            return _database.Table<Tbl_Sch_0_0_Block_7>()
                             .Where(x => x.fsu_id == fsu_id && x.is_household)
                             .ToListAsync();
         }
@@ -494,7 +494,7 @@ namespace Income.Database.Queries
         public async Task<int> MarkCasualty(int casualtyHouseholdId)
         {
             // Fetch the casualty household
-            var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_5>()
+            var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_7>()
                 .Where(h => h.fsu_id == SessionStorage.SelectedFSUId && h.Block_5A_3 == casualtyHouseholdId)
                 .FirstOrDefaultAsync();
 
@@ -511,17 +511,17 @@ namespace Income.Database.Queries
             // If the household is not found, return 0 to indicate no rows were updated
             return 0;
         }
-        public Task<int> Update_SCH0_0_Block_5A(Tbl_Sch_0_0_Block_5 data)
+        public Task<int> Update_SCH0_0_Block_5A(Tbl_Sch_0_0_Block_7 data)
         {
             return _database.UpdateAsync(data);
         }
 
 
-        public async Task<List<Tbl_Sch_0_0_Block_5>> GetSelectedBlock5List(int Fsu_id)
+        public async Task<List<Tbl_Sch_0_0_Block_7>> GetSelectedBlock5List(int Fsu_id)
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_5>? data_set = await _database.Table<Tbl_Sch_0_0_Block_5>().Where(x => x.fsu_id == Fsu_id && x.is_selected_travel == true).ToListAsync();
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.fsu_id == Fsu_id && x.is_selected_travel == true).ToListAsync();
                 return data_set;
             }
             catch (Exception)
@@ -536,7 +536,7 @@ namespace Income.Database.Queries
             try
             {
                 // Fetch the casualty household
-                var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_5>()
+                var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_7>()
                     .Where(h => h.fsu_id == SessionStorage.SelectedFSUId && h.Block_5A_3 == casualtyHouseholdId)
                     .FirstOrDefaultAsync();
 
