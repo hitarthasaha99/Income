@@ -101,7 +101,7 @@ namespace Income.Viewmodels.SCH0_0
         {
             try
             {
-                double perc = tbl_Sch_0_0_block_2_1.Where(x => x.is_deleted != true).Sum(static x => x.percentage);
+                double perc = tbl_Sch_0_0_block_2_1.Where(x => x.is_deleted != true).Sum(static x => x.percentage.GetValueOrDefault());
                 total_population_percentage = perc;
                 OnPropertyChanged(nameof(total_population_percentage));
                 return;

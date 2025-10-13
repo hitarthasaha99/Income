@@ -64,7 +64,6 @@ namespace Income.Viewmodels.SCH0_0
                             id = Guid.NewGuid(),
                             serial_number = item.serial_no,
                             serial_no_of_hamlets_in_su = item.name_of_hamlet,
-                            population_percentage = item.percentage_of_population,
                         });
                     }
                 }

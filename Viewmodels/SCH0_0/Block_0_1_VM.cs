@@ -118,6 +118,7 @@ namespace Income.Viewmodels.SCH0_0
                     block_0_1.Block_1_4 = Block_0_1_Constants.Sample.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sample))?.id ?? 0;
                     Block_1_4_Selected = Block_0_1_Constants.Sample.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sample))?.title ?? string.Empty;
                     block_0_1.Block_1_5 = Block_0_1_Constants.Sector.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sec))?.id;
+                    Block_1_5_Selected = Block_0_1_Constants.Sector.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sec))?.title ?? string.Empty;
                     block_0_1.Block_1_6 = getfsuresponse.nss_reg;
                     block_0_1.Block_1_7 = getfsuresponse.dc;
                     block_0_1.Block_1_8 = getfsuresponse.strm;

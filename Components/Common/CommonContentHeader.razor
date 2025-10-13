@@ -27,7 +27,7 @@
                 <i style="font-size: 35px;" class="bi bi-clock-fill text-success"></i>
                 <div class="ms-2">
                     <label class="form-label fs-13 mb-0">Timestamp</label>
-                    <p style="font-weight: bold;">@SessionStorage.survey_timestamp</p>
+                    <p style="font-weight: bold;">@Time</p>
                 </div>
             </div>
             @if (ShowVisitedBlock) 
@@ -63,7 +63,8 @@
     List<Tbl_Visited_Blocks>? visited_Blocks = new();
     int hhd_id = SessionStorage.selected_hhd_id;
     string location = SessionStorage.location;
-    string dateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+    [Parameter]
+    public string Time { get; set; } = string.Empty;
     CommonFunction funcs = new();
 
     protected override async Task OnParametersSetAsync()
@@ -91,7 +92,7 @@
         {
             visited_Blocks = result;
         }
-        dateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
         if (string.IsNullOrEmpty(SessionStorage.location) && ShowVisitedBlock == true)
         {

@@ -10,7 +10,6 @@ namespace Income.Database.Models.SCH0_0
         public bool is_selected { get; set; } = false;
         public int? serial_number { get; set; }
         public string? serial_no_of_hamlets_in_su { get; set; }
-        public decimal? population_percentage { get; set; }
         public int SerialNumber { get; set; } 
         public double Percentage { get; set; }
         public string? HamletName { get; set; }
