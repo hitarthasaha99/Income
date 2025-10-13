@@ -63,6 +63,7 @@
     List<Tbl_Visited_Blocks>? visited_Blocks = new();
     int hhd_id = SessionStorage.selected_hhd_id;
     string location = SessionStorage.location;
+    string dateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
     CommonFunction funcs = new();
 
     protected override async Task OnParametersSetAsync()
@@ -90,6 +91,8 @@
         {
             visited_Blocks = result;
         }
+        dateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
         if (string.IsNullOrEmpty(SessionStorage.location) && ShowVisitedBlock == true)
         {
             preloadService.Show(SpinnerColor.Light, "Fetching Location Details...");

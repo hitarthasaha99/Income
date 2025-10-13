@@ -24,7 +24,7 @@ namespace Income
             //builder.Services.AddSingleton<Income.Services.IncomeService>();
 
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_0_1_VM>();
-
+            builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_1_VM>();
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             //builder.Services.AddFluentValidationAutoValidation();
 

@@ -73,6 +73,8 @@ namespace Income.Viewmodels.SCH0_0
         [ObservableProperty]
         private string _block_1_4_Selected = string.Empty;
         [ObservableProperty]
+        private string _block_1_5_Selected = string.Empty;
+        [ObservableProperty]
         private string _block_1_12_Selected = string.Empty;
         [ObservableProperty]
         private string? _block_1_16_Selected = string.Empty;
@@ -115,7 +117,7 @@ namespace Income.Viewmodels.SCH0_0
                     block_0_1.Block_1_3 = "00";
                     block_0_1.Block_1_4 = Block_0_1_Constants.Sample.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sample))?.id ?? 0;
                     Block_1_4_Selected = Block_0_1_Constants.Sample.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sample))?.title ?? string.Empty;
-                    block_0_1.Block_1_5 = Block_0_1_Constants.Sector.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sec))?.title;
+                    block_0_1.Block_1_5 = Block_0_1_Constants.Sector.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.sec))?.id;
                     block_0_1.Block_1_6 = getfsuresponse.nss_reg;
                     block_0_1.Block_1_7 = getfsuresponse.dc;
                     block_0_1.Block_1_8 = getfsuresponse.strm;
@@ -139,6 +141,7 @@ namespace Income.Viewmodels.SCH0_0
             else
             {
                 Block_1_4_Selected = Block_0_1_Constants.Sample.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_4))?.title ?? string.Empty;
+                Block_1_5_Selected = Block_0_1_Constants.Sector.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_5))?.title ?? string.Empty;
                 Block_1_12_Selected = Block_0_1_Constants.FrameCode.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_12))?.title ?? string.Empty;
                 Block_1_16_Selected = block_0_1.Block_1_16 != null ? CommonList.LOOKUP_CONST_SURVEY_CODE.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_16))?.title : string.Empty;
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;

@@ -40,7 +40,7 @@ namespace Income.Database.Models.SCH0_0
         //sample (central-1, state-2)
         public int? Block_1_4 { get; set; }
         //sector (rural-1, urban-2)
-        public string? Block_1_5 { get; set; }
+        public int? Block_1_5 { get; set; }
         //NSS region
         [MaxLength(50)]
         public string? Block_1_6 { get; set; }

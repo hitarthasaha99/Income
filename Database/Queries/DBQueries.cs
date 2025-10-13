@@ -60,13 +60,13 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveSCH0Block4_2(List<Tbl_Sch_0_0_Block_2_2> tbl_Sch_0_0_Block_4_2)
+        public async Task<int?> SaveSCH0Block2_2(List<Tbl_Sch_0_0_Block_2_2> tbl_Sch_0_0_Block_2_2)
         {
             try
             {
-                if (tbl_Sch_0_0_Block_4_2 != null && tbl_Sch_0_0_Block_4_2.Count > 0)
+                if (tbl_Sch_0_0_Block_2_2 != null && tbl_Sch_0_0_Block_2_2.Count > 0)
                 {
-                    foreach (var item in tbl_Sch_0_0_Block_4_2)
+                    foreach (var item in tbl_Sch_0_0_Block_2_2)
                     {
                         var check_existence = await _database.Table<Tbl_Sch_0_0_Block_2_2>().Where(x => x.id == item.id).ToListAsync();
                         if (check_existence != null && check_existence.Count > 0)
@@ -93,11 +93,11 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_2_2>?> FetchSCH0Block4_2Data()
+        public async Task<List<Tbl_Sch_0_0_Block_2_2>?> FetchSCH0Block2_2Data()
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_4_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)

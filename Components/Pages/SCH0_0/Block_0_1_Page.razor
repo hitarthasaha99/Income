@@ -191,10 +191,40 @@
         Console.WriteLine("Form validated successfully");
 
         await block_0_1_VM.Save();
-
+        //Navigation rules -
+        // 1. For rural FSU (Block_1_5 = 1) and D > 1 (Block_1_15) -> Hamlet formation page (2.1)
+        // 2. For rural FSU (Block_1_5 = 1) and D = 1 (Block_1_15) -> Block 4 (No hamlets formed)
+        // 3. For urban FSU (Block_1_5 = 2), irrespective of D (Block_1_15) -> Hamlet selection page (2.2)
+        // 4. If Block_1_16 (Survey code) != 1 or 4, go to Field Operation
         if (is_go_next)
         {
-            NavigationManager.NavigateTo("/dashboard/sch0.0/block_3");
+            if (block_0_1_VM.block_0_1.Block_1_16 == 1 || block_0_1_VM.block_0_1.Block_1_16 == 4)
+            {
+                //Rural FSU
+                if (block_0_1_VM.block_0_1.Block_1_5 == 1)
+                {
+                    if (block_0_1_VM.block_0_1.Block_1_15 > 1)
+                    {
+                        //navigate to hamlet formation page for rural FSU
+                        NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_1");
+                    }
+                    else
+                    {
+                        //navigate to block 4 page
+                    }
+                }
+                //Urban FSU
+                else
+                {
+                    //navigate to hamlet selection page
+                }
+            }
+            
+            else
+            {
+                //navigate to field operation (FSU cannot be surveyed)
+            }
+            //NavigationManager.NavigateTo("/dashboard/sch0.0/block_3");
         }
         //NavigationManager.NavigateTo("/dashboard/sch0.0/block_3");
         // int field_validation = await JSRuntime.InvokeAsync<int>("__FieldValidate", commonConfig.Sch_0_0_Block_1_RequiredFields(block_0_1_VM.block_0_1.survey_code.ToString()), JsonConvert.SerializeObject(block_0_1_VM.block_0_1));

@@ -1,0 +1,160 @@
+﻿@page "/dashboard/sch0.0/block_2_2"
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@using Income.Database.Models.Common
+@using Income.Viewmodels.SCH0_0
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Block_2_2_VM block_2_2_VM
+
+<div class="my-2">
+    <CommonContentHeader 
+        SelectedFsuId="@SelectedFsuId"
+        survey_time="@survey_time" 
+    />
+    <div class="card card-style2">
+        <div class="card-header d-flex align-items-center">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">[Block 4.2]</span>List of sub-units (SU) and identification of selected SU
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th>Selected</th>
+                            <th>Serial Number</th>
+                            <th>Selected SU</th>
+                            <th>% of population</th>
+                        </tr>
+                        <tr>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(block_2_2_VM.tbl_Sch_0_0_Block_2_2 != null && block_2_2_VM.tbl_Sch_0_0_Block_2_2.Count > 0)
+                        {
+                            foreach (var item in block_2_2_VM.tbl_Sch_0_0_Block_2_2)
+                            {
+                                <tr>
+                                    <td><input type="checkbox" disabled @bind="item.IsChecked"></td>
+                                    <td>@item.SerialNumber</td>
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-between m-0 p-0">
+                                            <p class="m-0 p-0">@item.SampleHgSbNumber</p>
+                                        </div>
+                                    </td>
+                                    <td>@item.Percentage</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="bg-success" colspan="3"></th>
+                            <th class="bg-success text-white">@block_2_2_VM.total_population_percentage %</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1" ></i>Back</NavLink>
+        <div class="d-flex">
+            @* <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink> *@
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+        </div>
+    </div>
+    <Modal @ref="block_2_2_VM.SelectionModal" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false">
+        <HeaderTemplate>
+            <h5 class="modal-title">SU Selection</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(() => block_2_2_VM.HandleModal())"></button>
+        </HeaderTemplate>
+        <BodyTemplate>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Serial Number</th>
+                            <th>Hamlet Name</th>
+                            <th>Population Percentage %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(block_2_2_VM.tbl_Sch_0_0_Block_2_2 != null && block_2_2_VM.tbl_Sch_0_0_Block_2_2.Count > 0)
+                        {
+                            foreach(var item in block_2_2_VM.tbl_Sch_0_0_Block_2_2)
+                            {
+                                <tr>
+                                    <td><input type="checkbox" @bind="item.is_selected" disabled/></td>
+                                    <td>@item.SerialNumber</td>
+                                    <td>@item.HamletName</td>
+                                    <td>@item.Percentage</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </BodyTemplate>
+        <FooterTemplate>
+            <NavLink class="btn btn-primary me-2" @onclick="@(() => block_2_2_VM.SubmitSelection())"><i class="bi bi-floppy-fill me-1"></i>Select</NavLink>
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => block_2_2_VM.HandleModal())">Close</NavLink>
+        </FooterTemplate>
+    </Modal>
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    CommonQueries commonQueries = new();
+    DBQueries SCH_0_0_Queries = new();
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        block_2_2_VM.NotifyUiUpdate += StateHasChanged;
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+         {
+                block_uri = "/dashboard/sch0.0/block_2_2",
+                block_title = "Sch 0.0 Block 2.2",
+                block_code = CommonEnum.sch_0_0_block_2_2.ToString(),
+            };   
+        await commonQueries.InsertVisitedBlock(vb);
+        block_2_2_VM.Init();
+        return;
+    }
+    async Task HandleSubmit(bool action)
+    {
+        NavigationManager.NavigateTo("/dashboard/sch0.0/block_3");
+        return;
+        // if (block_2_2_VM.total_population_percentage != 100)
+        // {
+        //     toastService.ShowError("Total population percentage  should be 100%");
+        //     return;
+        // }
+        // var response = await SCH_0_0_Queries.SaveSCH0Block4_2(block_2_2_VM.tbl_Sch_0_0_block_2_2);
+        // if (response != 1)
+        // {
+        //     toastService.ShowError("Gettinng Error while storing Data into Database! Please try again.");
+        //     return;
+        // }
+        // if (action == true)
+        // {
+        //     NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2A");
+        //     return;
+        // }
+        // return;
+    }
+}
+
+
