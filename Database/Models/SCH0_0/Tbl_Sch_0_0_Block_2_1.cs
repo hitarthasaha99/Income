@@ -8,9 +8,8 @@ namespace Income.Database.Models.SCH0_0
         [PrimaryKey]
         public Guid id { get; set; }
         public int? serial_no { get; set; }
-        public string? name_of_hamlet { get; set; }
         public double? percentage { get; set; } = 0;
-        public string? hamlet_name { get; set; } = string.Empty;
+        public string hamlet_name { get; set; } = string.Empty;
         public bool is_selected { get; set; } = false;
     }
 }

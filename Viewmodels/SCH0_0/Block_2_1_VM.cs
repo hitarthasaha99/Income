@@ -1,6 +1,8 @@
 ﻿using BlazorBootstrap;
 using BootstrapBlazor.Components;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Income.Common;
+using Income.Database.Models.Common;
 using Income.Database.Models.SCH0_0;
 using Income.Database.Queries;
 using Microsoft.AspNetCore.Components;
@@ -14,7 +16,8 @@ namespace Income.Viewmodels.SCH0_0
         Blazored.Toast.Services.ToastService ToastService = new Blazored.Toast.Services.ToastService();
         DBQueries SCH_0_0_Queries = new();
         public List<Tbl_Sch_0_0_Block_2_1> tbl_Sch_0_0_block_2_1 { get; set; } = new();
-        public double total_population_percentage { get; set; } = new();
+        [ObservableProperty]
+        private double total_population_percentage = 0;
         DBQueries dB = new();
         CommonQueries cQ = new();
         public Block_2_1_VM()
@@ -28,7 +31,7 @@ namespace Income.Viewmodels.SCH0_0
             {
                 id = Guid.NewGuid(),
                 serial_no = tbl_Sch_0_0_block_2_1.Count + 1,
-                name_of_hamlet = string.Empty,
+                hamlet_name = string.Empty,
                 percentage = 0,
                 is_deleted = false
             };
@@ -74,13 +77,15 @@ namespace Income.Viewmodels.SCH0_0
                 }
                 if (field_name == "name_of_hamlet")
                 {
-                    tbl_Sch_0_0_block_2_1[index].name_of_hamlet = e.Value.ToString();
+                    tbl_Sch_0_0_block_2_1[index].hamlet_name = e.Value.ToString();
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(e.Value.ToString()))
                     {
-                        tbl_Sch_0_0_block_2_1[index].percentage = Convert.ToDouble(e.Value);
+                        double value = Convert.ToDouble(e.Value);
+                        value = Math.Round(value, 1, MidpointRounding.AwayFromZero); // restrict to 1 decimal
+                        tbl_Sch_0_0_block_2_1[index].percentage = value;
                     }
                     else
                     {
@@ -89,7 +94,6 @@ namespace Income.Viewmodels.SCH0_0
                     CalculateTotalPopulationPercentage();   
                 }
                 OnPropertyChanged(nameof(tbl_Sch_0_0_block_2_1));
-                return;
             }
             catch(Exception ex)
             {
@@ -102,14 +106,11 @@ namespace Income.Viewmodels.SCH0_0
             try
             {
                 double perc = tbl_Sch_0_0_block_2_1.Where(x => x.is_deleted != true).Sum(static x => x.percentage.GetValueOrDefault());
-                total_population_percentage = perc;
-                OnPropertyChanged(nameof(total_population_percentage));
-                return;
+                Total_population_percentage = perc;
+                NotifyUiUpdate?.Invoke();
             }
             catch(Exception ex)
             {
-                total_population_percentage = 0;
-                return;
             }
         }
 
@@ -130,7 +131,39 @@ namespace Income.Viewmodels.SCH0_0
             }
             CalculateTotalPopulationPercentage();
             OnPropertyChanged(nameof(tbl_Sch_0_0_block_2_1));
-            return;
         }
+
+        public ValidationResult Validate()
+        {
+            var result = new ValidationResult();
+
+            try
+            {
+                double total = tbl_Sch_0_0_block_2_1.Sum(row => row.percentage.GetValueOrDefault());
+                if (total != 100)
+                    result.Errors.Add("Total percentage must be equal to 100.");
+
+                if (tbl_Sch_0_0_block_2_1.Any(row => row.percentage == 0))
+                    result.Errors.Add("Hamlet percentage cannot be zero.");
+
+                if (tbl_Sch_0_0_block_2_1.Any(row => string.IsNullOrWhiteSpace(row.hamlet_name)))
+                    result.Errors.Add("Hamlet name cannot be empty.");
+
+                if (tbl_Sch_0_0_block_2_1
+                    .GroupBy(x => x.hamlet_name.ToLower())
+                    .Any(g => g.Count() > 1))
+                    result.Errors.Add("Hamlet names must be unique.");
+
+                result.IsValid = result.Errors.Count == 0;
+            }
+            catch (Exception ex)
+            {
+                result.Errors.Add("An unexpected error occurred during validation.");
+                result.IsValid = false;
+            }
+
+            return result;
+        }
+
     }
 }
