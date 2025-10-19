@@ -191,7 +191,7 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveSCH0Block5(List<Tbl_Sch_0_0_Block_7> tbl_Sch_0_0_Block_5)
+        public async Task<int?> SaveSCH0Block5(List<Tbl_Sch_0_0_Block_5> tbl_Sch_0_0_Block_5)
         {
             try
             {
@@ -199,7 +199,7 @@ namespace Income.Database.Queries
                 {
                     foreach (var item in tbl_Sch_0_0_Block_5)
                     {
-                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.id == item.id).ToListAsync();
+                        var check_existence = await _database.Table<Tbl_Sch_0_0_Block_5>().Where(x => x.id == item.id).ToListAsync();
                         if (check_existence != null && check_existence.Count > 0)
                         {
                             await _database.UpdateAsync(item);

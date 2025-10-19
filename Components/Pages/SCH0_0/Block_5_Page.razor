@@ -123,67 +123,60 @@
     }
     async Task HandleSubmit(string action)
     {
-        if (action == "NEXT")
+        if (total_population_percentage != 100)
         {
-            NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
+            toastService.ShowError("Total population percentage should be 100%");
             return;
         }
-        // if (total_population_percentage != 100)
-        // {
-        //     toastService.ShowError("Total population percentage  should be 100%, Please check!");
-        //     return;
-        // }
-        // if (action == "SELECTION")
-        // {
-        //     Random num = new Random();
-        //     int? from_val = tbl_Sch_0_0_Block_5[0].serial_number;
-        //     int? to_val = tbl_Sch_0_0_Block_5[tbl_Sch_0_0_Block_5.Count - 1].serial_number;
-        //     int selection_index = num.Next(Convert.ToInt32(from_val), Convert.ToInt32(to_val));
-        //     tbl_Sch_0_0_Block_5[selection_index - 1].is_selected = true;
-        //     is_selection_done = true;
-        //     toastService.ShowSuccess($"Selection Has been done for Serial Number : {tbl_Sch_0_0_Block_5[selection_index - 1].serial_number}");
-        //     var response = await SCH_0_0_Queries.SaveSCH0Block5(tbl_Sch_0_0_Block_5);
-        //     if (response != 1)
-        //     {
-        //         toastService.ShowSuccess($"Error while storing data into database, Please try again!");
-        //         return;
-        //     }
-        //     StateHasChanged();
-        //     return;
-        // }
-        // else
-        // {
-        //     if (action == "SAVE")
-        //     {
-        //         var response = await SCH_0_0_Queries.SaveSCH0Block5(tbl_Sch_0_0_Block_5);
-        //         if (response != 1)
-        //         {
-        //             toastService.ShowError($"Error while storing data into database, Please try again!");
-        //             return;
-        //         }
-        //         return;
-        //     }
-        //     else if (action == "NEXT")
-        //     {
-        //         if (is_selection_done != true)
-        //         {
-        //             toastService.ShowError($"You need to perform do selection first to continue, Please try again!");
-        //             return;
-        //         }
-        //         else
-        //         {
-        //             var response = await SCH_0_0_Queries.SaveSCH0Block5(tbl_Sch_0_0_Block_5);
-        //             if (response != 1)
-        //             {
-        //                 toastService.ShowError($"Error while storing data into database, Please try again!");
-        //                 return;
-        //             }
-        //             NavigationManager.NavigateTo("/dashboard/sch0.0/block_3_1");
-        //             return;
-        //         }
-        //     }
-        //     return;
-        // }
+        if (action == "SELECTION")
+        {
+            Random num = new Random();
+            int? from_val = block_5[0].serial_number;
+            int? to_val = block_5[block_5.Count - 1].serial_number;
+            int selection_index = num.Next(Convert.ToInt32(from_val), Convert.ToInt32(to_val));
+            block_5[selection_index - 1].IsChecked = true;
+            is_selection_done = true;
+            toastService.ShowSuccess($"Selection Has been done for Serial Number : {block_5[selection_index - 1].serial_number}");
+            var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+            if (response != 1)
+            {
+                toastService.ShowSuccess($"Error while storing data into database, Please try again!");
+                return;
+            }
+            StateHasChanged();
+            return;
+        }
+        else
+        {
+            if (action == "SAVE")
+            {
+                var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+                if (response != 1)
+                {
+                    toastService.ShowError($"Error while storing data into database, Please try again!");
+                    return;
+                }
+                return;
+            }
+            else if (action == "NEXT")
+            {
+                if (is_selection_done != true)
+                {
+                    toastService.ShowError($"You need to perform do selection first to continue, Please try again!");
+                    return;
+                }
+                else
+                {
+                    var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+                    if (response != 1)
+                    {
+                        toastService.ShowError($"Error while storing data into database, Please try again!");
+                        return;
+                    }
+                    NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{true}");
+                }
+            }
+        }
     }
     void HandleChange(ChangeEventArgs args, Guid id)
     {
