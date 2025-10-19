@@ -546,7 +546,7 @@
                     foreach (var item in fsus)
                     {
 
-                        List<Tbl_Sch_0_0_Block_7> dataList = await  dB.FetchSCH0Block5Data() ?? new List<Tbl_Sch_0_0_Block_7>();
+                        List<Tbl_Sch_0_0_Block_7> dataList = await dB.GetBlock7Data(item.fsu_id);
                         int count = 0;
                         foreach (var Item in dataList)
                         {

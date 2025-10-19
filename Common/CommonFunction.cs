@@ -12,24 +12,50 @@ namespace Income.Common
 {
     public class CommonFunction
     {
-        public int? CalculateNoOfSUToBeFormed(bool is_special, int? population)
+        public static int CalculateNoOfSubDivisions(string stateCode, int population, int sector, string district)
         {
-            if (is_special)
+            int subDivisions = 1;
+            try
             {
-                // Logic for special case
-                if (population < 750)
-                    return 1;
+                if (stateCode != null)
+                {
+                    // special cases 
+                    if (sector == 1 && (stateCode.Equals("02") || stateCode.Equals("11") || stateCode.Equals("35") ||
+                        (stateCode.Equals("05") && !(district.Equals("05") || district.Equals("11") || district.Equals("13") || district.Equals("12")))
+                        || (stateCode.Equals("01") && (district.Equals("05") || district.Equals("06") || district.Equals("19") || district.Equals("20")
+                        || district.Equals("16") || district.Equals("18") || district.Equals("17"))) ||
+                        (stateCode.Equals("37") && (district.Equals("01") || district.Equals("02"))) ||
+                        (stateCode.Equals("32") && district.Equals("09"))))
+                    {
+                        if (population >= 750)
+                        {
+                            if (population < 1200)
+                            {
+                                subDivisions = 2;
+                            }
+                            else
+                            {
+                                subDivisions = 2 + (int)Math.Ceiling((double)(population - 1199) / 600);
+                            }
+                        }
 
-                return ((population - 750) / 900) + 2;
+                    }
+                    //For usual case
+                    else if (population >= 1500)
+                    {
+                        if (population < 2400)
+                        {
+                            subDivisions = 2;
+                        }
+                        else
+                        {
+                            subDivisions = 2 + (int)Math.Ceiling((double)(population - 2399) / 1200);
+                        }
+                    }
+                }
             }
-            else
-            {
-                // Logic for normal case
-                if (population < 1500)
-                    return 1;
-
-                return ((population - 1500) / 900) + 2;
-            }
+            catch (Exception) { }
+            return subDivisions;
         }
 
         public List<Tbl_Sch_0_0_Block_7> SSWOR(List<Tbl_Sch_0_0_Block_7> items, int numberOfSelections = 20)

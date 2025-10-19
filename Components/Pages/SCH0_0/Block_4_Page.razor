@@ -1,0 +1,146 @@
+﻿@page "/dashboard/sch0.0/block_4"
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+
+<div class="my-2">
+    <CommonContentHeader 
+    SelectedFsuId="@SelectedFsuId"
+    survey_time="@survey_time" 
+    />
+    <div class="card card-style2">
+        <div class="card-header  d-flex align-items-center">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">[4]</span>Identification of selected sub-unit and formation of
+                sub-division
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group mb-3">
+                        <label for="" class="mb-2 d-flex align-items-start">
+                            <span class="form-badge">1. </span> Sample sub-unit(SU) number
+                        </label>
+                        <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_0_1.sample_su_number">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group mb-3">
+                        <label for="" class="mb-2 d-flex align-items-start">
+                            <span class="form-badge">2. </span> Approximate population of the SU
+                        </label>
+                        <input disabled type="number" class="form-control form-control-sm" id="" value="@block_0_1.approximate_population_su" @onchange="@((ChangeEventArgs e) => HandleChange(e))">
+                        <ValidationComponent @ref="population_ref" is_error="@is_error" field_name="Approximate population of the SU" />
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="" class="mb-2 d-flex align-items-start">
+                            <span class="form-badge">3. </span> Number of Sub-divisions of SU to be formed(D1)
+                        </label>
+                        <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_0_1.number_of_sub_division_of_su_to_be_formed">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</NavLink>
+        <div class="d-flex">
+            @* <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink> *@
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
+    List<Tbl_Sch_0_0_Block_2_2> block_2_2 = new();
+    DateTime survey_time = DateTime.Now;
+    CommonQueries commonQueries = new();
+    DBQueries Queries = new();
+    ValidationComponent population_ref = new();
+    bool is_error = false;
+    CommonFunction commonFunction = new();
+    CommonConfig commonConfig = new();
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+            {
+                block_uri = "/dashboard/sch0.0/block_4",
+                block_title = "Sch 0.0 Block 4",
+                block_code = CommonEnum.sch_0_0_block_4.ToString(),
+            };
+        await commonQueries.InsertVisitedBlock(vb);
+        block_0_1 = await Queries.FetchBlock1() ?? new();
+        block_2_2 = await Queries.FetchSCH0Block2_2Data() ?? new();
+
+        var selected_su = block_2_2.Find(k => k.IsChecked == true);
+        if (block_0_1 != null && selected_su != null)
+        {
+            block_0_1.sample_su_number = selected_su?.serial_number;
+            var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
+            block_0_1.approximate_population_su = (int)calc;
+            int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+            block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
+        }
+
+        StateHasChanged();
+        return;
+    }
+
+    void HandleChange(ChangeEventArgs eventArgs)
+    {
+        try
+        {
+            string value = eventArgs.Value.ToString();
+            if (string.IsNullOrEmpty(value))
+            {
+                block_0_1.approximate_population_su = 0;
+                block_0_1.number_of_sub_division_of_su_to_be_formed = 0;
+                StateHasChanged();
+                return;
+            }
+            else
+            {
+                block_0_1.approximate_population_su = Convert.ToInt32(value);
+                //tbl_Sch_0_0_Block_4_2A.number_of_sub_division_of_su_to_be_formed = commonFunction.CalculateNoOfSUToBeFormed(false, tbl_Sch_0_0_Block_4_2A.approximate_population_su);
+                StateHasChanged();
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Error in population input: " + ex.ToString());
+            return;
+        }
+    }
+
+    async Task HandleSubmit(bool go_next)
+    {
+        var update = await Queries.SaveBlock1(block_0_1);
+        if (update.GetValueOrDefault() != 0)
+        {
+            if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
+            else
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_7");
+        }
+        else
+        {
+            toastService.ShowError("Error while saving data! Please try again.");
+        }
+    }
+}

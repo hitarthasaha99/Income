@@ -33,7 +33,10 @@
             SessionStorage.user_name = user_details.username;
             SessionStorage.role_name = function.GetUserRoleName(SessionStorage.user_role);
             preloadService.Hide();
-            NavigationManager.NavigateTo("/dashboard/fsulist");
+
+            SessionStorage.SelectedFSUId = 10232;
+            // NavigationManager.NavigateTo("/dashboard/fsulist");
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
             return;
         }
     }

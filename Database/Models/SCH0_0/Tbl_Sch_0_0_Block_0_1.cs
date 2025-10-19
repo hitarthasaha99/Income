@@ -86,9 +86,13 @@ namespace Income.Database.Models.SCH0_0
         public int? Block_1_16 { get; set; }
         //reason for substitution of original sample (code) (for codes 4 – 7 in item 17)
         public int? Block_1_17 { get; set; }
+        public string? state_code { get; set; } = string.Empty;
         //remarks
         [MaxLength(2000)]
         public string? remarks { get; set; } = null;
-
+        //Block 4 items
+        public int? sample_su_number { get; set; }
+        public int? approximate_population_su { get; set; }
+        public int? number_of_sub_division_of_su_to_be_formed { get; set; }
     }
 }

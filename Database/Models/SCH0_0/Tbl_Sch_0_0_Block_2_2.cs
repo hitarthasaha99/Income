@@ -15,6 +15,8 @@ namespace Income.Database.Models.SCH0_0
         public double Percentage { get; set; }
         public string? HamletName { get; set; }
         public string SampleHgSbNumber { get; set; } = string.Empty;
+        [MaxLength(50)]
+        public string SamplingSerialNumberOfTheHgSb { get; set; } = string.Empty;
         public bool IsChecked { get; set; } = false;
         [JsonIgnore]
         [Ignore]

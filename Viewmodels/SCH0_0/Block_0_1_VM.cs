@@ -105,7 +105,7 @@ namespace Income.Viewmodels.SCH0_0
                 var getfsuresponse = await CommonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
                 if (getfsuresponse != null)
                 {
-                    //block_0_1._stateCode = getfsuresponse.St;
+                    block_0_1.state_code = getfsuresponse.st;
                     block_0_1.Block_0_1 = getfsuresponse.stn;
                     block_0_1.Block_0_2 = getfsuresponse.dn;
                     block_0_1.Block_0_3 = getfsuresponse.tehn;

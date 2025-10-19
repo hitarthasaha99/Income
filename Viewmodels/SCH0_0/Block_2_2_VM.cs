@@ -14,30 +14,27 @@ namespace Income.Viewmodels.SCH0_0
     public partial class Block_2_2_VM : BaseVM
     {
         public event Action NotifyUiUpdate;
-        public List<int?> selected_serial_number = new();
-        Blazored.Toast.Services.IToastService ToastService;
         public List<Tbl_Sch_0_0_Block_2_2>? tbl_Sch_0_0_Block_2_2 { get; set; } = new();
         [ObservableProperty]
         private double total_population_percentage = 0.0;
+        [ObservableProperty]
+        private bool _allowSelection = false;
         public List<Tbl_Sch_0_0_Block_2_1>? tbl_Sch_0_0_Block_2_1 { get; set; } = new();
-        private List<SerialPopulation> _serialPopulationsList = new();
+        private Tbl_Fsu_List Tbl_Fsu_List = new();
         DBQueries SCH_0_0_Queries = new();
         CommonQueries cQ = new();
-        //public Modal SelectionModal = default;
-        public List<Tbl_Sch_0_0_Block_2_2> SelectionList = new();
-        public Guid current_selected_row { get; set; } = Guid.Empty;
-        public Block_2_2_VM(IToastService toastService)
+        public Block_2_2_VM()
         {
-            ToastService = toastService;
         }
 
         public async Task Init()
         {
             tbl_Sch_0_0_Block_2_1 = await SCH_0_0_Queries.FetchSCH0Block2_1Data();
             tbl_Sch_0_0_Block_2_2 = await SCH_0_0_Queries.FetchSCH0Block2_2Data();
+            var fsu_response = Tbl_Fsu_List = await cQ.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+
             if (tbl_Sch_0_0_Block_2_2 == null || tbl_Sch_0_0_Block_2_2.Count == 0)
             {
-                var fsu_response = await cQ.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
                 if (fsu_response != null)
                 {
                     if (fsu_response.totalsu > 0)
@@ -57,7 +54,8 @@ namespace Income.Viewmodels.SCH0_0
                     }
                 }
             }
-            tbl_Sch_0_0_Block_2_2 = tbl_Sch_0_0_Block_2_2.OrderBy(k => k.serial_number).ToList();
+            AllowSelection = !tbl_Sch_0_0_Block_2_2?.Any(x => x.IsChecked == true) ?? true;
+            tbl_Sch_0_0_Block_2_2 = tbl_Sch_0_0_Block_2_2?.OrderBy(k => k.serial_number).ToList();
             CalculateTotalPercentage();
             OnPropertyChanged(nameof(tbl_Sch_0_0_Block_2_2));
         }
@@ -108,16 +106,82 @@ namespace Income.Viewmodels.SCH0_0
             Total_population_percentage = total;
         }
 
-        public void DoSelection()
+        public async void DoSelection()
         {
-            var result = Validate();
-            if (!result.IsValid)
+            try
             {
-                foreach (var error in result.Errors)
+                List<Tbl_Sch_0_0_Block_2_2> list = [];
+                var percentages = tbl_Sch_0_0_Block_2_2
+                          .Select(row => row.Percentage) // Extract Percentage values.
+                          .ToList();
+                double minValue = percentages.Min();
+                double maxValue = percentages.Max();
+                if (Math.Abs(maxValue - minValue) > 5)
                 {
-                    ToastService.ShowError(error);
+                    //bool r = await AppShell.Current.DisplayAlert("All the sub-units need to have more or less equal population. Do you want to continue?", "", "Yes", "No");
+
+                    //if (!r)
+                    //{
+                    //    return;
+                    //}
+                }
+                if (Tbl_Fsu_List != null)
+                {
+                    if (Tbl_Fsu_List.totalsu > 0 && Tbl_Fsu_List.totalsu >= Tbl_Fsu_List.selsu)
+                    {
+                        int index = 1;
+                        foreach (var row in tbl_Sch_0_0_Block_2_2)
+                        {
+                            row.IsChecked = false;
+                            row.is_enabled = false;// Reset IsChecked for all rows
+                            row.SamplingSerialNumberOfTheHgSb = string.Empty; // Reset SamplingSerialNumberOfTheHgSb
+                            row.SampleHgSbNumber = string.Empty; // Reset SampleHgSbNumber
+                            if (index == Tbl_Fsu_List.selsu)
+                            {
+                                row.IsChecked = true;
+                                row.SampleHgSbNumber = "1";
+                            }
+                            row.fsu_id = SessionStorage.SelectedFSUId;
+
+                            Tbl_Sch_0_0_Block_2_2 n1 = new();
+                            n1.IsChecked = row.IsChecked;
+                            n1.is_enabled = row.is_enabled;
+                            n1.SamplingSerialNumberOfTheHgSb = row.SamplingSerialNumberOfTheHgSb;
+                            n1.SampleHgSbNumber = row.SampleHgSbNumber;
+                            n1.fsu_id = row.fsu_id;
+                            n1.serial_number = row.serial_number;
+                            n1.HamletName = row.HamletName;
+                            n1.Percentage = row.Percentage;
+                            n1.tenant_id = row.tenant_id;
+                            n1.serial_no_of_hamlets_in_su = row.serial_no_of_hamlets_in_su;
+                            if (string.IsNullOrEmpty(row.id.ToString()))
+                            {
+                                // Save the data object to the database
+                                n1.id = Guid.NewGuid();
+                            }
+                            else
+                            {
+                                n1.id = row.id;
+                            }
+                            list.Add(n1);
+                            index++;
+                        }
+                        if (list.Count > 0)
+                        {
+                            await SCH_0_0_Queries.SaveSCH0Block2_2(list);
+                        }
+                        tbl_Sch_0_0_Block_2_2 = list;
+                        AllowSelection = false;
+                        OnPropertyChanged(nameof(tbl_Sch_0_0_Block_2_2));
+                        NotifyUiUpdate?.Invoke();
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+
+            }
+
         }
 
         void ResetSerialPopulationsList()

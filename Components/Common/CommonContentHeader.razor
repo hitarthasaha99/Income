@@ -97,7 +97,7 @@
         if (string.IsNullOrEmpty(SessionStorage.location) && ShowVisitedBlock == true)
         {
             preloadService.Show(SpinnerColor.Light, "Fetching Location Details...");
-            location = funcs.fetchGeoLocation().Result;
+            location = await funcs.fetchGeoLocation();
         }
         else
         {

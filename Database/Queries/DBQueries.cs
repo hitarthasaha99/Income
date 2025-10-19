@@ -134,7 +134,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_4>("SELECT * FROM Tbl_Sch_0_0_Block_4_2A WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_4>("SELECT * FROM Tbl_Sch_0_0_Block_4 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return response != null && response.Count > 0 ? response.FirstOrDefault() : null;
             }
             catch (Exception ex)
@@ -224,11 +224,11 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_7>?> FetchSCH0Block5Data()
+        public async Task<List<Tbl_Sch_0_0_Block_5>?> FetchSCH0Block5Data()
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_7> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_5> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_5>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)
@@ -344,16 +344,29 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<Tbl_Sch_0_0_Block_7> GetBlock5Data(int hhd_id = 0)
+        public async Task<Tbl_Sch_0_0_Block_7> GetBlock7DataByHHD(int hhd_id = 0)
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND tenant_id = ? AND Block_5A_3 = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id, SessionStorage.selected_hhd_id);
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ? AND Block_5A_3 = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id, SessionStorage.selected_hhd_id);
                 return data_set != null && data_set.Count > 0 ? data_set.FirstOrDefault() : new();
             }
             catch (Exception ex)
             {
                 return new Tbl_Sch_0_0_Block_7();
+            }
+        }
+
+        public async Task<List<Tbl_Sch_0_0_Block_7>> GetBlock7Data(int fsuID)
+        {
+            try
+            {
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                return data_set != null && data_set.Count > 0 ? data_set : new();
+            }
+            catch (Exception ex)
+            {
+                return new List<Tbl_Sch_0_0_Block_7>();
             }
         }
 
@@ -367,7 +380,7 @@ namespace Income.Database.Queries
                     foreach (var file in files)
                     {
                         file.block_name = file.is_sub_unit == true ? CommonEnum.sch_0_0_block_3.ToString() : CommonEnum.sch_0_0_block_3_1.ToString();
-                        await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("DELETE FROM Tbl_File WHERE block_name = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", file.block_name, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                        await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("DELETE FROM Tbl_Sch_0_0_Block_3 WHERE block_name = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", file.block_name, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                         file.id = Guid.NewGuid();
                         file.is_deleted = false;
                         status = await _database.InsertAsync(file);
@@ -381,12 +394,12 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<Tbl_Sch_0_0_Block_3?> GetFileData(string block_name)
+        public async Task<Tbl_Sch_0_0_Block_3?> GetFileData(int is_su)
         {
             try
             {
-                var check_existence = await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("SELECT * FROM Tbl_File WHERE block_name = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", block_name, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
-                if (!check_existence.Any())
+                var check_existence = await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("SELECT * FROM Tbl_Sch_0_0_Block_3 WHERE is_sub_unit = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", is_su, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                if (check_existence.Count == 0)
                 {
                     return null;
                 }

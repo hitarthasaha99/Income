@@ -70,11 +70,11 @@
             block_code = CommonEnum.sch_0_0_block_3.ToString(),
         };
         await CommonQueries.InsertVisitedBlock(vb);
-        Tbl_Sch_0_0_Block_3? response = await SCH_0_0_Querie.GetFileData(CommonEnum.sch_0_0_block_3.ToString());
+        Tbl_Sch_0_0_Block_3? response = await SCH_0_0_Querie.GetFileData(0);
         if (response != null)
         {
             file = response;
-            var base64string = file.Image_File != null ? Convert.ToBase64String(file.Image_File): "";
+            var base64string = file != null ? Convert.ToBase64String(file.file_byte): "";
             //Now create ImageSource from the stream again
             file.file_image_source = $"data:{file.file_type};base64,{base64string}"; //Provide a fresh MemoryStream each time
             StateHasChanged();
@@ -165,31 +165,31 @@
     async Task HandleSubmit(string type)
     {
 
-        NavigationManager.NavigateTo("/dashboard/sch0.0/block_4_1");
-        // try
-        // {
-        //     if (string.IsNullOrEmpty(file.file_image_source))
-        //     {
-        //         toastService.ShowError("Please select a file");
-        //         return;
-        //     }
-        //     var status = await SCH_0_0_Quarie.SaveFileData(file);
-        //     if (status != 1)
-        //     {
-        //         toastService.ShowError("Getting Error while saving file, please try agian!");
-        //         return;
-        //     }
-        //     if (type == "NEXT")
-        //     {
-        //         NavigationManager.NavigateTo("/dashboard/sch0.0/block_4_2");
-        //     }
-        //     return;
-        // }
-        // catch (Exception ex)
-        // {
-        //     toastService.ShowError(ex.ToString());
-        //     return;
-        // }
+        //NavigationManager.NavigateTo("/dashboard/sch0.0/block_4_1");
+        try
+        {
+            if (string.IsNullOrEmpty(file.file_image_source))
+            {
+                toastService.ShowError("Please select a file");
+                return;
+            }
+            var status = await SCH_0_0_Querie.SaveFileData(new List<Tbl_Sch_0_0_Block_3>() { file});
+            if (status != 1)
+            {
+                toastService.ShowError("Getting Error while saving file, please try agian!");
+                return;
+            }
+            if (type == "NEXT")
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_4");
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError(ex.ToString());
+            return;
+        }
     }
 
     async Task DeleteFile()
