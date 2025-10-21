@@ -1,0 +1,71 @@
+﻿@using Income.Database.Models.Common
+@using System.Globalization
+@typeparam TValue
+@inherits InputBase<TValue>
+
+<div class="labeled-select">
+    <select @bind="CurrentValueAsString"
+            @attributes="AdditionalAttributes"
+            class="form-control @GetCssClass()">
+        @if (Items != null)
+        {
+            @foreach (var item in Items)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        }
+    </select>
+
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label>@Label</label>
+    }
+
+    @if (IsError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="validation-message" style="color:@GetColor(ErrorSeverity)">
+            @ErrorMessage
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public bool IsError { get; set; } = false;
+    [Parameter] public ValidationSeverity ErrorSeverity { get; set; } = ValidationSeverity.Hard;
+    [Parameter] public string ErrorMessage { get; set; }
+
+    // Select options
+    [Parameter] public List<SelectListItem> Items { get; set; }
+
+    private string GetCssClass()
+    {
+        if (!IsError) return "";
+        return ErrorSeverity == ValidationSeverity.Hard ? "border-red-500" : "border-green-500";
+    }
+
+    private string GetColor(ValidationSeverity severity) =>
+        severity == ValidationSeverity.Hard ? "red" : "green";
+
+    protected override bool TryParseValueFromString(string value, out TValue result, out string validationErrorMessage)
+    {
+        if (BindConverter.TryConvertTo<TValue>(value, CultureInfo.CurrentCulture, out var parsedValue))
+        {
+            result = parsedValue;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        result = default;
+        validationErrorMessage = $"The {FieldIdentifier.FieldName} field is not valid.";
+        return false;
+    }
+    // Helper class for select items
+    public class SelectListItem
+    {
+        public string Value { get; set; }
+        public string Text { get; set; }
+    }
+}
+
+

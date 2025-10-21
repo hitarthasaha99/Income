@@ -28,7 +28,7 @@ namespace Income.Common
         public static DateTime survey_end_date = funcs.ConvertDate("30th June 2026");
         public static int selected_hhd_size = new();
         public static DateTime survey_timestamp = new();
-
+        public static int FSU_Sector = 0;
         public static void ClearSession()
         {
             SelectedFSUId = 0;
@@ -47,6 +47,7 @@ namespace Income.Common
             location = "";
             selected_hhd_size = new();
             survey_timestamp = new();
+            FSU_Sector = 0;
         }
     }
 }

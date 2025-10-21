@@ -1,0 +1,717 @@
+﻿@page "/dashboard/sch0.0/block_7"
+@using Blazored.FluentValidation
+@using Income.Common.SCH0_0
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@using Income.Validators.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject PreloadService preloadService
+
+
+<GlobalErrorBoundary>
+    <div class="my-2">
+        <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                             survey_time="@survey_time" />
+        <div class="card card-style2">
+            <div class="card-header d-flex align-items-center">
+                <h3 class="card-title m-0 d-flex align-items-center">
+                    <span class="text-primary me-1">[Block 7]</span>List of households and selection of households for Schedule on HIS
+                </h3>
+                <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => HandleModal("ADD"))"><i class="bi bi-plus"></i> <span>Add</span></button>
+                <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => Generate())"><i class="bi bi-plus"></i> <span>Generate</span></button>
+                <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => CalculateSSS())"><i class="bi bi-plus"></i> <span>Calculate SSS</span></button>
+
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th>Srl.No.</th>
+                                <th>House Number</th>
+                                <th>Is the house used only for non-residential purposes? (yes-1, no-2)</th>
+                                <th>Household Serial Number</th>
+                                <th>Name of the head of the household</th>
+                                <th>Household Size</th>
+                                <th>Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</th>
+                                <th>Household Type</th>
+                                <th>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</th>
+                                <th>Usual monthly consumption expenditure of the household (Rs.)</th>
+                                <th>SSS number for Schedule HIS 2026</th>
+                                <th>Selected</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr>
+                                <th>(0)</th>
+                                <th>(1)</th>
+                                <th>(2)</th>
+                                <th>(3)</th>
+                                <th>(4)</th>
+                                <th>(5)</th>
+                                <th>(6)</th>
+                                <th>(7)</th>
+                                <th>(8)</th>
+                                <th>(9)</th>
+                                <th>(10)</th>
+                                <th>(11)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ListItems != null && ListItems.Count > 0)
+                            {
+                                foreach (var item in ListItems)
+                                {
+                                    if (item.is_deleted != true)
+                                    {
+                                        <tr>
+                                            <td>@item.Block_5A_1</td>
+                                            <td>@item.Block_5A_2</td>
+                                            <td>@item.is_household</td>
+                                            <td>@item.Block_5A_3</td>
+                                            <td>@item.Block_5A_4</td>
+                                            <td>@item.Block_5A_5</td>
+                                            <td>@item.Block_5A_6</td>
+                                            <td>@item.Block_5A_7</td>
+                                            <td>@item.Block_5A_8</td>
+                                            <td>@item.Block_5A_9</td>
+                                            <td>@item.SSS</td>
+                                            <td><input type="checkbox" @bind="item.isSelected" disabled /></td>
+                                            <td class="d-flex align-items-center">
+                                                <button class="btn btn-sm btn-primary me-2" @onclick="@(() => HandleModal("UPDATE", item))"><i class="bi bi-pencil-square me-1"></i>Edit</button>
+                                                <button class="btn btn-sm btn-danger" @onclick="@(() => HandleDelete(item.id))"><i class="bi bi-trash me-1"></i>Delete</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+            <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</NavLink>
+            <div class="d-flex">
+                @* <button disabled="@((ListItems != null && ListItems.Count > 0 ? ListItems.FirstOrDefault(l => l.is_selected == true) != null ? true : false : false))" class="btn btn-outline-success me-2" @onclick="@(() => HandleSubmit("SELECTION"))"><i class="bi bi-copy me-2"></i>Do Selection</button> *@
+                <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit("NEXT"))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
+        </div>
+        <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
+            <HeaderTemplate>
+                <h5 class="modal-title">@((fields.id == Guid.Empty ? "Add Household" : "Update Household"))</h5>
+            </HeaderTemplate>
+            <BodyTemplate>
+                @if (fields != null)
+                {
+                    <EditForm EditContext="@editContext" OnValidSubmit="@HandleAddRow">
+                        <FluentValidationValidator />
+
+                        <div class="container-fluid">
+                            <div class="row g-3">
+                                <!-- Serial Number -->
+                                <div class="col-md-6">
+                                    <label class="form-label">1. Serial Number of Row</label>
+                                    <InputNumber class="form-control form-control-sm" @bind-Value="fields.Block_5A_1" Disabled="true" />
+                                </div>
+
+                                <!-- House Number -->
+                                <div class="col-md-6">
+                                    <label class="form-label">2. House Number</label>
+                                    <InputText class="form-control form-control-sm"
+                                               @bind-Value="fields.Block_5A_2"
+                                                />
+                                    <ValidationMessage For="@(() => fields.Block_5A_2)" />
+                                </div>
+
+                                <!-- Is Household -->
+                                <div class="col-md-6">
+                                    <label class="form-label">3. Is the house for non-residential purposes?</label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="fields.is_household">
+                                        <option value="">- Select -</option>
+                                        @if (commonList?.LOOKUP_CONST_YES_NO != null)
+                                        {
+                                            foreach (var item in commonList.LOOKUP_CONST_YES_NO)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => fields.is_household)" />
+                                </div>
+
+                                <!-- Household Serial Number -->
+                                <div class="col-md-6">
+                                    <label class="form-label">4. Household Serial Number</label>
+                                    <InputNumber class="form-control form-control-sm" @bind-Value="fields.Block_5A_3" Disabled="true" />
+                                </div>
+
+                                <!-- Head of Household Name -->
+                                <div class="col-md-6">
+                                    <label class="form-label">5. Name of Head of Household</label>
+                                    <InputText class="form-control form-control-sm"
+                                               onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
+                                               @bind-Value="fields.Block_5A_4"
+                                               @oninput="OnHeadNameInput"/>
+                                    <ValidationMessage For="@(() => fields.Block_5A_4)" />
+                                </div>
+
+
+                                <!-- Household Size -->
+                                <div class="col-md-6">
+                                    <label class="form-label">6. Household Size</label>
+                                    <InputNumber class="form-control form-control-sm"
+                                                 @bind-Value="fields.Block_5A_5"
+                                                  />
+                                    <ValidationMessage For="@(() => fields.Block_5A_5)" />
+                                </div>
+
+                                <!-- Highest Education Level -->
+                                <div class="col-md-6">
+                                    <label class="form-label">7. Highest Education Level (Urban only)</label>
+                                    <InputSelect class="form-select form-select-sm"
+                                                 @bind-Value="fields.Block_5A_6" Disabled="@(sector == 1)">
+                                        <option value="">- Select -</option>
+                                        @if (Block_7_Constants.HighestEdu != null)
+                                        {
+                                            foreach (var item in Block_7_Constants.HighestEdu)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => fields.Block_5A_6)" />
+                                </div>
+
+                                <!-- Household Type -->
+                                <div class="col-md-6">
+                                    <label class="form-label">8. Household Type</label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="fields.Block_5A_7">
+                                        <option value="">- Select -</option>
+                                        @if (sector == 1 && Block_7_Constants.HHDTypeRural != null)
+                                        {
+                                            foreach (var item in Block_7_Constants.HHDTypeRural)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                        else if (sector != 1 && Block_7_Constants.HHDTypeUrban != null)
+                                        {
+                                            foreach (var item in Block_7_Constants.HHDTypeUrban)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => fields.Block_5A_7)" />
+                                </div>
+
+                                <!-- Total Land Owned -->
+                                <div class="col-md-6">
+                                    <label class="form-label">9. Total Land Owned (Rural only)</label>
+                                    <InputNumber class="form-control form-control-sm"
+                                                 @bind-Value="fields.Block_5A_8"
+                                                  />
+                                    <ValidationMessage For="@(() => fields.Block_5A_8)" />
+                                </div>
+
+                                <!-- Monthly Expenditure -->
+                                <div class="col-md-6">
+                                    <label class="form-label">10. Usual Monthly Consumption Expenditure</label>
+                                    <InputNumber class="form-control form-control-sm"
+                                                 @bind-Value="fields.Block_5A_9"
+                                                  />
+                                    <ValidationMessage For="@(() => fields.Block_5A_9)" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-outline-primary"
+                                    @onclick="@(() => HandleModal("CLOSE"))">
+                                Close
+                            </button>
+                        </div>
+                    </EditForm>
+                }
+
+
+
+            </BodyTemplate>
+
+
+        </Modal>
+    </div>
+</GlobalErrorBoundary>
+
+
+
+@code {
+    EditContext editContext;
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    CommonQueries commonQueries = new();
+    DBQueries SCH_0_0_Queries = new();
+    CommonConfig commonConfig = new();
+    Modal AddModal = default;
+    public int sector { get; set; } = 0;
+    Tbl_Sch_0_0_Block_7 fields = new();
+    List<Tbl_Sch_0_0_Block_7> ListItems = new();
+    ValidationComponent house_number_ref = new();
+    ValidationComponent purpose_ref = new();
+    ValidationComponent head_name_ref = new();
+    ValidationComponent size_ref = new();
+    CommonList commonList = new();
+    private ValidationMessageStore messageStore;
+
+    CommonFunction commonFunctions = new();
+    bool is_error = false;
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+            {
+                block_uri = "/dashboard/sch0.0/block_5",
+                block_title = "Sch 0.0 Block 5",
+                block_code = CommonEnum.sch_0_0_block_5.ToString(),
+            };
+
+        await commonQueries.InsertVisitedBlock(vb);
+        var block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+        if (block_0_1 != null)
+        {
+            SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
+        }
+        var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+        if (response != null && response.Count > 0)
+        {
+            ListItems = new();
+            ListItems = response.OrderBy(x => x.Block_5A_1).ToList();
+            StateHasChanged();
+        }
+        return;
+    }
+
+    private async Task LoadData()
+    {
+        var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+        if (response != null && response.Count > 0)
+        {
+            ListItems?.Clear();
+            ListItems?.AddRange(response.OrderBy(x => x.Block_5A_1).ToList());
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Generates true random households based on sector(n=size)
+    /// Weightage - 80% households and 20% non-households
+    /// </summary>
+    /// <returns></returns>
+    private async Task Generate()
+    {
+        try
+        {
+            List<Tbl_Sch_0_0_Block_7> generatedHHDs = new();
+            var education_levels = Block_7_Constants.HighestEdu.Select(x => x.id).ToArray();
+            var household_types = sector == 1 ? Block_7_Constants.HHDTypeRural.Select(x => x.id).ToArray() : Block_7_Constants.HHDTypeUrban.Select(x => x.id).ToArray();
+            int size = 1000;
+            Random gen = new();
+            for(int i = 1; i<=size; i++)
+            {
+                Tbl_Sch_0_0_Block_7 obj = new();
+                obj.id = Guid.NewGuid();
+                obj.is_household = (gen.NextDouble() < 0.8) ? 2 : 1;
+                obj.Block_5A_1 = generatedHHDs.Count > 0 ?  (generatedHHDs.Max(x => x.Block_5A_1.GetValueOrDefault())  + 1) : 1;
+                obj.Block_5A_2 = $"H-{obj.Block_5A_1}";
+                obj.Block_5A_3 = obj.is_household == 2 ? (generatedHHDs.Count > 0 ? (generatedHHDs.Max(x => x.Block_5A_3.GetValueOrDefault()) + 1) : 1) : 0;
+                obj.Block_5A_4 = $"Head {obj.Block_5A_1}";
+                obj.Block_5A_5 = gen.Next(1,11);
+                obj.Block_5A_6 = sector == 1 ? null : education_levels[gen.Next(education_levels.Length)];
+                obj.Block_5A_7 = household_types[gen.Next(household_types.Length)];
+                obj.Block_5A_8 = sector == 1 ? Math.Round(gen.NextDouble() * 5, 3) : null;
+                obj.Block_5A_9 = gen.Next(5000,100000);
+                generatedHHDs.Add(obj);
+            }
+            var response = await SCH_0_0_Queries.SaveBulkBlock7(generatedHHDs);
+            await LoadData();
+        }
+        catch(Exception ex)
+        {
+            toastService.ShowError($"Getting Error while generating households {ex}, Please try again!");
+        }
+    }
+
+    private async Task CalculateSSS()
+    {
+        //1. Separate logic for rural (consider both A and B) and urban (only A)
+        //2. A - Arrange usual monthly consumption expenditure (Block_5A_9) in ascending order and find median
+        //3. B - Arrange land area (Block_5A_8) in ascending order and find 60th percentile value
+        //4. Calculate SSS using formula below -
+        /*
+         * Rural:
+         * SSS - 11 = Block_5A_7 = 1 and Block_5A_8 < B
+         * SSS - 12 = Block_5A_7 = 1 and Block_5A_8 >= B
+         * SSS - 21 = Block_5A_7 = 2 and Block_5A_9 < A
+         * SSS - 22 = Block_5A_7 = 2 and Block_5A_9 >= A
+         * SSS - 31 = Block_5A_7 = 3 and Block_5A_9 < A
+         * SSS - 32 = Block_5A_7 = 3 and Block_5A_9 >= A
+         * SSS - 41 = Block_5A_7 = 4
+         * SSS - 91 = Block_5A_7 = 9
+         * Urban:
+         * SSS - 11 = Block_5A_7 = 1 and Block_5A_9 < A
+         * SSS - 12 = Block_5A_7 = 1 and Block_5A_9 >= A and Block_5A_6 in [1,2,3,4,5,6]
+         * SSS - 13 = Block_5A_7 = 1 and Block_5A_9 >= A and Block_5A_6 in [7,10,11]
+         * SSS - 21 = Block_5A_7 = 2 and Block_5A_9 < A
+         * SSS - 22 = Block_5A_7 = 2 and Block_5A_9 >= A and Block_5A_6 in [1,2,3,4,5,6]
+         * SSS - 23 = Block_5A_7 = 2 and Block_5A_9 >= A and Block_5A_6 in [7,10,11]
+         * SSS - 31 = Block_5A_7 = 3 and Block_5A_9 < A
+         * SSS - 91 = Block_5A_7 in [4,9]
+         */
+        try
+        {
+            preloadService.Show(SpinnerColor.Info, "Assigning SSS");
+            // Fetch data
+            var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+            if (response == null || response.Count == 0)
+                return;
+
+            // --- Calculate A: median of Block_5A_9 ---
+            var allExpenditure = response.Where(x => x.Block_5A_9.HasValue)
+                                         .Select(x => x.Block_5A_9.Value)
+                                         .OrderBy(x => x)
+                                         .ToList();
+            decimal A = 0;
+            int count = allExpenditure.Count;
+            if (count > 0)
+            {
+                if (count % 2 == 1)
+                    A = allExpenditure[count / 2];
+                else
+                    A = (allExpenditure[(count / 2) - 1] + allExpenditure[count / 2]) / 2m;
+            }
+
+            // --- Calculate B: 60th percentile of Block_5A_8 ---
+            var landAreas = response.Where(x => x.Block_5A_8.HasValue)
+                                    .Select(x => x.Block_5A_8.Value)
+                                    .OrderBy(x => x)
+                                    .ToList();
+            decimal B = 0;
+            int landCount = landAreas.Count;
+            if (landCount > 0)
+            {
+                double percentileIndex = 0.6 * (landCount - 1);
+                int lowerIndex = (int)Math.Floor(percentileIndex);
+                int upperIndex = (int)Math.Ceiling(percentileIndex);
+                B = (decimal)(landAreas[lowerIndex] + (landAreas[upperIndex] - landAreas[lowerIndex]) * (percentileIndex - lowerIndex));
+            }
+
+            // --- Assign A and B to each household ---
+            foreach (var item in response)
+            {
+                item.a = A;
+                item.b = B;
+            }
+
+            // --- Assign SSS based on sector ---
+            foreach (var item in response)
+            {
+                int block7 = item.Block_5A_7 ?? 0;
+                int expenditure = item.Block_5A_9 ?? 0;
+                double landArea = item.Block_5A_8 ?? 0;
+                int education = item.Block_5A_6 ?? 0;
+
+                if (sector == 1) // Rural
+                {
+                    switch (block7)
+                    {
+                        case 1:
+                            item.SSS = landArea < (double)B ? 11 : 12;
+                            break;
+                        case 2:
+                            item.SSS = expenditure < (int)A ? 21 : 22;
+                            break;
+                        case 3:
+                            item.SSS = expenditure < (int)A ? 31 : 32;
+                            break;
+                        case 4:
+                            item.SSS = 41;
+                            break;
+                        case 9:
+                            item.SSS = 91;
+                            break;
+                        default:
+                            item.SSS = 0;
+                            break;
+                    }
+                }
+                else if (sector == 2) // Urban
+                {
+                    switch (block7)
+                    {
+                        case 1:
+                            if (expenditure < (int)A)
+                                item.SSS = 11;
+                            else if (new int[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
+                                item.SSS = 12;
+                            else if (new int[] { 7, 10, 11 }.Contains(education))
+                                item.SSS = 13;
+                            else
+                                item.SSS = 0;
+                            break;
+
+                        case 2:
+                            if (expenditure < (int)A)
+                                item.SSS = 21;
+                            else if (new int[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
+                                item.SSS = 22;
+                            else if (new int[] { 7, 10, 11 }.Contains(education))
+                                item.SSS = 23;
+                            else
+                                item.SSS = 0;
+                            break;
+
+                        case 3:
+                            item.SSS = expenditure < (int)A ? 31 : 0;
+                            break;
+
+                        case 4:
+                        case 9:
+                            item.SSS = 91;
+                            break;
+
+                        default:
+                            item.SSS = 0;
+                            break;
+                    }
+                }
+            }
+
+            // Optionally: Save updated response to database here
+            var update = await SCH_0_0_Queries.SaveSSSToDatabase(response);
+            if (update == 1)
+            {
+                toastService.ShowSuccess("SSS assignment successful");
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle/log exception
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            preloadService.Hide();
+        }
+    }
+
+
+
+
+    async Task HandleSubmit(string action = "")
+    {
+        NavigationManager.NavigateTo("/dashboard/sch0.0/block_5A");
+        return;
+        // if (action == "SELECTION")
+        // {
+        //     var item_count = ListItems.Count(l => l.is_deleted != true);
+        //     if (item_count < 20)
+        //     {
+        //         toastService.ShowError("Please add atleast 20 rows to continue, Please try again!");
+        //         return;
+        //     }
+
+        //     /* SRSWOR Algo Start
+        //     /
+        //     /
+        //     var selected_items = commonFunctions.SSWOR(ListItems.Where(j => j.is_deleted != true).ToList());
+        //     foreach(var item in selected_items)
+        //     {
+        //         var item_index = ListItems.FindIndex(l => l.id == item.id);
+        //         if (item_index != -1)
+        //         {
+        //             ListItems[item_index].is_selected = true;
+        //         }
+        //          toastService.ShowSuccess($"Serial number {item.serial_no}");
+        //     }
+        //     /
+        //     / SRSWOR Algo END
+        //     StateHasChanged();
+        //     var response = await SCH_0_0_Queries.SaveSCH0Block5(ListItems);
+        //     if (response != 1)
+        //     {
+        //         toastService.ShowError("Getting error , Please try again!");
+        //         return;
+        //     }
+        //     toastService.ShowSuccess("Selection done successfully!");
+        //     return;
+
+        // }
+
+        // if(ListItems != null && ListItems.Count >= 1) {
+        //     var response = await SCH_0_0_Queries.SaveSCH0Block5(ListItems);
+        //     if (response != 1)
+        //     {
+        //         toastService.ShowError("Getting error , Please try again!");
+        //         return;
+        //     }
+        //     if (action == "NEXT")
+        //     {
+        //         NavigationManager.NavigateTo("/dashboard/sch0.0/block_6");
+        //         return;
+        //     }
+        //     return;
+        // }
+        // toastService.ShowError("Please add atleast one row to continue, Please try again!");
+        // return;
+    }
+
+    void HandleDelete(Guid id)
+    {
+        int item_index = ListItems.FindIndex(l => l.id == id);
+        if (item_index != -1)
+        {
+            ListItems[item_index].is_deleted = true;
+            StateHasChanged();
+        }
+        else
+        {
+            toastService.ShowError("Not Able to delete row, Please try again!");
+            return;
+        }
+    }
+
+    async Task HandleModal(string action = "", Tbl_Sch_0_0_Block_7? data = null)
+    {
+        try
+        {
+            if (action == "ADD")
+            {
+                if (data == null)
+                {
+                    fields = new();
+                    fields.id = Guid.NewGuid();
+                    fields.Block_5A_1 = ReturnHHDSerialNumber().GetValueOrDefault();
+                    fields.Block_5A_3 = ReturnHHDSamplingSerialNumber().GetValueOrDefault();
+                }
+                else
+                {
+                    fields = data;
+                }
+                // Recreate EditContext for the new model
+                editContext = new EditContext(fields);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += ClearFieldErrorsOnChange;
+
+                await AddModal.ShowAsync();
+            }
+            else if (action == "UPDATE")
+            {
+                if (data != null)
+                {
+                    fields = data;
+                    // Recreate EditContext for the new model
+                    editContext = new EditContext(fields);
+                    messageStore = new ValidationMessageStore(editContext);
+                    editContext.OnFieldChanged += ClearFieldErrorsOnChange;
+                    await AddModal.ShowAsync();
+                }
+            }
+            else
+            {
+                await AddModal.HideAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+
+    }
+
+    private void ClearFieldErrorsOnChange(object? sender, FieldChangedEventArgs e)
+    {
+        // Remove only that field's messages
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Tell Blazor to re-render the validation summary/messages
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private void OnHeadNameInput(ChangeEventArgs e)
+    {
+        fields.Block_5A_4 = e.Value?.ToString() ?? string.Empty;
+
+        var fieldIdentifier = editContext.Field(nameof(fields.Block_5A_4));
+        messageStore.Clear(fieldIdentifier);
+        editContext.NotifyValidationStateChanged();
+
+        // Optional: if you want live revalidation after clearing:
+        editContext.Validate();
+
+        StateHasChanged();
+    }
+
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        if (editContext != null)
+        {
+            editContext.Validate();
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Save or Update Row
+    /// </summary>
+    /// <returns></returns>
+    async Task HandleAddRow()
+    {
+        var block_5_obj = fields;
+        if (block_5_obj != null)
+        {
+            await SCH_0_0_Queries.SaveUpdateSCH0Block7(block_5_obj);
+        }
+        await AddModal.HideAsync();
+        await LoadData();
+               
+    }
+
+    int? ReturnHHDSerialNumber()
+    {
+        try
+        {
+            int maxValue = ListItems.Where(x => x.is_deleted != true).Any()? ListItems.Where(x => x.is_deleted != true).Max(x => x.Block_5A_1.GetValueOrDefault()) : 0; // or use int? maxValue = null;
+            return maxValue + 1;
+        }
+        catch(Exception ex)
+        {
+            toastService.ShowError($"Getting Error while generating Household Serial Number {ex}, Please try again!");
+            return null;
+        }
+    }
+
+    int? ReturnHHDSamplingSerialNumber()
+    {
+        try
+        {
+            int maxValue = ListItems.Where(x => x.is_deleted != true).Any() ? ListItems.Where(x => x.is_deleted != true).Max(x => x.Block_5A_3.GetValueOrDefault()) : 0; // or use int? maxValue = null;
+            return maxValue + 1;
+        }
+        catch(Exception ex)
+        {
+            toastService.ShowError($"Getting Error while generating Household sampling Serial Number {ex}, Please try again!");
+            return null;
+        }
+    }
+}

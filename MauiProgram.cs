@@ -1,4 +1,6 @@
 ﻿using Blazored.Toast;
+using FluentValidation;
+using Income.Services;
 using Income.Validators.SCH0_0;
 using Microsoft.Extensions.Logging;
 
@@ -26,8 +28,13 @@ namespace Income
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_0_1_VM>();
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_1_VM>();
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_2_VM>();
+            builder.Services.AddValidatorsFromAssemblyContaining<Block7Validator>();
+
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             //builder.Services.AddFluentValidationAutoValidation();
+
+            builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
+
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

@@ -365,7 +365,7 @@ namespace Income.Common
         public static int GetFilteredSubstitutionTravel(List<Tbl_Sch_0_0_Block_7> list)
         {
             var counter = 0;
-            var initialSelectedList = list.Where(entry => entry.is_initially_selected_travel == true && entry.SubstitutionCount != 0).ToList();
+            var initialSelectedList = list.Where(entry => entry.isInitialySelected == true && entry.SubstitutionCount != 0).ToList();
 
             foreach (var item in initialSelectedList)
             {

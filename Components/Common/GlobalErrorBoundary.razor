@@ -1,0 +1,23 @@
+﻿@using Income.Services
+@inject IGlobalExceptionHandler GlobalExceptionHandler
+
+<ErrorBoundary>
+    <ChildContent>
+        @ChildContent
+    </ChildContent>
+    <ErrorContent>
+        @RenderError
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    private RenderFragment<Exception> RenderError => ex => builder =>
+    {
+        GlobalExceptionHandler.Log(ex);
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "text-danger");
+        builder.AddContent(2, "An unexpected error occurred. Please try again.");
+        builder.CloseElement();
+    };
+}

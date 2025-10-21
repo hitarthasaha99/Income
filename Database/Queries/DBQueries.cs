@@ -263,22 +263,7 @@ namespace Income.Database.Queries
         //        return null;
         //    }
         //}
-        public static int GetEducationFilteredSubstitution(List<Tbl_Sch_0_0_Block_7> block_5_reponse)
-        {
-            var counter = 0;
-            var initialSelectedList = block_5_reponse.Where(entry => entry.is_initially_selected_travel == true && entry.substitution_count_travel != 0).ToList();
-
-            foreach (var item in initialSelectedList)
-            {
-                var filteredData = block_5_reponse.Where(entry => entry.is_selected_travel == true && entry.original_household_id_travel == item.Block_5A_3).FirstOrDefault(); // && entry.substituted_for_id_cms != item.Block_5A_3
-                if (filteredData != null && filteredData.status_travel == "SUBSTITUTE")
-                {
-                    counter++;
-                }
-                //}
-            }
-            return counter;
-        }
+        
         public async Task<int?> SaveBlock1(Tbl_Sch_0_0_Block_0_1 tbl_Sch_0_0_Block_0_1)
         {
             try
@@ -433,9 +418,9 @@ namespace Income.Database.Queries
             // Step 2: Get all eligible households
             var filteredData = await _database.Table<Tbl_Sch_0_0_Block_7>()
                 .Where(h => h.fsu_id == FSUID
-                    && (h.is_selected_travel == null || h.is_selected_travel == false)
-                    && (h.is_casualty_travel == null || h.is_casualty_travel == false)
-                    && h.is_household == true)
+                    && (h.isSelected == null || h.isSelected == false)
+                    && (h.isCasualty == null || h.isCasualty == false)
+                    && h.is_household == 1)
                 .ToListAsync();
 
             // Step 3: Try to find the next higher serial number
@@ -456,7 +441,7 @@ namespace Income.Database.Queries
             return nextHousehold;
         }
 
-        public async Task<int?> SaveUpdateSCH0Block5(Tbl_Sch_0_0_Block_7 tbl_Sch_0_0_Block_5)
+        public async Task<int?> SaveUpdateSCH0Block7(Tbl_Sch_0_0_Block_7 tbl_Sch_0_0_Block_5)
         {
             try
             {
@@ -464,7 +449,7 @@ namespace Income.Database.Queries
                 {
 
                     var check_existence = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.id == tbl_Sch_0_0_Block_5.id).ToListAsync();
-                    if (check_existence != null)
+                    if (check_existence != null && check_existence.Count > 0)
                     {
                         await _database.UpdateAsync(tbl_Sch_0_0_Block_5);
                     }
@@ -488,6 +473,62 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> SaveSSSToDatabase(List<Tbl_Sch_0_0_Block_7> households)
+        {
+            if (households == null || households.Count == 0)
+                return 0;
+
+            try
+            {
+
+                // Begin transaction
+                await _database.RunInTransactionAsync(tran =>
+                {
+                    foreach (var item in households)
+                    {
+                        // Update each household in the database
+                        tran.Execute("UPDATE Tbl_Sch_0_0_Block_7 SET SSS = ?, a = ?, b = ? WHERE id = ?",
+             item.SSS, item.a, item.b, item.id);
+                    }
+                });
+
+                Console.WriteLine("All SSS values updated successfully!");
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error updating SSS values: " + ex.Message);
+                return 0;
+            }
+        }
+
+
+        public async Task<int?> SaveBulkBlock7(List<Tbl_Sch_0_0_Block_7> list)
+        {
+            try
+            {
+                if (list != null && list.Count > 0)
+                {
+
+                    var insert = await _database.InsertAllAsync(list);
+
+                    return insert;
+                }
+                else
+                {
+                    toastService.ShowError($"Getting Error While storing data!");
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While saving SCH 0 Block 5: {ex.Message}");
+                return null;
+            }
+        }
+
+
+
         // Added By testing 16/6/25
         public Task<Tbl_Sch_0_0_Block_2_2> GetSelectedSubUnit(string fsuID)
         {
@@ -499,7 +540,7 @@ namespace Income.Database.Queries
         public Task<List<Tbl_Sch_0_0_Block_7>> Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(int fsu_id)
         {
             return _database.Table<Tbl_Sch_0_0_Block_7>()
-                            .Where(x => x.fsu_id == fsu_id && x.is_household)
+                            .Where(x => x.fsu_id == fsu_id && x.is_household == 1)
                             .ToListAsync();
         }
 
@@ -514,8 +555,8 @@ namespace Income.Database.Queries
             // If the household is found, mark it as a casualty
             if (casualtyHousehold != null)
             {
-                casualtyHousehold.is_casualty_travel = true;
-                casualtyHousehold.status_travel = "CASUALTY";
+                casualtyHousehold.isCasualty = true;
+                casualtyHousehold.status = "CASUALTY";
                 // Update the household and return the number of affected rows
                 int result = await _database.UpdateAsync(casualtyHousehold);
                 return result;
@@ -534,7 +575,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.fsu_id == Fsu_id && x.is_selected_travel == true).ToListAsync();
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.fsu_id == Fsu_id && x.isSelected == true).ToListAsync();
                 return data_set;
             }
             catch (Exception)
@@ -554,10 +595,10 @@ namespace Income.Database.Queries
                     .FirstOrDefaultAsync();
 
                 // If the household is found, mark it as a casualty
-                if (casualtyHousehold != null && casualtyHousehold.is_casualty_travel == true && casualtyHousehold.status_travel == "CASUALTY")
+                if (casualtyHousehold != null && casualtyHousehold.isCasualty == true && casualtyHousehold.status == "CASUALTY")
                 {
-                    casualtyHousehold.is_casualty_travel = false;
-                    casualtyHousehold.status_travel = string.Empty;
+                    casualtyHousehold.isCasualty = false;
+                    casualtyHousehold.status = string.Empty;
                     // Update the household and return the number of affected rows
                     int result = await _database.UpdateAsync(casualtyHousehold);
                     return result;

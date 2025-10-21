@@ -77,7 +77,8 @@ namespace Income.Database.Models.Common
         public int? updatelistingcount { get; set; } = 0;
         [JsonIgnore]
         public bool NeedDownload { get; set; } = false;
-
+        public decimal? a { get; set; }
+        public decimal? b { get; set; }
 
     }
 
