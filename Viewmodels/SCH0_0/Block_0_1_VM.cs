@@ -125,7 +125,7 @@ namespace Income.Viewmodels.SCH0_0
                     block_0_1.Block_1_9 = getfsuresponse.sstrm;
                     block_0_1.Block_1_10 = getfsuresponse.subrnd;
                     block_0_1.Block_1_11 = getfsuresponse.sro;
-                    block_0_1.Block_1_12 = null;
+                    block_0_1.Block_1_12 = Block_0_1_Constants.FrameCode.FirstOrDefault(x => x.id == Convert.ToInt16(getfsuresponse.fc))?.id ?? 0;
                     block_0_1.Block_1_13 = getfsuresponse.framepop;
                     block_0_1.Block_1_14 = null;
                     block_0_1.Block_1_15 = getfsuresponse.totalsu;

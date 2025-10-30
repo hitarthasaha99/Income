@@ -9,6 +9,7 @@ namespace Income.Database.Models.SCH0_0
         [PrimaryKey]
         public Guid id { get; set; }
         public int SSS { get; set; }
+        public int Stratum { get; set; }
         public bool? isInitialySelected { get; set; }
 
         //is household or not
@@ -16,27 +17,27 @@ namespace Income.Database.Models.SCH0_0
         //is selected for 
         public bool isSelected { get; set; } = false;
         //serial number
-        public int? Block_5A_1 { get; set; }
+        public int? Block_7_1 { get; set; }
         //house number
         [MaxLength(50)]
-        public string Block_5A_2 { get; set; } = string.Empty;
+        public string Block_7_2 { get; set; } = string.Empty;
         //srl.no. hhd id used everywhere to identify house hold, in schedule it shows as household serial number
         //only these considered for listing
-        public int? Block_5A_3 { get; set; }
+        public int? Block_7_3 { get; set; }
         //name of head of the household
         [MaxLength(50)]
-        public string? Block_5A_4 { get; set; } = string.Empty;
+        public string? Block_7_4 { get; set; } = string.Empty;
         //household (hh) size
         [MaxLength(50)]
-        public int? Block_5A_5 { get; set; }
+        public int? Block_7_5 { get; set; }
         //highest education level attained among the household members
-        public int? Block_5A_6 { get; set; }
+        public int? Block_7_6 { get; set; }
         //household type
-        public int? Block_5A_7 { get; set; }
+        public int? Block_7_7 { get; set; }
         //total amount of land owned (in acres)
-        public double? Block_5A_8 { get; set; }
+        public double? Block_7_8 { get; set; }
         //usual monthly consumption expenditure of the household
-        public int? Block_5A_9 { get; set; }
+        public int? Block_7_9 { get; set; }
         // Indicates whether this household is a substitution for another household
         public bool isSubstitute { get; set; } = false;
 

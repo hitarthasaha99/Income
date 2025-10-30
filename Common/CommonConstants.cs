@@ -344,7 +344,7 @@ namespace Income.Common
             {
                 if (item.SubstitutionCount == 1)
                 {
-                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_5A_3 && entry.SubstitutedForID == item.Block_5A_3);
+                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID == item.Block_7_3);
                     if (filteredData != null && filteredData.status == "SUBSTITUTE")
                     {
                         counter++;
@@ -352,7 +352,7 @@ namespace Income.Common
                 }
                 else if (item.SubstitutionCount == 2)
                 {
-                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_5A_3 && entry.SubstitutedForID != item.Block_5A_3);
+                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID != item.Block_7_3);
                     if (filteredData != null && filteredData.status == "SUBSTITUTE")
                     {
                         counter++;
@@ -371,7 +371,7 @@ namespace Income.Common
             {
                 if (item.SubstitutionCount == 1)
                 {
-                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_5A_3 && entry.SubstitutedForID == item.Block_5A_3);
+                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID == item.Block_7_3);
                     if (filteredData != null && filteredData.status == "SUBSTITUTE")
                     {
                         counter++;
@@ -379,7 +379,7 @@ namespace Income.Common
                 }
                 else if (item.SubstitutionCount == 2)
                 {
-                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_5A_3 && entry.SubstitutedForID != item.Block_5A_3);
+                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID != item.Block_7_3);
                     if (filteredData != null && filteredData.status == "SUBSTITUTE")
                     {
                         counter++;

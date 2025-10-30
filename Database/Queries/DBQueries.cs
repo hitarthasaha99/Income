@@ -401,7 +401,7 @@ namespace Income.Database.Queries
 
         public Task<Tbl_Sch_0_0_Block_7> FetchCasualtyOrOriginalHouseHold(int FSUID, int ID)
         {
-            return _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.fsu_id == FSUID && x.Block_5A_3 == ID).FirstOrDefaultAsync();
+            return _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.fsu_id == FSUID && x.Block_7_3 == ID).FirstOrDefaultAsync();
         }
 
         //find a household with a higher and smaller serial number
@@ -409,7 +409,7 @@ namespace Income.Database.Queries
         {
             // Step 1: Get the casualty household
             var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_7>()
-                .Where(h => h.fsu_id == FSUID && h.Block_5A_3 == casualtyHouseholdId)
+                .Where(h => h.fsu_id == FSUID && h.Block_7_3 == casualtyHouseholdId)
                 .FirstOrDefaultAsync();
 
             if (casualtyHousehold == null)
@@ -425,16 +425,16 @@ namespace Income.Database.Queries
 
             // Step 3: Try to find the next higher serial number
             var nextHousehold = filteredData
-                .Where(h => h.Block_5A_3 > casualtyHousehold.Block_5A_3)
-                .OrderBy(h => h.Block_5A_3)
+                .Where(h => h.Block_7_3 > casualtyHousehold.Block_7_3)
+                .OrderBy(h => h.Block_7_3)
                 .FirstOrDefault();
 
             // Step 4: If not found, try to find the previous lower serial number
             if (nextHousehold == null)
             {
                 nextHousehold = filteredData
-                    .Where(h => h.Block_5A_3 < casualtyHousehold.Block_5A_3)
-                    .OrderByDescending(h => h.Block_5A_3)
+                    .Where(h => h.Block_7_3 < casualtyHousehold.Block_7_3)
+                    .OrderByDescending(h => h.Block_7_3)
                     .FirstOrDefault();
             }
 
@@ -549,7 +549,7 @@ namespace Income.Database.Queries
         {
             // Fetch the casualty household
             var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_7>()
-                .Where(h => h.fsu_id == SessionStorage.SelectedFSUId && h.Block_5A_3 == casualtyHouseholdId)
+                .Where(h => h.fsu_id == SessionStorage.SelectedFSUId && h.Block_7_3 == casualtyHouseholdId)
                 .FirstOrDefaultAsync();
 
             // If the household is found, mark it as a casualty
@@ -591,7 +591,7 @@ namespace Income.Database.Queries
             {
                 // Fetch the casualty household
                 var casualtyHousehold = await _database.Table<Tbl_Sch_0_0_Block_7>()
-                    .Where(h => h.fsu_id == SessionStorage.SelectedFSUId && h.Block_5A_3 == casualtyHouseholdId)
+                    .Where(h => h.fsu_id == SessionStorage.SelectedFSUId && h.Block_7_3 == casualtyHouseholdId)
                     .FirstOrDefaultAsync();
 
                 // If the household is found, mark it as a casualty

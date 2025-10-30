@@ -88,13 +88,22 @@
         block_2_2 = await Queries.FetchSCH0Block2_2Data() ?? new();
 
         var selected_su = block_2_2.Find(k => k.IsChecked == true);
-        if (block_0_1 != null && selected_su != null)
+        if (block_0_1 != null)
         {
-            block_0_1.sample_su_number = selected_su?.serial_number;
-            var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
-            block_0_1.approximate_population_su = (int)calc;
-            int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
-            block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
+            if (selected_su != null)
+            {
+                block_0_1.sample_su_number = selected_su?.serial_number;
+                var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
+                block_0_1.approximate_population_su = (int)calc;
+                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+                block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
+            }
+            else
+            {
+                block_0_1.sample_su_number = 1;
+                block_0_1.approximate_population_su = block_0_1.Block_1_14;
+                block_0_1.number_of_sub_division_of_su_to_be_formed = 0;
+            }
         }
 
         StateHasChanged();

@@ -59,7 +59,7 @@
                                     </td>
                                     <td>@item.framepop</td>
                                     <td>
-                                        <span class="badge rounded-pill bg-warning text-dark" style="font-size: 15px;">@item.completed_hhd / @item.total_hhd</span>
+                                        <span class="badge rounded-pill bg-warning text-dark" style="font-size: 15px;">-</span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
@@ -789,7 +789,7 @@
          }
          foreach(var Item in FsuHouseData)
          {
-           var  RefinedData = oldData.FirstOrDefault(x=> x.fsu_id == Item.fsu_id && x.Block_5A_3 == Item.hhd_id);
+           var  RefinedData = oldData.FirstOrDefault(x=> x.fsu_id == Item.fsu_id && x.Block_7_3 == Item.hhd_id);
             if(RefinedData != null)
             {
                 if(RefinedData.hhdStatus != Item.lookup_submit_status)
