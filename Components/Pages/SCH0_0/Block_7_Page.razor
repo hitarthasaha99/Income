@@ -3,6 +3,7 @@
 @using Income.Common.SCH0_0
 @using Income.Database.Models.Common
 @using Income.Database.Models.SCH0_0
+@using Income.SurveyLibrary
 @using Income.Validators.SCH0_0
 @layout Income.Components.Layout.DashboardLayout
 @inject IJSRuntime JSRuntime
@@ -23,6 +24,7 @@
                 <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => HandleModal("ADD"))"><i class="bi bi-plus"></i> <span>Add</span></button>
                 <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => Generate())"><i class="bi bi-plus"></i> <span>Generate</span></button>
                 <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => CalculateSSS())"><i class="bi bi-plus"></i> <span>Calculate SSS</span></button>
+                <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => DoSelection())"><i class="bi bi-plus"></i> <span>Selection</span></button>
 
             </div>
             <div class="card-body p-0">
@@ -323,7 +325,7 @@
             List<Tbl_Sch_0_0_Block_7> generatedHHDs = new();
             var education_levels = Block_7_Constants.HighestEdu.Select(x => x.id).ToArray();
             var household_types = sector == 1 ? Block_7_Constants.HHDTypeRural.Select(x => x.id).ToArray() : Block_7_Constants.HHDTypeUrban.Select(x => x.id).ToArray();
-            int size = 1000;
+            int size = 100;
             Random gen = new();
             for(int i = 1; i<=size; i++)
             {
@@ -364,17 +366,17 @@
          * SSS - 22 = Block_7_7 = 2 and Block_7_9 >= A
          * SSS - 31 = Block_7_7 = 3 and Block_7_9 < A
          * SSS - 32 = Block_7_7 = 3 and Block_7_9 >= A
-         * SSS - 41 = Block_7_7 = 4
-         * SSS - 91 = Block_7_7 = 9
+         * SSS - 40 = Block_7_7 = 4
+         * SSS - 90 = Block_7_7 = 9
          * Urban:
          * SSS - 11 = Block_7_7 = 1 and Block_7_9 < A
-         * SSS - 12 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
-         * SSS - 13 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [7,10,11]
+         * SSS - 121 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
+         * SSS - 122 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [7,8,10,11]
          * SSS - 21 = Block_7_7 = 2 and Block_7_9 < A
-         * SSS - 22 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
-         * SSS - 23 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [7,10,11]
-         * SSS - 31 = Block_7_7 = 3 and Block_7_9 < A
-         * SSS - 91 = Block_7_7 in [4,9]
+         * SSS - 221 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
+         * SSS - 222 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [7,8,10,11]
+         * SSS - 40 = Block_7_7 = 3
+         * SSS - 90 = Block_7_7 in [4,9]
          */
         try
         {
@@ -386,7 +388,7 @@
 
             // --- Calculate A: median of Block_7_9 ---
             var allExpenditure = response.Where(x => x.Block_7_9.HasValue)
-                                         .Select(x => x.Block_7_9.Value)
+                                         .Select(x => x.Block_7_9.Value / x.Block_7_5.Value)
                                          .OrderBy(x => x)
                                          .ToList();
             decimal A = 0;
@@ -435,21 +437,27 @@
                     {
                         case 1:
                             item.SSS = landArea < (double)B ? 11 : 12;
+                            item.Stratum = 10;
                             break;
                         case 2:
                             item.SSS = expenditure < (int)A ? 21 : 22;
+                            item.Stratum = 20;
                             break;
                         case 3:
                             item.SSS = expenditure < (int)A ? 31 : 32;
+                            item.Stratum = 30;
                             break;
                         case 4:
-                            item.SSS = 41;
+                            item.SSS = 40;
+                            item.Stratum = 40;
                             break;
                         case 9:
-                            item.SSS = 91;
+                            item.SSS = 90;
+                            item.Stratum = 90;
                             break;
                         default:
                             item.SSS = 0;
+                            item.Stratum = 0;
                             break;
                     }
                 }
@@ -458,37 +466,42 @@
                     switch (block7)
                     {
                         case 1:
+                            item.Stratum = 10;
                             if (expenditure < (int)A)
                                 item.SSS = 11;
                             else if (new int[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
-                                item.SSS = 12;
-                            else if (new int[] { 7, 10, 11 }.Contains(education))
-                                item.SSS = 13;
+                                item.SSS = 121;
+                            else if (new int[] { 7, 8, 10, 11 }.Contains(education))
+                                item.SSS = 122;
                             else
                                 item.SSS = 0;
                             break;
 
                         case 2:
+                            item.Stratum = 20;
                             if (expenditure < (int)A)
                                 item.SSS = 21;
                             else if (new int[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
-                                item.SSS = 22;
-                            else if (new int[] { 7, 10, 11 }.Contains(education))
-                                item.SSS = 23;
+                                item.SSS = 221;
+                            else if (new int[] { 7, 8, 10, 11 }.Contains(education))
+                                item.SSS = 222;
                             else
                                 item.SSS = 0;
                             break;
 
                         case 3:
-                            item.SSS = expenditure < (int)A ? 31 : 0;
+                            item.Stratum = 40;
+                            item.SSS = expenditure < (int)A ? 40 : 0;
                             break;
 
                         case 4:
                         case 9:
-                            item.SSS = 91;
+                            item.Stratum = 90;
+                            item.SSS = 90;
                             break;
 
                         default:
+                            item.Stratum = 0;
                             item.SSS = 0;
                             break;
                     }
@@ -514,6 +527,64 @@
         }
     }
 
+
+    async Task DoSelection()
+    {
+        try
+        {
+            List<SSSItem> s1List = new List<SSSItem>();
+
+            await SCH_0_0_Queries.UpdateAllRowsForColumnAsync(SessionStorage.SelectedFSUId);
+            var existingListingData = await SCH_0_0_Queries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+
+            // Loop through Block_7_List and populate the corresponding lists
+            foreach (var item in existingListingData)
+            {
+                SSSItem sssItem = new SSSItem
+                {
+                    SerialNumber = item.Id,
+                    SSSValue = item.SSS,
+                    IsSelected = false
+                };
+                s1List.Add(sssItem);
+            }
+
+            if (s1List.Count > 0)
+            {
+                //Rural
+                if(sector == 1)
+                {
+                    var sssRequirements = new Dictionary<int, int>
+                    {
+                        { 11, 3 }, // SSS 1 needs 2 entries
+                        { 12, 3 }, // SSS 2 needs 2 entries
+                        { 21, 2 }, // SSS 3 needs 2 entries
+                        { 22, 2 }, // SSS 4 needs 2 entries
+                        { 31, 2 }, // SSS 5 needs 2 entries
+                        { 32, 2 }, // SSS 5 needs 2 entries
+                        { 40, 4 }, // SSS 5 needs 2 entries
+                        { 90, 2 }, // SSS 5 needs 2 entries
+                    };
+
+                    // Define the shortfall fallback order for each SSS
+                    var shortfallFallbacks = new Dictionary<int, List<int>>
+                    {
+                        { 1, new List<int> { 2, 3, 4, 5 } },  // SSS 1 looks to SSS 2 first, then SSS 3
+                        { 2, new List<int> { 1, 4, 3, 5 } },  // SSS 2 looks to SSS 1 first, then SSS 3
+                        { 3, new List<int> { 4, 1, 2, 5 } },   // SSS 3 looks to SSS 2 first, then SSS 1
+                        { 4, new List<int> { 3, 2, 1, 5 } },   // SSS 3 looks to SSS 2 first, then SSS 1
+                        { 5, new List<int> { 1, 2, 3, 4 } }   // SSS 3 looks to SSS 2 first, then SSS 1
+                    };
+                }
+                
+            }
+
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Getting error during selection: {ex}, Please try again!");
+        }
+    }
 
 
 
