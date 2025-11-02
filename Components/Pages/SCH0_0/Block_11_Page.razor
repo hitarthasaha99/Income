@@ -1,0 +1,242 @@
+﻿@page "/dashboard/sch0.0/block_11"
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+
+<div class="my-2">
+    <CommonContentHeader 
+        SelectedFsuId="@SelectedFsuId"
+        survey_time="@survey_time" 
+    />
+
+    <div class="card card-style2">
+        <div class="card-header d-flex align-items-center">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">[Block 11]</span>Particulars of sampling of households
+            </h3>
+        </div>
+
+        <div class="row gx-5 p-2 ">
+            <div class="mb-4 col-md-4">
+                <label class="form-label fw-bold">
+                    <span class="badge bg-primary me-2">1a</span>Enumerator Name
+                </label>
+                <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.enumerator_name" disabled>
+            </div>
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                    <div class="mb-4 col-md-4">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">1b</span>Supervisor Name
+                        </label>
+                        <input type="text" class="form-control" @bind="tbl_Sch_0_0_FieldOperation.supervisor_name" disabled>
+                    </div>
+            }
+            <div class="mb-4 col-md-4">
+                <label class="form-label fw-bold">
+                    <span class="badge bg-primary me-2">2.1</span>Date of start of field work
+                </label>
+                <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_start_date" disabled>
+            </div>
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">2.1</span>Date of end of field work
+                    </label>
+                    <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_end_date" disabled>
+                </div>
+            }
+            
+            <div class="mb-4 col-md-4">
+                <label class="form-label fw-bold">
+                    <span class="badge bg-primary me-2">3</span>total time taken to canvass the schedule by the team of enumerator (SE/JSO) (in hours)
+                </label>
+                <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.time_taken">
+            </div>
+
+            <div class="mb-4 col-12">
+                <label class="form-label fw-bold d-block">
+                    <span class="badge bg-primary me-2">4</span>
+                    Whether any remark has been entered by SE/JSO/SS/SSO
+                </label>
+
+                <div class="row mt-3 g-3 align-items-start">
+
+                    <!-- 5.i -->
+                    <div class="col-auto">
+                        <label class="form-label fw-bold d-block mb-1">
+                            <span class="badge bg-primary me-2">5.i</span>
+                            In Block 9/10
+                        </label>
+
+                        <div class="form-check">
+                            <input disabled class="form-check-input is_sso" value="1" type="radio"
+                                   id="remarkBlockYes" name="remarks_block_9_10" checked="@remarks_block_9_10_yes">
+                            <label class="form-check-label" for="remarkBlockYes">Yes</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input disabled class="form-check-input is_sso" value="2" type="radio"
+                                   id="remarkBlockNo" name="remarks_block_9_10" checked="@(!remarks_block_9_10_yes)">
+                            <label class="form-check-label" for="remarkBlockNo">No</label>
+                        </div>
+                    </div>
+
+                    <!-- 5.ii -->
+                    <div class="col-auto">
+                        <label class="form-label fw-bold d-block mb-1">
+                            <span class="badge bg-primary me-2">5.ii</span>
+                            Elsewhere in the schedule
+                        </label>
+
+                        <div class="form-check">
+                            <input disabled class="form-check-input is_sso" value="1" type="radio"
+                                   id="remarkElseYes" name="remarks_elsewhere" checked="@remarks_elsewhere_yes">
+                            <label class="form-check-label" for="remarkElseYes">Yes</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input disabled class="form-check-input is_sso" value="2" type="radio"
+                                   id="remarkElseNo" name="remarks_elsewhere" checked="@(!remarks_elsewhere_yes)">
+                            <label class="form-check-label" for="remarkElseNo">No</label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        <div class="d-flex">
+            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                    <NavLink class="btn btn-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+            }
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Exit<i class="bi bi-chevron-right ms-1"></i></NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    Tbl_Sch_0_0_FieldOperation tbl_Sch_0_0_FieldOperation = new();
+    CommonQueries commonQueries = new();
+    DBQueries DBQueries = new();
+    private string start_date = string.Empty;
+    private string end_date = string.Empty;
+    private bool remarks_block_9_10_yes = false;
+    private bool remarks_elsewhere_yes = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+            {
+                await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+            {
+                block_uri = "/dashboard/sch0.0/block_11",
+                block_title = "Sch 0.0 Block 11",
+                block_code = CommonEnum.sch_0_0_block_11.ToString(),
+            };
+            await commonQueries.InsertVisitedBlock(vb);
+            var block_1 = await DBQueries.FetchBlock1();
+            tbl_Sch_0_0_FieldOperation = await DBQueries.FetchBlock2();
+            if (tbl_Sch_0_0_FieldOperation == null)
+            {
+                tbl_Sch_0_0_FieldOperation = new Tbl_Sch_0_0_FieldOperation
+                {
+                    id = new Guid(),
+                    fsu_id = SelectedFsuId,
+                    enumerator_name = SessionStorage.user_name,
+                    field_work_start_date = DateTime.Now,
+                };
+            }
+            else
+            {
+                if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+                {
+                    tbl_Sch_0_0_FieldOperation.supervisor_name = SessionStorage.user_name;
+                    tbl_Sch_0_0_FieldOperation.field_work_end_date = DateTime.Now;
+                }
+            }
+
+            remarks_block_9_10_yes = !string.IsNullOrEmpty(block_1?.EnumeratorRemarks) || !string.IsNullOrEmpty(block_1?.SupervisorRemarks);
+            
+            StateHasChanged();
+            return;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return;
+        }
+    }
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+    public async Task HandleSubmit(bool is_go_next)
+    {
+
+        try
+        {
+            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                var res = await DBQueries.SaveBlock2(tbl_Sch_0_0_FieldOperation);
+                if (res.GetValueOrDefault() > 0)
+                {
+                    toastService.ShowSuccess("Data saved successfully");
+                    if (is_go_next)
+                    {
+                        NavigationManager.NavigateTo("/dashboard/fsulist");
+                        return;
+                    }
+                }
+                else
+                {
+                    toastService.ShowError("Failed to save data");
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+        finally
+        {
+            
+        }
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+}

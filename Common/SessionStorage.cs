@@ -49,5 +49,27 @@ namespace Income.Common
             survey_timestamp = new();
             FSU_Sector = 0;
         }
+
+        public static UserRole GetUserRole()
+        {
+            if (user_role == CommonConstants.USER_CODE_JSO || user_role == CommonConstants.USER_CODE_JSO2)
+            {
+                return UserRole.JSO;
+            }
+            else if (user_role == CommonConstants.USER_CODE_SSO || user_role == CommonConstants.USER_CODE_SSO2)
+            {
+                return UserRole.SSO;
+            }
+            else
+            {
+                return UserRole.DS;
+            }
+        }
+        public enum UserRole
+        {
+            JSO = 1,
+            SSO = 2,
+            DS = 3
+        }
     }
 }

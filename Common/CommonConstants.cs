@@ -118,10 +118,12 @@ namespace Income.Common
         sch_0_0_block_4,
         sch_0_0_block_4_3,
         sch_0_0_block_5,
-        sch_0_0_block_5A,
         sch_0_0_block_6,
         sch_0_0_block_7,
-        sch_0_0_block_8
+        sch_0_0_block_7_selection,
+        sch_0_0_block_8,
+        sch_0_0_block_9,
+        sch_0_0_block_11,
     }
 
     public class CommonList

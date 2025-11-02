@@ -1,0 +1,114 @@
+﻿@page "/dashboard/sch0.0/block_9"
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+
+<div class="my-2">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                         survey_time="@survey_time" />
+    <div class="card card-style2">
+        @* Enumerator Comments *@
+        <div class="card-header d-flex align-items-center">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">[Block 9]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
+            </h3>
+        </div>
+        <div class="card-body p-2">
+            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO))" class="form-control w-100" cols="5" @bind="EnumeratorRemarks"></textarea>
+        </div>
+
+        @* Supervisor Comments *@
+        <div class="card-header d-flex align-items-center">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">[Block 10]</span> Remarks by Field Supervisor (FS)/Senior Statistical Officer (SSO)
+            </h3>
+        </div>
+        <div class="card-body p-2">
+            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" cols="5" @bind="SupervisorRemarks"></textarea>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+        <NavLink class="btn btn-outline-primary me-2" hidden="@(SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+        <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+    </div>
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    CommonQueries commonQueries = new();
+    DBQueries SCH_0_0_Queries = new();
+    bool is_error = false;
+    Tbl_Sch_0_0_Block_0_1 tbl_Sch_0_0_Block_0_1 = new();
+    string EnumeratorRemarks = string.Empty;
+    string SupervisorRemarks = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/sch0.0/block_9",
+            block_title = "Sch 0.0 Block 9/10",
+            block_code = CommonEnum.sch_0_0_block_9.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
+        tbl_Sch_0_0_Block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+        if (tbl_Sch_0_0_Block_0_1 != null)
+        {
+            EnumeratorRemarks = tbl_Sch_0_0_Block_0_1.EnumeratorRemarks ?? string.Empty;
+            SupervisorRemarks = tbl_Sch_0_0_Block_0_1.SupervisorRemarks ?? string.Empty;
+        }
+        StateHasChanged();
+        return;
+    }
+
+
+
+    async Task HandleSubmit(bool go_next)
+    {
+        try
+        {
+            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                tbl_Sch_0_0_Block_0_1.EnumeratorRemarks = EnumeratorRemarks;
+            }
+            else if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+            {
+                tbl_Sch_0_0_Block_0_1.SupervisorRemarks = SupervisorRemarks;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
+                return;
+            }
+            int update = await SCH_0_0_Queries.SaveBlock1(tbl_Sch_0_0_Block_0_1) ?? 0;
+            if (update > 0)
+            {
+                if (go_next)
+                {
+                    NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
+                }
+                else
+                {
+                    toastService.ShowSuccess("Data saved successfully.");
+                }
+            }
+            
+            else
+            {
+                toastService.ShowError("Failed to save data. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("An error occurred while saving the data. Please try again.");
+        }
+        finally
+        {
+            
+        }
+    }
+}

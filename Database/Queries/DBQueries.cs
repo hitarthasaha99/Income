@@ -312,20 +312,43 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_FieldOperation>("SELECT * FROM Tbl_Sch_0_0_Block_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_FieldOperation>("SELECT * FROM Tbl_Sch_0_0_FieldOperation WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 if (response != null && response.Count > 0)
                 {
                     return response.FirstOrDefault();
                 }
                 else
                 {
-                    return new Tbl_Sch_0_0_FieldOperation();
+                    return null;
                 }
             }
             catch (Exception ex)
             {
                 toastService.ShowError($"Error While saving SCH 0 Block 1: {ex.Message}");
-                return new Tbl_Sch_0_0_FieldOperation();
+                return null;
+            }
+        }
+
+        public async Task<int?> SaveBlock2(Tbl_Sch_0_0_FieldOperation tbl_Sch_0_0_FieldOperation)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Sch_0_0_FieldOperation>().Where(x => x.id == tbl_Sch_0_0_FieldOperation.id).ToListAsync();
+                if (check_existence != null && check_existence.Count > 0)
+                {
+                    status = await _database.UpdateAsync(tbl_Sch_0_0_FieldOperation);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_Sch_0_0_FieldOperation);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While saving SCH 0 Block 2: {ex.Message}");
+                return null;
             }
         }
 
@@ -487,8 +510,8 @@ namespace Income.Database.Queries
                     foreach (var item in households)
                     {
                         // Update each household in the database
-                        tran.Execute("UPDATE Tbl_Sch_0_0_Block_7 SET SSS = ?, a = ?, b = ? WHERE id = ?",
-             item.SSS, item.a, item.b, item.id);
+                        tran.Execute("UPDATE Tbl_Sch_0_0_Block_7 SET Stratum = ?, SSS = ?, a = ?, b = ? WHERE id = ?",
+             item.Stratum,item.SSS, item.a, item.b, item.id);
                     }
                 });
 
@@ -540,7 +563,7 @@ namespace Income.Database.Queries
         public Task<List<Tbl_Sch_0_0_Block_7>> Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(int fsu_id)
         {
             return _database.Table<Tbl_Sch_0_0_Block_7>()
-                            .Where(x => x.fsu_id == fsu_id && x.is_household == 1)
+                            .Where(x => x.fsu_id == fsu_id && x.is_household == 2)
                             .ToListAsync();
         }
 
@@ -565,7 +588,7 @@ namespace Income.Database.Queries
             // If the household is not found, return 0 to indicate no rows were updated
             return 0;
         }
-        public Task<int> Update_SCH0_0_Block_5A(Tbl_Sch_0_0_Block_7 data)
+        public Task<int> Update_SCH0_0_Block_7(Tbl_Sch_0_0_Block_7 data)
         {
             return _database.UpdateAsync(data);
         }
@@ -644,6 +667,8 @@ namespace Income.Database.Queries
                 row.status = "";
                 row.hhdStatus = 0;
                 row.needDownload = 0;
+                row.SelectedFromSSS = null;
+                row.SelectedPostedSSS = null;
             }
             // Use UpdateAllAsync to update all records in the table
             return await _database.UpdateAllAsync(rows);

@@ -10,6 +10,8 @@ namespace Income.Database.Models.SCH0_0
         public Guid id { get; set; }
         public int SSS { get; set; }
         public int Stratum { get; set; }
+        public int? SelectedPostedSSS { get; set; } = null; // SSS code to "post" (if merged)
+        public int? SelectedFromSSS { get; set; } = null;   // original SSS it was taken from
         public bool? isInitialySelected { get; set; }
 
         //is household or not
@@ -38,6 +40,8 @@ namespace Income.Database.Models.SCH0_0
         public double? Block_7_8 { get; set; }
         //usual monthly consumption expenditure of the household
         public int? Block_7_9 { get; set; }
+        //usual monthly income per capita (7_9/7_5) of the household
+        public double? UMPCE { get; set; } = 0.0;
         // Indicates whether this household is a substitution for another household
         public bool isSubstitute { get; set; } = false;
 

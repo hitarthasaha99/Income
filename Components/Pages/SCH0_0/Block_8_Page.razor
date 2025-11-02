@@ -1,0 +1,463 @@
+﻿@page "/dashboard/sch0.0/block_8"
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+
+<div class="my-2">
+    <CommonContentHeader 
+        SelectedFsuId="@SelectedFsuId"
+        survey_time="@survey_time" 
+    />
+    <div class="card card-style2">
+        <div class="card-header d-flex align-items-center">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">[Block 8]</span>Particulars of sampling of households
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th rowspan="3">Schedule</th>
+                            <th rowspan="3">Population</th>
+                            <th rowspan="3">Second Stage Stratum(SSS)</th>
+                            <th class="align-middle text-center" colspan="6">Number of households</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2">Listed (H)</th>
+                            <th rowspan="2">Selected (h)</th>
+                            <th class="align-middle text-center" colspan="3">Surveyed</th>
+                            <th rowspan="2">Casualty<br>[col. 5 - col. 8]</th>
+                        </tr>
+                        <tr>
+
+                            <th>Originally Selected</th>
+                            <th>Substituted</th>
+                            <th>Total<br>[col. 6 + col. 7]</th>
+                        </tr>
+                        <tr>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                            <th>(5)</th>
+                            <th>(6)</th>
+                            <th>(7)</th>
+                            <th>(8)</th>
+                            <th>(9)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="align-middle text-center" rowspan="9">
+                                @schedule_name
+                            </td>
+                            <td class="align-middle text-center" rowspan="9">
+                                @population
+                            </td>
+                            <td rowspan="1">11</td>
+                            <td>@sss_11_listed_hhd</td>
+                            <td>@sss_11_selected_hhd</td>
+                            <td>@sss_11_originally_selected_hhd</td>
+                            <td>@sss_11_substituted_hhd</td>
+                            <td>@sss_11_col_8_total_hhd</td>
+                            <td>@sss_11_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">@(sector == 1 ? 12 : 121)</td>
+                            <td>@sss_12_listed_hhd</td>
+                            <td>@sss_12_selected_hhd</td>
+                            <td>@sss_12_originally_selected_hhd</td>
+                            <td>@sss_12_substituted_hhd</td>
+                            <td>@sss_12_col_8_total_hhd</td>
+                            <td>@sss_12_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">@(sector == 1 ? 21 : 122)</td>
+                            <td>@sss_21_listed_hhd</td>
+                            <td>@sss_21_selected_hhd</td>
+                            <td>@sss_21_originally_selected_hhd</td>
+                            <td>@sss_21_substituted_hhd</td>
+                            <td>@sss_21_col_8_total_hhd</td>
+                            <td>@sss_21_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">@(sector == 1 ? 22 : 21)</td>
+                            <td>@sss_22_listed_hhd</td>
+                            <td>@sss_22_selected_hhd</td>
+                            <td>@sss_22_originally_selected_hhd</td>
+                            <td>@sss_22_substituted_hhd</td>
+                            <td>@sss_22_col_8_total_hhd</td>
+                            <td>@sss_22_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">@(sector == 1 ? 31 : 221)</td>
+                            <td>@sss_31_listed_hhd</td>
+                            <td>@sss_31_selected_hhd</td>
+                            <td>@sss_31_originally_selected_hhd</td>
+                            <td>@sss_31_substituted_hhd</td>
+                            <td>@sss_31_col_8_total_hhd</td>
+                            <td>@sss_31_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">@(sector == 1 ? 32 : 222)</td>
+                            <td>@sss_32_listed_hhd</td>
+                            <td>@sss_32_selected_hhd</td>
+                            <td>@sss_32_originally_selected_hhd</td>
+                            <td>@sss_32_substituted_hhd</td>
+                            <td>@sss_32_col_8_total_hhd</td>
+                            <td>@sss_32_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">40</td>
+                            <td>@sss_40_listed_hhd</td>
+                            <td>@sss_40_selected_hhd</td>
+                            <td>@sss_40_originally_selected_hhd</td>
+                            <td>@sss_40_substituted_hhd</td>
+                            <td>@sss_40_col_8_total_hhd</td>
+                            <td>@sss_40_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">90</td>
+                            <td>@sss_90_listed_hhd</td>
+                            <td>@sss_90_selected_hhd</td>
+                            <td>@sss_90_originally_selected_hhd</td>
+                            <td>@sss_90_substituted_hhd</td>
+                            <td>@sss_90_col_8_total_hhd</td>
+                            <td>@sss_90_casualty_hhd</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="1">all (99)</td>
+                            <td>@total_listed</td>
+                            <td>@total_selected</td>
+                            <td>@total_originally_selected</td>
+                            <td>@total_substituted</td>
+                            <td>@total_col_8_total</td>
+                            <td>@total_casualty</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-3">
+        <NavLink class="btn btn-outline-primary" onclick="@GoBack">
+            <i class="bi bi-chevron-left me-1"></i>Back
+        </NavLink>
+
+        <NavLink class="btn btn-outline-primary" @onclick="@HandleSubmit">
+            Next<i class="bi bi-chevron-right ms-1"></i>
+        </NavLink>
+    </div>
+</div>
+
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    Tbl_Sch_0_0_Block_7? tbl_Sch_0_0_Block_7 = new();
+    CommonQueries cQ = new();
+    DBQueries dQ = new();
+    CommonConfig commonConfig = new();
+
+    int sector = 0;
+    string schedule_name = string.Empty;
+    int population = 0;
+
+    int sss_11_listed_hhd = 0;
+    int sss_12_listed_hhd = 0;
+    int sss_21_listed_hhd = 0;
+    int sss_22_listed_hhd = 0;
+    int sss_31_listed_hhd = 0;
+    int sss_32_listed_hhd = 0;
+    int sss_40_listed_hhd = 0;
+    int sss_90_listed_hhd = 0;
+
+    int sss_11_selected_hhd = 0;
+    int sss_12_selected_hhd = 0;
+    int sss_21_selected_hhd = 0;
+    int sss_22_selected_hhd = 0;
+    int sss_31_selected_hhd = 0;
+    int sss_32_selected_hhd = 0;
+    int sss_40_selected_hhd = 0;
+    int sss_90_selected_hhd = 0;
+
+    int sss_11_originally_selected_hhd = 0;
+    int sss_12_originally_selected_hhd = 0;
+    int sss_21_originally_selected_hhd = 0;
+    int sss_22_originally_selected_hhd = 0;
+    int sss_31_originally_selected_hhd = 0;
+    int sss_32_originally_selected_hhd = 0;
+    int sss_40_originally_selected_hhd = 0;
+    int sss_90_originally_selected_hhd = 0;
+
+    int sss_11_substituted_hhd = 0;
+    int sss_12_substituted_hhd = 0;
+    int sss_21_substituted_hhd = 0;
+    int sss_22_substituted_hhd = 0;
+    int sss_31_substituted_hhd = 0;
+    int sss_32_substituted_hhd = 0;
+    int sss_40_substituted_hhd = 0;
+    int sss_90_substituted_hhd = 0;
+
+    int sss_11_col_8_total_hhd = 0;
+    int sss_12_col_8_total_hhd = 0;
+    int sss_21_col_8_total_hhd = 0;
+    int sss_22_col_8_total_hhd = 0;
+    int sss_31_col_8_total_hhd = 0;
+    int sss_32_col_8_total_hhd = 0;
+    int sss_40_col_8_total_hhd = 0;
+    int sss_90_col_8_total_hhd = 0;
+
+    int sss_11_casualty_hhd = 0;
+    int sss_12_casualty_hhd = 0;
+    int sss_21_casualty_hhd = 0;
+    int sss_22_casualty_hhd = 0;
+    int sss_31_casualty_hhd = 0;
+    int sss_32_casualty_hhd = 0;
+    int sss_40_casualty_hhd = 0;
+    int sss_90_casualty_hhd = 0;
+
+    int total_listed = 0;
+    int total_selected = 0;
+    int total_originally_selected = 0;
+    int total_substituted = 0;
+    int total_col_8_total = 0;
+    int total_casualty = 0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+            {
+                block_uri = "/dashboard/sch0.0/block_8",
+                block_title = "Sch 0.0 Block 8",
+                block_code = CommonEnum.sch_0_0_block_8.ToString(),
+            };
+        await cQ.InsertVisitedBlock(vb);
+
+        sector = SessionStorage.FSU_Sector;
+        if (SessionStorage.FSU_Sector == 1)
+        {
+            schedule_name = "HIS - Rural Sector\n(Feb 2026 - Jan 2027)";
+        }
+        else
+        {
+            schedule_name = "HIS - Urban Sector\n(Feb 2026 - Jan 2027)";
+        }
+
+        var response = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+        if (response != null && response.Count > 0)
+        {
+            population = response.Count();
+
+            if(sector == 1)
+            {
+                var sss_11_total_hhd = response.Where(x => x.SSS == 11);
+                var sss_12_total_hhd = response.Where(x => x.SSS == 12);
+                var sss_21_total_hhd = response.Where(x => x.SSS == 21);
+                var sss_22_total_hhd = response.Where(x => x.SSS == 22);
+                var sss_31_total_hhd = response.Where(x => x.SSS == 31);
+                var sss_32_total_hhd = response.Where(x => x.SSS == 32);
+                var sss_40_total_hhd = response.Where(x => x.SSS == 40);
+                var sss_90_total_hhd = response.Where(x => x.SSS == 90);
+
+                sss_11_listed_hhd = sss_11_total_hhd?.Count() ?? 0;
+                sss_12_listed_hhd = sss_12_total_hhd?.Count() ?? 0;
+                sss_21_listed_hhd = sss_21_total_hhd?.Count() ?? 0;
+                sss_22_listed_hhd = sss_22_total_hhd?.Count() ?? 0;
+                sss_31_listed_hhd = sss_31_total_hhd?.Count() ?? 0;
+                sss_32_listed_hhd = sss_32_total_hhd?.Count() ?? 0;
+                sss_40_listed_hhd = sss_40_total_hhd?.Count() ?? 0;
+                sss_90_listed_hhd = sss_90_total_hhd?.Count() ?? 0;
+
+                sss_11_selected_hhd = sss_11_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_12_selected_hhd = sss_12_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_21_selected_hhd = sss_21_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_22_selected_hhd = sss_22_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_31_selected_hhd = sss_31_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_32_selected_hhd = sss_32_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_40_selected_hhd = sss_40_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_90_selected_hhd = sss_90_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+
+
+                sss_11_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 11);
+                sss_12_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 12);
+                sss_21_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 21);
+                sss_22_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 22);
+                sss_31_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 31);
+                sss_32_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 32);
+                sss_40_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 40);
+                sss_90_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 90);
+
+
+                sss_11_substituted_hhd = GetFilteredSubstitution(response, 11);
+                sss_12_substituted_hhd = GetFilteredSubstitution(response, 12);
+                sss_21_substituted_hhd = GetFilteredSubstitution(response, 21);
+                sss_22_substituted_hhd = GetFilteredSubstitution(response, 22);
+                sss_31_substituted_hhd = GetFilteredSubstitution(response, 31);
+                sss_32_substituted_hhd = GetFilteredSubstitution(response, 32);
+                sss_40_substituted_hhd = GetFilteredSubstitution(response, 40);
+                sss_90_substituted_hhd = GetFilteredSubstitution(response, 90);
+
+                sss_11_col_8_total_hhd = sss_11_originally_selected_hhd + sss_11_substituted_hhd;
+                sss_12_col_8_total_hhd = sss_12_originally_selected_hhd + sss_12_substituted_hhd;
+                sss_21_col_8_total_hhd = sss_21_originally_selected_hhd + sss_21_substituted_hhd;
+                sss_22_col_8_total_hhd = sss_22_originally_selected_hhd + sss_22_substituted_hhd;
+                sss_31_col_8_total_hhd = sss_31_originally_selected_hhd + sss_31_substituted_hhd;
+                sss_32_col_8_total_hhd = sss_32_originally_selected_hhd + sss_32_substituted_hhd;
+                sss_40_col_8_total_hhd = sss_40_originally_selected_hhd + sss_40_substituted_hhd;
+                sss_90_col_8_total_hhd = sss_90_originally_selected_hhd + sss_90_substituted_hhd;
+
+                sss_11_casualty_hhd = sss_11_selected_hhd - sss_11_col_8_total_hhd;
+                sss_12_casualty_hhd = sss_12_selected_hhd - sss_12_col_8_total_hhd;
+                sss_21_casualty_hhd = sss_21_selected_hhd - sss_21_col_8_total_hhd;
+                sss_22_casualty_hhd = sss_22_selected_hhd - sss_22_col_8_total_hhd;
+                sss_31_casualty_hhd = sss_31_selected_hhd - sss_31_col_8_total_hhd;
+                sss_32_casualty_hhd = sss_32_selected_hhd - sss_32_col_8_total_hhd;
+                sss_40_casualty_hhd = sss_40_selected_hhd - sss_40_col_8_total_hhd;
+                sss_90_casualty_hhd = sss_90_selected_hhd - sss_90_col_8_total_hhd;
+
+                total_listed = sss_11_listed_hhd + sss_12_listed_hhd + sss_21_listed_hhd + sss_22_listed_hhd + sss_31_listed_hhd + sss_32_listed_hhd + sss_40_listed_hhd + sss_90_listed_hhd;
+                total_selected = sss_11_selected_hhd + sss_12_selected_hhd + sss_21_selected_hhd + sss_22_selected_hhd + sss_31_selected_hhd + sss_32_selected_hhd + sss_40_selected_hhd + sss_90_selected_hhd;
+                total_originally_selected = sss_11_originally_selected_hhd + sss_12_originally_selected_hhd + sss_21_originally_selected_hhd + sss_22_originally_selected_hhd + sss_31_originally_selected_hhd + sss_32_originally_selected_hhd + sss_40_originally_selected_hhd + sss_90_originally_selected_hhd;
+                total_substituted = sss_11_substituted_hhd + sss_12_substituted_hhd + sss_21_substituted_hhd + sss_22_substituted_hhd + sss_31_substituted_hhd + sss_32_substituted_hhd + sss_40_substituted_hhd + sss_90_substituted_hhd;
+                total_col_8_total = sss_11_col_8_total_hhd + sss_12_col_8_total_hhd + sss_21_col_8_total_hhd + sss_22_col_8_total_hhd + sss_31_col_8_total_hhd + sss_32_col_8_total_hhd + sss_40_col_8_total_hhd + sss_90_col_8_total_hhd;
+                total_casualty = sss_11_casualty_hhd + sss_12_casualty_hhd + sss_21_casualty_hhd + sss_22_casualty_hhd + sss_31_casualty_hhd + sss_32_casualty_hhd + sss_40_casualty_hhd + sss_90_casualty_hhd;
+            }
+
+            else if (sector == 2)
+            {
+                var sss_11_total_hhd = response.Where(x => x.SSS == 11);
+                var sss_121_total_hhd = response.Where(x => x.SSS == 121);
+                var sss_122_total_hhd = response.Where(x => x.SSS == 122);
+                var sss_21_total_hhd = response.Where(x => x.SSS == 21);
+                var sss_221_total_hhd = response.Where(x => x.SSS == 221);
+                var sss_222_total_hhd = response.Where(x => x.SSS == 222);
+                var sss_40_total_hhd = response.Where(x => x.SSS == 40);
+                var sss_90_total_hhd = response.Where(x => x.SSS == 90);
+
+                sss_11_listed_hhd = sss_11_total_hhd?.Count() ?? 0;
+                sss_12_listed_hhd = sss_121_total_hhd?.Count() ?? 0;
+                sss_21_listed_hhd = sss_122_total_hhd?.Count() ?? 0;
+                sss_22_listed_hhd = sss_21_total_hhd?.Count() ?? 0;
+                sss_31_listed_hhd = sss_221_total_hhd?.Count() ?? 0;
+                sss_32_listed_hhd = sss_222_total_hhd?.Count() ?? 0;
+                sss_40_listed_hhd = sss_40_total_hhd?.Count() ?? 0;
+                sss_90_listed_hhd = sss_90_total_hhd?.Count() ?? 0;
+
+                sss_11_selected_hhd = sss_11_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_12_selected_hhd = sss_121_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_21_selected_hhd = sss_122_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_22_selected_hhd = sss_21_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_31_selected_hhd = sss_221_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_32_selected_hhd = sss_222_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_40_selected_hhd = sss_40_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                sss_90_selected_hhd = sss_90_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+
+
+                sss_11_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 11);
+                sss_12_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 121);
+                sss_21_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 122);
+                sss_22_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 21);
+                sss_31_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 221);
+                sss_32_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 222);
+                sss_40_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 40);
+                sss_90_originally_selected_hhd = GetFilteredCountOnInitialySelected(response, 90);
+
+
+                sss_11_substituted_hhd = GetFilteredSubstitution(response, 11);
+                sss_12_substituted_hhd = GetFilteredSubstitution(response, 121);
+                sss_21_substituted_hhd = GetFilteredSubstitution(response, 122);
+                sss_22_substituted_hhd = GetFilteredSubstitution(response, 21);
+                sss_31_substituted_hhd = GetFilteredSubstitution(response, 221);
+                sss_32_substituted_hhd = GetFilteredSubstitution(response, 222);
+                sss_40_substituted_hhd = GetFilteredSubstitution(response, 40);
+                sss_90_substituted_hhd = GetFilteredSubstitution(response, 90);
+
+                sss_11_col_8_total_hhd = sss_11_originally_selected_hhd + sss_11_substituted_hhd;
+                sss_12_col_8_total_hhd = sss_12_originally_selected_hhd + sss_12_substituted_hhd;
+                sss_21_col_8_total_hhd = sss_21_originally_selected_hhd + sss_21_substituted_hhd;
+                sss_22_col_8_total_hhd = sss_22_originally_selected_hhd + sss_22_substituted_hhd;
+                sss_31_col_8_total_hhd = sss_31_originally_selected_hhd + sss_31_substituted_hhd;
+                sss_32_col_8_total_hhd = sss_32_originally_selected_hhd + sss_32_substituted_hhd;
+                sss_40_col_8_total_hhd = sss_40_originally_selected_hhd + sss_40_substituted_hhd;
+                sss_90_col_8_total_hhd = sss_90_originally_selected_hhd + sss_90_substituted_hhd;
+
+                sss_11_casualty_hhd = sss_11_selected_hhd - sss_11_col_8_total_hhd;
+                sss_12_casualty_hhd = sss_12_selected_hhd - sss_12_col_8_total_hhd;
+                sss_21_casualty_hhd = sss_21_selected_hhd - sss_21_col_8_total_hhd;
+                sss_22_casualty_hhd = sss_22_selected_hhd - sss_22_col_8_total_hhd;
+                sss_31_casualty_hhd = sss_31_selected_hhd - sss_31_col_8_total_hhd;
+                sss_32_casualty_hhd = sss_32_selected_hhd - sss_32_col_8_total_hhd;
+                sss_40_casualty_hhd = sss_40_selected_hhd - sss_40_col_8_total_hhd;
+                sss_90_casualty_hhd = sss_90_selected_hhd - sss_90_col_8_total_hhd;
+
+                total_listed = sss_11_listed_hhd + sss_12_listed_hhd + sss_21_listed_hhd + sss_22_listed_hhd + sss_31_listed_hhd + sss_32_listed_hhd + sss_40_listed_hhd + sss_90_listed_hhd;
+                total_selected = sss_11_selected_hhd + sss_12_selected_hhd + sss_21_selected_hhd + sss_22_selected_hhd + sss_31_selected_hhd + sss_32_selected_hhd + sss_40_selected_hhd + sss_90_selected_hhd;
+                total_originally_selected = sss_11_originally_selected_hhd + sss_12_originally_selected_hhd + sss_21_originally_selected_hhd + sss_22_originally_selected_hhd + sss_31_originally_selected_hhd + sss_32_originally_selected_hhd + sss_40_originally_selected_hhd + sss_90_originally_selected_hhd;
+                total_substituted = sss_11_substituted_hhd + sss_12_substituted_hhd + sss_21_substituted_hhd + sss_22_substituted_hhd + sss_31_substituted_hhd + sss_32_substituted_hhd + sss_40_substituted_hhd + sss_90_substituted_hhd;
+                total_col_8_total = sss_11_col_8_total_hhd + sss_12_col_8_total_hhd + sss_21_col_8_total_hhd + sss_22_col_8_total_hhd + sss_31_col_8_total_hhd + sss_32_col_8_total_hhd + sss_40_col_8_total_hhd + sss_90_col_8_total_hhd;
+                total_casualty = sss_11_casualty_hhd + sss_12_casualty_hhd + sss_21_casualty_hhd + sss_22_casualty_hhd + sss_31_casualty_hhd + sss_32_casualty_hhd + sss_40_casualty_hhd + sss_90_casualty_hhd;
+            }
+
+
+        }
+
+    }
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    async Task HandleSubmit()
+    {
+        NavigationManager.NavigateTo("/dashboard/sch0.0/block_9");
+    }
+
+    #region Helper Methods
+    private static int GetFilteredSubstitution(List<Tbl_Sch_0_0_Block_7> list, int sss)
+    {
+        var counter = 0;
+        var initialSelectedList = list.Where(entry => entry.SSS == sss && entry.isInitialySelected == true && entry.SubstitutionCount != 0).ToList();
+
+        foreach (var item in initialSelectedList)
+        {
+            if (item.SubstitutionCount == 1)
+            {
+                var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID == item.Block_7_3);
+                if (filteredData != null && filteredData.status == "SUBSTITUTE")
+                {
+                    counter++;
+                }
+            }
+            else if (item.SubstitutionCount == 2)
+            {
+                var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID != item.Block_7_3);
+                if (filteredData != null && filteredData.status == "SUBSTITUTE")
+                {
+                    counter++;
+                }
+            }
+        }
+        return counter;
+    }
+
+    private static int GetFilteredCountOnInitialySelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)
+    {
+        return list.Count(entry => entry.SSS == sss && entry.isInitialySelected == isInitialySelected && entry.SubstitutionCount == 0 && entry.status != "CASUALTY");
+    }
+    private static int GetFilteredCountOnSelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)
+    {
+        return list.Count(entry => entry.SSS == sss && entry.isInitialySelected == isInitialySelected);
+    }
+    #endregion
+}

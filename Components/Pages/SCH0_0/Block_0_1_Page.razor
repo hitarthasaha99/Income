@@ -164,7 +164,7 @@
         <div class="d-flex justify-content-between mb-3">
             <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
             <div class="d-flex">
-                <button class="btn btn-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
+                <button class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
                 <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
             </div>
         </div>
@@ -175,11 +175,13 @@
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
+    
     async void GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
+
     protected override async Task OnInitializedAsync()
     {
         block_0_1_VM.NotifyUiUpdate += StateHasChanged;
@@ -188,9 +190,10 @@
 
     async Task HandleSubmit(bool is_go_next)
     {
-        Console.WriteLine("Form validated successfully");
-
-        await block_0_1_VM.Save();
+        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        {
+            await block_0_1_VM.Save();
+        }
         //Navigation rules -
         // 1. For rural FSU (Block_1_5 = 1) and D > 1 (Block_1_15) -> Hamlet formation page (2.1)
         // 2. For rural FSU (Block_1_5 = 1) and D = 1 (Block_1_15) -> Block 4 (No hamlets formed)
@@ -225,31 +228,9 @@
             else
             {
                 //navigate to field operation (FSU cannot be surveyed)
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
             }
-            //NavigationManager.NavigateTo("/dashboard/sch0.0/block_3");
         }
-        //NavigationManager.NavigateTo("/dashboard/sch0.0/block_3");
-        // int field_validation = await JSRuntime.InvokeAsync<int>("__FieldValidate", commonConfig.Sch_0_0_Block_1_RequiredFields(block_0_1_VM.block_0_1.survey_code.ToString()), JsonConvert.SerializeObject(block_0_1_VM.block_0_1));
-        // if (field_validation == 0)
-        // {
-        //     block_0_1_VM.is_error = true;
-        //     await block_0_1_VM.approx_present_pop.Validate(block_0_1_VM.is_error, block_0_1_VM.block_0_1.approx_present_population.ToString(), CommonConstants.VALIDATION_TYPE_REG_EXP, CommonConstants.REG_EXP_POSITIVE_NUMBER_NON_ZERO);
-        //     await block_0_1_VM.survey_code.Validate(block_0_1_VM.is_error, block_0_1_VM.block_0_1.survey_code.ToString(), CommonConstants.VALIDATION_TYPE_SELECT);
-        //     if (CommonConstants.LOOKUP_SURVEY_CODE_4 == block_0_1_VM.block_0_1.survey_code.ToString() || CommonConstants.LOOKUP_SURVEY_CODE_7 == block_0_1_VM.block_0_1.survey_code.ToString())
-        //     {
-        //         await block_0_1_VM.substitution_reason.Validate(block_0_1_VM.is_error, block_0_1_VM.block_0_1.substitution_reason.ToString(), CommonConstants.VALIDATION_TYPE_SELECT);
-        //     }
-        //     return;
-        // }
-        // block_0_1_VM.is_error = false;
-        // await block_0_1_VM.approx_present_pop.Validate(block_0_1_VM.is_error, block_0_1_VM.block_0_1.approx_present_population.ToString(), CommonConstants.VALIDATION_TYPE_REG_EXP, CommonConstants.REG_EXP_POSITIVE_NUMBER_NON_ZERO);
-        // await block_0_1_VM.survey_code.Validate(block_0_1_VM.is_error, block_0_1_VM.block_0_1.survey_code.ToString(), CommonConstants.VALIDATION_TYPE_SELECT);
-        // await block_0_1_VM.substitution_reason.Validate(block_0_1_VM.is_error, block_0_1_VM.block_0_1.substitution_reason.ToString(), CommonConstants.VALIDATION_TYPE_SELECT);
-        // if (is_go_next)
-        // {
-            
-        //     return;
-        // }
-        // return;
+        
     }
 }
