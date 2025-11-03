@@ -29,6 +29,7 @@ namespace Income.Common
         public static int selected_hhd_size = new();
         public static DateTime survey_timestamp = new();
         public static int FSU_Sector = 0;
+        public static bool selection_done = false;
         public static void ClearSession()
         {
             SelectedFSUId = 0;

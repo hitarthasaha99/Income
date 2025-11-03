@@ -19,7 +19,7 @@
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">[Block 2.1]</span>List of hamlets (only for rural samples with SU formation)
             </h3>
-            <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => block_2_1_VM.AddRow())"><i class="bi bi-plus"></i> <span>Add</span></button>
+            <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" hidden="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" @onclick="@(() => block_2_1_VM.AddRow())"><i class="bi bi-plus"></i> <span>Add</span></button>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -47,10 +47,10 @@
                                 {
                                     <tr>
                                         <td>@item.serial_no</td>
-                                        <td><input class="form-control form-control-sm" value="@item.hamlet_name" @onchange="@((ChangeEventArgs e) => block_2_1_VM.HandleChange(e, item.id, "name_of_hamlet"))"></td>
-                                        <td><input type="number" step="0.1" min="0" max="100" class="form-control form-control-sm" value="@item.percentage" @oninput="(e => RestrictToOneDecimal(e, item))" onkeypress = "return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)"></td>
+                                        <td><input class="form-control form-control-sm" value="@item.hamlet_name" disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" @onchange="@((ChangeEventArgs e) => block_2_1_VM.HandleChange(e, item.id, "name_of_hamlet"))"></td>
+                                        <td><input type="number" step="0.1" min="0" max="100" disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" class="form-control form-control-sm" value="@item.percentage" @oninput="(e => RestrictToOneDecimal(e, item))" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)"></td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger d-flex align-items-center" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="bi bi-trash me-2"></i><span>Delete</span></button>
+                                            <button class="btn btn-sm btn-danger d-flex align-items-center" hidden="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="bi bi-trash me-2"></i><span>Delete</span></button>
                                         </td>
                                     </tr>
                                 }
@@ -136,6 +136,12 @@
         //2. No hamlet name can be empty
         //3. Hamlet percentage cannot be zero/empty
         //4. Allow till one decimal place
+
+        if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2");
+            return;
+        }
         
         var result = block_2_1_VM.Validate();
         if (result != null && result.Errors.Count > 0)
@@ -161,7 +167,6 @@
         else if (action == "NEXT")
         {
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2");
-            return;
         }
     }
 }

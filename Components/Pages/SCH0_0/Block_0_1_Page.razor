@@ -114,7 +114,14 @@
 
                 <div class="mb-3 col-4">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">14</span>Approx. present population</label>
-                    <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" disabled="@(!block_0_1_VM.EnablePopulation)" />
+                    <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(!block_0_1_VM.EnablePopulation)" />
+
+                    @if (IsBlock_1_14_ErrorMessageVisible)
+                    {
+                        <div class="text-success mt-1 fw-bold">
+                            @Block_1_14_ErrorMessage
+                        </div>
+                    }
                 </div>
 
                 <div class="mb-3 col-4">
@@ -123,7 +130,7 @@
                 </div>
                 <div class="mb-3 col-4" EditContext="EditContext">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">16</span>Survey Code</label>
-                    <select class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => block_0_1_VM.SurveyCodeSelectionChanged(e))">
+                    <select disabled="@SessionStorage.selection_done" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => block_0_1_VM.SurveyCodeSelectionChanged(e))">
                         <option value="">Select</option>
                         @if (block_0_1_VM.survey_code_list != null && block_0_1_VM.survey_code_list.Count > 0)
                         {
@@ -133,14 +140,14 @@
                             }
                         }
                     </select>
-                    <ValidationComponent @ref="block_0_1_VM.survey_code" is_error="@block_0_1_VM.is_error" field_name="Survey Code" />
+                    
                 </div>
                 <div class="mb-3 col-4" hidden="@(!block_0_1_VM.ShowItem17)">
                         <label class="form-label fw-bold">
                             <span class="badge bg-primary me-2">17</span>
                             Reason for substitution of original sample (code)
                         </label>
-                        <select class="form-select w-100" @bind="block_0_1_VM.block_0_1.Block_1_17">
+                        <select disabled="@SessionStorage.selection_done" class="form-select w-100" @bind="block_0_1_VM.block_0_1.Block_1_17">
                             <option value="">Select</option>
                             @if (block_0_1_VM.substitution_reason_list != null && block_0_1_VM.substitution_reason_list.Count > 0)
                             {
@@ -150,13 +157,11 @@
                                 }
                             }
                         </select>
-                        <ValidationComponent @ref="block_0_1_VM.substitution_reason"
-                                             is_error="@block_0_1_VM.is_error"
-                                             field_name="Substitution Reason" />
+                        
                     </div>
                 <div class="mb-3 col-12">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">18</span>Remarks</label>
-                    <textarea type="text" class="form-control disabled" placeholder="" cols="4" value="@block_0_1_VM.block_0_1.remarks"></textarea>
+                    <textarea disabled="@SessionStorage.selection_done" type="text" class="form-control disabled" placeholder="" cols="4" value="@block_0_1_VM.block_0_1.remarks"></textarea>
                 </div>
 
             </div>
@@ -164,7 +169,7 @@
         <div class="d-flex justify-content-between mb-3">
             <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
             <div class="d-flex">
-                <button class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
+                <button class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
                 <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
             </div>
         </div>
@@ -175,6 +180,52 @@
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
+    bool IsBlock_1_14_ErrorMessageVisible = false;
+    string Block_1_14_ErrorMessage = string.Empty;
+
+    private void ValidatePopulation(ChangeEventArgs e)
+    {
+        try
+        {
+            var _block_1_14 = Convert.ToInt32(e.Value);
+            int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
+            int _block_1_13 = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
+            if (sector == 1)
+            {
+                double change = ((double)(_block_1_14 - _block_1_13) / _block_1_13) * 100;
+                if (Math.Abs(change) >= 20)
+                {
+                    IsBlock_1_14_ErrorMessageVisible = true;
+                    Block_1_14_ErrorMessage = "W075A: Wide variation in approximate population and frame population";
+                }
+                else
+                {
+                    IsBlock_1_14_ErrorMessageVisible = false;
+                }
+            }
+            else if (sector == 2)
+            {
+                int maxValue = (int)(_block_1_13 * 4 * 1.2);
+                int minValue = (int)(_block_1_13 * 4 * 0.80);
+
+                if (_block_1_14 < minValue || _block_1_14 > maxValue)
+                {
+                    IsBlock_1_14_ErrorMessageVisible = true;
+                    Block_1_14_ErrorMessage = "W075B: Wide variation in approximate population and frame population";
+                }
+                else
+                {
+                    IsBlock_1_14_ErrorMessageVisible = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in ValidatePopulation: " + ex.Message);
+        }
+    
+    }
+
     
     async void GoBack()
     {
@@ -190,7 +241,7 @@
 
     async Task HandleSubmit(bool is_go_next)
     {
-        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.selection_done)
         {
             await block_0_1_VM.Save();
         }

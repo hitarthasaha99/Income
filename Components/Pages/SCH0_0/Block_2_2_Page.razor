@@ -179,6 +179,7 @@
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             toastService.ShowError("An error occurred while navigating");
             return;
         }

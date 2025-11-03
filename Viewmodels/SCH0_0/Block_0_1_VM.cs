@@ -146,6 +146,7 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_12_Selected = Block_0_1_Constants.FrameCode.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_12))?.title ?? string.Empty;
                 Block_1_16_Selected = block_0_1.Block_1_16 != null ? CommonList.LOOKUP_CONST_SURVEY_CODE.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_16))?.title : string.Empty;
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
+                EnablePopulation = !SessionStorage.selection_done;
             }
             OnPropertyChanged(nameof(block_0_1));
         }
@@ -189,7 +190,7 @@ namespace Income.Viewmodels.SCH0_0
             try
             {
                 var val = args.Value.ToString();
-                EnablePopulation = val == "1" || val == "4";
+                EnablePopulation = (val == "1" || val == "4") && !SessionStorage.selection_done;
                 ShowItem17 = val == "4" || val == "5" || val == "6" || val == "7";
                 if (!EnablePopulation)
                 {

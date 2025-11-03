@@ -181,7 +181,7 @@
             }
 
             remarks_block_9_10_yes = !string.IsNullOrEmpty(block_1?.EnumeratorRemarks) || !string.IsNullOrEmpty(block_1?.SupervisorRemarks);
-            
+
             StateHasChanged();
             return;
         }
@@ -222,6 +222,7 @@
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
         }
         finally
         {

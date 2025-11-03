@@ -163,6 +163,7 @@
         }
         catch(Exception ex)
         {
+            Console.WriteLine(ex.Message);
             toastService.ShowError(ex.ToString());
             return;
         }

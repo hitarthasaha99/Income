@@ -315,6 +315,7 @@
         try
         {
             SessionStorage.SelectedFSUId = fsu_id;
+            var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
             if (block_name == "sch0.0")
             {
                 var data = await dB.FetchBlock1();
@@ -327,14 +328,14 @@
             else if (block_name == "sch25.0")
             {
                 var data = await dB.GetSelectedBlock5List(fsu_id);
-                var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
                 if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
                 {
-                    toastService.ShowError("Please ensure the Selection Done and the data is downloaded Sucessfully.");
+                    toastService.ShowError("Please ensure the selection is done and the data is downloaded Sucessfully.");
                     return;
                 }
 
             }
+            SessionStorage.selection_done = FsuData?.FirstOrDefault().is_selection_done ?? false;
             SessionStorage.selected_hhd_seq = 0;
             SessionStorage.selected_hhd_id = 0;
             string page_name = block_name == "sch0.0" ? "block0_1" : "su_list_page";

@@ -27,11 +27,11 @@
             </h3>
 
             <div class="ms-auto d-flex gap-2">
-                <button class="btn btn-primary btn-sm d-flex align-items-center" @onclick="@(() => CalculateSSS())">
+                <button class="btn btn-primary btn-sm d-flex align-items-center" hidden="@SessionStorage.selection_done" @onclick="@(() => CalculateSSS())">
                     <i class="bi bi-calculator"></i> <span class="ms-1">Calc SSS</span>
                 </button>
 
-                <button class="btn btn-primary btn-sm d-flex align-items-center" @onclick="@(() => DoSelection())">
+                <button class="btn btn-primary btn-sm d-flex align-items-center" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
                     <i class="bi bi-check2-square"></i> <span class="ms-1">Selection</span>
                 </button>
             </div>
@@ -156,13 +156,7 @@
         {
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
         }
-        var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
-        if (response != null && response.Count > 0)
-        {
-            ListItems = new();
-            ListItems = response.OrderBy(x => x.Block_7_1).ToList();
-            StateHasChanged();
-        }
+        await LoadData();
         return;
     }
 
@@ -385,9 +379,17 @@
                 {
                     item.isInitialySelected = item.isSelected;
                     await SCH_0_0_Queries.Update_SCH0_0_Block_7(item);
+                    SessionStorage.selection_done = true;
                 }
 
                 Debug.WriteLine("Selected households:");
+                //Update selection flag at FSU level
+                var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+                if (fsu != null)
+                {
+                    fsu.is_selection_done = true;
+                    await commonQueries.UpdateFSU(fsu);
+                }
                 foreach (var hh in result.Households.Where(h => h.isSelected))
                 {
                     Debug.WriteLine($"Id={hh.Block_7_3} Stratum={hh.Stratum} FromSSS={hh.SelectedFromSSS} PostedSSS={hh.SelectedPostedSSS}");

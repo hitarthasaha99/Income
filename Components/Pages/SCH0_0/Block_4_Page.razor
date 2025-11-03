@@ -132,6 +132,7 @@
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.ToString());
             toastService.ShowError("Error in population input: " + ex.ToString());
             return;
         }

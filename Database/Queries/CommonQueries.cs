@@ -196,6 +196,24 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task UpdateFSU(Tbl_Fsu_List fsu)
+        {
+            try
+            {
+                if (fsu != null)
+                {
+                    var check_existence = await _database.Table<Tbl_Fsu_List>().Where(x => x.id == fsu.id).ToListAsync();
+                    if (check_existence != null)
+                    {
+                        await _database.UpdateAsync(fsu);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
         public async Task<int?> SaveFsuList(List<Tbl_Fsu_List> tbl_Fsu_List)
         {
             try
