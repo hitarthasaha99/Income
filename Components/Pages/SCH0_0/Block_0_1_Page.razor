@@ -114,7 +114,7 @@
 
                 <div class="mb-3 col-4">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">14</span>Approx. present population</label>
-                    <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(!block_0_1_VM.EnablePopulation)" />
+                    <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(SessionStorage.hamlet_selection_done && block_0_1_VM.EnablePopulation)" />
 
                     @if (IsBlock_1_14_ErrorMessageVisible)
                     {
@@ -130,7 +130,7 @@
                 </div>
                 <div class="mb-3 col-4" EditContext="EditContext">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">16</span>Survey Code</label>
-                    <select disabled="@SessionStorage.selection_done" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => block_0_1_VM.SurveyCodeSelectionChanged(e))">
+                    <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => block_0_1_VM.SurveyCodeSelectionChanged(e))">
                         <option value="">Select</option>
                         @if (block_0_1_VM.survey_code_list != null && block_0_1_VM.survey_code_list.Count > 0)
                         {
@@ -147,7 +147,7 @@
                             <span class="badge bg-primary me-2">17</span>
                             Reason for substitution of original sample (code)
                         </label>
-                        <select disabled="@SessionStorage.selection_done" class="form-select w-100" @bind="block_0_1_VM.block_0_1.Block_1_17">
+                        <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" @bind="block_0_1_VM.block_0_1.Block_1_17">
                             <option value="">Select</option>
                             @if (block_0_1_VM.substitution_reason_list != null && block_0_1_VM.substitution_reason_list.Count > 0)
                             {
@@ -161,7 +161,7 @@
                     </div>
                 <div class="mb-3 col-12">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">18</span>Remarks</label>
-                    <textarea disabled="@SessionStorage.selection_done" type="text" class="form-control disabled" placeholder="" cols="4" value="@block_0_1_VM.block_0_1.remarks"></textarea>
+                    <textarea disabled="@SessionStorage.hamlet_selection_done" type="text" class="form-control disabled" placeholder="" cols="4" value="@block_0_1_VM.block_0_1.remarks"></textarea>
                 </div>
 
             </div>
@@ -169,7 +169,7 @@
         <div class="d-flex justify-content-between mb-3">
             <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
             <div class="d-flex">
-                <button class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
+                <button class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
                 <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
             </div>
         </div>
@@ -241,7 +241,7 @@
 
     async Task HandleSubmit(bool is_go_next)
     {
-        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.selection_done)
+        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done)
         {
             await block_0_1_VM.Save();
         }

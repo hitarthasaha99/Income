@@ -316,6 +316,11 @@
         {
             SessionStorage.SelectedFSUId = fsu_id;
             var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
+            var subUnitData = await dB.FetchSCH0Block2_2Data();
+            if (subUnitData != null && subUnitData.Count > 0)
+            {
+                SessionStorage.hamlet_selection_done = subUnitData.Any(x => x.IsChecked);
+            }
             if (block_name == "sch0.0")
             {
                 var data = await dB.FetchBlock1();

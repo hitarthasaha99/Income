@@ -36,6 +36,7 @@
     <div class="my-2">
         <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                              survey_time="@survey_time" />
+        <ConfirmDialog @ref="dialog" />
         <div class="card card-style2">
 
             <!-- 🔹 Sticky Top Action Header -->
@@ -45,7 +46,7 @@
                     List of households and selection of households for Schedule on HIS
                 </h3>
 
-                <div class="ms-auto d-flex gap-2">
+                <div class="ms-auto d-flex gap-2" hidden="@SessionStorage.selection_done">
                     <button class="btn btn-primary btn-sm d-flex align-items-center" @onclick="@(() => HandleModal("ADD"))">
                         <i class="bi bi-plus"></i> <span class="ms-1">Add</span>
                     </button>
@@ -145,7 +146,7 @@
 
         <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
             <HeaderTemplate>
-                <h5 class="modal-title">@((fields.id == Guid.Empty ? "Add Household" : "Update Household"))</h5>
+                <h5 class="modal-title">@((isAdd ? "Add Household" : "Update Household"))</h5>
             </HeaderTemplate>
             <BodyTemplate>
                 @if (fields != null)
@@ -157,13 +158,13 @@
                             <div class="row g-3">
                                 <!-- Serial Number -->
                                 <div class="col-md-6">
-                                    <label class="form-label">1. Serial Number of Row</label>
+                                    <label class="form-label">0. Serial Number of Row</label>
                                     <InputNumber class="form-control form-control-sm" @bind-Value="fields.Block_7_1" Disabled="true" />
                                 </div>
 
                                 <!-- House Number -->
                                 <div class="col-md-6">
-                                    <label class="form-label">2. House Number</label>
+                                    <label class="form-label">1. House Number</label>
                                     <InputText class="form-control form-control-sm"
                                                @bind-Value="fields.Block_7_2"
                                                 />
@@ -172,8 +173,8 @@
 
                                 <!-- Is Household -->
                                 <div class="col-md-6">
-                                    <label class="form-label">3. Is the house for non-residential purposes?</label>
-                                    <InputSelect class="form-select form-select-sm" @bind-Value="fields.is_household">
+                                    <label class="form-label">2. Is the house for non-residential purposes?</label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="fields.is_household" oninput="@(((ChangeEventArgs e) => OnIsHouseholdChanged(e)))">
                                         <option value="">- Select -</option>
                                         @if (commonList?.LOOKUP_CONST_YES_NO != null)
                                         {
@@ -188,13 +189,13 @@
 
                                 <!-- Household Serial Number -->
                                 <div class="col-md-6">
-                                    <label class="form-label">4. Household Serial Number</label>
+                                    <label class="form-label">3. Household Serial Number</label>
                                     <InputNumber class="form-control form-control-sm" @bind-Value="fields.Block_7_3" Disabled="true" />
                                 </div>
 
                                 <!-- Head of Household Name -->
-                                <div class="col-md-6">
-                                    <label class="form-label">5. Name of Head of Household</label>
+                                <div class="col-md-6" hidden="@(fields.is_household == 1)">
+                                    <label class="form-label">4. Name of Head of Household</label>
                                     <InputText class="form-control form-control-sm"
                                                onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
                                                @bind-Value="fields.Block_7_4"
@@ -204,8 +205,8 @@
 
 
                                 <!-- Household Size -->
-                                <div class="col-md-6">
-                                    <label class="form-label">6. Household Size</label>
+                                <div class="col-md-6" hidden="@(fields.is_household == 1)">
+                                    <label class="form-label">5. Household Size</label>
                                     <InputNumber class="form-control form-control-sm"
                                                  @bind-Value="fields.Block_7_5"
                                                   />
@@ -213,8 +214,8 @@
                                 </div>
 
                                 <!-- Highest Education Level -->
-                                <div class="col-md-6">
-                                    <label class="form-label">7. Highest Education Level (Urban only)</label>
+                                <div class="col-md-6" hidden="@(fields.is_household == 1)">
+                                    <label class="form-label">6. Highest Education Level (Urban only)</label>
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="fields.Block_7_6" Disabled="@(sector == 1)">
                                         <option value="">- Select -</option>
@@ -226,12 +227,12 @@
                                             }
                                         }
                                     </InputSelect>
-                                    <ValidationMessage For="@(() => fields.Block_7_5)" />
+                                    <ValidationMessage For="@(() => fields.Block_7_6)" />
                                 </div>
 
                                 <!-- Household Type -->
-                                <div class="col-md-6">
-                                    <label class="form-label">8. Household Type</label>
+                                <div class="col-md-6" hidden="@(fields.is_household == 1)">
+                                    <label class="form-label">7. Household Type</label>
                                     <InputSelect class="form-select form-select-sm" @bind-Value="fields.Block_7_7">
                                         <option value="">- Select -</option>
                                         @if (Block_7_Constants.HighestEdu != null)
@@ -249,25 +250,28 @@
                                             }
                                         }
                                     </InputSelect>
-                                    <ValidationMessage For="@(() => fields.Block_7_5)" />
+                                    <ValidationMessage For="@(() => fields.Block_7_7)" />
                                 </div>
 
                                 <!-- Total Land Owned -->
-                                <div class="col-md-6">
-                                    <label class="form-label">9. Total Land Owned (Rural only)</label>
-                                    <InputNumber class="form-control form-control-sm"
+                                <div class="col-md-6" hidden="@(fields.is_household == 1)">
+                                    <label class="form-label">8. Total Land Owned (Rural only)</label>
+                                    <InputNumber class="form-control form-control-sm no-spinner"
                                                  @bind-Value="fields.Block_7_8"
-                                                  />
-                                    <ValidationMessage For="@(() => fields.Block_7_5)" />
+                                                 step="any"
+                                                 Disabled="@(sector == 2)"
+                                                 onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(event.target.value + event.key)" />
+                                    <ValidationMessage For="@(() => fields.Block_7_8)" />
                                 </div>
 
                                 <!-- Monthly Expenditure -->
-                                <div class="col-md-6">
-                                    <label class="form-label">10. Usual Monthly Consumption Expenditure</label>
-                                    <InputNumber class="form-control form-control-sm"
+                                <div class="col-md-6" hidden="@(fields.is_household == 1)">
+                                    <label class="form-label">9. Usual Monthly Consumption Expenditure</label>
+                                    <InputNumber class="form-control form-control-sm no-spinner"
+                                                 step="any"
                                                  @bind-Value="fields.Block_7_9"
-                                                  />
-                                    <ValidationMessage For="@(() => fields.Block_7_5)" />
+                                                 oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+                                    <ValidationMessage For="@(() => fields.Block_7_9)" />
                                 </div>
                             </div>
                         </div>
@@ -309,7 +313,11 @@
     ValidationComponent head_name_ref = new();
     ValidationComponent size_ref = new();
     CommonList commonList = new();
+    Tbl_Sch_0_0_Block_0_1 block_1_obj;
     private ValidationMessageStore messageStore;
+    private ConfirmDialog dialog = default!;
+
+    bool isAdd = false;
 
     CommonFunction commonFunctions = new();
     bool is_error = false;
@@ -332,6 +340,7 @@
         var block_0_1 = await SCH_0_0_Queries.FetchBlock1();
         if (block_0_1 != null)
         {
+            block_1_obj = block_0_1;
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
         }
         var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
@@ -343,6 +352,27 @@
         }
         return;
     }
+
+    private void OnIsHouseholdChanged(ChangeEventArgs e)
+    {
+        var selectedValue = e.Value?.ToString();
+
+        if (selectedValue == "1")
+        {
+            fields.Block_7_4 = string.Empty;
+            fields.Block_7_5 = 0;
+            fields.Block_7_6 = null;
+            fields.Block_7_7 = null;
+            fields.Block_7_8 = null;
+            fields.Block_7_9 = 0;
+            fields.Block_7_3 = 0;
+        }
+        else if (selectedValue == "2")
+        {
+        }
+
+    }
+
 
     private async Task LoadData()
     {
@@ -634,17 +664,48 @@
 
     async Task HandleSubmit(string action = "")
     {
-        NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
-        return;
+        int total_listed_population = ListItems.Sum(x => x.Block_7_5.GetValueOrDefault());
+        int no_of_sd = block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault();
+        int su_population = block_1_obj.approximate_population_su.GetValueOrDefault();
+
+        int approx_population_fsu = block_1_obj.Block_1_14.GetValueOrDefault();
+        int number_of_sub_units = block_1_obj.Block_1_15.GetValueOrDefault();
+
+        int listedTotal = total_listed_population * no_of_sd;
+
+        double lowerLimit = su_population * 0.95;
+        double upperLimit = su_population * 1.05;
+
+        bool isWithin5Percent = listedTotal >= lowerLimit && listedTotal <= upperLimit;
+        if (!isWithin5Percent)
+        {
+            string validationMessage = $"Population mismatch: {listedTotal} should be within ±5% of {su_population}.\nDo you want to continue?";
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmation = await dialog.ShowAsync(
+                title: "Alert",
+                message1: validationMessage,
+                confirmDialogOptions: options);
+
+            if (confirmation)
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
+        }
     }
 
-    void HandleDelete(Guid id)
+    async Task HandleDelete(Guid id)
     {
         int item_index = ListItems.FindIndex(l => l.id == id);
         if (item_index != -1)
         {
             ListItems[item_index].is_deleted = true;
-            StateHasChanged();
+            await SCH_0_0_Queries.DeleteHHD(id);
+            toastService.ShowSuccess("Row deleted successfully!");
+            await LoadData();
         }
         else
         {
@@ -659,6 +720,7 @@
         {
             if (action == "ADD")
             {
+                isAdd = true;
                 if (data == null)
                 {
                     fields = new();
@@ -679,6 +741,7 @@
             }
             else if (action == "UPDATE")
             {
+                isAdd = false;
                 if (data != null)
                 {
                     fields = data;
@@ -754,13 +817,20 @@
     {
         try
         {
-            int maxValue = ListItems.Where(x => x.is_deleted != true).Any()? ListItems.Where(x => x.is_deleted != true).Max(x => x.Block_7_1.GetValueOrDefault()) : 0; // or use int? maxValue = null;
-            return maxValue + 1;
+            // Get the maximum Block_7_1 value from non-deleted items
+            if (ListItems.Count() > 0)
+            {
+                return ListItems.Max(x => x.Block_7_1.GetValueOrDefault()) + 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
         catch(Exception ex)
         {
             toastService.ShowError($"Getting Error while generating Household Serial Number {ex}, Please try again!");
-            return null;
+            return 0;
         }
     }
 
@@ -768,13 +838,28 @@
     {
         try
         {
-            int maxValue = ListItems.Where(x => x.is_deleted != true).Any() ? ListItems.Where(x => x.is_deleted != true).Max(x => x.Block_7_3.GetValueOrDefault()) : 0; // or use int? maxValue = null;
-            return maxValue + 1;
+            // Get the maximum Block_7_1 value from non-deleted items
+            if (ListItems.Count() > 0)
+            {
+                var households = ListItems.Where(x => x.is_household == 2);
+                if (households != null && households.Count() > 0)
+                {
+                    return households.Max(x => x.Block_7_3.GetValueOrDefault()) + 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                return 0;
+            }
         }
         catch(Exception ex)
         {
             toastService.ShowError($"Getting Error while generating Household sampling Serial Number {ex}, Please try again!");
-            return null;
+            return 0;
         }
     }
 }

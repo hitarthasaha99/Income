@@ -369,7 +369,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set != null && data_set.Count > 0 ? data_set : new();
             }
             catch (Exception ex)
@@ -493,6 +493,33 @@ namespace Income.Database.Queries
             {
                 toastService.ShowError($"Error While saving SCH 0 Block 5: {ex.Message}");
                 return null;
+            }
+        }
+
+        public async Task<int> DeleteHHD(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting household: " + ex.Message);
+                return 0;
             }
         }
 
