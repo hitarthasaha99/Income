@@ -1,0 +1,335 @@
+﻿@page "/dashboard/his/block_3"
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using FluentValidation
+@using Microsoft.AspNetCore.Components.Forms
+
+
+<div class="my-2">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                         survey_time="@survey_time" />
+    <div class="card card-style2">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">Block 3: demographic and other particulars of household members </span>
+            </h3>
+            @* AddButton *@
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">Add</button>
+
+        </div>
+
+        @* Tables *@
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mb-0 text-center">
+                    <thead>
+                        <tr>
+                            <th rowspan="3">s.no.</th>
+                            <th rowspan="3">name of member</th>
+                            <th rowspan="3">relation to head(code)</th>
+                            <th rowspan="3">gender(code)</th>
+                            <th rowspan="3">age (years)</th>
+                            <th rowspan="3">marital status(code)</th>
+                            <th rowspan="3">highest educational level attained(code)</th>
+                            <th colspan="4">activity status</th>
+                            <th rowspan="3" style="min-width:200px">whether a beneficiary of any Central/State Government social assistance scheme as on date of survey(<i>yes-1/no-2</i>)</th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">during 30 days</th>
+                            <th colspan="2">during 365 days</th>
+                        </tr>
+                        <tr>
+                            <th>primary(code)</th>
+                            <th>secondary(code)</th>
+                            <th>primary(code)</th>
+                            <th>secondary(code)</th>
+                        </tr>
+                        <tr>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                            <th>(5)</th>
+                            <th>(6)</th>
+                            <th>(7)</th>
+                            <th>(8)</th>
+                            <th>(9)</th>
+                            <th>(10)</th>
+                            <th>(11)</th>
+                            <th>(12)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+
+                            @* <td>
+                                <span style="color: #7A52F4;"><i class="bi bi-eye"></i></span>
+                            </td> *@
+                        </tr>
+
+
+                    </tbody>
+                </table>
+
+                <div class="mb-3 px-2">
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* Next And Back Button *@
+    <div class="d-flex justify-content-between mb-3">
+        <NavLink class="btn btn-outline-primary" href="/back">
+            <i class="bi bi-chevron-left me-1"></i>
+            Back
+        </NavLink>
+        <div class="d-flex">
+            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                <NavLink class="btn btn-primary me-2 is_sso action" href="/save">
+                    <i class="bi bi-floppy-fill me-1"></i>
+                    Save
+                </NavLink>
+            }
+            <NavLink class="btn btn-outline-primary" href="/next">
+                Next
+                <i class="bi bi-chevron-right ms-1"></i>
+            </NavLink>
+        </div>
+    </div>
+
+
+    @* Model Module *@
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Add Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">1.</span> Sl no.
+                                </label>
+                                <input type="text" class="form-control form-control-sm" value="" disabled />
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">2.</span> Name of Member
+                                </label>
+                                <input type="text" class="form-control form-control-sm" placeholder="Enter Name of member" />
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">3.</span> Relation to head (code)
+                                </label>
+                                <select class="form-select form-select-sm">
+                                    <option>-Select-</option>
+                                    <option>self-1</option>
+                                    <option>spouse of head-2</option>
+                                    <option>married child-3</option>
+                                    <option>spouse of married child-4</option>
+                                    <option>unmarried child-5</option>
+                                    <option>grandchild-6</option>
+                                    <option>father/mother/father-in-law/mother-in-law-7</option>
+                                    <option>brother/sister/brother-in-law/sister-in- law/other relatives-8</option>
+                                    <option>servants/employees/other non-relatives-9 </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">4.</span> Gender (code)
+                                </label>
+                                <select class="form-select form-select-sm">
+                                    <option>-Select-</option>
+                                    <option>male-1</option>
+                                    <option>female-2</option>
+                                    <option>transgender-3</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">5.</span> Age(years)
+                                </label>
+                                <input type="number" class="form-control form-control-sm" />
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">6.</span> Marital status (code)
+                                </label>
+                                <select class="form-select form-select-sm">
+                                    <option>-Select-</option>
+                                    <option>never married – 1</option>
+                                    <option>currently married (including living together) – 2</option>
+                                    <option>widowed – 3</option>
+                                    <option>divorced/separated – 4</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-12 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">7.</span> Highest level of complete education (code)
+                                </label>
+                                <select class="form-select form-select-sm">
+                                    <option>-Select-</option>
+                                  
+                                    <option>not literate (i.e. not able to read or write a simple message with understanding in any language) -01 </option>
+                                    <option>literate without formal schooling (like NFEC, AEC, TLC, literate without any schooling, etc.)-02 </option>
+                                    <option>literate with formal education below primary-03 </option>
+                                    <option>primary -04 </option>
+                                    <option>upper primary/middle -05 </option>
+                                    <option>secondary -06 </option>
+                                    <option>higher secondary -07 </option>
+                                    <option>diploma /certificate course - 08 </option>
+                                    <option>graduate -10 </option>
+                                    <option>postgraduate and above - 11 </option>
+                                    
+                                </select>
+                            </div>
+                            <div class="mb-3 row">
+                                <h4>Activity status</h4>
+                                <p>During 30 days</p>
+                                @* primary *@
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">8.</span> Primary
+                                    </label>
+                                    <select class="form-select form-select-sm">
+                                        <option>-Select-</option>
+                                        <option>self-employed in agriculture (own account worker/employer) - 01 </option>
+                                        <option>self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                        <option>unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                        <option>regular wage/ salary – 04 </option>
+                                        <option>casual labour – 05 </option>
+                                        <option>did not work but was seeking and/or available for work – 06 </option>
+                                        <option>student / attended educational institution - 07 </option>
+                                        <option>attended domestic duties only – 08 </option>
+                                        <option>attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                        <option>earning from rent – 10 </option>
+                                        <option>earning from pensions -11 </option>
+                                        <option>earning from remittances -12 </option>
+                                        <option>earning from interest - 13 </option>
+                                        <option>unfit for work due to disability or illness – 14 </option>
+                                        <option>others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                       
+                                    </select>
+                                </div>
+                                @* secondary *@
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">9.</span> Secondary
+                                    </label>
+                                     <select class="form-select form-select-sm">
+                                        <option>-Select-</option>
+                                        <option>self-employed in agriculture (own account worker/employer) - 01 </option>
+                                        <option>self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                        <option>unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                        <option>regular wage/ salary – 04 </option>
+                                        <option>casual labour – 05 </option>
+                                        <option>did not work but was seeking and/or available for work – 06 </option>
+                                        <option>student / attended educational institution - 07 </option>
+                                        <option>attended domestic duties only – 08 </option>
+                                        <option>attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                        <option>earning from rent – 10 </option>
+                                        <option>earning from pensions -11 </option>
+                                        <option>earning from remittances -12 </option>
+                                        <option>earning from interest - 13 </option>
+                                        <option>unfit for work due to disability or illness – 14 </option>
+                                        <option>others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                       
+                                    </select>
+                                </div>
+                                @* 365 Days Fild *@
+                                <p>During 365 days</p>
+                                @* primary *@
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">10.</span> Primary
+                                    </label>
+                                    <select class="form-select form-select-sm">
+                                        <option>-Select-</option>
+                                        <option>self-employed in agriculture (own account worker/employer) - 01 </option>
+                                        <option>self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                        <option>unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                        <option>regular wage/ salary – 04 </option>
+                                        <option>casual labour – 05 </option>
+                                        <option>did not work but was seeking and/or available for work – 06 </option>
+                                        <option>student / attended educational institution - 07 </option>
+                                        <option>attended domestic duties only – 08 </option>
+                                        <option>attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                        <option>earning from rent – 10 </option>
+                                        <option>earning from pensions -11 </option>
+                                        <option>earning from remittances -12 </option>
+                                        <option>earning from interest - 13 </option>
+                                        <option>unfit for work due to disability or illness – 14 </option>
+                                        <option>others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                       
+                                    </select>
+                                </div>
+                                @* secondary *@
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">11.</span> Secondary
+                                    </label>
+                                     <select class="form-select form-select-sm">
+                                        <option>-Select-</option>
+                                        <option>self-employed in agriculture (own account worker/employer) - 01 </option>
+                                        <option>self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                        <option>unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                        <option>regular wage/ salary – 04 </option>
+                                        <option>casual labour – 05 </option>
+                                        <option>did not work but was seeking and/or available for work – 06 </option>
+                                        <option>student / attended educational institution - 07 </option>
+                                        <option>attended domestic duties only – 08 </option>
+                                        <option>attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                        <option>earning from rent – 10 </option>
+                                        <option>earning from pensions -11 </option>
+                                        <option>earning from remittances -12 </option>
+                                        <option>earning from interest - 13 </option>
+                                        <option>unfit for work due to disability or illness – 14 </option>
+                                        <option>others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                       
+                                    </select>
+                                </div>
+                            </div>
+                <div class="col-sm-12 mb-3">
+                                <label class="form-label fw-bold d-flex align-items-start">
+                                    <span class="me-2">12.</span> whether a beneficiary of any Central/ State Government social assistance scheme as on date of survey (yes-1/ no-2)
+                                </label>
+                                <select class="form-select form-select-sm">
+                                    <option>-Select-</option>
+                                    <option>yes-1</option>
+                                    <option>no-2</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">
+                        <i class="bi bi-floppy-fill me-1"></i>
+                        Save</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    private CommonConfig commonConfig = new CommonConfig();
+    DateTime survey_time = DateTime.Now;
+}
