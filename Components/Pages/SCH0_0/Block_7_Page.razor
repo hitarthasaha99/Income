@@ -207,10 +207,14 @@
                                 <!-- Household Size -->
                                 <div class="col-md-6" hidden="@(fields.is_household == 1)">
                                     <label class="form-label">5. Household Size</label>
-                                    <InputNumber class="form-control form-control-sm"
+                                    <InputNumber class="form-control form-control-sm no-spinner"
+                                                 @oninput="OnHHDSizeInput"
                                                  @bind-Value="fields.Block_7_5"
                                                   />
                                     <ValidationMessage For="@(() => fields.Block_7_5)" />
+                                    <div class="text-success mt-1 fw-bold" hidden="@(!ShowPopulationWarning)">
+                                        @PopulationWarningMessage
+                                    </div>
                                 </div>
 
                                 <!-- Highest Education Level -->
@@ -316,6 +320,8 @@
     Tbl_Sch_0_0_Block_0_1 block_1_obj;
     private ValidationMessageStore messageStore;
     private ConfirmDialog dialog = default!;
+    private bool ShowPopulationWarning = false;
+    private string PopulationWarningMessage = "Please re-check the value";
 
     bool isAdd = false;
 
@@ -350,7 +356,6 @@
             ListItems = response.OrderBy(x => x.Block_7_1).ToList();
             StateHasChanged();
         }
-        return;
     }
 
     private void OnIsHouseholdChanged(ChangeEventArgs e)
@@ -676,15 +681,41 @@
         double lowerLimit = su_population * 0.95;
         double upperLimit = su_population * 1.05;
 
-        bool isWithin5Percent = listedTotal >= lowerLimit && listedTotal <= upperLimit;
-        if (!isWithin5Percent)
+        double lowerLimit_1 = approx_population_fsu * 0.95;
+        double upperLimit_1 = approx_population_fsu * 1.05;
+
+        bool isWithin5Percent_i = listedTotal >= lowerLimit && listedTotal <= upperLimit;
+        bool isWithin5Percent_ii = (listedTotal * number_of_sub_units) >= lowerLimit_1
+                                    && (listedTotal * number_of_sub_units) <= upperLimit_1;
+
+        // Build warning message when any condition fails
+        string validationMessage = string.Empty;
+
+        if (!isWithin5Percent_i)
         {
-            string validationMessage = $"Population mismatch: {listedTotal} should be within ±5% of {su_population}.\nDo you want to continue?";
+            validationMessage +=
+                $"(i) Population mismatch:\n" +
+                $"{listedTotal} should be within ±5% of {su_population}.\n\n";
+        }
+
+        if (!isWithin5Percent_ii)
+        {
+            validationMessage +=
+                $"(ii) Population mismatch:\n" +
+                $"{listedTotal * number_of_sub_units} should be within ±5% of {approx_population_fsu}.\n\n";
+        }
+
+        // If message exists, show confirm dialog
+        if (!string.IsNullOrWhiteSpace(validationMessage))
+        {
+            validationMessage += "Do you want to continue?";
+
             var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
             var confirmation = await dialog.ShowAsync(
                 title: "Alert",
                 message1: validationMessage,
-                confirmDialogOptions: options);
+                confirmDialogOptions: options
+            );
 
             if (confirmation)
             {
@@ -696,6 +727,7 @@
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
         }
     }
+
 
     async Task HandleDelete(Guid id)
     {
@@ -718,6 +750,7 @@
     {
         try
         {
+            ShowPopulationWarning = false;
             if (action == "ADD")
             {
                 isAdd = true;
@@ -746,6 +779,10 @@
                 {
                     fields = data;
                     // Recreate EditContext for the new model
+                    if (fields.Block_7_5 > 30)
+                    {
+                        ShowPopulationWarning = true;
+                    }
                     editContext = new EditContext(fields);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += ClearFieldErrorsOnChange;
@@ -787,6 +824,24 @@
         StateHasChanged();
     }
 
+    private void OnHHDSizeInput(ChangeEventArgs e)
+    {
+        fields.Block_7_5 = e.Value != null && int.TryParse(e.Value.ToString(), out int result) ? result : (int?)null;
+
+        if (fields.Block_7_5 > 30)
+        {
+            ShowPopulationWarning = true;
+            PopulationWarningMessage = "Please re-check the value";
+        }
+        else
+        {
+            ShowPopulationWarning = false;
+            PopulationWarningMessage = string.Empty;
+        }
+
+        StateHasChanged();
+    }
+
 
     private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
     {
@@ -824,7 +879,7 @@
             }
             else
             {
-                return 0;
+                return 1;
             }
         }
         catch(Exception ex)
@@ -848,12 +903,12 @@
                 }
                 else
                 {
-                    return 0;
+                    return 1;
                 }
             }
             else
             {
-                return 0;
+                return 1;
             }
         }
         catch(Exception ex)

@@ -195,6 +195,23 @@ namespace Income.Viewmodels.SCH0_0
             }
         }
 
+        public bool PopulationVariationExists()
+        {
+            try
+            {
+                var percentages = tbl_Sch_0_0_Block_2_2
+                          .Select(row => row.Percentage) // Extract Percentage values.
+                          .ToList();
+                double minValue = percentages.Min();
+                double maxValue = percentages.Max();
+                return Math.Abs(maxValue - minValue) > 5;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         public ValidationResult Validate()
         {
             var result = new ValidationResult();
