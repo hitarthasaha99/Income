@@ -552,6 +552,40 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> ResetSelection()
+        {
+            try
+            {
+                var response = await GetBlock7Data(SessionStorage.SelectedFSUId);
+                if (response != null && response.Count > 0)
+                {
+                    foreach (var item in response)
+                    {
+                        item.isSelected = false;
+                        item.isInitialySelected = false;
+                        item.isCasualty = false;
+                        item.isSubstitute = false;
+                        item.SubstitutedForID = null;
+                        item.OriginalHouseholdID = null;
+                        item.SubstitutionCount = 0;
+                        item.status = "";
+                        item.SSS = 0;
+                        item.Stratum = 0;
+                        item.a = 0;
+                        item.b = 0;
+                    }
+                    var update = await _database.UpdateAllAsync(response);
+                    return update;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error resetting selection: " + ex.Message);
+                return 0;
+            }
+        }
+
 
         public async Task<int?> SaveBulkBlock7(List<Tbl_Sch_0_0_Block_7> list)
         {
