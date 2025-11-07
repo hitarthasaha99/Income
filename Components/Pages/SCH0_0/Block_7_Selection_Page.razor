@@ -34,6 +34,11 @@
                 <button class="btn btn-primary btn-sm d-flex align-items-center" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
                     <i class="bi bi-check2-square"></i> <span class="ms-1">Selection</span>
                 </button>
+
+                <button class="btn btn-primary btn-sm d-flex align-items-center" @onclick="@(() => ResetSelection())">
+                    <i class="bi bi-arrow-clockwise"></i> <span class="ms-1">Reset Selection</span>
+                </button>
+
             </div>
         </div>
 
@@ -157,7 +162,6 @@
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
         }
         await LoadData();
-        return;
     }
 
     private async Task LoadData()
@@ -168,6 +172,36 @@
             ListItems?.Clear();
             ListItems?.AddRange(response.OrderBy(x => x.Block_7_1).ToList());
             StateHasChanged();
+        }
+    }
+
+    private async Task ResetSelection()
+    {
+        try
+        {
+            preloadService.Show(SpinnerColor.Info, "Resetting Selection, Please wait...");
+            var response = await SCH_0_0_Queries.ResetSelection();
+            if (response > 0)
+            {
+                toastService.ShowSuccess("Selection reset successful");
+                SessionStorage.selection_done = false;
+                //Update selection flag at FSU level
+                var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+                if (fsu != null)
+                {
+                    fsu.is_selection_done = false;
+                    await commonQueries.UpdateFSU(fsu);
+                }
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Getting error during resetting selection: {ex}, Please try again!");
+        }
+        finally
+        {
+            preloadService.Hide();
         }
     }
 

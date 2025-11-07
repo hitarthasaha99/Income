@@ -369,7 +369,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set != null && data_set.Count > 0 ? data_set : new();
             }
             catch (Exception ex)
@@ -496,6 +496,33 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> DeleteHHD(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting household: " + ex.Message);
+                return 0;
+            }
+        }
+
         public async Task<int> SaveSSSToDatabase(List<Tbl_Sch_0_0_Block_7> households)
         {
             if (households == null || households.Count == 0)
@@ -521,6 +548,40 @@ namespace Income.Database.Queries
             catch (Exception ex)
             {
                 Console.WriteLine("Error updating SSS values: " + ex.Message);
+                return 0;
+            }
+        }
+
+        public async Task<int> ResetSelection()
+        {
+            try
+            {
+                var response = await GetBlock7Data(SessionStorage.SelectedFSUId);
+                if (response != null && response.Count > 0)
+                {
+                    foreach (var item in response)
+                    {
+                        item.isSelected = false;
+                        item.isInitialySelected = false;
+                        item.isCasualty = false;
+                        item.isSubstitute = false;
+                        item.SubstitutedForID = null;
+                        item.OriginalHouseholdID = null;
+                        item.SubstitutionCount = 0;
+                        item.status = "";
+                        item.SSS = 0;
+                        item.Stratum = 0;
+                        item.a = 0;
+                        item.b = 0;
+                    }
+                    var update = await _database.UpdateAllAsync(response);
+                    return update;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error resetting selection: " + ex.Message);
                 return 0;
             }
         }

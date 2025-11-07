@@ -30,6 +30,8 @@ namespace Income.Common
         public static DateTime survey_timestamp = new();
         public static int FSU_Sector = 0;
         public static bool selection_done = false;
+        public static bool hamlet_selection_done = false;
+        public static bool FSU_Submitted = false;
         public static void ClearSession()
         {
             SelectedFSUId = 0;
@@ -49,6 +51,20 @@ namespace Income.Common
             selected_hhd_size = new();
             survey_timestamp = new();
             FSU_Sector = 0;
+            selection_done = false;
+            hamlet_selection_done = false;
+            FSU_Submitted = false;
+        }
+
+        public static void ClearFSUFlags()
+        {
+            SelectedFSUId = 0;
+            FSU_Sector = 0;
+            selected_hhd_id = 0;
+            selected_hhd_seq = 0;
+            selection_done = false;
+            hamlet_selection_done = false;
+            FSU_Submitted = false;
         }
 
         public static UserRole GetUserRole()

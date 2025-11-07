@@ -19,7 +19,10 @@
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">[Block 2.1]</span>List of hamlets (only for rural samples with SU formation)
             </h3>
-            <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" hidden="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" @onclick="@(() => block_2_1_VM.AddRow())"><i class="bi bi-plus"></i> <span>Add</span></button>
+            @if (!SessionStorage.hamlet_selection_done)
+            {
+                <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => block_2_1_VM.AddRow())"><i class="bi bi-plus"></i> <span>Add</span></button>
+            }
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -47,11 +50,15 @@
                                 {
                                     <tr>
                                         <td>@item.serial_no</td>
-                                        <td><input class="form-control form-control-sm" value="@item.hamlet_name" disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" @onchange="@((ChangeEventArgs e) => block_2_1_VM.HandleChange(e, item.id, "name_of_hamlet"))"></td>
-                                        <td><input type="number" step="0.1" min="0" max="100" disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" class="form-control form-control-sm" value="@item.percentage" @oninput="(e => RestrictToOneDecimal(e, item))" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)"></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-danger d-flex align-items-center" hidden="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO || SessionStorage.selection_done)" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="bi bi-trash me-2"></i><span>Delete</span></button>
-                                        </td>
+                                        <td><input class="form-control form-control-sm" value="@item.hamlet_name" disabled="@(SessionStorage.hamlet_selection_done)" @onchange="@((ChangeEventArgs e) => block_2_1_VM.HandleChange(e, item.id, "name_of_hamlet"))"></td>
+                                        <td><input type="number" step="0.1" min="0" max="100" disabled="@(SessionStorage.hamlet_selection_done)" class="form-control form-control-sm" value="@item.percentage" @oninput="(e => RestrictToOneDecimal(e, item))" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)"></td>
+                                        @if (!SessionStorage.hamlet_selection_done)
+                                        {
+                                            <td>
+                                                <button class="btn btn-sm btn-danger d-flex align-items-center" hidden="@(SessionStorage.hamlet_selection_done)" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="bi bi-trash me-2"></i><span>Delete</span></button>
+                                            </td>
+                                        }
+                                        
                                     </tr>
                                 }
                             }
@@ -71,7 +78,7 @@
     <div class="d-flex justify-content-between mb-3">
         <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1" ></i>Back</NavLink>
         <div class="d-flex">
-            <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit("SAVE"))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+            <NavLink class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit("SAVE"))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
             <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit("NEXT"))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
         </div>
     </div>
@@ -88,6 +95,7 @@
     DBQueries sch_0_0_Queries = new();
     private List<string> validationErrors = new();
     private string validationMessage = "";
+    bool is_sel;
     async void GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -117,6 +125,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        is_sel = SessionStorage.hamlet_selection_done;
         block_2_1_VM.NotifyUiUpdate += StateHasChanged;
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
@@ -126,7 +135,7 @@
         };
         await commonQueries.InsertVisitedBlock(vb);
         await block_2_1_VM.Init();
-        return;
+        StateHasChanged();
     }
 
     async Task HandleSubmit(string action)

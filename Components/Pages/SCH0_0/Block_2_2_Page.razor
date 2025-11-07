@@ -139,24 +139,38 @@
         }
         else
         {
-            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
-            var confirmation = await dialog.ShowAsync(
-                title: "Alert",
-                message1: "Do you want to proceed?",
-                confirmDialogOptions: options);
-
-            if (confirmation)
+            if (block_2_2_VM.PopulationVariationExists())
             {
-                preloadService.Show(SpinnerColor.Light, "Processing, please wait");
-                block_2_2_VM.DoSelection();
-                toastService.ShowSuccess("SU selection done successfully");
-                preloadService.Hide();
+                var options_0 = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                var confirmation_0 = await dialog.ShowAsync(
+                    title: "Alert",
+                    message1: "All the sub-units need to have more or less equal population. Do you want to continue?",
+                    confirmDialogOptions: options_0);
+
+                if (confirmation_0)
+                {
+                    preloadService.Show(SpinnerColor.Light, "Processing, please wait");
+                    block_2_2_VM.DoSelection();
+                    toastService.ShowSuccess("SU selection done successfully");
+                    preloadService.Hide();
+                }
             }
             else
             {
-                // do something
+                var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                var confirmation = await dialog.ShowAsync(
+                    title: "Alert",
+                    message1: "Do you want to proceed?",
+                    confirmDialogOptions: options);
+
+                if (confirmation)
+                {
+                    preloadService.Show(SpinnerColor.Light, "Processing, please wait");
+                    block_2_2_VM.DoSelection();
+                    toastService.ShowSuccess("SU selection done successfully");
+                    preloadService.Hide();
+                }
             }
-            
         }
     }
 
