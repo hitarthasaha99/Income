@@ -1,0 +1,627 @@
+﻿@page "/dashboard/his/ssu_page"
+@using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject PreloadService preloadService
+@inject IToastService toastService
+@inject IJSRuntime JSRuntime
+@inject IJSRuntime JS
+
+
+<div class="my-2">
+	<CommonContentHeader SelectedFsuId="@SelectedFsuId"
+						 survey_time="@survey_time"
+						 page_name="/dashboard/fsulist"
+						 ShowVisitedBlock="ShowVisitedBlock" />
+	<div class="card card-style2">
+		<div class="card-header d-flex align-items-center">
+			<h3 class="card-title m-0 d-flex align-items-center">
+				Selected Sampling Units list
+			</h3>
+			@* <button class="btn btn-sm btn-primary ms-auto" @onclick="HandlePrint">
+				<i class="bi bi-printer"></i> Print
+			</button> *@
+		</div>
+		<div class="card-body p-0">
+			<div class="table-responsive">
+				<table class="table table-striped table-bordered custom-badge mb-0">
+					<thead>
+						<tr>
+							<th>Action</th>
+							<th></th>
+							<th>HHD Serial</th>
+							<th>HHD Number</th>
+							<th>HHD Head</th>
+							<th>HHD Size</th>
+							<th>Survey Status</th>
+							<th>HHD Status</th>
+							<th>Substituted for ID</th>
+							<th></th>
+
+						</tr>
+					</thead>
+					<tbody>
+						@if (hhd_list != null && hhd_list.Count > 0)
+						{
+							foreach (var item in hhd_list)
+							{
+								@if (item.is_deleted != true)
+								{
+									<tr>
+										<td>
+											<div class="d-flex">
+												@if (item.status != "SUBSTITUTED")
+												{
+													@if (item.isSelected == true)
+													{
+														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="me-3 text-muted"><i class="bi bi-arrow-right"></i></NavLink>
+													}
+													<NavLink @onclick="@(() => HandleComments(item))" class="me-3 text-muted"><i class="bi bi-chat-left-text"></i></NavLink>
+												}
+
+											</div>
+										</td>
+										@if (((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2) && item.hhdStatus != 21) || (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS && item.hhdStatus == 31))
+										{
+											@if (item.status != "SUBSTITUTED" && item.hhdStatus != 32)
+											{
+												<td><input class="form-check-input" type="checkbox" @onchange="@((ChangeEventArgs args) => HandleCheckedChange(args, item))"></td>
+											}
+											else
+											{
+												<td></td>
+											}
+										}
+										else
+										{
+											<td></td>
+										}
+										<td>@item.Block_7_3</td>
+										<td>@item.Block_7_2</td>
+										<td>@item.Block_7_4</td>
+										<td>@item.Block_7_5</td>
+										<td class="custom-badge">
+											<span class="@($"badge badge-outline badge-{commonFunction.ReturnStatusColor(item.status == "SUBSTITUTED" ? commonList?.LOOKUP_CONST_STATUS_LIST?.FirstOrDefault(o => o.id == 100)?.title : commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus) != null ? commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus).title ?? "" : "")}")">
+												@((item.status == "SUBSTITUTED") ? commonList?.LOOKUP_CONST_STATUS_LIST?.FirstOrDefault(o => o.id == 100)?.title : ((commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus) != null ? commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus).title ?? "" : "")))
+											</span>
+										</td>
+										<td class="custom-badge">
+											<div class="badge badge-warning">@(SetStatus(item.status))</div>
+										</td>
+										<td>@(item.OriginalHouseholdID)</td>
+										<td>
+											<NavLink class="btn btn-outline-primary me-2" hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO && item.hhdStatus == 12) ? false : true)">Download<i class="bi bi-download ms-1"></i></NavLink>
+										</td>
+									</tr>
+								}
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="d-flex justify-content-between mb-3">
+		<div class="d-flex">
+			<NavLink class="btn btn-outline-primary me-2" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</NavLink>
+			@* <NavLink class="btn btn-primary me-2" @onclick="HandleValidate">Validate<i class="bi bi-check-circle-fill ms-1"></i></NavLink> *@
+			@* <NavLink class="btn btn-outline-primary fw-500 disabled">Download<i class="bi bi-download ms-1"></i></NavLink> *@
+		</div>
+		<div class="d-flex">
+			<NavLink class="@((SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO ? "btn btn-outline-primary disabled d-none" : "btn btn-outline-primary"))">Submit to SSO<i class="bi bi-chevron-right ms-1"></i></NavLink>
+		</div>
+	</div>
+</div>
+
+<script src="js/download.js"></script>
+
+
+
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    bool ShowVisitedBlock = false;
+    DateTime survey_time = DateTime.Now;
+    List<Tbl_Sch_0_0_Block_7>? hhd_list = new();
+    CommonQueries commonQueries = new();
+	DBQueries dQ = new();
+	CommonConfig commonConfig = new();
+	CommonFunction commonFunction = new();
+	CommonList commonList = new();
+	List<Tbl_Sch_0_0_Block_7>? selected_for_submission = new();
+	CommonFunction funcs = new();
+
+	async void GoBack()
+	{
+		await JSRuntime.InvokeVoidAsync("__handleGoBack");
+		return;
+	}
+
+	void HandleCheckedChange(ChangeEventArgs args, Tbl_Sch_0_0_Block_7 item)
+	{
+		if (args.Value.ToString() == "True")
+		{
+			var is_exist = selected_for_submission.FirstOrDefault(k => k.id == item.id);
+			if (is_exist == null)
+			{
+				selected_for_submission.Add(item);
+			}
+		}
+		else
+		{
+			var is_exist = selected_for_submission.FindIndex(k => k.id == item.id);
+			if (is_exist != -1)
+			{
+				selected_for_submission.RemoveAt(is_exist);
+			}
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+		{
+			block_uri = "/dashboard/his/ssu_list_page",
+			block_title = "SSU List Page",
+			block_code = CommonEnum.ssu_list_page.ToString(),
+		};
+		await commonQueries.InsertVisitedBlock(vb);
+		var data = await dQ.GetBlock7Data(SessionStorage.SelectedFSUId);
+		SessionStorage.selected_hhd_seq = 0;
+		SessionStorage.selected_hhd_id = 0;
+		if (data != null && data.Count > 0)
+		{
+			hhd_list = new();
+			List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.Block_7_3).ToList();
+			int i = 1;
+			foreach (var item in selected)
+			{
+				// var status_response = await dQ.FetchStatusManager(item.Block_7_3);
+				// // Task.Delay(500);
+				// if (status_response != null)
+				// {
+				// 	item.hhdStatus = status_response.hhd_status;
+				// }
+				// else
+				// {
+				// 	item.hhdStatus = 11;
+				// }
+				// //item.seq_no = i;
+				hhd_list.Add(item);
+				i++;
+			}
+		}
+		StateHasChanged();
+	}
+
+	// async Task HandleSsoSubmission()
+	// {
+	// 	if (selected_for_submission != null && selected_for_submission.Count > 0)
+	// 	{
+	// 		List<string> pending_hhd_id = new();
+	// 		List<int> pendingnumber = new();
+	// 		List<string> pending_validate = new();
+	// 		bool canSubmitReferback = true;
+	// 		foreach (var item in selected_for_submission)
+	// 		{
+	// 			var block_3_data = await dQ.FetchBlock3(item.Block_7_3);
+	// 			var block_2_data = await dQ.FetchBlock2(item.Block_7_3);
+	// 			var data = await dQ.GetWarningList(item.Block_7_3);
+	// 			var CheckAnyPendingComment = await dQ.CheckAnyRejectedCommentAsync(item.Block_7_3);
+	// 			if (CheckAnyPendingComment > 0)
+	// 			{
+	// 				pendingnumber.Add(CheckAnyPendingComment);
+	// 			}
+	// 			var pendingWarning = data.Where(k => (k.parent_comment_id == null || k.parent_comment_id == Guid.Empty) && (k.warning_status == 1 || k.warning_status == 3)).ToList();
+
+	// 			string status = await commonQueries.ReturnBlockLevelValidationStatus(item.fsu_id, item.Block_7_3, item.status);
+	// 			if (status != CommonConstants.SUCCESS_TEXT)
+	// 			{
+	// 				pending_hhd_id.Add(item.Block_7_3.ToString());
+	// 			}
+	// 			if (status != CommonConstants.FAILURE_TEXT && status != CommonConstants.SUCCESS_TEXT)
+	// 			{
+	// 				toastService.ShowError(status);
+	// 			}
+
+	// 			if (pendingWarning != null && pendingWarning.Count > 0)
+	// 			{
+	// 				pending_validate.Add(item.Block_7_3.ToString());
+	// 			}
+	// 			if (item.hhdStatus == 12 && item?.needDownload != null && item.needDownload != 12)
+	// 			{
+	// 				canSubmitReferback = false;
+	// 			}
+	// 		}
+	// 		if (pending_hhd_id != null && pending_hhd_id.Count > 0)
+	// 		{
+	// 			toastService.ShowError($"Data submission pending for HHD-ID - {string.Join(",", pending_hhd_id)}");
+	// 			return;
+	// 		}
+	// 		else if (pending_validate != null && pending_validate.Count > 0)
+	// 		{
+	// 			toastService.ShowError($"Warnning Validation pending for HHD-ID - {string.Join(",", pending_validate)}");
+	// 			return;
+
+	// 		}
+	// 		else if (pendingnumber.Count > 0)
+	// 		{
+	// 			toastService.ShowError("Comments needs to Validate, Submission Not Possible");
+	// 			return;
+	// 		}
+	// 		if (commonFunction.checkHasInternet() == false)
+	// 		{
+	// 			toastService.ShowError("No Internet Connection, Please try again once when you came back online!");
+	// 			return;
+	// 		}
+	// 		if (canSubmitReferback == false)
+	// 		{
+	// 			toastService.ShowError("Referback Household need to download before submit");
+	// 			return;
+	// 		}
+	// 		preloadService.Show(SpinnerColor.Light, "We are gathering Data from Local Database to send into central Database! Please hang on.");
+	// 		var submission_data = await commonQueries.FetchSSO_SubmissionData(selected_for_submission);
+	// 		if (submission_data != null)
+	// 		{
+	// 			toastService.ShowSuccess("Data retrive successfuly from local database!");
+	// 			preloadService.Show(SpinnerColor.Light, "We are saving data into server! Please hang on.");
+	// 			var response = await travelService.PostAsync(CommonConfig.SAVE_SUBMITTED_RESPONSE, submission_data);
+	// 			if (response != null)
+	// 			{
+	// 				foreach (var item in selected_for_submission)
+	// 				{
+	// 					await dQ.SaveHhdStatus(item.Block_7_3, 21, SessionStorage.SelectedFSUId);
+	// 				}
+	// 				toastService.ShowSuccess("Data submitted successfully!");
+	// 				preloadService.Show(SpinnerColor.Light, "DB Cleaning in-progress! Please hang on.");
+	// 				var stat = await commonQueries.ClearUnusedData();
+	// 				if (stat != CommonConstants.SUCCESS_TEXT)
+	// 				{
+	// 					toastService.ShowError(stat);
+	// 				}
+	// 				preloadService.Hide();
+	// 			}
+	// 			else
+	// 			{
+	// 				toastService.ShowError("Getting Error while submitting data to server, Please connect with adminstrator!");
+	// 				preloadService.Hide();
+	// 				return;
+	// 			}
+	// 			var data = await SCH_0_0_Queries.FetchSCH0Block5Data();
+	// 			if (data != null && data.Count > 0)
+	// 			{
+	// 				hhd_list = new();
+	// 				List<Tbl_Sch_0_0_Block_5> selected = data.Where(k => k.is_selected_travel == true).OrderBy(k => k.Block_7_3).ToList();
+	// 				int i = 1;
+	// 				foreach (var item in selected)
+	// 				{
+	// 					var status_response = await dQ.FetchStatusManager(item.Block_7_3);
+	// 					if (status_response != null)
+	// 					{
+	// 						item.hhdStatus = status_response.hhd_status;
+	// 						item.needDownload = status_response.hhd_status;
+	// 					}
+	// 					else
+	// 					{
+	// 						item.hhdStatus = 11;
+	// 					}
+	// 					item.seq_no = i;
+	// 					hhd_list.Add(item);
+	// 					i++;
+	// 				}
+	// 				await SCH_0_0_Queries.SaveSCH0Block5(hhd_list);
+	// 			}
+	// 			StateHasChanged();
+	// 			preloadService.Hide();
+	// 			return;
+	// 		}
+	// 		else
+	// 		{
+	// 			toastService.ShowError("Getting Error while retrieving data from Local Database, Please try Later!");
+	// 			preloadService.Hide();
+	// 			return;
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		toastService.ShowError("Please Select an HouseHold For Submission");
+	// 		return;
+	// 	}
+	// }
+
+	async Task HandleStartSurvey(Tbl_Sch_0_0_Block_7 data)
+	{
+		var name = commonFunction.GetUserRoleName(SessionStorage.user_role);
+		if (name == CommonConstants.ROLE_NAME_JSO)
+		{
+			if (data.hhdStatus == 0 || data.hhdStatus == 11)
+			{
+				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				//SessionStorage.selected_hhd_seq = data.seq_no;
+				SessionStorage.selected_hhd_size = data.Block_7_5.GetValueOrDefault();
+				preloadService.Show(SpinnerColor.Light, "Fetching location details...");
+				SessionStorage.location = await commonFunction.fetchGeoLocation();
+				preloadService.Show(SpinnerColor.Light, "Updating location details...");
+				//await dQ.SaveHhdStatus(data.Block_7_3, 10, SessionStorage.SelectedFSUId);
+				preloadService.Hide();
+				NavigationManager.NavigateTo("/dashboard/his/block0_1");
+			}
+			else
+			{
+				if (data.hhdStatus == 12 && data.needDownload != 12)
+				{
+					toastService.ShowError("Supervisor Comments need to be downloaded before editing the Household");
+					return;
+				}
+				else
+				{
+					toastService.ShowError("Data has been submitted, edit is not allowed!");
+					return;
+				}
+			}
+			//NavigationManager.NavigateTo("/dashboard/his/block0_1");
+		}
+		else if (name == CommonConstants.ROLE_NAME_SSO)
+		{
+			if (data.hhdStatus == 21 || data.hhdStatus == 22)
+			{
+				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				//SessionStorage.selected_hhd_seq = data.seq_no;
+				NavigationManager.NavigateTo("/dashboard/his/block0_1");
+				return;
+			}
+			toastService.ShowInfo("Survey is not allowed for this status.");
+			return;
+		}
+		else if (name == CommonConstants.ROLE_NAME_DS)
+		{
+			if (data.hhdStatus == 31)
+			{
+				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				//SessionStorage.selected_hhd_seq = data.seq_no;
+				NavigationManager.NavigateTo("/dashboard/his/block0_1");
+				return;
+			}
+			toastService.ShowInfo("Survey is not allowed for this status.");
+			return;
+		}
+		else
+		{
+			//SessionStorage.selected_hhd_seq = data.seq_no;
+			SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+			NavigationManager.NavigateTo("/dashboard/his/block0_1");
+			return;
+		}
+	}
+
+	void HandleComments(Tbl_Sch_0_0_Block_7 data)
+	{
+		var name = commonFunction.GetUserRoleName(SessionStorage.user_role);
+
+		if (name == CommonConstants.ROLE_NAME_JSO)
+		{
+			if (data.hhdStatus == 10 || data.hhdStatus == 11 || data.needDownload == 12)
+			{
+				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				//SessionStorage.selected_hhd_seq = data.seq_no;
+				NavigationManager.NavigateTo("/dashboard/his/block_comments");
+				return;
+			}
+			else
+			{
+				if (data.hhdStatus == 12 && data.needDownload != 12)
+				{
+					toastService.ShowError("Please Download the Referback household before validate Additional Comment");
+					return;
+				}
+				else
+				{
+					toastService.ShowError("Survey is not allowed for this status.");
+					return;
+				}
+			}
+
+		}
+		else if (name == CommonConstants.ROLE_NAME_SSO)
+		{
+			if (data.hhdStatus == 21 || data.hhdStatus == 22)
+			{
+				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				//SessionStorage.selected_hhd_seq = data.seq_no;
+				NavigationManager.NavigateTo("/dashboard/his/block_comments");
+				return;
+			}
+			else
+			{
+				toastService.ShowWarning("Survey is not allowed for this status.");
+				return;
+			}
+
+		}
+		else if (name == CommonConstants.ROLE_NAME_DS)
+		{
+			if (data.hhdStatus == 31)
+			{
+				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				//SessionStorage.selected_hhd_seq = data.seq_no;
+				NavigationManager.NavigateTo("/dashboard/his/block_comments");
+				return;
+			}
+			else
+			{
+				toastService.ShowWarning("Survey is not allowed for this status.");
+				return;
+			}
+		}
+		else
+		{
+			SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+			//SessionStorage.selected_hhd_seq = data.seq_no;
+			NavigationManager.NavigateTo("/dashboard/his/block_comments");
+			return;
+		}
+
+	}
+
+	private string SetStatus(string status)
+	{
+		try
+		{
+			if (string.IsNullOrEmpty(status))
+			{
+				return "O";
+			}
+			return status.ToUpper() switch
+			{
+				"SUBSTITUTE" => "S",
+				"SUBSTITUTED" => "X",
+				"CASUALTY" => "C",
+				"ORIGINAL" => "O",
+				_ => "O",
+			};
+		}
+		catch (Exception ex)
+		{
+			return "O";
+		}
+	}
+
+	// private void HandleValidate()
+	// {
+	// 	Warnning_VM.selected_HHdList?.Clear();
+	// 	Warnning_VM.selected_HHdList?.AddRange(selected_for_submission);
+	// 	if (!selected_for_submission.Any())
+	// 	{
+	// 		toastService.ShowError("Please select at least one household for validation.");
+	// 	}
+	// 	else if (selected_for_submission.Exists(x => x.hhdStatus == 12 && x.needDownload != 12))
+	// 	{
+	// 		toastService.ShowInfo("Please Download the Referback household before validate");
+	// 	}
+	// 	else if (selected_for_submission.Exists(x => x.hhdStatus != 0 && x.hhdStatus != 11 && x.hhdStatus != 10 && x.hhdStatus != 12) && SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+	// 	{
+	// 		toastService.ShowInfo("Please Check Household status before validate");
+	// 	}
+	// 	else if (selected_for_submission.Exists(x => x.hhdStatus != 21 && x.hhdStatus != 22) && SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO)
+	// 	{
+	// 		toastService.ShowInfo("Please Check Household status before validate");
+	// 	}
+	// 	else if (selected_for_submission.Exists(x => x.hhdStatus != 31) && SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+	// 	{
+	// 		toastService.ShowInfo("Please Check Household status before validate");
+	// 	}
+	// 	else
+	// 	{
+	// 		NavigationManager.NavigateTo("/dashboard/his/validate_page");
+	// 	}
+	// }
+
+	// private async Task HandlePrint()
+	// {
+	// 	try
+	// 	{
+	// 		preloadService.Show(SpinnerColor.Light, "File printing in-progress... please wait!");
+	// 		var helper = new PrintHelper();
+	// 		var fileName = $"Report_{DateTime.Now:yyyyMMdd_HHmmss}.docx";
+	// 		var bytes = await helper.PrintDocumentAsync();
+	// 		var base64 = Convert.ToBase64String(bytes);
+	// 		var stat = await commonFunction.DownloadPrintedFile(base64, fileName);
+	// 		if (stat != CommonConstants.SUCCESS_TEXT)
+	// 		{
+	// 			toastService.ShowError(stat);
+	// 		}
+	// 		else
+	// 		{
+	// 			toastService.ShowSuccess("File printed succesfully");
+	// 		}
+	// 		preloadService.Hide();
+	// 		return;
+	// 	}
+	// 	catch (Exception ex)
+	// 	{
+	// 		preloadService.Hide();
+	// 		toastService.ShowError($"Error while printing: {ex.Message}");
+	// 		return;
+	// 	}
+	// }
+
+	// async Task HandleDownload(Tbl_Sch_0_0_Block_7 householdData)
+	// {
+	// 	try
+	// 	{
+	// 		if (!funcs.checkHasInternet())
+	// 		{
+	// 			toastService.ShowWarning("No Internet Connection. Please try again when you're back online!");
+	// 			return;
+	// 		}
+
+	// 		preloadService.Show(SpinnerColor.Light, "Fetching data from central database for offline access. Please wait...");
+
+	// 		var saved_response = await travelService.GetAsync($"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{householdData.fsu_id}/{householdData.hhdStatus}");
+
+	// 		if (string.IsNullOrEmpty(saved_response))
+	// 		{
+	// 			toastService.ShowError($"No data found on server for  this Household. Synchronization failed.");
+	// 			return;
+	// 		}
+
+	// 		try
+	// 		{
+	// 			var decoded = JsonConvert.DeserializeObject<saved_response_top_layer>(saved_response);
+	// 			if (decoded == null || decoded.result == null || string.IsNullOrEmpty(decoded?.result?.submitted_json_data))
+	// 			{
+	// 				toastService.ShowError($"No submission data found in server response for Household: {householdData.Block_7_3}.");
+	// 				return;
+	// 			}
+
+	// 			var savedData = JsonConvert.DeserializeObject<bind_layer>(decoded.result.submitted_json_data);
+	// 			if (savedData == null)
+	// 			{
+	// 				toastService.ShowError($"Failed to parse server data for FSU: {householdData.Block_7_3}.");
+	// 				return;
+	// 			}
+
+	// 			// SCH25 blocks
+	// 			if (savedData.TravelSch25datumDto?.Count > 0)
+	// 			{
+	// 				foreach (var sch25 in savedData.TravelSch25datumDto.Where(x => x.hhd_id == householdData.Block_7_3))
+	// 				{
+	// 					await dQ.SaveHhdStatus(sch25.hhd_id ?? 0, sch25.hhd_status ?? 0, decoded.result.fsu_id);
+	// 					await SCH_0_0_Queries.Update_SCH0_0_Block_5AHHD_Status(sch25.hhd_status ?? 0, sch25.hhd_id ?? 0, decoded.result.fsu_id);
+	// 					await dQ.SaveBlock2(sch25.block_2);
+	// 					await dQ.SaveBlock1(sch25.block_1);
+	// 					await dQ.UpsertWarningAsync(sch25.warning);
+	// 					await dQ.UpsertComments(sch25.comments);
+	// 					var downloadStatus = await SCH_0_0_Queries.Update_SCH0_0_Block_5Download_Status(12, sch25.hhd_id ?? 0, decoded.result.fsu_id);
+	// 					if (downloadStatus > 0)
+	// 					{
+	// 						var Index = hhd_list?.FirstOrDefault(x => x.Block_7_3 == householdData.Block_7_3);
+	// 						if (Index != null)
+	// 						{
+	// 							Index.needDownload = 12;
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+
+	// 			toastService.ShowSuccess($"Household data synchronization completed successfully");
+	// 		}
+	// 		catch (Exception ex)
+	// 		{
+	// 			Console.WriteLine($"Error processing response for the FSU : {ex}");
+	// 			toastService.ShowError($"Error syncing Household . Please check logs.");
+	// 		}
+	// 	}
+	// 	catch (Exception ex)
+	// 	{
+	// 		toastService.ShowError($"Unexpected error: {ex.Message}");
+	// 	}
+	// 	finally
+	// 	{
+	// 		preloadService.Hide();
+	// 		StateHasChanged();
+	// 	}
+	// }
+}
+

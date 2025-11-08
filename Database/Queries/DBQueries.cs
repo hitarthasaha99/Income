@@ -655,7 +655,7 @@ namespace Income.Database.Queries
         }
 
 
-        public async Task<List<Tbl_Sch_0_0_Block_7>> GetSelectedBlock5List(int Fsu_id)
+        public async Task<List<Tbl_Sch_0_0_Block_7>> GetSelectedBlock7List(int Fsu_id)
         {
             try
             {

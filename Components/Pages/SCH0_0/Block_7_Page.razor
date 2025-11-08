@@ -239,14 +239,14 @@
                                     <label class="form-label">7. Household Type</label>
                                     <InputSelect class="form-select form-select-sm" @bind-Value="fields.Block_7_7">
                                         <option value="">- Select -</option>
-                                        @if (Block_7_Constants.HighestEdu != null)
+                                        @if (sector == 1 && Block_7_Constants.HHDTypeRural != null)
                                         {
-                                            foreach (var item in Block_7_Constants.HighestEdu)
+                                            foreach (var item in Block_7_Constants.HHDTypeRural)
                                             {
                                                 <option value="@item.id">@item.title</option>
                                             }
                                         }
-                                        else if (sector != 1 && Block_7_Constants.HHDTypeUrban != null)
+                                        else if (sector == 2 && Block_7_Constants.HHDTypeUrban != null)
                                         {
                                             foreach (var item in Block_7_Constants.HHDTypeUrban)
                                             {
