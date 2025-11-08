@@ -82,6 +82,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Viewmodels\HIS2026\" />
       <Folder Include="wwwroot\js\HIS_Block_3_Js\" />
     </ItemGroup>
 

@@ -23,6 +23,7 @@ namespace Income
             builder.Services.AddBlazorBootstrap();
             builder.Services.AddSingleton(new HttpClient());
             builder.Services.AddSingleton<Income.Services.NetworkService>();
+            builder.Services.AddSingleton<Income.Services.LocalizationService>();
             //builder.Services.AddSingleton<Income.Services.IncomeService>();
 
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_0_1_VM>();

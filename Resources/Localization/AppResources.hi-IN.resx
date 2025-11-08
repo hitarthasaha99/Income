@@ -1,0 +1,998 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>ट्रैवल साथी</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>नमस्ते</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>स्वागत</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>भाषा चुनें</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>अंग्रेज़ी</value>
+  </data>
+  <data name="Hindi" xml:space="preserve">
+    <value>हिन्दी</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>होम</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>सेटिंग्स</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>प्रोफ़ाइल</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>लॉगआउट</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>लोड हो रहा है, कृपया प्रतीक्षा करें...</value>
+  </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>नेटवर्क से कनेक्ट नहीं हो सका।</value>
+  </data>
+  <data name="SaveSuccess" xml:space="preserve">
+    <value>डेटा सफलतापूर्वक सहेजा गया।</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>डेटा सहेजने में विफल। कृपया पुनः प्रयास करें।</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>उपयोगकर्ता नाम</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>पासवर्ड</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>लॉगिन</value>
+  </data>
+  <data name="LoginFailed" xml:space="preserve">
+    <value>अमान्य उपयोगकर्ता नाम या पासवर्ड।</value>
+  </data>
+  <data name="sector" xml:space="preserve">
+    <value>सेक्टर</value>
+  </data>
+  <data name="state_ut_name" xml:space="preserve">
+    <value>राज्य/संघ राज्य का नाम </value>
+  </data>
+  <data name="district_name" xml:space="preserve">
+    <value>जिले का नाम </value>
+  </data>
+  <data name="sub_dist" xml:space="preserve">
+    <value>उप-जिला/तहसील/शहर का नाम </value>
+  </data>
+  <data name="vill_name" xml:space="preserve">
+    <value>गांव का नाम: </value>
+  </data>
+  <data name="invst_unit_no" xml:space="preserve">
+    <value>अन्वेषक इकाई संख्या/ब्लॉक नंबर:</value>
+  </data>
+  <data name="sample_su_no" xml:space="preserve">
+    <value>प्रतिदर्श उप-इकाई (एसयू) संख्या:</value>
+  </data>
+  <data name="round_number" xml:space="preserve">
+    <value>दौर संख्या:</value>
+  </data>
+  <data name="sch_no" xml:space="preserve">
+    <value>अनुसूची संख्या : </value>
+  </data>
+  <data name="serial_no_sample_fsu" xml:space="preserve">
+    <value>प्रतिदर्श एफएसयू की क्रम संख्या:</value>
+  </data>
+  <data name="sample_sub_div_no" xml:space="preserve">
+    <value>प्रतिदर्श  उप-मंडल संख्या:</value>
+  </data>
+  <data name="sample_hh_number" xml:space="preserve">
+    <value>प्रतिदर्श परिवार संख्या :</value>
+  </data>
+  <data name="survey_code" xml:space="preserve">
+    <value>सर्वेक्षण कोड</value>
+  </data>
+  <data name="reason_for_substitution" xml:space="preserve">
+    <value>मूल परिवार के प्रतिस्थापन/हताहत होने का कारण </value>
+  </data>
+  <data name="block_3_heading" xml:space="preserve">
+    <value>ब्लॉक  3: परिवार  का जनसांख्यिकीय विवरण</value>
+  </data>
+  <data name="srl_no" xml:space="preserve">
+    <value>क्रम सं</value>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value>नाम </value>
+  </data>
+  <data name="gender" xml:space="preserve">
+    <value>लिंग  (कोड) </value>
+  </data>
+  <data name="age" xml:space="preserve">
+    <value>आयु  
+(वर्ष) </value>
+  </data>
+  <data name="marital_status" xml:space="preserve">
+    <value>वैवाहिक स्थिति (कोड) </value>
+  </data>
+  <data name="highest_level" xml:space="preserve">
+    <value>पूर्ण शिक्षा का उच्चतम स्तर 
+(कोड) </value>
+  </data>
+  <data name="entry" xml:space="preserve">
+    <value>अगर कॉलम 4 की प्रविष्टि ≥18 है,  
+क्या सर्वेक्षण की तारीख पर कोई ड्राइविंग लाइसेंस है? 
+(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="weeklystatus" xml:space="preserve">
+    <value>वर्तमान साप्ताहिक स्थिति  
+(कोड) </value>
+  </data>
+  <data name="forenrty" xml:space="preserve">
+    <value>यदि कॉलम 4 की प्रविष्टि ≥ 6 है और  कॉलम 8 में कोड 4 है , क्या पत्राचार/दूरस्थ शिक्षा के माध्यम से बुनियादी शिक्षा प्राप्त कर रहें हैं? (हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="for_code" xml:space="preserve">
+    <value>कॉलम 8 में कोड 1, 2 और 3 के लिए, 
+क्या  1 किमी या उससे अधिक की दूरी पर आवास इकाई के परिसर के बाहर काम का कम से कम एक निश्चित स्थान है  
+(हाँ-1, नहीं-2)</value>
+  </data>
+  <data name="9" xml:space="preserve">
+    <value>कॉलम 8 में कोड 9 के अलावा अन्य कोड के लिए, 
+क्या सर्वेक्षण की तारीख को बस/रेल के लिए सीजन टिकट/पास/फ्री पास है या नहीं  
+(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="if" xml:space="preserve">
+    <value>यदि कॉलम 11 में कोड 1है , 
+तो  रेल/बस के लिए सीजन टिकट/पास की स्थिति 
+(रेल पास-1, बस पास-2, दोनों-3) </value>
+  </data>
+  <data name="worked" xml:space="preserve">
+    <value>क्या पिछले 30 दिनों के दौरान वर्तमान स्थिति में घर से काम किया गया है 
+(हाँ - 1, नहीं - 2) </value>
+  </data>
+  <data name="code" xml:space="preserve">
+    <value>यदि कॉलम 8 में कोड 1 या 2 है, </value>
+  </data>
+  <data name="internet" xml:space="preserve">
+    <value>यदि कॉलम 13 में 1 है , तो क्या इस तरह के काम के लिए इंटरनेट का उपयोग किया गया है (हां- 1, नहीं- 2) </value>
+  </data>
+  <data name="characteristics" xml:space="preserve">
+    <value>[4] परिवार की विशेषताएं </value>
+  </data>
+  <data name="household" xml:space="preserve">
+    <value>परिवार का आकार </value>
+  </data>
+  <data name="type" xml:space="preserve">
+    <value>परिवार का  प्रकार (कोड) </value>
+  </data>
+  <data name="religion" xml:space="preserve">
+    <value>धर्म (कोड) </value>
+  </data>
+  <data name="social" xml:space="preserve">
+    <value>सामाजिक समूह (कोड) </value>
+  </data>
+  <data name="vehicles" xml:space="preserve">
+    <value>क्या घरेलू उपयोग के लिए सर्वेक्षण की तिथि पर परिवार के पास निम्नलिखित में से कोई वाहन है और ऐसे वाहनों की संख्या </value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>मद सं</value>
+  </data>
+  <data name="vehicle" xml:space="preserve">
+    <value>वाहन का प्रकार </value>
+  </data>
+  <data name="survey" xml:space="preserve">
+    <value>क्या सर्वेक्षण की तिथि पर है?(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="possessed" xml:space="preserve">
+    <value>परिग्रह वाले वाहनों की संख्या </value>
+  </data>
+  <data name="bicycle" xml:space="preserve">
+    <value>साइकिल  </value>
+  </data>
+  <data name="motorcycle" xml:space="preserve">
+    <value>मोटरसाइकिल या स्कूटर  </value>
+  </data>
+  <data name="Rickshaw" xml:space="preserve">
+    <value>रिक्शा/तिपहिया साइकिल </value>
+  </data>
+  <data name="Autorickshaw" xml:space="preserve">
+    <value>ऑटोरिक्शा/टोटो/ई-रिक्शा </value>
+  </data>
+  <data name="Cars" xml:space="preserve">
+    <value>कार </value>
+  </data>
+  <data name="Tractor" xml:space="preserve">
+    <value>ट्रैक्‍टर  </value>
+  </data>
+  <data name="Boat" xml:space="preserve">
+    <value>नाव/डिंगी </value>
+  </data>
+  <data name="Others" xml:space="preserve">
+    <value>अन्य  </value>
+  </data>
+  <data name="commercial" xml:space="preserve">
+    <value>&#x8;क्या व्यावसायिक उपयोग के लिए सर्वेक्षण की तिथि तक  परिवार के पास निम्नलिखित में से कोई वाहन है और ऐसे वाहनों की संख्या </value>
+  </data>
+  <data name="ItemNo" xml:space="preserve">
+    <value>मद सं</value>
+  </data>
+  <data name="Typeofvehicle" xml:space="preserve">
+    <value>वाहन का प्रकार </value>
+  </data>
+  <data name="whether" xml:space="preserve">
+    <value>क्या सर्वेक्षण की तिथि पर है?(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="bicycle1" xml:space="preserve">
+    <value>साइकिल  </value>
+  </data>
+  <data name="scooter" xml:space="preserve">
+    <value>मोटरसाइकिल या स्कूटर</value>
+  </data>
+  <data name="Rickshawtricycle" xml:space="preserve">
+    <value>रिक्शा/तिपहिया साइकिल </value>
+  </data>
+  <data name="AutorickshawTotoerickshaw" xml:space="preserve">
+    <value>ऑटोरिक्शा/टोटो/ई-रिक्शा</value>
+  </data>
+  <data name="Cars1" xml:space="preserve">
+    <value>कार  </value>
+  </data>
+  <data name="Tractor1" xml:space="preserve">
+    <value>ट्रैक्‍टर  </value>
+  </data>
+  <data name="Van" xml:space="preserve">
+    <value>वैन/मिनीबस/बस </value>
+  </data>
+  <data name="Heavy" xml:space="preserve">
+    <value>भारी वाहन जैसे लॉरी, ट्रक आदि. </value>
+  </data>
+  <data name="Dingi" xml:space="preserve">
+    <value>नाव/डिंगी </value>
+  </data>
+  <data name="Others1" xml:space="preserve">
+    <value>अन्य </value>
+  </data>
+  <data name="Block6_1" xml:space="preserve">
+    <value>ब्लॉक 6.1: निश्चित कार्यस्थल तक आने-जाने की यात्राओं का विवरण जो 15 वर्ष या उससे अधिक आयु के व्यक्तियों के लिए सामान्य प्रकृति की हैं, जिनका कार्यस्थल निश्चित है (अर्थात्, ब्लॉक 3 के कॉलम 10 में कोड 1) </value>
+  </data>
+  <data name="srl" xml:space="preserve">
+    <value>परिवार के सदस्यों की क्रम सं.  (जैसा कि ब्लॉक 3 के कॉलम 1 में है) </value>
+  </data>
+  <data name="origin" xml:space="preserve">
+    <value>मूल स्थान से कार्यस्थल तक </value>
+  </data>
+  <data name="workplace" xml:space="preserve">
+    <value>कार्यस्थल से गंतव्य</value>
+  </data>
+  <data name="usual" xml:space="preserve">
+    <value>मूल स्थान से काम पर जाने का सामान्य समय 
+(24 घंटे प्रारूप में hh:mm) </value>
+  </data>
+  <data name="Average" xml:space="preserve">
+    <value>कार्यस्थल तक पहुंचने में लगा औसत समय (मिनटों में)</value>
+  </data>
+  <data name="Usual1" xml:space="preserve">
+    <value>कार्य की सामान्य अवधि (घंटों में)</value>
+  </data>
+  <data name="whether2" xml:space="preserve">
+    <value>क्या सर्वेक्षण की तिथि से पहले वाले यात्रा-दिवस पर निर्धारित कार्यस्थल तक और वहाँ से यात्रा की गई थी (हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="average2" xml:space="preserve">
+    <value>यात्रा की औसत मासिक लागत (रु.)</value>
+  </data>
+  <data name="primary" xml:space="preserve">
+    <value>परिवहन का प्राथमिक साधन (कोड) </value>
+  </data>
+  <data name="if2" xml:space="preserve">
+    <value>यदि कॉलम 5 में कोड '43' को छोड़कर '41' से '81' के बीच है, तो द्वितीयक परिवहन साधन (कोड) 
+[यदि परिवहन का द्वितीयक साधन उपयोग नहीं किया गया है तो कोड 09 दर्ज करें] </value>
+  </data>
+  <data name="time" xml:space="preserve">
+    <value>कार्यस्थल से गंतव्य के लिए प्रस्थान का सामान्य समय 
+(24 घंटे प्रारूप में hh:mm) </value>
+  </data>
+  <data name="average3" xml:space="preserve">
+    <value>गंतव्य तक पहुँचने में लगने वाला औसत समय 
+(मिनटों में) </value>
+  </data>
+  <data name="average4" xml:space="preserve">
+    <value>यात्रा की औसत मासिक लागत (रु.) </value>
+  </data>
+  <data name="primary2" xml:space="preserve">
+    <value>परिवहन का प्राथमिक साधन (कोड) </value>
+  </data>
+  <data name="record" xml:space="preserve">
+    <value>यदि कॉलम 10 में कोड '43' को छोड़कर '41' से '81' के बीच है, तो द्वितीयक परिवहन साधन (कोड) 
+[यदि परिवहन का द्वितीयक साधन उपयोग नहीं किया गया है तो कोड 09 दर्ज करें] </value>
+  </data>
+  <data name="Block6_2" xml:space="preserve">
+    <value>ब्लॉक 6.2: 15 वर्ष या उससे अधिक आयु के व्यक्तियों के लिए, जिनका कार्यस्थल निश्चित है, यात्रा संदर्भ अवधि (1 यात्रा दिवस) में सर्वेक्षण की तिथि से पहले के यात्रा दिवस में निश्चित कार्यस्थल तक और वहां से एक दिन के भीतर की यात्राओं का विवरण (अर्थात्, ब्लॉक 3 के कॉलम 10 में कोड 1 और ब्लॉक 6.1 के कॉलम 13 में कोड 1) </value>
+  </data>
+  <data name="srlno" xml:space="preserve">
+    <value>परिवार के सदस्यों की क्रम सं.  
+(जैसा कि ब्लॉक 3 के कॉलम 1 में है) </value>
+  </data>
+  <data name="trip" xml:space="preserve">
+    <value>यात्रा क्रम सं</value>
+  </data>
+  <data name="origin1" xml:space="preserve">
+    <value>मूल स्थान  
+घर है 
+(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="origin2" xml:space="preserve">
+    <value>मूल स्थान</value>
+  </data>
+  <data name="workplace3" xml:space="preserve">
+    <value>कार्यस्थल</value>
+  </data>
+  <data name="whether3" xml:space="preserve">
+    <value>क्या वापसी यात्रा की गई 
+(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="ifcode" xml:space="preserve">
+    <value>यदि कोड 2 कॉलम 3 और कॉलम 10 दोनों में है, गंतव्य  घर है 
+(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="destination" xml:space="preserve">
+    <value>गंतव्य</value>
+  </data>
+  <data name="distance" xml:space="preserve">
+    <value>मूल स्थान से कार्यस्थल तक की दूरी 
+(किमी) </value>
+  </data>
+  <data name="distance2" xml:space="preserve">
+    <value>कार्यस्थल से गंतव्य तक की दूरी (किमी ) 
+[कॉलम 10 में कोड 1 के लिए, कॉलम 15 की प्रविष्टि को कॉलम 16 में कॉपी करें] </value>
+  </data>
+  <data name="if3" xml:space="preserve">
+    <value>यदि कॉलम 10 में कोड 2 और कॉलम 11 में कोड 2 है कार्यस्थल से गंतव्य तक यात्रा का उद्देश्य (कोड) </value>
+  </data>
+  <data name="if4" xml:space="preserve">
+    <value>यदि कॉलम 17 में कोड '11' है क्या कार्यस्थल निश्चित है 
+(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="PIN1" xml:space="preserve">
+    <value>पिन कोड 
+(कोड 9 दें, यदि पिन अज्ञात है) </value>
+  </data>
+  <data name="if5" xml:space="preserve">
+    <value>यदि कॉलम 4 में कोड '9' है </value>
+  </data>
+  <data name="State" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश 
+(कोड) </value>
+  </data>
+  <data name="district" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="PIN9" xml:space="preserve">
+    <value>पिन कोड 
+(कोड 9 दें, यदि पिन अज्ञात है) </value>
+  </data>
+  <data name="if9" xml:space="preserve">
+    <value>यदि कॉलम 7 में कोड '9' है </value>
+  </data>
+  <data name="StateUT" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश 
+
+(कोड) </value>
+  </data>
+  <data name="district3" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="PIN6" xml:space="preserve">
+    <value>पिन कोड 
+
+(कोड 9 दें, यदि पिन अज्ञात है) </value>
+  </data>
+  <data name="if12" xml:space="preserve">
+    <value>यदि कॉलम 12 में कोड '9' </value>
+  </data>
+  <data name="State6" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश 
+
+(कोड) </value>
+  </data>
+  <data name="district7" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="Block8" xml:space="preserve">
+    <value>ब्लॉक 8: सर्वेक्षण की तिथि से पहले यात्रा संदर्भ अवधि (1 यात्रा दिवस) में 6 वर्ष या उससे अधिक आयु के परिवार के सदस्यों द्वारा कार्य और शैक्षणिक संस्थान में जाने को छोड़कर (जैसा कि ब्लॉक 6.1 से ब्लॉक 7 में पहले ही दर्ज किया गया है) किसी भी उद्देश्य के लिए एक दिन के भीतर की गई यात्राओं का विवरण</value>
+  </data>
+  <data name="trip3" xml:space="preserve">
+    <value>यात्रा क्रम सं  </value>
+  </data>
+  <data name="no" xml:space="preserve">
+    <value>यात्रा में परिवार के सदस्यों की संख्या</value>
+  </data>
+  <data name="origin9" xml:space="preserve">
+    <value>मूल स्थान </value>
+  </data>
+  <data name="destination8" xml:space="preserve">
+    <value>गंतव्य</value>
+  </data>
+  <data name="whether10" xml:space="preserve">
+    <value>क्या वापसी यात्रा की गई 
+
+(हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="distance11" xml:space="preserve">
+    <value>मूल स्थान  से गंतव्य तक की दूरी 
+
+(किमी) </value>
+  </data>
+  <data name="hhmm" xml:space="preserve">
+    <value>मूल स्थान से गंतव्य के लिए प्रस्थान का समय 
+(24 घंटे प्रारूप में hh:mm) </value>
+  </data>
+  <data name="average12" xml:space="preserve">
+    <value>गंतव्य तक पहुंचने में लगा औसत समय (मिनटों में) </value>
+  </data>
+  <data name="primary33" xml:space="preserve">
+    <value>परिवहन का प्राथमिक साधन (कोड) </value>
+  </data>
+  <data name="cost77" xml:space="preserve">
+    <value>यात्रा की लागत 
+(रु.) </value>
+  </data>
+  <data name="PIN88" xml:space="preserve">
+    <value>पिन कोड 
+
+(कोड 9 दें, यदि पिन अज्ञात है) </value>
+  </data>
+  <data name="if88" xml:space="preserve">
+    <value>यदि कॉलम 3 में कोड '9' है</value>
+  </data>
+  <data name="PIN55" xml:space="preserve">
+    <value>पिन कोड 
+
+(कोड 9 दें, यदि पिन अज्ञात है) </value>
+  </data>
+  <data name="if99" xml:space="preserve">
+    <value>यदि कॉलम 6 में कोड '9' है</value>
+  </data>
+  <data name="StateUT3" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश 
+
+(कोड) </value>
+  </data>
+  <data name="district8" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="State9" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश 
+
+(कोड) </value>
+  </data>
+  <data name="district89" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="Block81" xml:space="preserve">
+    <value>ब्लॉक 8.1: सर्वेक्षण की तिथि से पहले यात्रा दिवस में की गई 6 वर्ष या उससे अधिक आयु के प्रत्येक परिवार के सदस्य के लिए यात्रा (जैसा कि ब्लॉक 8 में दर्ज है) का उद्देश्य</value>
+  </data>
+  <data name="srl4" xml:space="preserve">
+    <value>यात्रा क्रम सं 
+
+ (जैसा कि कॉलम 1 ब्लॉक 8 में है) </value>
+  </data>
+  <data name="srl8" xml:space="preserve">
+    <value>इस यात्रा में परिवार के सदस्यों की क्रम संख्या 
+
+(जैसा कि कॉलम 1, ब्लॉक 3 में है) </value>
+  </data>
+  <data name="purpose" xml:space="preserve">
+    <value>यात्रा का उद्देश्य 
+
+(कोड) </value>
+  </data>
+  <data name="Block91" xml:space="preserve">
+    <value>ब्लॉक 9.1: यात्रा संदर्भ अवधि (28 यात्रा दिवस) में सभी यात्रा-दिवसों के दौरान परिवार के सदस्यों द्वारा उद्देश्यानुसार की गई रात्रि यात्राओं का विवरण  
+
+(ब्लॉक 9, कॉलम 1 में प्रत्येक यात्रा के लिए भरा जाना है) </value>
+  </data>
+  <data name="Serial" xml:space="preserve">
+    <value>यात्रा की क्रम संख्या (जैसा कि कॉलम 1, ब्लॉक 9 में है) (ऑटो) </value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>आरंभ करने की तिथि</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>समाप्त करने की तिथि</value>
+  </data>
+  <data name="Multi" xml:space="preserve">
+    <value>मल्टी-मोडल (हाँ-1, नहीं-2) </value>
+  </data>
+  <data name="Primary99" xml:space="preserve">
+    <value>प्राथमिक साधन (मोड) (दूरी पर आधारित) (कोड) </value>
+  </data>
+  <data name="Class66" xml:space="preserve">
+    <value>यात्रा की श्रेणी (कोड) (यदि पंक्ति 5 में कोड ‘61’ है) </value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>यात्रा की श्रेणी (कोड) (यदि पंक्ति 5 में कोड ‘61’ है) </value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="if33" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Code99" xml:space="preserve">
+    <value>हवाई अड्डे / रेलवे स्टेशन का कोड या नाम </value>
+  </data>
+  <data name="Secondary" xml:space="preserve">
+    <value>परिवहन का द्वितीयक साधन (कोड) </value>
+  </data>
+  <data name="Block52" xml:space="preserve">
+    <value>Block 5.2: 6 वर्ष और उससे अधिक आयु के व्यक्तियों के लिए शैक्षणिक संस्थान से यात्रा संदर्भ अवधि (90 यात्रा दिन) में सर्वेक्षण की तारीख के निकटतम यात्रा दिवस में दिन-यात्रा का विवरण  जो व्यक्तिगत रूप से बुनियादी पाठ्यक्रम में भाग ले रहे हैं (यानी, ब्लॉक 3 के कॉलम 8 में कोड 04 और ब्लॉक 3 के कॉलम 9 में कोड 2 और ब्लॉक 5.1 के कॉलम 12 में कोड 1 है ) </value>
+  </data>
+  <data name="5_1_heading" xml:space="preserve">
+    <value> 5.1: 6 वर्ष और उससे अधिक आयु के व्यक्तियों, जो व्यक्तिगत रूप से बुनियादी पाठ्यक्रम में भाग ले रहे हैं, के शैक्षणिक संस्थान (बुनियादी पाठ्यक्रम से संबंधित) जाने और आने के सामान्य यात्राओं का विवरण (यानी, ब्लॉक 3 के कॉलम 8 में कोड 4 और ब्लॉक 3 के कॉलम 9 में कोड 2) </value>
+  </data>
+  <data name="5_1_col_1" xml:space="preserve">
+    <value>परिवार के सदस्यों की क्रम सं.  </value>
+  </data>
+  <data name="5_1_col_2" xml:space="preserve">
+    <value>मूल स्थान से शैक्षणिक संस्थान के लिए प्रस्थान का सामान्य समय </value>
+  </data>
+  <data name="4_1_heading" xml:space="preserve">
+    <value>[4.1] परिवार की विशेषताएँ </value>
+  </data>
+  <data name="4_1_col_1" xml:space="preserve">
+    <value>परिवार का पिछले महीने का उपभोग व्यय (रु. में) </value>
+  </data>
+  <data name="block5_head" xml:space="preserve">
+    <value> 5.1: 6 वर्ष और उससे अधिक आयु के व्यक्तियों, जो व्यक्तिगत रूप से बुनियादी पाठ्यक्रम में भाग ले रहे हैं, के शैक्षणिक संस्थान (बुनियादी पाठ्यक्रम से संबंधित) जाने और आने के सामान्य यात्राओं का विवरण (यानी, ब्लॉक 3 के कॉलम 8 में कोड 4 और ब्लॉक 3 के कॉलम 9 में कोड 2)</value>
+  </data>
+  <data name="block5_srl" xml:space="preserve">
+    <value>परिवार के सदस्यों की क्रम सं.
+(जैसा कि ब्लॉक 3 के कॉलम 1 में है)
+</value>
+  </data>
+  <data name="block5_origin" xml:space="preserve">
+    <value>मूल स्थान से शैक्षणिक संस्थान </value>
+  </data>
+  <data name="block5_education" xml:space="preserve">
+    <value>शैक्षणिक संस्थान से गंतव्य के लिए प्रस्थान का सामान्य समय
+(24 घंटे प्रारूप में hh:mm)
+</value>
+  </data>
+  <data name="block5_usual" xml:space="preserve">
+    <value>मूल स्थान से शैक्षणिक संस्थान के लिए प्रस्थान का सामान्य समय
+(24 घंटे प्रारूप में hh:mm)
+</value>
+  </data>
+  <data name="block5_average" xml:space="preserve">
+    <value>शैक्षणिक संस्थान तक पहुंचने में लगने वाला औसत समय (मिनटों में)</value>
+  </data>
+  <data name="block5_travel" xml:space="preserve">
+    <value>यात्रा की औसत मासिक लागत
+(रु.)
+</value>
+  </data>
+  <data name="block5_transport" xml:space="preserve">
+    <value>परिवहन का प्राथमिक साधन (कोड)</value>
+  </data>
+  <data name="block5_if" xml:space="preserve">
+    <value>यदि कॉलम 5 में '43' को छोड़कर '41' से '81' के बीच का कोड है,
+परिवहन का द्वितीयक साधन (कोड)
+[कोड 09 दर्ज करें, यदि परिवहन के द्वितीयक मोड का उपयोग नहीं किया जाता है]
+</value>
+  </data>
+  <data name="block5_whether" xml:space="preserve">
+    <value>क्या पिछले 90 यात्रा दिनों की यात्रा संदर्भ अवधि के दौरान कम से कम एक यात्रा दिन में शैक्षणिक संस्थान तक और वहाँ से यात्रा की गई है
+(हाँ-1, नहीं-2)
+</value>
+  </data>
+  <data name="block5_online" xml:space="preserve">
+    <value>शिक्षण संस्थान में घर बैठे ऑनलाइन उपस्थिति (यात्रा के दिन से पहले पिछले 7 दिनों में दिनों की संख्या)</value>
+  </data>
+  <data name="block5_leving" xml:space="preserve">
+    <value>शैक्षणिक संस्थान से गंतव्य के लिए प्रस्थान का सामान्य समय
+(24 घंटे प्रारूप में hh:mm)
+</value>
+  </data>
+  <data name="block5_reach" xml:space="preserve">
+    <value>गंतव्य तक पहुंचने में लगने वाला औसत समय (मिनटों में)</value>
+  </data>
+  <data name="block5_9" xml:space="preserve">
+    <value>यात्रा की औसत मासिक लागत
+(रु.)
+</value>
+  </data>
+  <data name="block5_10" xml:space="preserve">
+    <value>परिवहन का प्राथमिक साधन (कोड)</value>
+  </data>
+  <data name="block5_11" xml:space="preserve">
+    <value>यदि कॉलम 10 में '43' को छोड़कर '41' से '81' के बीच का कोड,
+परिवहन का द्वितीयक साधन (कोड)
+[कोड 09 दर्ज करें, यदि परिवहन के द्वितीयक मोड का उपयोग नहीं किया जाता है]
+</value>
+  </data>
+  <data name="block_5_2_head" xml:space="preserve">
+    <value>Block 5.2: 6 वर्ष और उससे अधिक आयु के व्यक्तियों के लिए शैक्षणिक संस्थान से यात्रा संदर्भ अवधि (90 यात्रा दिन) में सर्वेक्षण की तारीख के निकटतम यात्रा दिवस में दिन-यात्रा का विवरण  जो व्यक्तिगत रूप से बुनियादी पाठ्यक्रम में भाग ले रहे हैं (यानी, ब्लॉक 3 के कॉलम 8 में कोड 04 और ब्लॉक 3 के कॉलम 9 में कोड 2 और ब्लॉक 5.1 के कॉलम 12 में कोड 1 है )</value>
+  </data>
+  <data name="block_5_2_1" xml:space="preserve">
+    <value>परिवार के सदस्यों की क्रम सं.
+(जैसा कि ब्लॉक 3 के कॉलम 1 में है)
+</value>
+  </data>
+  <data name="block_5_2_2" xml:space="preserve">
+    <value>यात्रा क्रम सं.</value>
+  </data>
+  <data name="block_5_2_3" xml:space="preserve">
+    <value>मूल स्थान
+घर है
+(हाँ-1, नहीं-2)
+</value>
+  </data>
+  <data name="block_5_2_4_head" xml:space="preserve">
+    <value>मूल स्थान </value>
+  </data>
+  <data name="block_5_2_4" xml:space="preserve">
+    <value>पिन कोड
+(कोड 9 दें, यदि पिन अज्ञात है)
+</value>
+  </data>
+  <data name="block_5_2_5_head" xml:space="preserve">
+    <value>यदि कॉलम 4 में कोड '9' है</value>
+  </data>
+  <data name="block_5_2_5" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश
+(कोड)
+</value>
+  </data>
+  <data name="block_5_2_6" xml:space="preserve">
+    <value>जिला
+(कोड)
+</value>
+  </data>
+  <data name="block_5_2_7" xml:space="preserve">
+    <value>पिन कोड
+(कोड 9 दें, यदि पिन अज्ञात है)
+</value>
+  </data>
+  <data name="block_5_2_8_head" xml:space="preserve">
+    <value>यदि कॉलम 7 में कोड '9' है</value>
+  </data>
+  <data name="block_5_2_8" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश
+(कोड)
+</value>
+  </data>
+  <data name="block_5_2_9" xml:space="preserve">
+    <value>क्या वापसी यात्रा की गई
+(हाँ-1, नहीं-2)
+</value>
+  </data>
+  <data name="block_5_2_10" xml:space="preserve">
+    <value>क्या वापसी यात्रा की गई
+(हाँ-1, नहीं-2)
+</value>
+  </data>
+  <data name="block_5_2_11" xml:space="preserve">
+    <value>यदि कोड 2 कॉलम 3 और कॉलम 10 दोनों में है,
+गंतव्य
+घर है
+(हाँ-1, नहीं-2)
+</value>
+  </data>
+  <data name="block_5_2_7_head" xml:space="preserve">
+    <value>शिक्षण संस्थान</value>
+  </data>
+  <data name="block_5_2_12_head" xml:space="preserve">
+    <value>गंतव्य
+[कॉलम 10 में कोड 1 के लिए, कॉलम 4 से कॉलम 6 तक की प्रविष्टि को कॉलम 12 से 14 तक कॉपी करें]
+</value>
+  </data>
+  <data name="block_5_2_12" xml:space="preserve">
+    <value>पिन कोड
+(कोड 9 दें, यदि पिन अज्ञात है)
+</value>
+  </data>
+  <data name="block_5_2_13_head" xml:space="preserve">
+    <value>यदि कॉलम 12 में कोड '9'</value>
+  </data>
+  <data name="block_5_2_13" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश
+(कोड)
+</value>
+  </data>
+  <data name="block_5_2_14" xml:space="preserve">
+    <value>जिला
+(कोड)
+</value>
+  </data>
+  <data name="block_5_2_15" xml:space="preserve">
+    <value>मूल स्थान से शैक्षणिक संस्थान तक की दूरी
+(किमी)
+</value>
+  </data>
+  <data name="block_5_2_16" xml:space="preserve">
+    <value>शैक्षणिक संस्थान से गंतव्य तक की दूरी (किमी )
+[कॉलम 10 में कोड 1 के लिए, कॉलम 15 की प्रविष्टि को कॉलम 16 में कॉपी करें]
+ 
+</value>
+  </data>
+  <data name="block_5_2_17" xml:space="preserve">
+    <value>यदि कॉलम 10 में कोड 2 और कॉलम 11 में कोड 2,
+शैक्षणिक संस्थान से गंतव्य तक यात्रा का उद्देश्य
+(कोड)
+</value>
+  </data>
+  <data name="block7_head" xml:space="preserve">
+    <value>ब्लॉक 7: ब्लॉक 3 के कॉलम 8 में कोड 1, 2 और 3 के संबंध में15 वर्ष और उससे अधिक * आयु के व्यक्तियों के लिए सर्वेक्षण की तारीख से पहले एक यात्रा दिवस के भीतर (यात्रा संदर्भ अवधि 1 यात्रा दिवस) गैर-निश्चित कार्यस्थल तक की यात्राओं का विवरण।</value>
+  </data>
+  <data name="block7_1" xml:space="preserve">
+    <value>परिवार के सदस्यों की क्रम सं.
+(जैसा कि ब्लॉक 3 के कॉलम 1 में है)
+ 
+</value>
+  </data>
+  <data name="block7_2" xml:space="preserve">
+    <value>यात्रा क्रम सं</value>
+  </data>
+  <data name="block7_2_9" xml:space="preserve">
+    <value>क्या वापसी यात्रा की गई
+(हाँ-1, नहीं-2)
+</value>
+  </data>
+  <data name="block7_2_10" xml:space="preserve">
+    <value>मूल स्थान  से गंतव्य तक की दूरी
+(किमी)
+</value>
+  </data>
+  <data name="block7_2_11" xml:space="preserve">
+    <value>मूल स्थान से गंतव्य के लिए प्रस्थान का समय
+(24 घंटे प्रारूप में hh:mm)
+</value>
+  </data>
+  <data name="block7_2_12" xml:space="preserve">
+    <value>गंतव्य तक पहुंचने में लगा औसत समय (मिनटों में)</value>
+  </data>
+  <data name="block7_2_13" xml:space="preserve">
+    <value>परिवहन का प्राथमिक साधन (कोड)</value>
+  </data>
+  <data name="block7_2_14" xml:space="preserve">
+    <value>यात्रा की लागत
+(रु.)
+</value>
+  </data>
+  <data name="block7_3" xml:space="preserve">
+    <value>पिन कोड
+(कोड 9 दें, यदि पिन अज्ञात है)
+</value>
+  </data>
+  <data name="block7_4_head" xml:space="preserve">
+    <value>यदि कॉलम 3 में कोड '9' है</value>
+  </data>
+  <data name="block7_4" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश
+(कोड)
+</value>
+  </data>
+  <data name="block7_5" xml:space="preserve">
+    <value>जिला
+(कोड)
+</value>
+  </data>
+  <data name="block7_6" xml:space="preserve">
+    <value>पिन कोड
+(कोड 9 दें, यदि पिन अज्ञात है)
+</value>
+  </data>
+  <data name="block7_7_head" xml:space="preserve">
+    <value>यदि कॉलम 6 में कोड '9' है</value>
+  </data>
+  <data name="block9_head" xml:space="preserve">
+    <value>ब्लॉक 9: यात्रा संदर्भ अवधि (28 यात्रा दिन) में सभी यात्रा-दिनों के दौरान घर के सदस्यों द्वारा की गई रात्रि यात्राओं का विवरण</value>
+  </data>
+  <data name="block9_head_1" xml:space="preserve">
+    <value>सर्वेक्षण की तिथि से पहले पिछले 28 यात्रा दिवसों में परिवार द्वारा की गई रात्रि यात्राओं की संख्या (वापसी यात्रा को अलग यात्रा के रूप में गिना जाएगा)</value>
+  </data>
+  <data name="block9_1" xml:space="preserve">
+    <value>यात्रा क्रम सं</value>
+  </data>
+  <data name="block9_2" xml:space="preserve">
+    <value>यात्रा में परिवार के सदस्यों की संख्या</value>
+  </data>
+  <data name="block9_3" xml:space="preserve">
+    <value>यात्रा का उद्देश्य
+(कोड)
+</value>
+  </data>
+  <data name="block9_10" xml:space="preserve">
+    <value>क्या वापसी यात्रा की गई
+(हाँ-1, नहीं-2)
+</value>
+  </data>
+  <data name="2_heading" xml:space="preserve">
+    <value>[2] क्षेत्र संकार्य का विवरण </value>
+  </data>
+  <data name="State/UT" xml:space="preserve">
+    <value>राज्य/केंद्र शासित प्रदेश 
+(कोड) </value>
+  </data>
+  <data name="district33" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="State77" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="district66" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="State44" xml:space="preserve">
+    <value>जिला  
+(कोड) </value>
+  </data>
+  <data name="district9" xml:space="preserve">
+    <value>जिला  
+(कोड) &#x8;</value>
+  </data>
+  <data name="Block10" xml:space="preserve">
+    <value>[10] अन्वेषक (एसई/जेएसओ) की टिप्पणियाँ </value>
+  </data>
+  <data name="Block11" xml:space="preserve">
+    <value>[11] पर्यवेक्षी अधिकारी(ओं) की टिप्पणियाँ</value>
+  </data>
+  <data name="enuname" xml:space="preserve">
+    <value>गणनाकर्ता का नाम (ब्लॉक अक्षर)</value>
+  </data>
+  <data name="surveyinspection" xml:space="preserve">
+    <value>सर्वेक्षण/निरीक्षण </value>
+  </data>
+  <data name="inminutes" xml:space="preserve">
+    <value>एन्यूमेरटरों (एसई/जेएसओ) की टीम द्वारा अनुसूची की समीक्षा में लिया गया कुल समय
+(मिनटों में)
+</value>
+  </data>
+  <data name="number" xml:space="preserve">
+    <value>अनुसूची का प्रचार करने वाली टीम में एन्यूमेरेटर (एसई/जेएसओ) की संख्या</value>
+  </data>
+  <data name="whether23" xml:space="preserve">
+    <value>क्या एसई/ जेएसओ/ एसएस/ एसएसओ द्वारा कोई टिप्पणी दर्ज की गई है? ब्लॉक 10/11 में (हाँ -1, नहीं -2)</value>
+  </data>
+  <data name="Whether24" xml:space="preserve">
+    <value>क्या एसई/ जेएसओ/ एसएस/ एसएसओ द्वारा कोई टिप्पणी दर्ज की गई है? अनुसूची में अन्यत्र (हाँ -1, नहीं -2)</value>
+  </data>
+  <data name="name6" xml:space="preserve">
+    <value>सूचनादाता का नाम:</value>
+  </data>
+  <data name="Mobile6" xml:space="preserve">
+    <value>सूचनादाता/किसी अन्य घरेलू सदस्य का मोबाइल नंबर जिससे संपर्क किया जा सके</value>
+  </data>
+  <data name="Landline" xml:space="preserve">
+    <value>घर का लैंडलाइन नंबर, यदि कोई हो (एसटीडी कोड से शुरू करें)</value>
+  </data>
+  <data name="Response" xml:space="preserve">
+    <value>एसई/जेएसओ द्वारा मूल्यांकित सूचनादाता का प्रतिक्रिया कोड</value>
+  </data>
+  <data name="SupervisorName" xml:space="preserve">
+    <value>पर्यवेक्षक का नाम</value>
+  </data>
+</root>
