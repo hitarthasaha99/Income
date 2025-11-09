@@ -2,6 +2,7 @@
 using FluentValidation;
 using Income.Services;
 using Income.Validators.SCH0_0;
+using Income.Viewmodels;
 using Microsoft.Extensions.Logging;
 
 namespace Income
@@ -24,11 +25,13 @@ namespace Income
             builder.Services.AddSingleton(new HttpClient());
             builder.Services.AddSingleton<Income.Services.NetworkService>();
             builder.Services.AddSingleton<Income.Services.LocalizationService>();
+            builder.Services.AddSingleton<LanguageState>();
             //builder.Services.AddSingleton<Income.Services.IncomeService>();
 
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_0_1_VM>();
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_1_VM>();
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_2_VM>();
+            builder.Services.AddSingleton<Comment_vm>();
             builder.Services.AddValidatorsFromAssemblyContaining<Block7Validator>();
 
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();

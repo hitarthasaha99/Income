@@ -341,7 +341,7 @@
 				//SessionStorage.selected_hhd_seq = data.seq_no;
 				SessionStorage.selected_hhd_size = data.Block_7_5.GetValueOrDefault();
 				preloadService.Show(SpinnerColor.Light, "Fetching location details...");
-				SessionStorage.location = await CommonFunction.fetchGeoLocation();
+				SessionStorage.location = await funcs.fetchGeoLocation();
 				preloadService.Show(SpinnerColor.Light, "Updating location details...");
 				//await dQ.SaveHhdStatus(data.Block_7_3, 10, SessionStorage.SelectedFSUId);
 				preloadService.Hide();

@@ -190,7 +190,7 @@ namespace Income.Common
             }
         }
 
-        public static async Task<string> fetchGeoLocation()
+        public async Task<string> fetchGeoLocation()
         {
             try
             {

@@ -16,22 +16,32 @@ namespace Income.Services
 
         public LocalizationService()
         {
-            _resourceManager = new ResourceManager("Income.Resources.Localization.AppResources", typeof(LocalizationService).Assembly);
+            try
+            {
+                _resourceManager = new ResourceManager("Income.Resources.Localization.AppResources", typeof(LocalizationService).Assembly);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         public string this[string key] => _resourceManager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
 
         public void SetLanguage(string culture)
         {
-            CultureInfo newCulture = new CultureInfo(culture);
-            CultureInfo.DefaultThreadCurrentCulture = newCulture;
-            CultureInfo.DefaultThreadCurrentUICulture = newCulture;
-            OnLanguageChanged?.Invoke();
+            try
+            {
+                CultureInfo newCulture = new CultureInfo(culture);
+                CultureInfo.DefaultThreadCurrentCulture = newCulture;
+                CultureInfo.DefaultThreadCurrentUICulture = newCulture;
+                OnLanguageChanged?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
-    public class LanguageState
-    {
-        public event Action? OnChange;
-        public void NotifyLanguageChanged() => OnChange?.Invoke();
-    }
+    
 }

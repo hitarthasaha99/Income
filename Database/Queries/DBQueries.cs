@@ -839,7 +839,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.Table<Tbl_Block_1>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted != null && x.is_deleted == false)).FirstOrDefaultAsync();
+                var response = await _database.Table<Tbl_Block_1>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
                 if (response != null)
                 {
                     return response;

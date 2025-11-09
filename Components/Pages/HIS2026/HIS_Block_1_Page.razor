@@ -7,6 +7,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject LocalizationService Loc
 
 
 <div class="pb-5">
@@ -247,6 +248,7 @@
     bool is_substitution_reason_disable = true;
     bool is_remarks_visible = false;
     int hhdStatus = 0;
+    CommonFunction function = new();
     public async Task SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
         block_1.survey_code = string.IsNullOrEmpty(args.Value.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
@@ -337,6 +339,16 @@
         {
             await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
         }
+        var row = await dQ.GetSelectedSubUnit(SessionStorage.SelectedFSUId.ToString());
+        int subD = 0;
+        if (row != null)
+        {
+            subD = row.serial_number.GetValueOrDefault() == 0 ? 1 : row.serial_number.GetValueOrDefault();
+        }
+        else
+        {
+            subD = 1;
+        }
         var response = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id) ?? new();
         if (response.id != Guid.Empty)
         {
@@ -345,7 +357,7 @@
             //init_survey_code = response.survey_code;
             if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
             {
-                var location = string.IsNullOrEmpty(SessionStorage.location) ? await CommonFunction.fetchGeoLocation() : SessionStorage.location;
+                var location = string.IsNullOrEmpty(SessionStorage.location) ? await function.fetchGeoLocation() : SessionStorage.location;
                 block_1.survey_coordinates = string.IsNullOrEmpty(block_1.survey_coordinates) ? location : block_1.survey_coordinates;
                 SessionStorage.location = block_1.survey_coordinates;
             }
@@ -372,10 +384,10 @@
             block_1.round_number = "80";//sch_0_block_1_res.Block_1_9;
             block_1.schedule_number = "HIS2026";
             block_1.serial_number_sample_fsu = SessionStorage.SelectedFSUId.ToString();//sch_0_block_1_res.Block_1_11;
-            block_1.sample_sub_division_number = sch_0_block_1_res.Block_1_12;
+            block_1.sample_sub_division_number = subD;
             block_1.sample_hhd_number = SessionStorage.selected_hhd_seq;
             block_1.town_name = sch_0_block_1_res.Block_0_4;
-            block_1.survey_coordinates = string.IsNullOrEmpty(SessionStorage.location) ? await CommonFunction.fetchGeoLocation() : SessionStorage.location;
+            block_1.survey_coordinates = string.IsNullOrEmpty(SessionStorage.location) ? await function.fetchGeoLocation() : SessionStorage.location;
             SessionStorage.location = block_1.survey_coordinates;
             block_1.survey_timestamp = DateTime.Now;
             SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
