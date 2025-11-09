@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Income.Database.Models.Common;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_4_Q5
+    public class Tbl_Block_4_Q5 : Tbl_Base
     {
         [PrimaryKey]
         public Guid id { get; set; }
+        public int hhd_id { get; set; }
 
         // Foreign key to Tbl_Block_4
         public Guid Block4Id { get; set; }

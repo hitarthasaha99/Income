@@ -9,6 +9,16 @@ namespace Income.Common.HIS2026
 {
     public class Block_4_Constants
     {
+        public static readonly List<Tbl_Lookup> Q4_4_AgriculturalActivities =
+        [
+            new() { id = 1, title = "Cultivation of crops / fruits / vegetables / spices" },
+            new() { id = 2, title = "Cultivation of flowers" },
+            new() { id = 3, title = "Animal husbandry" },
+            new() { id = 4, title = "Fisheries" },
+            new() { id = 5, title = "Agroforestry activity" },
+            new() { id = 6, title = "Others (bee keeping, sericulture, lac culture, ancillary etc.)" },
+        ];
+
         public static List<Tbl_Lookup> Q4_8 =
         [
             new() { id = 1, title = "For agricultural uses : Crop production -1" },

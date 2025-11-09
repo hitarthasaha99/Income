@@ -1,6 +1,7 @@
 ﻿using Blazored.Toast;
 using FluentValidation;
 using Income.Services;
+using Income.Validators.HIS2026;
 using Income.Validators.SCH0_0;
 using Income.Viewmodels;
 using Microsoft.Extensions.Logging;
@@ -33,6 +34,7 @@ namespace Income
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_2_VM>();
             builder.Services.AddSingleton<Comment_vm>();
             builder.Services.AddValidatorsFromAssemblyContaining<Block7Validator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<Block_4_Q5_Validator>();
 
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             //builder.Services.AddFluentValidationAutoValidation();

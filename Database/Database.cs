@@ -61,6 +61,8 @@ namespace Income.Database
                 await _database.CreateTableAsync<Tbl_Sch_0_0_Block_5>().ConfigureAwait(false);
                 await _database.CreateTableAsync<Tbl_Block_1>().ConfigureAwait(false);
                 await _database.CreateTableAsync<Tbl_Block_3>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_4>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_4_Q5>().ConfigureAwait(false);
 
                 // Run indexes
                 await CreateIndexesAsync();

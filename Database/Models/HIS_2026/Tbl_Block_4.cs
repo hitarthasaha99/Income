@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_4
+    public class Tbl_Block_4 : Tbl_Base
     {
         [PrimaryKey]
         public Guid id { get; set; }
+        public int hhd_id { get; set; }
 
         // Q4.1 – Household size (auto-populated from Block 3)
         public int? item_1 { get; set; }

@@ -240,8 +240,8 @@ namespace Income.Database.Queries
             }
         }
 
-        
-        
+
+
         public async Task<int?> SaveBlock1(Tbl_Sch_0_0_Block_0_1 tbl_Sch_0_0_Block_0_1)
         {
             try
@@ -516,7 +516,7 @@ namespace Income.Database.Queries
                     {
                         // Update each household in the database
                         tran.Execute("UPDATE Tbl_Sch_0_0_Block_7 SET Stratum = ?, SSS = ?, a = ?, b = ? WHERE id = ?",
-             item.Stratum,item.SSS, item.a, item.b, item.id);
+             item.Stratum, item.SSS, item.a, item.b, item.id);
                     }
                 });
 
@@ -812,6 +812,7 @@ namespace Income.Database.Queries
             }
         }
 
+        //HIS BLOCK 1
         public async Task<int?> Save_SCH_HIS_Block1(Tbl_Block_1 tbl_block_1)
         {
             try
@@ -856,7 +857,219 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> DeleteHISBlock1(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_1>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting household: " + ex.Message);
+                return 0;
+            }
+        }
+
+        //HIS Block 3
+        public async Task<List<Tbl_Block_3>> Fetch_SCH_HIS_Block3(int hhd_id, int tenant_id = 1)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_3>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && x.tenant_id == tenant_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_3>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving Block 3: {ex.Message}");
+                return new List<Tbl_Block_3>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block3(Tbl_Block_3 tbl_block_3)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_3>().Where(x => x.id == tbl_block_3.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_3);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_3);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 3: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteHISBlock3(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_3>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting household member: " + ex.Message);
+                return 0;
+            }
+        }
+
+        //HIS Block 4
+        public async Task<Tbl_Block_4?> Fetch_SCH_HIS_Block4(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_4>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 4: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<List<Tbl_Block_4_Q5>> Fetch_SCH_HIS_Block4_NICList()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_4_Q5>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 4 NICLIST: {ex.Message}");
+                return new List<Tbl_Block_4_Q5>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_4>().Where(x => x.id == tbl_block_4.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_4);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_4);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 4: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block4_NICList(Tbl_Block_4_Q5 obj)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(obj);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(obj);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 4: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteBlock4_NICList(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting item " + ex.Message);
+                return 0;
+            }
+        }
     }
-
-
 }
