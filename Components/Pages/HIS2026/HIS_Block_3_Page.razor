@@ -5,21 +5,23 @@
 @using FluentValidation
 @using Income.Database.Models.HIS_2026
 @using Microsoft.AspNetCore.Components.Forms
-@inject IJSRuntime JSRuntime
-
 
 <div class="my-2">
+    <!-- Header component showing selected FSU and survey time -->
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+
     <div class="card card-style2">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">Block 3: demographic and other particulars of household members </span>
             </h3>
+            <!-- Button to open modal to add new household member -->
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal"><i class="bi bi-plus"></i>Add</button>
         </div>
 
         <div class="card-body p-0">
             <div class="table-responsive">
+                <!-- Table displaying household members -->
                 <table class="table table-bordered table-striped mb-0 text-center">
                     <thead>
                         <tr>
@@ -79,6 +81,7 @@
                     </tbody>
                 </table>
 
+                <!-- Remarks textarea -->
                 <div class="mb-3 px-2">
                     <label for="remarksTextarea" class="form-label">Remarks</label>
                     <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
@@ -87,6 +90,7 @@
         </div>
     </div>
 
+    <!-- Navigation buttons -->
     <div class="d-flex justify-content-between mb-3">
         <NavLink class="btn btn-outline-primary" href="/back">
             <i class="bi bi-chevron-left me-1"></i>
@@ -107,14 +111,13 @@
         </div>
     </div>
 
-    <!-- Modal Popuop From block -->
+    <!-- Modal Popup for Adding a new member -->
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true"
          data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <EditForm Model="@newMember" OnValidSubmit="HandleSaveClicked">
+                <EditForm Model="@newMember" OnValidSubmit="HandleAddMember">
                     <DataAnnotationsValidator />
-                    <ValidationSummary />
 
                     <div class="modal-header">
                         <h5 class="modal-title" id="addModalLabel">Add Item</h5>
@@ -123,19 +126,29 @@
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="row">
+                                <!-- Sl no input (readonly) -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">1.</span> Sl no.
                                     </label>
                                     <input type="text" class="form-control form-control-sm" value="@(block3Members.Count + 1)" disabled />
                                 </div>
+
+                                <!-- Name of Member input -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">2.</span> Name of Member
                                     </label>
-                                    <InputText id="nameInput" class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" />
-                                    <div></div>
+                                    <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" />
+                                    <ValidationMessage For="@(() => newMember.item_2)">
+                                       
+                                        <small class="text-danger">
+                                            @context
+                                        </small>
+                                    </ValidationMessage>
                                 </div>
+
+                                <!-- Relation to head select -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">3.</span> Relation to head (code)
@@ -152,7 +165,14 @@
                                         <option value="8">brother/sister/brother-in-law/sister-in-law/other relatives-8</option>
                                         <option value="9">servants/employees/other non-relatives-9 </option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(relationError))
+                                    {
+                                        <small class="text-danger">@relationError</small>
+                                    }
                                 </div>
+
+
+                                <!-- Gender select -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">4.</span> Gender (code)
@@ -163,13 +183,25 @@
                                         <option value="2">female-2</option>
                                         <option value="3">transgender-3</option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(genderError))
+                                    {
+                                        <small class="text-danger">@genderError</small>
+                                    }
                                 </div>
+
+                                <!-- Age input -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">5.</span> Age(years)
                                     </label>
-                                    <InputNumber id="ageInput" class="form-control form-control-sm" @bind-Value="newMember.age" />
+                                    <InputNumber class="form-control form-control-sm" @bind-Value="newMember.age" />
+                                    @if (!string.IsNullOrEmpty(ageError))
+                                    {
+                                        <small class="text-danger">@ageError</small>
+                                    }
                                 </div>
+
+                                <!-- Marital status select -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">6.</span> Marital status (code)
@@ -181,7 +213,13 @@
                                         <option value="3">widowed – 3</option>
                                         <option value="4">divorced/separated – 4</option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(item_6Error))
+                                    {
+                                        <small class="text-danger">@item_6Error</small>
+                                    }
                                 </div>
+
+                                <!-- Highest education level select -->
                                 <div class="col-sm-12 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">7.</span> Highest level of complete education (code)
@@ -200,6 +238,8 @@
                                         <option value="10">postgraduate and above - 11 </option>
                                     </InputSelect>
                                 </div>
+
+                                <!-- Activity status during 30 days -->
                                 <h4>Activity status (During 30 days)</h4>
                                 <div class="row">
                                     <div class="col-sm-6 mb-3">
@@ -231,6 +271,7 @@
                                         </label>
                                         <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_9">
                                             <option value="">-Select-</option>
+                                            <!-- Same options as above -->
                                             <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                             <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
                                             <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
@@ -250,6 +291,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Activity status during 365 days -->
                                 <h4>Activity status (During 365 days)</h4>
                                 <div class="row">
                                     <div class="col-sm-6 mb-3">
@@ -258,6 +300,7 @@
                                         </label>
                                         <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_10">
                                             <option value="">-Select-</option>
+                                            <!-- Same options as above for primary -->
                                             <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                             <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
                                             <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
@@ -281,6 +324,7 @@
                                         </label>
                                         <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_11">
                                             <option value="">-Select-</option>
+                                            <!-- Same options as above for secondary -->
                                             <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                             <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
                                             <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
@@ -300,6 +344,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Beneficiary select -->
                                 <div class="col-sm-12 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">12.</span> whether a beneficiary of any Central/ State Government social assistance scheme as on date of survey (yes-1/ no-2)
@@ -314,6 +359,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <!-- Save button to submit the form -->
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-floppy-fill me-1"></i>
                             Save
@@ -331,38 +377,124 @@
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
 
+    // List for holding household members data
     private List<Tbl_Block_3> block3Members = new();
+
+    // Model bound to the form in modal for adding new member
     private Tbl_Block_3 newMember = new Tbl_Block_3();
 
-    private async Task<bool> ValidateJsInputs()
+    // Error message for Relation to head field
+    private string relationError = "";
+    // Error message for Gender field
+
+    private string genderError = "";
+    // Error message for Age field
+    private string ageError = "";
+    // Error message for Marital status field
+
+    private string item_6Error = "";
+
+    // Logic: Add member to List when form is submitted
+    private void HandleAddMember()
     {
-        bool isNameValid = await JSRuntime.InvokeAsync<bool>("validationHelpers.validateName");
-        if (!isNameValid)
-            return false;
+        relationError = ""; // Clear previous errors
 
-        bool isAgeValid = await JSRuntime.InvokeAsync<bool>("validationHelpers.validateAge");
-        if (!isAgeValid)
-            return false;
+        int nextSerialNo = block3Members.Count + 1;
 
-        return true;
-    }
-
-    // Merged HandleSaveClicked with validation and save logic
-    private async Task HandleSaveClicked()
-    {
-        if (!await ValidateJsInputs())
+        // 1. First member must be self-1
+        if (nextSerialNo == 1 && newMember.item_3 != 1)
+        {
+            relationError = "H004(ii): Invalid Entry, Please check the entry";
             return;
+        }
+        else
+        {
+            relationError = null;
+        }
 
-        newMember.serial_no = block3Members.Count + 1;
+        // 2. Self-1 not allowed for other members
+        if (nextSerialNo > 1 && newMember.item_3 == 1)
+        {
+            relationError = "H004(ii): Invalid Entry, Please check the entry";
+            return;
+        }
+        else
+        {
+            relationError = null;
+        }
+
+        // 3. Range check (1-9)
+        if (!(newMember.item_3.HasValue && newMember.item_3 >= 1 && newMember.item_3 <= 9))
+        {
+            relationError = "H004(i):Invalid Entry, Please check the entry";
+            return;
+        }
+        else
+        {
+            relationError = null;
+        }
+
+
+        // 4. Gender Error Check
+        if (!(newMember.gender.HasValue && (newMember.gender == 1 || newMember.gender == 2 || newMember.gender == 3)))
+        {
+            genderError = "H005(i): Invalid Entry, Please check the entry";
+            return;
+        }
+        else
+        {
+            genderError = null;  // Clear error if valid
+        }
+        // 5.Age Error Check
+        if (!newMember.age.HasValue || newMember.age < 1 || newMember.age > 120)
+        {
+            ageError = "H006(i): Invalid Entry, Please check the entry";
+            return;
+        }
+        else
+        {
+            ageError = null;
+        }
+        // 6.Marital status Error Range check (1-4)
+        if (!(newMember.item_6.HasValue && newMember.item_6 >= 1 && newMember.item_6 <= 4))
+        {
+            item_6Error = "H007(i): Entry, Please check the entry";
+            return;
+        }
+        else
+        {
+            item_6Error = null;
+        }
+        // 6.Marital status Error H007(ii):If entry in Col.3 =2, then entry in Col.6 = 2 check
+        if (newMember.item_3 == 2 && newMember.item_6 == 2)
+        {
+            item_6Error = "H007(ii): Please check the entries in columns 3 & 6.";
+            return;
+        }
+        // 6.Marital status Error H007(iii): If entry in Col.3 = 3 or 4, then entry in Col.6 ≠ 1 check
+        else if ((newMember.item_3 == 3 || newMember.item_3 == 4) && newMember.item_6 == 1)
+        {
+            item_6Error = "H007(iii): Invalid Entry, Please check the entryies recorded against cols. 3 & 6";
+            return;
+        }
+        // 6.Marital status Error H007(iv): If entry in Col.3 =5, then entry in Col.6 =1 check
+
+        else if (newMember.item_3 == 5 && newMember.item_6 == 1)
+        {
+            item_6Error = "H007(iv): Invalid Entry, Please check the entryies recorded against cols. 3 & 6";
+            return;
+        }
+        else
+        {
+            item_6Error = null;
+        }
+        // If all checks pass, add member
         newMember.id = Guid.NewGuid();
+        newMember.serial_no = nextSerialNo;
         block3Members.Add(newMember);
 
         newMember = new Tbl_Block_3();
-
-        // Optionally close modal here
-        // JSRuntime.InvokeVoidAsync("bootstrap.Modal.getInstance", "#addModal").ContinueWith(jsTask =>
-        // {
-        //     JSRuntime.InvokeVoidAsync("bootstrap.Modal.getInstance", "#addModal").Result.Hide();
-        // });
+        toastService.ShowSuccess("Member added successfully!");
     }
+
 }
