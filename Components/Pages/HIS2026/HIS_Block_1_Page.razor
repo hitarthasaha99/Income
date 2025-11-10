@@ -1,0 +1,445 @@
+@page "/dashboard/his/block0_1"
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Viewmodels
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+
+<div class="pb-5">
+
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                         survey_time="@survey_time" />
+
+    <div class="card-style2 p-2">
+        <div class="w-100 card-header d-flex justify-content-between">
+            <p class="fs-5 m-0"><span class="text-primary me-2">[1]</span>Identification of sample household</p>
+            <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-outline-primary" @onclick="@(() => Comment())"><i class="bi bi-chat-left-text me-2"></i>Comment</NavLink>
+        </div>
+        <div class="card-container mt-2">
+            <div class="row card-body">
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">1</span>@Loc["sector"]
+                    </label>
+                    <input type="text" class="form-control" placeholder="" value="@block_1.sector_name" disabled>
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">2</span>@Loc["state_ut_name"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" value="@block_1.state_name" disabled>
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">3</span>@Loc["district_name"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.district_name">
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">4</span>@Loc["sub_dist"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.town_name">
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">5</span>@Loc["vill_name"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.village_name">
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">6</span>@Loc["invst_unit_no"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.investigator_unit_no">
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">7</span>@Loc["sample_su_no"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.sample_su_number">
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">8</span>@Loc["round_number"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.round_number">
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">9</span>@Loc["sch_no"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.schedule_number">
+                </div>
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">10</span>@Loc["serial_no_sample_fsu"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.serial_number_sample_fsu">
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">11</span>@Loc["sample_sub_div_no"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.sample_sub_division_number">
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">12</span>@Loc["sample_hh_number"]
+                    </label>
+                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.sample_hhd_number">
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">13</span>@Loc["survey_code"]
+                    </label>
+                    <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
+                        <option value="">Select</option>
+                        @if (commonList.LOOKUP_CONST_HHD_SURVEY_CODE != null && commonList.LOOKUP_CONST_HHD_SURVEY_CODE.Count > 0)
+                        {
+                            @foreach (var item in commonList.LOOKUP_CONST_HHD_SURVEY_CODE)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">14</span>@Loc["reason_for_substitution"]
+                    </label>
+
+                    <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
+                        <option value="">Select</option>
+                        @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
+                        {
+                            @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        }
+                    </select>
+                </div>
+                @* <div class="mb-3 col-12" hidden="@((!is_remarks_visible))">
+                    <label class="form-label fw-bold"><span class="badge bg-primary me-2">15</span>Remarks</label>
+                    <textarea type="text" class="form-control is_sso" placeholder="" cols="4" @bind="block_1.block_1_remarks"></textarea>
+                </div> *@
+            </div>
+        </div>
+    </div>
+
+    <Modal @ref="comment_vm.AddModal" Title="Comment" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.Large">
+        <BodyTemplate>
+            <div class="mb-3">
+                <div class="row mb-2">
+                    @* <div class="col-6"> *@
+                    @*     <label class="form-label fw-bold"> *@
+                    @*         <span class="badge bg-primary me-2">1</span>Select row *@
+                    @*     </label> *@
+                    @*     <select class="form-select w-100" @bind="comment_vm.Serialnumber"> *@
+                    @*         <option value="">Select</option> *@
+                    @*         @if (RowList != null) *@
+                    @*         { *@
+                    @*             @foreach (var item in RowList) *@
+                    @*             { *@
+                    @*                 <option value="@item">@item</option> *@
+                    @*             } *@
+                    @*         } *@
+                    @*     </select> *@
+                    @* </div> *@
+                    <div class="col-6">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">2</span>Question Number
+                        </label>
+                        <select class="form-select w-100" @bind="comment_vm.item_no">
+                            <option value="">Select</option>
+                            @if (Question != null)
+                            {
+                                @foreach (var item in Question)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <label for="commentBox" class="form-label">Enter your comment</label>
+                <textarea class="form-control" id="commentBox" rows="4" @bind="comment_vm.comment"></textarea>
+                @if (comment_vm.ShowError)
+                {
+                    <div class="text-danger mt-2">Comment cannot be empty.</div>
+                }
+            </div>
+
+            @if (CommentList != null)
+            {
+                <div style="overflow: auto;">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="min-width: 200px;">Comment</th>
+                                <th style="min-width: 100px;">Item Number</th>
+                                <th style="min-width: 50px;">Member Srl.</th>
+                                <th style="min-width: 20px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in CommentList)
+                            {
+                                <tr>
+                                    <td>@item.comment</td>
+                                    <td class="text-center">@item.item_no</td>
+                                    <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-success btn-sm me-2" @onclick="@(() => Update(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="bi bi-check-circle me-1"></i>Edit</button>
+                                        <button class="btn btn-danger btn-sm" @onclick="@(() => Delete(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="bi bi-x-circle me-1"></i>Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button class="btn btn-primary me-2" @onclick="@(() => Submit())"><i class="bi bi-check-circle me-1"></i>Submit</Button>
+            <Button class="btn btn-outline-primary" @onclick="@(() => Close())"><i class="bi bi-x-circle me-1"></i>Close</Button>
+        </FooterTemplate>
+    </Modal>
+
+
+    <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        <div class="d-flex">
+            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                <NavLink class="btn btn-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+            }
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+        </div>
+    </div>
+
+
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    private CommonConfig commonConfig = new CommonConfig();
+    CommonList commonList = new();
+    DateTime survey_time = DateTime.Now;
+    DBQueries dQ = new();
+    CommonQueries commonQueries = new();
+    Tbl_Comments comments = new();
+    List<string> Question = new List<string>();
+    List<Tbl_Comments> CommentList = new List<Tbl_Comments>();
+    //hhd_status_manager current_status = new();
+    List<int> RowList = [];
+    Tbl_Block_1 block_1 = new();
+    bool is_substitution_reason_disable = true;
+    bool is_remarks_visible = false;
+    int hhdStatus = 0;
+    CommonFunction function = new();
+    public async Task SurveyCodeSelectionChanged(ChangeEventArgs args)
+    {
+        block_1.survey_code = string.IsNullOrEmpty(args.Value.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
+        if (CommonConstants.LOOKUP_SURVEY_CODE_HDD_2 == args.Value.ToString() || CommonConstants.LOOKUP_SURVEY_CODE_HDD_3 == args.Value.ToString() || CommonConstants.LOOKUP_SURVEY_CODE_HDD_9 == args.Value.ToString())
+        {
+            is_substitution_reason_disable = false;
+        }
+        else
+        {
+            is_substitution_reason_disable = true;
+        }
+        is_remarks_visible = false;
+        block_1.substitution_reason = null;
+        block_1.block_1_remark = string.Empty;
+    }
+
+    public void SubstitutionReasonChanged(ChangeEventArgs args)
+    {
+        block_1.substitution_reason = string.IsNullOrEmpty(args.Value.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
+        if (block_1.substitution_reason == 9)
+        {
+            is_remarks_visible = true;
+        }
+        else
+        {
+            is_remarks_visible = false;
+        }
+    }
+
+    async void Comment()
+    {
+        await comment_vm.AddModal.ShowAsync();
+    }
+    async Task Submit()
+    {
+        var data = await comment_vm.Save("1");
+        // Reset fields
+        comment_vm.Serialnumber = null;
+        comment_vm.item_no = string.Empty;
+        comment_vm.comment = string.Empty;
+        if (data > 0)
+        {
+            CommentList = await comment_vm.LoadData("1");
+        }
+        StateHasChanged();
+    }
+
+    async void Close()
+    {
+        await comment_vm.AddModal.HideAsync();
+
+    }
+    async void Delete(Tbl_Comments data)
+    {
+        var DeleteResult = await comment_vm.Delete(data);
+        if (DeleteResult > 0)
+        {
+            CommentList = await comment_vm.LoadData("1");
+        }
+        StateHasChanged();
+
+    }
+
+    async void Update(Tbl_Comments data)
+    {
+
+        comment_vm.LoadDataById(data);
+
+    }
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        hhdStatus = await dQ.GetCurrentHHDStatus(SessionStorage.SelectedFSUId,SessionStorage.selected_hhd_id);
+        for (var i = 13; i <= 14; i++)
+        {
+            Question.Add(i.ToString());
+        }
+
+        CommentList = await comment_vm.LoadData("1");
+        comment_vm.NotifyUiUpdate += StateHasChanged;
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+        }
+        var row = await dQ.GetSelectedSubUnit(SessionStorage.SelectedFSUId.ToString());
+        int subD = 0;
+        if (row != null)
+        {
+            subD = row.serial_number.GetValueOrDefault() == 0 ? 1 : row.serial_number.GetValueOrDefault();
+        }
+        else
+        {
+            subD = 1;
+        }
+        var response = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id) ?? new();
+        if (response.id != Guid.Empty)
+        {
+            block_1 = new();
+            block_1 = response;
+            //init_survey_code = response.survey_code;
+            if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                var location = string.IsNullOrEmpty(SessionStorage.location) ? await function.fetchGeoLocation() : SessionStorage.location;
+                block_1.survey_coordinates = string.IsNullOrEmpty(block_1.survey_coordinates) ? location : block_1.survey_coordinates;
+                SessionStorage.location = block_1.survey_coordinates;
+            }
+            else
+            {
+                SessionStorage.location = block_1.survey_coordinates;
+            }
+            SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
+            is_remarks_visible = block_1.substitution_reason == 9 ? true : false;
+        }
+        else
+        {
+            var sch_0_block_1_res = await dQ.FetchBlock1();
+            var GetSelectedSUNumber = await dQ.FetchSCH0Block2_2Data();
+            block_1 = new();
+            block_1.id = Guid.NewGuid();
+            block_1.state_name = sch_0_block_1_res.Block_0_1;
+            block_1.sector_name = sch_0_block_1_res.Block_1_5 == null ? "" : sch_0_block_1_res.Block_1_5.ToString() == "1" ? "rural-1" : "urban-2";
+            block_1.district_name = sch_0_block_1_res.Block_0_2;
+            block_1.sub_district_name = sch_0_block_1_res.Block_0_3;
+            block_1.village_name = sch_0_block_1_res.Block_0_4;
+            block_1.investigator_unit_no = sch_0_block_1_res.Block_1_7;
+            block_1.sample_su_number = GetSelectedSUNumber?.Where(x => x.IsChecked == true)?.FirstOrDefault()?.serial_number.ToString();//sch_0_block_1_res.Block_1_8;
+            block_1.round_number = "80";//sch_0_block_1_res.Block_1_9;
+            block_1.schedule_number = "HIS2026";
+            block_1.serial_number_sample_fsu = SessionStorage.SelectedFSUId.ToString();//sch_0_block_1_res.Block_1_11;
+            block_1.sample_sub_division_number = subD;
+            block_1.sample_hhd_number = SessionStorage.selected_hhd_seq;
+            block_1.town_name = sch_0_block_1_res.Block_0_4;
+            block_1.survey_coordinates = string.IsNullOrEmpty(SessionStorage.location) ? await function.fetchGeoLocation() : SessionStorage.location;
+            SessionStorage.location = block_1.survey_coordinates;
+            block_1.survey_timestamp = DateTime.Now;
+            SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
+        }
+        StateHasChanged();
+    }
+
+    public async Task HandleSubmit(bool is_go_next)
+    {
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_10");
+                return;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_3");
+                return;
+            }
+        }
+        
+        var response = await dQ.Save_SCH_HIS_Block1(block_1);
+        if (response != 1)
+        {
+            toastService.ShowError("Getting error while deleting record, Please try again!");
+            return;
+        }
+        else
+        {
+            toastService.ShowSuccess("Data saved successfully!");
+            if (is_go_next)
+            {
+                if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
+                {
+                    await commonQueries.DeleteBlockDataForCasulaty();
+                    NavigationManager.NavigateTo("/dashboard/his/block_10");
+                    return;
+                }
+                else
+                {
+                    // if (block_1.survey_code != init_survey_code)
+                    // {
+                    //     await commonQueries.DeleteBlockDataForCasulaty();
+                    // }
+                    NavigationManager.NavigateTo("/dashboard/his/block_3");
+                    return;
+                }
+            }
+        }
+        return;
+
+    }
+}

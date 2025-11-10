@@ -139,17 +139,18 @@ namespace Income.Viewmodels.SCH0_0
 
             try
             {
-                double total = tbl_Sch_0_0_block_2_1.Sum(row => row.percentage.GetValueOrDefault());
+                var non_deleted = tbl_Sch_0_0_block_2_1.Where(x => x.is_deleted != true).ToList();
+                double total = non_deleted.Sum(row => row.percentage.GetValueOrDefault());
                 if (total != 100)
                     result.Errors.Add("Total percentage must be equal to 100.");
 
-                if (tbl_Sch_0_0_block_2_1.Any(row => row.percentage == 0))
+                if (non_deleted.Any(row => row.percentage == 0))
                     result.Errors.Add("Hamlet percentage cannot be zero.");
 
-                if (tbl_Sch_0_0_block_2_1.Any(row => string.IsNullOrWhiteSpace(row.hamlet_name)))
+                if (non_deleted.Any(row => string.IsNullOrWhiteSpace(row.hamlet_name)))
                     result.Errors.Add("Hamlet name cannot be empty.");
 
-                if (tbl_Sch_0_0_block_2_1
+                if (non_deleted
                     .GroupBy(x => x.hamlet_name.ToLower())
                     .Any(g => g.Count() > 1))
                     result.Errors.Add("Hamlet names must be unique.");

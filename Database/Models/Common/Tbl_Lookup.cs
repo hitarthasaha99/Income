@@ -9,7 +9,6 @@ namespace Income.Database.Models.Common
 {
     public class Tbl_Lookup
     {
-        [PrimaryKey]
         public int id { get; set; }
         public string? lookup_type { get; set; }
         public string? title { get; set; }

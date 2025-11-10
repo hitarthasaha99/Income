@@ -1,0 +1,368 @@
+﻿@page "/dashboard/his/block_3"
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@using FluentValidation
+@using Income.Database.Models.HIS_2026
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+
+
+<div class="my-2">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+    <div class="card card-style2">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">Block 3: demographic and other particulars of household members </span>
+            </h3>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal"><i class="bi bi-plus"></i>Add</button>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mb-0 text-center">
+                    <thead>
+                        <tr>
+                            <th rowspan="3">s.no.</th>
+                            <th rowspan="3">name of member</th>
+                            <th rowspan="3">relation to head(code)</th>
+                            <th rowspan="3">gender(code)</th>
+                            <th rowspan="3">age (years)</th>
+                            <th rowspan="3">marital status(code)</th>
+                            <th rowspan="3">highest educational level attained(code)</th>
+                            <th colspan="4">activity status</th>
+                            <th rowspan="3" style="min-width:200px">whether a beneficiary of any Central/State Government social assistance scheme as on date of survey(<i>yes-1/no-2</i>)</th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">during 30 days</th>
+                            <th colspan="2">during 365 days</th>
+                        </tr>
+                        <tr>
+                            <th>primary(code)</th>
+                            <th>secondary(code)</th>
+                            <th>primary(code)</th>
+                            <th>secondary(code)</th>
+                        </tr>
+                        <tr>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                            <th>(5)</th>
+                            <th>(6)</th>
+                            <th>(7)</th>
+                            <th>(8)</th>
+                            <th>(9)</th>
+                            <th>(10)</th>
+                            <th>(11)</th>
+                            <th>(12)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var member in block3Members)
+                        {
+                            <tr>
+                                <td>@member.serial_no</td>
+                                <td>@member.item_2</td>
+                                <td>@member.item_3</td>
+                                <td>@member.gender</td>
+                                <td>@member.age</td>
+                                <td>@member.item_6</td>
+                                <td>@member.item_7</td>
+                                <td>@member.item_8</td>
+                                <td>@member.item_9</td>
+                                <td>@member.item_10</td>
+                                <td>@member.item_11</td>
+                                <td>@(member.item_12 == 1 ? "Yes" : "No")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="mb-3 px-2">
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-3">
+        <NavLink class="btn btn-outline-primary" href="/back">
+            <i class="bi bi-chevron-left me-1"></i>
+            Back
+        </NavLink>
+        <div class="d-flex">
+            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                <NavLink class="btn btn-primary me-2 is_sso action" href="/save">
+                    <i class="bi bi-floppy-fill me-1"></i>
+                    Save
+                </NavLink>
+            }
+            <NavLink class="btn btn-outline-primary" href="/next">
+                Next
+                <i class="bi bi-chevron-right ms-1"></i>
+            </NavLink>
+        </div>
+    </div>
+
+    <!-- Modal Popuop From block -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <EditForm Model="@newMember" OnValidSubmit="HandleSaveClicked">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalLabel">Add Item</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">1.</span> Sl no.
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" value="@(block3Members.Count + 1)" disabled />
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">2.</span> Name of Member
+                                    </label>
+                                    <InputText id="nameInput" class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" />
+                                    <div></div>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">3.</span> Relation to head (code)
+                                    </label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_3">
+                                        <option value="">-Select-</option>
+                                        <option value="1">self-1</option>
+                                        <option value="2">spouse of head-2</option>
+                                        <option value="3">married child-3</option>
+                                        <option value="4">spouse of married child-4</option>
+                                        <option value="5">unmarried child-5</option>
+                                        <option value="6">grandchild-6</option>
+                                        <option value="7">father/mother/father-in-law/mother-in-law-7</option>
+                                        <option value="8">brother/sister/brother-in-law/sister-in-law/other relatives-8</option>
+                                        <option value="9">servants/employees/other non-relatives-9 </option>
+                                    </InputSelect>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">4.</span> Gender (code)
+                                    </label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.gender">
+                                        <option value="">-Select-</option>
+                                        <option value="1">male-1</option>
+                                        <option value="2">female-2</option>
+                                        <option value="3">transgender-3</option>
+                                    </InputSelect>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">5.</span> Age(years)
+                                    </label>
+                                    <InputNumber id="ageInput" class="form-control form-control-sm" @bind-Value="newMember.age" />
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">6.</span> Marital status (code)
+                                    </label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_6">
+                                        <option value="">-Select-</option>
+                                        <option value="1">never married – 1</option>
+                                        <option value="2">currently married (including living together) – 2</option>
+                                        <option value="3">widowed – 3</option>
+                                        <option value="4">divorced/separated – 4</option>
+                                    </InputSelect>
+                                </div>
+                                <div class="col-sm-12 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">7.</span> Highest level of complete education (code)
+                                    </label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_7">
+                                        <option value="">-Select-</option>
+                                        <option value="1">not literate (i.e. not able to read or write a simple message with understanding in any language) -01 </option>
+                                        <option value="2">literate without formal schooling (like NFEC, AEC, TLC, literate without any schooling, etc.)-02 </option>
+                                        <option value="3">literate with formal education below primary-03 </option>
+                                        <option value="4">primary -04 </option>
+                                        <option value="5">upper primary/middle -05 </option>
+                                        <option value="6">secondary -06 </option>
+                                        <option value="7">higher secondary -07 </option>
+                                        <option value="8">diploma /certificate course - 08 </option>
+                                        <option value="9">graduate -10 </option>
+                                        <option value="10">postgraduate and above - 11 </option>
+                                    </InputSelect>
+                                </div>
+                                <h4>Activity status (During 30 days)</h4>
+                                <div class="row">
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold d-flex align-items-start">
+                                            <span class="me-2">8.</span> Primary
+                                        </label>
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_8">
+                                            <option value="">-Select-</option>
+                                            <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                            <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                            <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                            <option value="4">regular wage/ salary – 04 </option>
+                                            <option value="5">casual labour – 05 </option>
+                                            <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                            <option value="7">student / attended educational institution - 07 </option>
+                                            <option value="8">attended domestic duties only – 08 </option>
+                                            <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                            <option value="10">earning from rent – 10 </option>
+                                            <option value="11">earning from pensions -11 </option>
+                                            <option value="12">earning from remittances -12 </option>
+                                            <option value="13">earning from interest - 13 </option>
+                                            <option value="14">unfit for work due to disability or illness – 14 </option>
+                                            <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                        </InputSelect>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold d-flex align-items-start">
+                                            <span class="me-2">9.</span> Secondary
+                                        </label>
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_9">
+                                            <option value="">-Select-</option>
+                                            <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                            <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                            <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                            <option value="4">regular wage/ salary – 04 </option>
+                                            <option value="5">casual labour – 05 </option>
+                                            <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                            <option value="7">student / attended educational institution - 07 </option>
+                                            <option value="8">attended domestic duties only – 08 </option>
+                                            <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                            <option value="10">earning from rent – 10 </option>
+                                            <option value="11">earning from pensions -11 </option>
+                                            <option value="12">earning from remittances -12 </option>
+                                            <option value="13">earning from interest - 13 </option>
+                                            <option value="14">unfit for work due to disability or illness – 14 </option>
+                                            <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                        </InputSelect>
+                                    </div>
+                                </div>
+
+                                <h4>Activity status (During 365 days)</h4>
+                                <div class="row">
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold d-flex align-items-start">
+                                            <span class="me-2">10.</span> Primary
+                                        </label>
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_10">
+                                            <option value="">-Select-</option>
+                                            <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                            <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                            <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                            <option value="4">regular wage/ salary – 04 </option>
+                                            <option value="5">casual labour – 05 </option>
+                                            <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                            <option value="7">student / attended educational institution - 07 </option>
+                                            <option value="8">attended domestic duties only – 08 </option>
+                                            <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                            <option value="10">earning from rent – 10 </option>
+                                            <option value="11">earning from pensions -11 </option>
+                                            <option value="12">earning from remittances -12 </option>
+                                            <option value="13">earning from interest - 13 </option>
+                                            <option value="14">unfit for work due to disability or illness – 14 </option>
+                                            <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                        </InputSelect>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold d-flex align-items-start">
+                                            <span class="me-2">11.</span> Secondary
+                                        </label>
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_11">
+                                            <option value="">-Select-</option>
+                                            <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                            <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                            <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                            <option value="4">regular wage/ salary – 04 </option>
+                                            <option value="5">casual labour – 05 </option>
+                                            <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                            <option value="7">student / attended educational institution - 07 </option>
+                                            <option value="8">attended domestic duties only – 08 </option>
+                                            <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                            <option value="10">earning from rent – 10 </option>
+                                            <option value="11">earning from pensions -11 </option>
+                                            <option value="12">earning from remittances -12 </option>
+                                            <option value="13">earning from interest - 13 </option>
+                                            <option value="14">unfit for work due to disability or illness – 14 </option>
+                                            <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                        </InputSelect>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">12.</span> whether a beneficiary of any Central/ State Government social assistance scheme as on date of survey (yes-1/ no-2)
+                                    </label>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_12">
+                                        <option value="">-Select-</option>
+                                        <option value="1">yes-1</option>
+                                        <option value="2">no-2</option>
+                                    </InputSelect>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-floppy-fill me-1"></i>
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    private CommonConfig commonConfig = new CommonConfig();
+    DateTime survey_time = DateTime.Now;
+
+    private List<Tbl_Block_3> block3Members = new();
+    private Tbl_Block_3 newMember = new Tbl_Block_3();
+
+    private async Task<bool> ValidateJsInputs()
+    {
+        bool isNameValid = await JSRuntime.InvokeAsync<bool>("validationHelpers.validateName");
+        if (!isNameValid)
+            return false;
+
+        bool isAgeValid = await JSRuntime.InvokeAsync<bool>("validationHelpers.validateAge");
+        if (!isAgeValid)
+            return false;
+
+        return true;
+    }
+
+    // Merged HandleSaveClicked with validation and save logic
+    private async Task HandleSaveClicked()
+    {
+        if (!await ValidateJsInputs())
+            return;
+
+        newMember.serial_no = block3Members.Count + 1;
+        newMember.id = Guid.NewGuid();
+        block3Members.Add(newMember);
+
+        newMember = new Tbl_Block_3();
+
+        // Optionally close modal here
+        // JSRuntime.InvokeVoidAsync("bootstrap.Modal.getInstance", "#addModal").ContinueWith(jsTask =>
+        // {
+        //     JSRuntime.InvokeVoidAsync("bootstrap.Modal.getInstance", "#addModal").Result.Hide();
+        // });
+    }
+}

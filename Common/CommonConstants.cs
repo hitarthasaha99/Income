@@ -124,6 +124,7 @@ namespace Income.Common
         sch_0_0_block_8,
         sch_0_0_block_9,
         sch_0_0_block_11,
+        ssu_list_page,
     }
 
     public class CommonList
@@ -168,6 +169,7 @@ namespace Income.Common
             new Tbl_Lookup { id = 6, lookup_type = CommonConstants.LOOKUP_RELIGION, title = "06 - Buddhism"},
             new Tbl_Lookup { id = 7, lookup_type = CommonConstants.LOOKUP_RELIGION, title = "07 - Zoroastrianism"},
             new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_RELIGION, title = "09 - Others"},
+            new Tbl_Lookup { id = 10, lookup_type = CommonConstants.LOOKUP_RELIGION, title = "10 - Not Reported"},
 
         };
         public List<Tbl_Lookup> LOOKUP_CONST_HOUSEHOLDTYPE_URBAN = new List<Tbl_Lookup>
@@ -193,6 +195,7 @@ namespace Income.Common
             new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_CASTE, title = "02 - Scheduled Caste (SC)"},
             new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_CASTE, title = "03 - Other Backward Class (OBC)"},
             new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_CASTE, title = "09 - Others"},
+            new Tbl_Lookup { id = 10, lookup_type = CommonConstants.LOOKUP_CASTE, title = "10 - Not Reported"},
 
         };
 

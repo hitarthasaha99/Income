@@ -81,4 +81,9 @@
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.9.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Viewmodels\HIS2026\" />
+      <Folder Include="wwwroot\js\HIS_Block_3_Js\" />
+    </ItemGroup>
+
 </Project>
