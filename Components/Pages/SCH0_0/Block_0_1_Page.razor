@@ -52,7 +52,6 @@
 
     <EditForm Model="@block_0_1_VM.block_0_1" OnValidSubmit="@(() => HandleSubmit(false))">
         <DataAnnotationsValidator />
-        <ValidationSummary />
 
         <div class="card-style2 mb-4">
             <div class="w-100 pb-3 ps-4 pt-3 mb-3" style="border-bottom: 1.5px solid black;">
@@ -114,8 +113,8 @@
 
                 <div class="mb-3 col-4">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">14</span>Approx. present population</label>
-                    <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(SessionStorage.hamlet_selection_done && block_0_1_VM.EnablePopulation)" />
-
+                    <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(SessionStorage.hamlet_selection_done || !block_0_1_VM.EnablePopulation)" />
+                    <ValidationMessage For="@(() => block_0_1_VM.block_0_1.Block_1_14)" />
                     @if (IsBlock_1_14_ErrorMessageVisible)
                     {
                         <div class="text-success mt-1 fw-bold">
@@ -140,7 +139,7 @@
                             }
                         }
                     </select>
-                    
+                    <ValidationMessage For="@(() => block_0_1_VM.block_0_1.Block_1_16)" />
                 </div>
                 <div class="mb-3 col-4" hidden="@(!block_0_1_VM.ShowItem17)">
                         <label class="form-label fw-bold">
@@ -157,7 +156,12 @@
                                 }
                             }
                         </select>
-                        
+                        @if (!string.IsNullOrEmpty(Block_1_17_ErrorMessage))
+                        {
+                            <div class="text-danger mt-1 fw-bold">
+                            @Block_1_17_ErrorMessage
+                            </div>
+                        }
                     </div>
                 <div class="mb-3 col-12">
                     <label class="form-label fw-bold"><span class="badge bg-primary me-2">18</span>Remarks</label>
@@ -182,11 +186,12 @@
     DateTime survey_time = DateTime.Now;
     bool IsBlock_1_14_ErrorMessageVisible = false;
     string Block_1_14_ErrorMessage = string.Empty;
-
+    string Block_1_17_ErrorMessage = string.Empty;
     private void ValidatePopulation(ChangeEventArgs e)
     {
         try
         {
+            IsBlock_1_14_ErrorMessageVisible = false;
             var _block_1_14 = Convert.ToInt32(e.Value);
             int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
             int _block_1_13 = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
@@ -223,10 +228,10 @@
         {
             Console.WriteLine("Error in ValidatePopulation: " + ex.Message);
         }
-    
+
     }
 
-    
+
     async void GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -241,8 +246,14 @@
 
     async Task HandleSubmit(bool is_go_next)
     {
+        Block_1_17_ErrorMessage = string.Empty;
         if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done)
         {
+            if(block_0_1_VM.ShowItem17 && block_0_1_VM.block_0_1.Block_1_17 == null)
+            {
+                Block_1_17_ErrorMessage = "E: Please select reason for substitution of original sample";
+                return;
+            }
             await block_0_1_VM.Save();
         }
         //Navigation rules -

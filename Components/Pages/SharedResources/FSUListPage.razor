@@ -314,6 +314,7 @@
     {
         try
         {
+            SessionStorage.ClearFSUFlags();
             SessionStorage.SelectedFSUId = fsu_id;
             var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
             var subUnitData = await dB.FetchSCH0Block2_2Data();

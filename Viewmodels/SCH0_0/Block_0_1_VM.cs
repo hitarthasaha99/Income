@@ -203,6 +203,8 @@ namespace Income.Viewmodels.SCH0_0
                 }
                 block_0_1.Block_1_16 = Convert.ToInt16(val);
                 OnPropertyChanged(nameof(block_0_1));
+                OnPropertyChanged(nameof(EnablePopulation));
+                NotifyUiUpdate.Invoke();
             }
             catch (Exception ex)
             {

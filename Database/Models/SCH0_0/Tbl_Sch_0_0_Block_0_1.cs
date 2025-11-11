@@ -71,7 +71,6 @@ namespace Income.Database.Models.SCH0_0
         //frame population / households
         //approx.present population
         [Required(ErrorMessage = "Approx. present population is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "Population must be greater than zero")]
         public int? Block_1_14 { get; set; }
 
         //total number of hgs/sbs formed (D)

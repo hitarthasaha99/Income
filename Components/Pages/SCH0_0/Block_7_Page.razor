@@ -399,19 +399,21 @@
     {
         try
         {
+            int max_srl_no = ListItems.Count > 0 ? ListItems.Max(x => x.Block_7_1.GetValueOrDefault()) + 1 : 1;
+            int max_hhd_srl_no = ListItems.Count > 0 ? ListItems.Max(x => x.Block_7_3.GetValueOrDefault()) + 1 : 1;
             List<Tbl_Sch_0_0_Block_7> generatedHHDs = new();
             var education_levels = Block_7_Constants.HighestEdu.Select(x => x.id).ToArray();
             var household_types = sector == 1 ? Block_7_Constants.HHDTypeRural.Select(x => x.id).ToArray() : Block_7_Constants.HHDTypeUrban.Select(x => x.id).ToArray();
-            int size = 700;
+            int size = 20;
             Random gen = new();
             for(int i = 1; i<=size; i++)
             {
                 Tbl_Sch_0_0_Block_7 obj = new();
                 obj.id = Guid.NewGuid();
                 obj.is_household = (gen.NextDouble() < 0.8) ? 2 : 1;
-                obj.Block_7_1 = generatedHHDs.Count > 0 ?  (generatedHHDs.Max(x => x.Block_7_1.GetValueOrDefault())  + 1) : 1;
+                obj.Block_7_1 = max_srl_no++;
                 obj.Block_7_2 = $"H-{obj.Block_7_1}";
-                obj.Block_7_3 = obj.is_household == 2 ? (generatedHHDs.Count > 0 ? (generatedHHDs.Max(x => x.Block_7_3.GetValueOrDefault()) + 1) : 1) : 0;
+                obj.Block_7_3 = obj.is_household == 2 ? max_hhd_srl_no++ : 0;
                 obj.Block_7_4 = $"Head {obj.Block_7_1}";
                 obj.Block_7_5 = obj.is_household == 2 ? gen.Next(1, 11) : 0;
                 obj.Block_7_6 = obj.is_household == 2 ? (sector == 1 ? null : education_levels[gen.Next(education_levels.Length)]) : null;
