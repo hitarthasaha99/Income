@@ -1,0 +1,95 @@
+﻿@page "/dashboard/his/block_7c"
+@using Blazored.FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+
+<div class="pb-5">
+    <CommonContentHeader />
+    @* 7.9 *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header d-flex align-items-center justify-content-between bg-transparent">
+            <h5 class="card-title m-0">
+                <span class="text-primary me-1">Block 7c:</span>
+                Income from Self-employment - Non-agriculture Activity
+            </h5>
+        </div>
+        <div class="row px-3 py-2">
+            <div class="col">
+                For Non-Agricultural Establishment <span class="text-primary">(entry against col. 8 or col. 9 is code 2 for at least one member of the household) </span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th colspan="3" class="bg-transparent text-start">
+                                <label class="form-label fs-6 fw-bold m-0">
+                                    <span class="badge bg-primary me-1">Q7.9</span>
+                                    Receipt from the non-agricultural activity in last month
+                                </label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width: 50px;">S. no. of activity</th>
+                            <th>Description of the activity</th>
+                            <th>Sale value (in Rs.)</th>
+                            <th>NIC code (2 digit)</th>
+                            <th>Gross value of receipts(in Rs.)</th>
+                        </tr>
+                        <tr>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @* Remarks Card *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header">
+            <h5 class="card-title m-0">
+                Remarks
+            </h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control w-100" rows="4"></textarea>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-primary me-2"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-outline-primary">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+}
+
+
+@code {
+
+}
