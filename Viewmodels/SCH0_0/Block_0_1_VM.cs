@@ -135,6 +135,7 @@ namespace Income.Viewmodels.SCH0_0
                     block_0_1.remarks = string.Empty;
                     EnableItem16 = true;
                     EnablePopulation = true;
+                    ShowItem17 = false;
                     //DisplayCoordinates = FormattedCoordinates;
                 }
                 //_surveyTimeStamp = DateTime.Now.ToString(Constants.DateTimeFormat);

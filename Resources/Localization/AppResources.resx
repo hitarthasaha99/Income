@@ -1,0 +1,1044 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Travel Companion</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Hello</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select Language</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Hindi" xml:space="preserve">
+    <value>Hindi</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading, please wait...</value>
+  </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>Unable to connect to the network.</value>
+  </data>
+  <data name="SaveSuccess" xml:space="preserve">
+    <value>Data saved successfully.</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Failed to save data. Please try again.</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginFailed" xml:space="preserve">
+    <value>Invalid username or password.</value>
+  </data>
+  <data name="sector" xml:space="preserve">
+    <value>Sector</value>
+    <comment>Sector</comment>
+  </data>
+  <data name="state_ut_name" xml:space="preserve">
+    <value>State/U.T. Name </value>
+    <comment>State/U.T. Name </comment>
+  </data>
+  <data name="district_name" xml:space="preserve">
+    <value>District Name</value>
+  </data>
+  <data name="sub_dist" xml:space="preserve">
+    <value>Name of Sub-District/Tehsil/Town </value>
+    <comment>Name of Sub-District/Tehsil/Town </comment>
+  </data>
+  <data name="vill_name" xml:space="preserve">
+    <value>Village Name</value>
+    <comment>vill</comment>
+  </data>
+  <data name="invst_unit_no" xml:space="preserve">
+    <value>Investigator Unit Number/Block Number: </value>
+    <comment>Investigator Unit Number/Block Number: </comment>
+  </data>
+  <data name="sample_su_no" xml:space="preserve">
+    <value>Sample Sub-Unit (SU) Number: </value>
+    <comment>Sample Sub-Unit (SU) Number: </comment>
+  </data>
+  <data name="round_number" xml:space="preserve">
+    <value>Round Number:</value>
+    <comment>Round Number:</comment>
+  </data>
+  <data name="sch_no" xml:space="preserve">
+    <value>Schedule number: </value>
+    <comment>Schedule number: </comment>
+  </data>
+  <data name="serial_no_sample_fsu" xml:space="preserve">
+    <value>Serial Number of Sample FSU: </value>
+  </data>
+  <data name="sample_sub_div_no" xml:space="preserve">
+    <value>Sample Sub-Division Number: </value>
+  </data>
+  <data name="sample_hh_number" xml:space="preserve">
+    <value>Sample Household Number: </value>
+    <comment>Sample Household Number: </comment>
+  </data>
+  <data name="survey_code" xml:space="preserve">
+    <value>Survey Code </value>
+    <comment>Survey Code </comment>
+  </data>
+  <data name="reason_for_substitution" xml:space="preserve">
+    <value>Reason for substitution/casualty of the original household </value>
+  </data>
+  <data name="block_3_heading" xml:space="preserve">
+    <value>Block 3: Demographic particulars of the household </value>
+    <comment>Block 3: Demographic particulars of the household </comment>
+  </data>
+  <data name="srl_no" xml:space="preserve">
+    <value>srl. no. </value>
+    <comment>srl. no. </comment>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value>name </value>
+    <comment>name </comment>
+  </data>
+  <data name="gender" xml:space="preserve">
+    <value>gender (code)</value>
+    <comment>gender (code)</comment>
+  </data>
+  <data name="age" xml:space="preserve">
+    <value>age (years)</value>
+    <comment>age (years)</comment>
+  </data>
+  <data name="marital_status" xml:space="preserve">
+    <value>marital status (code)</value>
+    <comment>marital (status)</comment>
+  </data>
+  <data name="highest_level" xml:space="preserve">
+    <value>highest level of completed education (code)</value>
+    <comment>highest level of completed education (code)</comment>
+  </data>
+  <data name="entry" xml:space="preserve">
+    <value>if entry in col. 4 ≥18,  whether has any driving license as on the date of survey? </value>
+    <comment>enrty</comment>
+  </data>
+  <data name="weeklystatus" xml:space="preserve">
+    <value>current weekly status  (code)</value>
+    <comment>current weekly status  </comment>
+  </data>
+  <data name="forenrty" xml:space="preserve">
+    <value>for entry≥ 6 in col. 4 and code 4 in col. 8, whether pursuing basic course through correspondence/ distance learning (yes-1, no-2) </value>
+    <comment>for entry≥ 6 in col. 4 and code 4 in col. 8, whether pursuing basic course through correspondence/ distance learning (yes-1, no-2) </comment>
+  </data>
+  <data name="for_code" xml:space="preserve">
+    <value>for code 1, 2 &amp; 3 in col. 8, whether have at least one fixed place of work outside the premises of dwelling unit at a distance of 1 km or more (yes-1, no-2) </value>
+    <comment>for code</comment>
+  </data>
+  <data name="9" xml:space="preserve">
+    <value>for code other than 9 in col. 8, whether having season ticket/pass/free pass for bus/rail as on the date of survey  (yes-1, no-2) </value>
+    <comment>for code other than 9</comment>
+  </data>
+  <data name="if" xml:space="preserve">
+    <value>if code 1 in col. 11, status of season tickets / pass for rail / bus (rail pass-1, bus pass-2, both–3) </value>
+    <comment>if code 1 in col. 11</comment>
+  </data>
+  <data name="worked" xml:space="preserve">
+    <value>whether worked from home in the current status during last 30 days (yes – 1, no – 2) </value>
+    <comment>whether worked from home in the current status during last 30 days (yes – 1, no – 2) </comment>
+  </data>
+  <data name="code" xml:space="preserve">
+    <value>If code 1 or 2 in col. 8, </value>
+    <comment>If code 1 or 2 in col. 8, </comment>
+  </data>
+  <data name="internet" xml:space="preserve">
+    <value>if 1 in col., 13, whether used internet for such work (yes- 1, no- 2) </value>
+    <comment>if 1 in col., 13, whether used internet for such work (yes- 1, no- 2) </comment>
+  </data>
+  <data name="characteristics" xml:space="preserve">
+    <value>[4] household characteristics </value>
+    <comment>[4] household characteristics </comment>
+  </data>
+  <data name="household" xml:space="preserve">
+    <value>household size </value>
+    <comment>household size </comment>
+  </data>
+  <data name="type" xml:space="preserve">
+    <value>household type (code) </value>
+    <comment>household type (code) </comment>
+  </data>
+  <data name="religion" xml:space="preserve">
+    <value>religion (code) </value>
+    <comment>religion (code) </comment>
+  </data>
+  <data name="social" xml:space="preserve">
+    <value>social group (code) </value>
+    <comment>social group (code) </comment>
+  </data>
+  <data name="vehicles" xml:space="preserve">
+    <value>whether the household possesses any of the following vehicles as on the date of survey for household use and number of such vehicles</value>
+    <comment>vehicles</comment>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>Item no.</value>
+    <comment>Item no.</comment>
+  </data>
+  <data name="vehicle" xml:space="preserve">
+    <value>type of vehicle </value>
+    <comment>type of vehicle </comment>
+  </data>
+  <data name="survey" xml:space="preserve">
+    <value>whether possesses as on the date of survey </value>
+    <comment>whether possesses as on the date of survey </comment>
+  </data>
+  <data name="possessed" xml:space="preserve">
+    <value>number possessed </value>
+    <comment>number possessed </comment>
+  </data>
+  <data name="bicycle" xml:space="preserve">
+    <value>bicycle  </value>
+    <comment>bicycle  </comment>
+  </data>
+  <data name="motorcycle" xml:space="preserve">
+    <value>motorcycle or scooter  </value>
+    <comment>motorcycle or scooter  </comment>
+  </data>
+  <data name="Rickshaw" xml:space="preserve">
+    <value>Rickshaw/tricycle </value>
+    <comment>Rickshaw/tricycle </comment>
+  </data>
+  <data name="Autorickshaw" xml:space="preserve">
+    <value>Autorickshaw/ Toto/ e-rickshaw </value>
+    <comment>Autorickshaw/ Toto/ e-rickshaw </comment>
+  </data>
+  <data name="Cars" xml:space="preserve">
+    <value>Cars</value>
+    <comment>Cars</comment>
+  </data>
+  <data name="Tractor" xml:space="preserve">
+    <value>Tractor</value>
+    <comment>Tractor</comment>
+  </data>
+  <data name="Boat" xml:space="preserve">
+    <value>Boat/ Dingi </value>
+    <comment>Boat/ Dingi </comment>
+  </data>
+  <data name="Others" xml:space="preserve">
+    <value>Others </value>
+    <comment>Others </comment>
+  </data>
+  <data name="commercial" xml:space="preserve">
+    <value>whether the household possesses any of the following vehicles as on the date of survey for commercial use and number of such vehicles</value>
+    <comment>whether the household possesses any of the following vehicles as on the date of survey for commercial use and number of such vehicles</comment>
+  </data>
+  <data name="ItemNo" xml:space="preserve">
+    <value>Item no. </value>
+    <comment>Item no. </comment>
+  </data>
+  <data name="Typeofvehicle" xml:space="preserve">
+    <value>Type of vehicle </value>
+    <comment>Type of vehicle </comment>
+  </data>
+  <data name="whether" xml:space="preserve">
+    <value>whether possesses as on the date of survey (yes-1, no-2) </value>
+    <comment>whether possesses as on the date of survey (yes-1, no-2) </comment>
+  </data>
+  <data name="bicycle1" xml:space="preserve">
+    <value>bicycle </value>
+    <comment>bicycle </comment>
+  </data>
+  <data name="scooter" xml:space="preserve">
+    <value>motorcycle or scooter </value>
+    <comment>motorcycle or scooter </comment>
+  </data>
+  <data name="Rickshawtricycle" xml:space="preserve">
+    <value>Rickshaw/tricycle </value>
+    <comment>Rickshaw/tricycle </comment>
+  </data>
+  <data name="AutorickshawTotoerickshaw" xml:space="preserve">
+    <value>Autorickshaw/ Toto/ e-rickshaw</value>
+    <comment>Autorickshaw/ Toto/ e-rickshaw</comment>
+  </data>
+  <data name="Cars1" xml:space="preserve">
+    <value>Cars</value>
+    <comment>Cars</comment>
+  </data>
+  <data name="Tractor1" xml:space="preserve">
+    <value>Tractor</value>
+    <comment>Tractor</comment>
+  </data>
+  <data name="Van" xml:space="preserve">
+    <value>Van/ minibus/ bus </value>
+    <comment>Van/ minibus/ bus </comment>
+  </data>
+  <data name="Heavy" xml:space="preserve">
+    <value>Heavy vehicles like lorry, truck etc</value>
+    <comment>Heavy vehicles like lorry, truck etc</comment>
+  </data>
+  <data name="Dingi" xml:space="preserve">
+    <value>Boat/ Dingi </value>
+    <comment>Boat/ Dingi </comment>
+  </data>
+  <data name="Others1" xml:space="preserve">
+    <value>Others</value>
+    <comment>Others</comment>
+  </data>
+  <data name="Block6_1" xml:space="preserve">
+    <value>Block 6.1: Details of trips to and from fixed workplace that are of usual nature for persons of age of 15 years and above having fixed place of work (i.e., code 1 in col. 10 of Block 3) </value>
+    <comment>Block 6.1: Details of trips to and from fixed workplace that are of usual nature for persons of age of 15 years and above having fixed place of work (i.e., code 1 in col. 10 of Block 3) </comment>
+  </data>
+  <data name="srl" xml:space="preserve">
+    <value>srl. no. of hh member (as in col. 1, block 3) </value>
+    <comment>srl. no. of hh member (as in col. 1, block 3)</comment>
+  </data>
+  <data name="origin" xml:space="preserve">
+    <value>origin to workplace </value>
+    <comment>origin to workplace </comment>
+  </data>
+  <data name="workplace" xml:space="preserve">
+    <value>workplace to destination</value>
+    <comment>workplace to destination</comment>
+  </data>
+  <data name="usual" xml:space="preserve">
+    <value>usual time of leaving for work from origin (hh:mm in 24 hrs format) </value>
+    <comment>usual time of leaving for work from origin (hh:mm in 24 hrs format)</comment>
+  </data>
+  <data name="Average" xml:space="preserve">
+    <value>Average time taken to reach workplace (in minutes)</value>
+    <comment>Average time taken to reach workplace (in minutes)</comment>
+  </data>
+  <data name="Usual1" xml:space="preserve">
+    <value>Usual duration of working (in hours)</value>
+    <comment>Usual duration of working (in hours)</comment>
+  </data>
+  <data name="whether2" xml:space="preserve">
+    <value>whether travelled to and from the fixed workplace on the travel-day prior to the date of survey (yes-1, no-2)  </value>
+    <comment>whether travelled to and from the fixed workplace on the travel-day prior to the date of survey (yes-1, no-2)  </comment>
+  </data>
+  <data name="average2" xml:space="preserve">
+    <value>average monthly cost of travel (Rs.) </value>
+    <comment>average monthly cost of travel (Rs.) </comment>
+  </data>
+  <data name="primary" xml:space="preserve">
+    <value>primary mode of transport (code)</value>
+    <comment>primary mode of transport (code)</comment>
+  </data>
+  <data name="if2" xml:space="preserve">
+    <value>if code between ‘41’ to ‘81’ excluding ‘43’ in col. 5 secondary mode of transport (code) </value>
+    <comment>if code between ‘41’ to ‘81’ excluding ‘43’ in col. 5 secondary mode of transport (code) </comment>
+  </data>
+  <data name="time" xml:space="preserve">
+    <value>usual time of leaving for destination from work (hh:mm in 24 hrs format) </value>
+    <comment>usual time of leaving for destination from work (hh:mm in 24 hrs format) </comment>
+  </data>
+  <data name="average3" xml:space="preserve">
+    <value>average time taken to reach destination (in minutes)  </value>
+    <comment>average time taken to reach destination (in minutes)</comment>
+  </data>
+  <data name="average4" xml:space="preserve">
+    <value>average monthly cost of travel (Rs.) </value>
+    <comment>average monthly cost of travel (Rs.) </comment>
+  </data>
+  <data name="primary2" xml:space="preserve">
+    <value>primary mode of transport (code) </value>
+    <comment>primary mode of transport (code) </comment>
+  </data>
+  <data name="record" xml:space="preserve">
+    <value>if code between ‘41’ to ‘81’ excluding ‘43’ in col.10, secondary mode of transport (code) [record code 09 if secondary mode of transport is not used]  </value>
+    <comment>if code between ‘41’ to ‘81’ excluding ‘43’ in col.10, secondary mode of transport (code) [record code 09 if secondary mode of transport is not used]  </comment>
+  </data>
+  <data name="Block6_2" xml:space="preserve">
+    <value>Block 6.2: Details of within-day-trips in the travel day prior to the date of survey in the travel reference period (1 travel day) to and from fixed workplace for persons of age of 15 years and above having fixed place of work (i.e., code 1 in col. 10 of Block 3 and code 1 in col. 13 of Block 6.1) </value>
+    <comment>Block 6.2: Details of within-day-trips in the travel day prior to the date of survey in the travel reference period (1 travel day) to and from fixed workplace for persons of age of 15 years and above having fixed place of work (i.e., code 1 in col. 10 of Block 3 and code 1 in col. 13 of Block 6.1) </comment>
+  </data>
+  <data name="srlno" xml:space="preserve">
+    <value>srl. no. of hh member (as in col. 1,block 3) </value>
+    <comment>srl. no. of hh member (as in col. 1,block 3) </comment>
+  </data>
+  <data name="trip" xml:space="preserve">
+    <value>trip srl. no</value>
+    <comment>trip srl. no</comment>
+  </data>
+  <data name="origin1" xml:space="preserve">
+    <value>origin  is home (yes-1, no-2) </value>
+    <comment>origin  is home (yes-1, no-2) </comment>
+  </data>
+  <data name="origin2" xml:space="preserve">
+    <value>origin  </value>
+    <comment>origin  </comment>
+  </data>
+  <data name="workplace3" xml:space="preserve">
+    <value>workplace </value>
+    <comment>workplace </comment>
+  </data>
+  <data name="whether3" xml:space="preserve">
+    <value>whether round trip performed (yes-1, no-2) </value>
+    <comment>whether round trip performed (yes-1, no-2) </comment>
+  </data>
+  <data name="ifcode" xml:space="preserve">
+    <value>if code ‘2’ in both col. 3 and col.10 whether destination is home (yes-1, no-2)  </value>
+    <comment>if code ‘2’ in both col. 3 and col.10 whether destination is home (yes-1, no-2)</comment>
+  </data>
+  <data name="destination" xml:space="preserve">
+    <value>destination</value>
+  </data>
+  <data name="distance" xml:space="preserve">
+    <value>distance from origin to workplace (kms) </value>
+    <comment>distance from origin to workplace (kms) </comment>
+  </data>
+  <data name="distance2" xml:space="preserve">
+    <value>distance from workplace to destination (kms) [for code 1 in col. 10 copy the entry in col. 15 to col. 16] </value>
+    <comment>distance from workplace to destination (kms) [for code 1 in col. 10 copy the entry in col. 15 to col. 16] </comment>
+  </data>
+  <data name="if3" xml:space="preserve">
+    <value>if code 2 in col.10 and code 2 in col.11 purpose of trip from workplace to destination (code) </value>
+    <comment>if code 2 in col.10 and code 2 in col.11 purpose of trip from workplace to destination (code) </comment>
+  </data>
+  <data name="if4" xml:space="preserve">
+    <value>if code ‘11’ in col.17 whether fixed place of work (yes-1, no-2) </value>
+    <comment>if code ‘11’ in col.17 whether fixed place of work (yes-1, no-2) </comment>
+  </data>
+  <data name="PIN1" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown) </value>
+    <comment>PIN code (give code 9, if PIN is unknown) </comment>
+  </data>
+  <data name="if5" xml:space="preserve">
+    <value>if code ‘9’ in col.  4</value>
+    <comment>if code ‘9’ in col.  4</comment>
+  </data>
+  <data name="State" xml:space="preserve">
+    <value>State/UT (code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district" xml:space="preserve">
+    <value>district (code)</value>
+    <comment>district  </comment>
+  </data>
+  <data name="PIN9" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown) </value>
+    <comment>PIN code (give code 9, if PIN is unknown) </comment>
+  </data>
+  <data name="if9" xml:space="preserve">
+    <value>if code ‘9’ in col.  7 </value>
+    <comment>if code ‘9’ in col.  7 </comment>
+  </data>
+  <data name="StateUT" xml:space="preserve">
+    <value>State/UT (code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district3" xml:space="preserve">
+    <value>district (code)</value>
+    <comment>district  </comment>
+  </data>
+  <data name="PIN6" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown) </value>
+    <comment>PIN code (give code 9, if PIN is unknown) </comment>
+  </data>
+  <data name="if12" xml:space="preserve">
+    <value>if code ‘9’ in col.  12 </value>
+    <comment>if code ‘9’ in col.  12 </comment>
+  </data>
+  <data name="State6" xml:space="preserve">
+    <value>State/UT (code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district7" xml:space="preserve">
+    <value>district (code)</value>
+    <comment>district</comment>
+  </data>
+  <data name="Block8" xml:space="preserve">
+    <value>Block 8: Details of within-day-trips in the travel-day prior to the date of survey in the travel reference period (1 travel day) by household members of age 6 years and above for any purpose excluding work and attending educational institution (as already captured in Block 6.1 to Block 7) </value>
+    <comment>Block 8: Details of within-day-trips in the travel-day prior to the date of survey in the travel reference period (1 travel day) by household members of age 6 years and above for any purpose excluding work and attending educational institution (as already captured in Block 6.1 to Block 7) </comment>
+  </data>
+  <data name="trip3" xml:space="preserve">
+    <value>trip srl. no. </value>
+    <comment>trip srl. no. </comment>
+  </data>
+  <data name="no" xml:space="preserve">
+    <value>no. of hh members in the trip </value>
+    <comment>no. of hh members in the trip </comment>
+  </data>
+  <data name="origin9" xml:space="preserve">
+    <value>origin </value>
+    <comment>origin </comment>
+  </data>
+  <data name="destination8" xml:space="preserve">
+    <value>destination </value>
+    <comment>destination </comment>
+  </data>
+  <data name="whether10" xml:space="preserve">
+    <value>whether return trip performed (yes-1, no-2) </value>
+    <comment>whether return trip performed (yes-1, no-2) </comment>
+  </data>
+  <data name="distance11" xml:space="preserve">
+    <value>distance from origin to destination (kms)</value>
+    <comment>distance from origin to destination  </comment>
+  </data>
+  <data name="hhmm" xml:space="preserve">
+    <value>time of leaving for destination from origin (hh:mm in 24 hrs format) </value>
+    <comment>(hh:mm in 24 hrs format) </comment>
+  </data>
+  <data name="average12" xml:space="preserve">
+    <value>average time taken to reach the destination (in minutes) </value>
+    <comment>average time taken to reach the destination (in minutes) </comment>
+  </data>
+  <data name="primary33" xml:space="preserve">
+    <value>primary mode of transport  (code)</value>
+    <comment>primary mode of transport  </comment>
+  </data>
+  <data name="cost77" xml:space="preserve">
+    <value>cost of travel (Rs.) </value>
+    <comment>cost of travel (Rs.) </comment>
+  </data>
+  <data name="PIN88" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown) </value>
+    <comment>PIN code (give code 9, if PIN is unknown) </comment>
+  </data>
+  <data name="if88" xml:space="preserve">
+    <value>if code ‘9’ in col. 3 </value>
+    <comment>if code ‘9’ in col. 3 </comment>
+  </data>
+  <data name="PIN55" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown) </value>
+    <comment>PIN code (give code 9, if PIN is unknown) </comment>
+  </data>
+  <data name="if99" xml:space="preserve">
+    <value>if code ‘9’ in col. 6 </value>
+    <comment>if code ‘9’ in col. 6 </comment>
+  </data>
+  <data name="StateUT3" xml:space="preserve">
+    <value>State/UT(code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district8" xml:space="preserve">
+    <value>district (code)</value>
+    <comment>district</comment>
+  </data>
+  <data name="State9" xml:space="preserve">
+    <value>State/UT (code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district89" xml:space="preserve">
+    <value>district  (code)</value>
+    <comment>district  </comment>
+  </data>
+  <data name="Block81" xml:space="preserve">
+    <value>Block 8.1: Purpose of the trip for each household member of age 6 years and above for within-day trips undertaken in the travel day prior to the date of survey (as recorded in Block 8) </value>
+    <comment>Block 8.1: Purpose of the trip for each household member of age 6 years and above for within-day trips undertaken in the travel day prior to the date of survey (as recorded in Block 8) </comment>
+  </data>
+  <data name="srl4" xml:space="preserve">
+    <value>srl. no. of trip   (as in col. 1 block 8) </value>
+    <comment> (as in col. 1 block 8) </comment>
+  </data>
+  <data name="srl8" xml:space="preserve">
+    <value>srl. no. of hh member who was in that trip (as in col. 1, block 3) </value>
+    <comment>(as in col. 1, block 3) </comment>
+  </data>
+  <data name="purpose" xml:space="preserve">
+    <value>purpose of trip (code)</value>
+    <comment>purpose of trip </comment>
+  </data>
+  <data name="Block91" xml:space="preserve">
+    <value>Block 9.1: Details of overnight trips by purpose undertaken by the household members during all the travel-days in the travel reference period (28 travel days) (to be filled for each trips in Block 9, Col. 1) </value>
+    <comment>Block 9.1: Details of overnight trips by purpose undertaken by the household members during all the travel-days in the travel reference period (28 travel days) (to be filled for each trips in Block 9, Col. 1) </comment>
+  </data>
+  <data name="Serial" xml:space="preserve">
+    <value>Serial No. of trip (as in col. 1, block 9) (auto) </value>
+    <comment>Serial No. of trip (as in col. 1, block 9) (auto) </comment>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Start date </value>
+    <comment>Start date </comment>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>End date</value>
+    <comment>End date</comment>
+  </data>
+  <data name="Multi" xml:space="preserve">
+    <value>Multi-Modal (yes-1, no-2) </value>
+    <comment>Multi-Modal (yes-1, no-2) </comment>
+  </data>
+  <data name="Primary99" xml:space="preserve">
+    <value>Primary Mode (based on distance) (code) </value>
+    <comment>Primary Mode (based on distance) (code) </comment>
+  </data>
+  <data name="Class66" xml:space="preserve">
+    <value>Class of Travel (code) (if code ‘61’ in row 5) </value>
+    <comment>Class of Travel (code) (if code ‘61’ in row 5) </comment>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total Time of Travel (hours) </value>
+    <comment>Total Time of Travel (hours) </comment>
+  </data>
+  <data name="if33" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Code99" xml:space="preserve">
+    <value>Code or Name of Airport / Railway Station </value>
+    <comment>Code or Name of Airport / Railway Station </comment>
+  </data>
+  <data name="Secondary" xml:space="preserve">
+    <value>Secondary Mode of transport (code) </value>
+    <comment>Secondary Mode of transport (code) </comment>
+  </data>
+  <data name="Block52" xml:space="preserve">
+    <value>Block 5.2: Details of within-day-trips in a travel day closest to the date of survey in the travel reference period (90 travel days) to and from educational institution for persons of age of 6 years and above who are attending basic course in-person (i.e., with code 04 in col. 8 of Block 3 and code 2 in col. 9 of Block 3 and code 1 in col. 12 of Block 5.1) </value>
+    <comment>Block 5.2: Details of within-day-trips in a travel day closest to the date of survey in the travel reference period (90 travel days) to and from educational institution for persons of age of 6 years and above who are attending basic course in-person (i.e., with code 04 in col. 8 of Block 3 and code 2 in col. 9 of Block 3 and code 1 in col. 12 of Block 5.1) </comment>
+  </data>
+  <data name="5_1_heading" xml:space="preserve">
+    <value>Block 5.1: Details of usual trips to and from educational institution (pertaining to basic course) for persons of age of 6 years and above who are attending basic course in-person (i.e., with code 4 in col. 8 of Block 3 and code 2 in col. 9 of Block 3) </value>
+    <comment>Block 5.1: Details of usual trips to and from educational institution (pertaining to basic course) for persons of age of 6 years and above who are attending basic course in-person (i.e., with code 4 in col. 8 of Block 3 and code 2 in col. 9 of Block 3) </comment>
+  </data>
+  <data name="5_1_col_1" xml:space="preserve">
+    <value>srl. no. of hh member </value>
+    <comment>srl. no. of hh member </comment>
+  </data>
+  <data name="5_1_col_2" xml:space="preserve">
+    <value>usual time of leaving for educational institution from origin </value>
+    <comment>usual time of leaving for educational institution from origin </comment>
+  </data>
+  <data name="4_1_heading" xml:space="preserve">
+    <value>[4.1] household characteristics </value>
+    <comment>[4.1] household characteristics </comment>
+  </data>
+  <data name="4_1_col_1" xml:space="preserve">
+    <value>Household’s last month consumption expenditure (in Rs.) </value>
+    <comment>Household’s last month consumption expenditure (in Rs.) </comment>
+  </data>
+  <data name="block5_head" xml:space="preserve">
+    <value>Block 5.1: Details of usual trips to and from educational institution (pertaining to basic course) for persons of age of 6 years and above who are attending basic course in-person (i.e., with code 4 in col. 8 of Block 3 and code 2 in col. 9 of Block 3) </value>
+    <comment>block5_head</comment>
+  </data>
+  <data name="block5_srl" xml:space="preserve">
+    <value>srl. no. of hh member(as in col. 1, block 3) </value>
+    <comment>block5_srl</comment>
+  </data>
+  <data name="block5_origin" xml:space="preserve">
+    <value>origin to educational institution </value>
+    <comment>origin to educational institution </comment>
+  </data>
+  <data name="block5_education" xml:space="preserve">
+    <value>educational institution to destination</value>
+    <comment>educational institution to destination</comment>
+  </data>
+  <data name="block5_usual" xml:space="preserve">
+    <value>usual time of leaving for educational institution from origin(hh:mm in 24 hrs format)</value>
+    <comment>usual time of leaving for educational institution from origin</comment>
+  </data>
+  <data name="block5_average" xml:space="preserve">
+    <value>average time taken to reach educational institution (in minutes)</value>
+    <comment>average time taken to reach educational institution (in minutes)</comment>
+  </data>
+  <data name="block5_travel" xml:space="preserve">
+    <value>average monthly cost of travel(Rs.)</value>
+    <comment>average monthly cost of travel</comment>
+  </data>
+  <data name="block5_transport" xml:space="preserve">
+    <value>primary mode of transport (code)</value>
+    <comment>primary mode of transport (code)</comment>
+  </data>
+  <data name="block5_if" xml:space="preserve">
+    <value>if code between ‘41’ to ‘81’ excluding ‘43’ in col. 5 secondary mode of transport (code)</value>
+    <comment>if code between ‘41’ to ‘81’ excluding ‘43’ in col. 5</comment>
+  </data>
+  <data name="block5_whether" xml:space="preserve">
+    <value>whether travelled to and from educational institution on at least one travel day during the travel reference period of last 90 travel days(yes-1, no-2)</value>
+    <comment>whether travelled to and from educational institution on at least one travel day during the travel reference period of last 90 travel days</comment>
+  </data>
+  <data name="block5_online" xml:space="preserve">
+    <value>online attendance at educational institution from home (number of days in last 7 days prior to the travel day)</value>
+    <comment>online attendance at educational institution from home (number of days in last 7 days prior to the travel day)</comment>
+  </data>
+  <data name="block5_leving" xml:space="preserve">
+    <value>usual time of leaving for destination from educational institution</value>
+    <comment>usual time of leaving for destination from educational institution (hh:mm in 24 hrs format)</comment>
+  </data>
+  <data name="block5_reach" xml:space="preserve">
+    <value>average time taken to reach destination (in minutes)</value>
+    <comment>average time taken to reach destination (in minutes)</comment>
+  </data>
+  <data name="block5_9" xml:space="preserve">
+    <value>average monthly cost of travel</value>
+    <comment>average monthly cost of travel</comment>
+  </data>
+  <data name="block5_10" xml:space="preserve">
+    <value>primary mode of transport (code)</value>
+    <comment>primary mode of transport (code)</comment>
+  </data>
+  <data name="block5_11" xml:space="preserve">
+    <value>if code between ‘41’ to ‘81’ excluding ‘43’ in col. 10,secondary mode of transport (code)[record code 09 if secondary mode of transport is not used]</value>
+    <comment>[record code 09 if secondary mode of transport is not used]</comment>
+  </data>
+  <data name="block_5_2_head" xml:space="preserve">
+    <value>Block 5.2: Details of within-day-trips in a travel day closest to the date of survey in the travel reference period (90 travel days) to and from educational institution for persons of age of 6 years and above who are attending basic course in-person (i.e., with code 04 in col. 8 of Block 3 and code 2 in col. 9 of Block 3 and code 1 in col. 12 of Block 5.1)</value>
+    <comment>Block 5.2: Details of within-day-trips in a travel day closest to the date of survey in the travel reference period (90 travel days) to and from educational institution for persons of age of 6 years and above who are attending basic course in-person (i.e., with code 04 in col. 8 of Block 3 and code 2 in col. 9 of Block 3 and code 1 in col. 12 of Block 5.1)</comment>
+  </data>
+  <data name="block_5_2_1" xml:space="preserve">
+    <value>srl. no. of hh member(as in col. 1,block 3)</value>
+    <comment>srl. no. of hh member</comment>
+  </data>
+  <data name="block_5_2_2" xml:space="preserve">
+    <value>trip srl. no. </value>
+    <comment>trip srl. no. </comment>
+  </data>
+  <data name="block_5_2_3" xml:space="preserve">
+    <value>origin is home (yes-1, no-2)</value>
+    <comment>origin</comment>
+  </data>
+  <data name="block_5_2_4_head" xml:space="preserve">
+    <value>origin </value>
+    <comment>origin </comment>
+  </data>
+  <data name="block_5_2_4" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown)</value>
+    <comment>PIN code</comment>
+  </data>
+  <data name="block_5_2_5_head" xml:space="preserve">
+    <value>if code ‘9’ in col.  4</value>
+    <comment>if code ‘9’ in col.  4</comment>
+  </data>
+  <data name="block_5_2_5" xml:space="preserve">
+    <value>State/UT(code)</value>
+    <comment>State/UT(code)</comment>
+  </data>
+  <data name="block_5_2_6" xml:space="preserve">
+    <value>district (code)</value>
+    <comment>(code)</comment>
+  </data>
+  <data name="block_5_2_7" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown)</value>
+    <comment>(give code 9, if PIN is unknown)</comment>
+  </data>
+  <data name="block_5_2_8_head" xml:space="preserve">
+    <value>if code ‘9’ in col.7</value>
+    <comment>if code ‘9’ in col.7</comment>
+  </data>
+  <data name="block_5_2_8" xml:space="preserve">
+    <value>State/UT(code)</value>
+    <comment>State/UT</comment>
+  </data>
+  <data name="block_5_2_9" xml:space="preserve">
+    <value>whether return trip performed (yes-1, no-2)</value>
+    <comment>whether return trip performed (yes-1, no-2)</comment>
+  </data>
+  <data name="block_5_2_10" xml:space="preserve">
+    <value>whether return trip performed (yes-1, no-2)</value>
+    <comment>whether return trip performed</comment>
+  </data>
+  <data name="block_5_2_11" xml:space="preserve">
+    <value>if code 2 in both col.3 and col.10, destination is home (yes-1, no-2)</value>
+    <comment>destination</comment>
+  </data>
+  <data name="block_5_2_7_head" xml:space="preserve">
+    <value>educational institution</value>
+    <comment>educational institution</comment>
+  </data>
+  <data name="block_5_2_12_head" xml:space="preserve">
+    <value>destination [for code 1 in col. 10 copy the entry in cols. 4 to col. 6 to cols. 12 to 14]</value>
+    <comment>destination</comment>
+  </data>
+  <data name="block_5_2_12" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown)</value>
+    <comment>PIN code</comment>
+  </data>
+  <data name="block_5_2_13_head" xml:space="preserve">
+    <value>if code ‘9’ in col.  12</value>
+    <comment>if code ‘9’ in col.  12</comment>
+  </data>
+  <data name="block_5_2_13" xml:space="preserve">
+    <value>State/UT(code)</value>
+    <comment>State/UT</comment>
+  </data>
+  <data name="block_5_2_14" xml:space="preserve">
+    <value>district (code)</value>
+    <comment>district </comment>
+  </data>
+  <data name="block_5_2_15" xml:space="preserve">
+    <value>distance from origin to educational institution(kms)</value>
+    <comment>distance from origin to educational institution</comment>
+  </data>
+  <data name="block_5_2_16" xml:space="preserve">
+    <value>distance from educational institution to destination (kms)[for code 1 in col. 10 copy the entry in col. 15 to col. 16 ]</value>
+    <comment>distance from educational institution to destination (kms)</comment>
+  </data>
+  <data name="block_5_2_17" xml:space="preserve">
+    <value>if code 2 in col.10 and code 2 in col.11, purpose of trip from educational institution to destination</value>
+    <comment>if code 2 in col.10 and code 2 in col.11, </comment>
+  </data>
+  <data name="block7_head" xml:space="preserve">
+    <value>Block 7: Details of within-day-trips in the travel day prior to the date of survey in the travel reference period (1 travel day) to non-fixed place of work for persons of age of 15 years and above* with code 1, 2 &amp; 3 in col. 8 of Block 3 </value>
+    <comment>Block 7: Details of within-day-trips in the travel day prior to the date of survey in the travel reference period (1 travel day) to non-fixed place of work for persons of age of 15 years and above* with code 1, 2 &amp; 3 in col. 8 of Block 3 </comment>
+  </data>
+  <data name="block7_1" xml:space="preserve">
+    <value>srl. no. of hh member (as in col. 1, block 3)</value>
+    <comment>srl. no. of hh member (as in col. 1, block 3)</comment>
+  </data>
+  <data name="block7_2" xml:space="preserve">
+    <value>trip srl. no. </value>
+    <comment>block7_2</comment>
+  </data>
+  <data name="block7_2_9" xml:space="preserve">
+    <value>whether return trip performed (yes-1, no-2)</value>
+    <comment>whether return trip performed (yes-1, no-2)</comment>
+  </data>
+  <data name="block7_2_10" xml:space="preserve">
+    <value>distance from origin to destination (kms)</value>
+  </data>
+  <data name="block7_2_11" xml:space="preserve">
+    <value>time of leaving for destination from origin (hh:mm in 24 hrs format)</value>
+  </data>
+  <data name="block7_2_12" xml:space="preserve">
+    <value>average time taken to reach the destination (in minutes)</value>
+  </data>
+  <data name="block7_2_13" xml:space="preserve">
+    <value>primary mode of transport (code)</value>
+  </data>
+  <data name="block7_2_14" xml:space="preserve">
+    <value>cost of trip(Rs.)</value>
+  </data>
+  <data name="block7_3" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown)</value>
+  </data>
+  <data name="block7_4_head" xml:space="preserve">
+    <value>if code ‘9’ in col. 3</value>
+  </data>
+  <data name="block7_4" xml:space="preserve">
+    <value>State/UT(code)</value>
+  </data>
+  <data name="block7_5" xml:space="preserve">
+    <value>district (code)</value>
+  </data>
+  <data name="block7_6" xml:space="preserve">
+    <value>PIN code (give code 9, if PIN is unknown)</value>
+  </data>
+  <data name="block7_7_head" xml:space="preserve">
+    <value>if code ‘9’ in col. 6</value>
+  </data>
+  <data name="block9_head" xml:space="preserve">
+    <value>Block 9: Details of overnight trips undertaken by the household members during all the travel-days in the travel reference period (28 travel days)</value>
+  </data>
+  <data name="block9_head_1" xml:space="preserve">
+    <value>no. of overnight trips performed by the household in the last 28 travel days prior to the date of survey (return trip will be counted as separate trip)</value>
+  </data>
+  <data name="block9_1" xml:space="preserve">
+    <value>trip srl. no. </value>
+  </data>
+  <data name="block9_2" xml:space="preserve">
+    <value>no. of hh members in the trip</value>
+  </data>
+  <data name="block9_3" xml:space="preserve">
+    <value>purpose of the trip </value>
+  </data>
+  <data name="block9_10" xml:space="preserve">
+    <value>whether return trip performed (yes-1, no-2</value>
+  </data>
+  <data name="2_heading" xml:space="preserve">
+    <value>[2] particulars of field operations</value>
+  </data>
+  <data name="State/UT" xml:space="preserve">
+    <value>State/UT (code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district33" xml:space="preserve">
+    <value>district  (code)</value>
+  </data>
+  <data name="State77" xml:space="preserve">
+    <value>State/UT (code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district66" xml:space="preserve">
+    <value>district (code)</value>
+  </data>
+  <data name="State44" xml:space="preserve">
+    <value>State/UT (code)</value>
+    <comment>State/UT </comment>
+  </data>
+  <data name="district9" xml:space="preserve">
+    <value>district (code)</value>
+    <comment>district</comment>
+  </data>
+  <data name="Block10" xml:space="preserve">
+    <value>[10] remarks by investigator (SE/ JSO) </value>
+    <comment>[10] remarks by investigator (SE/ JSO) </comment>
+  </data>
+  <data name="Block11" xml:space="preserve">
+    <value>[11] comments by supervisory officer(s) </value>
+    <comment>[11] comments by supervisory officer(s) </comment>
+  </data>
+  <data name="enuname" xml:space="preserve">
+    <value>name (block letters)</value>
+    <comment>name (block letters)</comment>
+  </data>
+  <data name="surveyinspection" xml:space="preserve">
+    <value> survey/ inspection</value>
+    <comment> survey/ inspection</comment>
+  </data>
+  <data name="inminutes" xml:space="preserve">
+    <value>total time taken to canvass the schedule by the team of enumerator (SE/JSO) (in minutes)</value>
+    <comment>total time taken to canvass the schedule by the team of enumerator (SE/JSO) (in minutes)</comment>
+  </data>
+  <data name="number" xml:space="preserve">
+    <value>number of enumerator (SE/JSO) in the team who canvassed the schedule </value>
+    <comment>number of enumerator (SE/JSO) in the team who canvassed the schedule </comment>
+  </data>
+  <data name="whether23" xml:space="preserve">
+    <value>Whether any remark has been entered by SE/JSO/SS/SSO In block 10/11 (yes -1, no -2)</value>
+    <comment>Whether any remark has been entered by SE/JSO/SS/SSO </comment>
+  </data>
+  <data name="Whether24" xml:space="preserve">
+    <value>Whether any remark has been entered by SE/JSO/SS/SSO Elsewhere in the schedule (yes -1, no -2)</value>
+    <comment>Whether any remark has been entered by SE/JSO/SS/SSO Elsewhere in the schedule (yes -1, no -2)</comment>
+  </data>
+  <data name="name6" xml:space="preserve">
+    <value>name of informant: </value>
+    <comment>name of informant: </comment>
+  </data>
+  <data name="Mobile6" xml:space="preserve">
+    <value>Mobile number of informant/any other household member who can be contacted </value>
+    <comment>Mobile number of informant/any other household member who can be contacted </comment>
+  </data>
+  <data name="Landline" xml:space="preserve">
+    <value>Landline number of the household, if any (Start with STD code) </value>
+    <comment>Landline number of the household, if any (Start with STD code) </comment>
+  </data>
+  <data name="Response" xml:space="preserve">
+    <value>Response code of the informant as assessed by SE/JSO </value>
+    <comment>Response code of the informant as assessed by SE/JSO </comment>
+  </data>
+  <data name="SupervisorName" xml:space="preserve">
+    <value>Supervisor Name</value>
+    <comment>Supervisor Name</comment>
+  </data>
+</root>

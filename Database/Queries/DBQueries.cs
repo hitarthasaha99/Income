@@ -1,5 +1,7 @@
 ﻿using Blazored.Toast.Services;
 using Income.Common;
+using Income.Database.Models.Common;
+using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
 using System;
 using System.Collections.Generic;
@@ -238,32 +240,8 @@ namespace Income.Database.Queries
             }
         }
 
-        //public async Task<Tbl_Sch_0_0_Block_6?> FetchBlock6Data()
-        //{
-        //    try
-        //    {
-        //        var block_0_data = await FetchBlock1();
-        //        Tbl_Sch_0_0_Block_6? data = new();
-        //        data.id = Guid.NewGuid();
-        //        data.schedule_name = "NHTS25";
-        //        data.sss = "all(9)";
-        //        var block_5_reponse = await FetchSCH0Block5Data();
-        //        data.population = (block_5_reponse?.Where(x => x.is_household == true).Sum(x => x.Block_5A_5));
-        //        int Data = GetEducationFilteredSubstitution(block_5_reponse);
-        //        data.listed_hhd = block_5_reponse.Count(x => x.is_household == true);
-        //        data.selected_hhd = block_5_reponse.Where(l => l.is_initially_selected_travel == true).Count();
-        //        data.originally_selected_hhd = block_5_reponse.Where(x => x.is_initially_selected_travel == true && x.substitution_count_travel == 0 && x.status_travel != "CASUALTY").Count();
-        //        data.number_of_hhd_surveyed_substituted = Data;
-        //        data.total = (data?.originally_selected_hhd ?? 0) + (data?.number_of_hhd_surveyed_substituted ?? 0);
-        //        data.cauality = (data?.selected_hhd ?? 0) - (data?.total ?? 0);
-        //        return data;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return null;
-        //    }
-        //}
-        
+
+
         public async Task<int?> SaveBlock1(Tbl_Sch_0_0_Block_0_1 tbl_Sch_0_0_Block_0_1)
         {
             try
@@ -538,7 +516,7 @@ namespace Income.Database.Queries
                     {
                         // Update each household in the database
                         tran.Execute("UPDATE Tbl_Sch_0_0_Block_7 SET Stratum = ?, SSS = ?, a = ?, b = ? WHERE id = ?",
-             item.Stratum,item.SSS, item.a, item.b, item.id);
+             item.Stratum, item.SSS, item.a, item.b, item.id);
                     }
                 });
 
@@ -628,6 +606,29 @@ namespace Income.Database.Queries
                             .ToListAsync();
         }
 
+        public async Task<int> GetCurrentHHDStatus(int fsuID, int hhd_id)
+        {
+            try
+            {
+                var hhd = await _database.Table<Tbl_Sch_0_0_Block_7>()
+                    .Where(x => x.fsu_id == fsuID && x.Block_7_3 == hhd_id)
+                    .FirstOrDefaultAsync();
+                if (hhd != null)
+                {
+                    return hhd.hhdStatus ?? 0;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+            finally
+            {
+
+            }
+        }
+
         //Mark casualty
         public async Task<int> MarkCasualty(int casualtyHouseholdId)
         {
@@ -655,7 +656,7 @@ namespace Income.Database.Queries
         }
 
 
-        public async Task<List<Tbl_Sch_0_0_Block_7>> GetSelectedBlock5List(int Fsu_id)
+        public async Task<List<Tbl_Sch_0_0_Block_7>> GetSelectedBlock7List(int Fsu_id)
         {
             try
             {
@@ -735,5 +736,340 @@ namespace Income.Database.Queries
             return await _database.UpdateAllAsync(rows);
         }
 
+        public async Task<List<Tbl_Comments>> GetItemsAsync(string block)
+        {
+            try
+            {
+                var response = await _database.QueryAsync<Tbl_Comments>("SELECT * FROM Tbl_Comments WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND survey_id = ? AND block = ? AND (parent_comment_id IS NULL OR parent_comment_id == ?)", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, SessionStorage.surveyId, block, Guid.Empty.ToString());
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Tbl_Comments> GetItemsAsyncById(Tbl_Comments data)
+        {
+            try
+            {
+                var response = await _database.QueryAsync<Tbl_Comments>("SELECT * FROM Tbl_Comments WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND survey_id = ? AND block = ? AND id = ?", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, SessionStorage.surveyId, data.block, data.id);
+                if (response != null && response.Count > 0)
+                {
+                    return response.FirstOrDefault();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<int> SaveBlockTbl_Comments(Tbl_Comments Comments)
+        {
+            try
+            {
+                int status = 0;
+                var check_existance = await _database.Table<Tbl_Comments>().Where(x => x.id == Comments.id).ToListAsync();
+                if (check_existance != null && check_existance.Count > 0)
+                {
+                    status = await _database.UpdateAsync(Comments);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(Comments);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+
+        public async Task<int> DeleteComments(Tbl_Comments Comments)
+        {
+            try
+            {
+                var data = await _database.DeleteAsync(Comments);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        //HIS BLOCK 1
+        public async Task<int?> Save_SCH_HIS_Block1(Tbl_Block_1 tbl_block_1)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_1>().Where(x => x.id == tbl_block_1.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_1);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_1);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While saving SCH 0 Block 1: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<Tbl_Block_1?> Fetch_SCH_HIS_Block1(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_1>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While saving Block 1: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteHISBlock1(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_1>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting household: " + ex.Message);
+                return 0;
+            }
+        }
+
+        //HIS Block 3
+        public async Task<List<Tbl_Block_3>> Fetch_SCH_HIS_Block3(int hhd_id, int tenant_id = 1)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_3>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && x.tenant_id == tenant_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_3>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving Block 3: {ex.Message}");
+                return new List<Tbl_Block_3>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block3(Tbl_Block_3 tbl_block_3)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_3>().Where(x => x.id == tbl_block_3.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_3);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_3);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 3: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteHISBlock3(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_3>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting household member: " + ex.Message);
+                return 0;
+            }
+        }
+
+        //HIS Block 4
+        public async Task<Tbl_Block_4?> Fetch_SCH_HIS_Block4(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_4>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 4: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<List<Tbl_Block_4_Q5>> Fetch_SCH_HIS_Block4_NICList()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_4_Q5>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 4 NICLIST: {ex.Message}");
+                return new List<Tbl_Block_4_Q5>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_4>().Where(x => x.id == tbl_block_4.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_4);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_4);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 4: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block4_NICList(Tbl_Block_4_Q5 obj)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(obj);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(obj);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 4: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteBlock4_NICList(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                        return deleted;
+                    }
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting item " + ex.Message);
+                return 0;
+            }
+        }
     }
 }

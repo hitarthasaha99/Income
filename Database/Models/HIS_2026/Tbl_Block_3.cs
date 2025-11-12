@@ -1,4 +1,6 @@
-﻿using SQLite;
+﻿using Income.Common;
+using Income.Database.Models.Common;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,15 +11,16 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_3
+    public class Tbl_Block_3 : Tbl_Base
     {
         [PrimaryKey]
         public Guid id { get; set; }
+        public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
         //s.no.
         public int? serial_no { get; set; }
         //name of member
-        [Required(ErrorMessage = "Name is required")]
-        [RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "Name must only contain letters and spaces")]
+        //[Required(ErrorMessage = "Name is required")]
+        //[RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "Name must only contain letters and spaces")]
         public string? item_2 { get; set; }
         //relation to head(code)
         public int? item_3 { get; set; }

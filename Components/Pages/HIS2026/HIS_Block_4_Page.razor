@@ -1,0 +1,827 @@
+﻿@page "/dashboard/his/block_4"
+@using Blazored.FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+
+<div class="pb-5">
+
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                         survey_time="@survey_time" />
+
+    <div class="card-style2 p-2">
+        <div class="w-100 card-header d-flex justify-content-between">
+            <p class="fs-5 m-0"><span class="text-primary me-2">[4]</span>Household Characteristics</p>
+            <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-outline-primary" @onclick="@(() => Comment())"><i class="bi bi-chat-left-text me-2"></i>Comment</NavLink>
+        </div>
+        <div class="card-container mt-2">
+            <div class="row card-body">
+                <!--4.1-->
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">1</span>Household Size
+                    </label>
+                    <input type="text" class="form-control" placeholder="" value="@block_4?.item_1" disabled>
+                </div>
+                <!--4.2-->
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">2</span>Social Group
+                    </label>
+                    <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_2">
+                        <option value="">Select</option>
+                        @if (commonList.LOOKUP_CONST_CASTE != null && commonList.LOOKUP_CONST_CASTE.Count > 0)
+                        {
+                            @foreach (var item in commonList.LOOKUP_CONST_CASTE)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <!--4.3-->
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">3</span>Religion
+                    </label>
+                    <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_3">
+                        <option value="">Select</option>
+                        @if (commonList.LOOKUP_CONST_RELIGION != null && commonList.LOOKUP_CONST_RELIGION.Count > 0)
+                        {
+                            @foreach (var item in commonList.LOOKUP_CONST_RELIGION)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Divider -->
+                <div class="col-12">
+                    <hr class="border border-primary border-2 opacity-50 my-3" />
+                </div>
+
+                <!--4.4-->
+                <div class="mb-4 col-12">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">4</span>
+                        Agricultural activities carried out by one or more household members in last 365 days
+                    </label>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px;">S. No.</th>
+                                    <th class="text-start">Description of Activity</th>
+                                    <th style="width: 80px;">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Block_4_Constants.Q4_4_AgriculturalActivities)
+                                {
+                                    <tr>
+                                        <td>@item.id</td>
+                                        <td class="text-start">@item.title</td>
+                                        <td>
+                                            <input type="checkbox"
+                                                   class="form-check-input is_sso"
+                                                   checked="@SelectedActivities.Contains(item.id)"
+                                                   @onchange="e => ToggleSelection(item.id, e)"
+                                                   disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <!-- Divider -->
+                <div class="col-12">
+                    <hr class="border border-primary border-2 opacity-50 my-3" />
+                </div>
+
+                <!--4.5-->
+                <div class="mb-4 col-12">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">5</span>
+                        Details of non-agricultural economic activity(ies) carried out by one or more household members in last 365 days
+                    </label>
+
+                    <!-- Add Button -->
+                    <div class="d-flex justify-content-end mb-2">
+                        <button class="btn btn-sm btn-outline-primary is_sso"
+                                @onclick="@(() => HandleModal("ADD"))"
+                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                            <i class="bi bi-plus-lg me-1"></i>Add Activity
+                        </button>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px;">S. No.</th>
+                                    <th class="text-start">Description of Activity</th>
+                                    <th style="width: 100px;">NIC Code (2 digit)</th>
+                                    <th style="width: 130px;">Seasonal? (Yes – 1 / No – 2)</th>
+                                    <th style="width: 180px;">Months of Operation (last 365 days)</th>
+                                    <th style="width: 150px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (NICfields != null && NICfields.Count > 0)
+                                {
+                                    foreach (var item in NICfields)
+                                    {
+                                        if (item.is_deleted != true)
+                                        {
+                                            <tr>
+                                                <td>@item.SerialNumber</td>
+                                                <td>@item.ActivityName</td>
+                                                <td>@item.NicCode</td>
+                                                <td>@item.BusinessSeasonal</td>
+                                                <td>@item.NumberOfMonths</td>
+
+                                                <td class="d-flex align-items-center">
+                                                    <button class="btn btn-sm btn-primary me-2"
+                                                            @onclick="@(() => HandleModal("UPDATE", item))">
+                                                        <i class="bi bi-pencil-square me-1"></i>Edit
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger"
+                                                            @onclick="@(() => HandleDelete(item.id))">
+                                                        <i class="bi bi-trash me-1"></i>Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="col-12">
+                    <hr class="border border-primary border-2 opacity-50 my-3" />
+                </div>
+
+                <!--4.6-->
+                <div class="mb-4 col-md-3">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">6</span>
+                        Own any land (within the country)?
+                    </label>
+                    <select class="form-select w-100 is_sso"
+                            @bind="block_4.item_6"
+                            disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                        <option value="">Select</option>
+                        @if (commonList.LOOKUP_CONST_YES_NO != null)
+                        {
+                            @foreach (var item in commonList.LOOKUP_CONST_YES_NO)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!--4.7-->
+                <div class="mb-4 col-md-3">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">7</span>
+                        If yes, total area (in acre)
+                    </label>
+                    <input type="text"
+                           class="form-control is_sso"
+                           placeholder="e.g. 2.345"
+                           disabled="@(block_4?.item_6 != 1 || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12))" />
+                </div>
+
+                <!--4.8-->
+                <div class="mb-4 col-md-6" hidden="@(block_4?.item_6 != 1)">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">8</span>
+                        Use of land owned <small class="text-muted">(multiple select)</small>
+                    </label>
+                    <div class="d-flex flex-wrap">
+                        @if (Block_4_Constants.Q4_8 != null && Block_4_Constants.Q4_8.Count > 0)
+                        {
+                            @foreach (var item in Block_4_Constants.Q4_8)
+                            {
+                                <div class="form-check me-3 mb-1">
+                                    <input class="form-check-input is_sso"
+                                           type="checkbox"
+                                           value="@item.id"
+                                           checked="@SelectedLandUses.Contains(item.id)"
+                                           @onchange="() => ToggleLandUse(item.id)"
+                                           disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                    <label class="form-check-label">@item.title</label>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="col-12">
+                    <hr class="border border-primary border-2 opacity-50 my-3" />
+                </div>
+
+                <!-- Row 1: Q4.9 and Q4.10 -->
+                <div class="row">
+                    <!--4.9-->
+                    <div class="mb-4 col-md-4">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">9</span>
+                            Does the household perform any economic activity on any building/structure during last 365 days?
+                        </label>
+                        <select class="form-select w-100 is_sso"
+                                @bind="block_4.item_9"
+                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                            <option value="">Select</option>
+                            @foreach (var item in Block_4_Constants.Q4_9)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!--4.10-->
+                    <div class="mb-4 col-md-8" hidden="@(block_4?.item_9 != 1 && block_4?.item_9 != 2 && block_4?.item_9 != 3)">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">10</span>
+                            If codes 1–3 in Q4.9, type of economic activity(ies) (multiple select)
+                        </label>
+                        <div class="d-flex flex-wrap">
+                            @foreach (var item in Block_4_Constants.Q4_10)
+                            {
+                                <div class="form-check me-3 mb-1">
+                                    <input class="form-check-input is_sso"
+                                           type="checkbox"
+                                           value="@item.id"
+                                           checked="@SelectedEconomicActivities.Contains(item.id)"
+                                           @onchange="() => ToggleEconomicActivity(item.id)"
+                                           disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                    <label class="form-check-label">@item.title</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Q4.11 – Q4.14 -->
+                <div class="row">
+                    <!--4.11-->
+                    <div class="mb-4 col-md-3">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">11</span>Type of dwelling unit
+                        </label>
+                        <select class="form-select w-100 is_sso"
+                                @bind="block_4.item_11"
+                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                            <option value="">Select</option>
+                            @foreach (var item in Block_4_Constants.Q4_11)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!--4.12-->
+                    <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0)">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">12</span>Carpet area (sq. ft.)
+                        </label>
+                        <input type="number"
+                               class="form-control is_sso"
+                               placeholder="e.g. 600"
+                               @bind="block_4.item_12"
+                               disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                    </div>
+
+                    <!--4.13-->
+                    <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0)">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">13</span>Type of structure
+                        </label>
+                        <select class="form-select w-100 is_sso"
+                                @bind="block_4.item_13"
+                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                            <option value="">Select</option>
+                            @foreach (var item in Block_4_Constants.Q4_13)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!--4.14-->
+                    <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0)">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">14</span>Number of rooms
+                        </label>
+                        <input type="number"
+                               class="form-control is_sso"
+                               placeholder="e.g. 3"
+                               @bind="block_4.item_14"
+                               disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                    </div>
+                </div>
+
+                <!-- Row 3: Q4.15 – Q4.17 -->
+                <div class="row">
+                    <!--4.15-->
+                    <div class="mb-4 col-md-4">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">15</span>Outstanding loan from financial institution?
+                        </label>
+                        <select class="form-select w-100 is_sso"
+                                @bind="block_4.item_15"
+                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                            <option value="">Select</option>
+                            @foreach (var item in Block_4_Constants.Q4_15)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!--4.16-->
+                    <div class="mb-4 col-md-4" hidden="@(block_4.item_15 != 1)">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">16</span>Purpose of the loan
+                        </label>
+                        <select class="form-select w-100 is_sso"
+                                @bind="block_4.item_16"
+                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                            <option value="">Select</option>
+                            @foreach (var item in Block_4_Constants.Q4_16)
+                            {
+                                <option value="@item.id">@item.title</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!--4.17-->
+                    <div class="mb-4 col-md-4" hidden="@(block_4.item_15 != 1)">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">17</span>
+                            Amount paid towards repayment of loan in the last month (₹)
+                        </label>
+                        <input type="number"
+                               class="form-control is_sso"
+                               placeholder="e.g. 2500"
+                               @bind="block_4.item_17"
+                               disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                    </div>
+                </div>
+                
+                <div class="mb-3 col-12">
+                    <label class="form-label fw-bold">Remarks</label>
+                    <textarea type="text" class="form-control is_sso" disabled="@(SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO))" placeholder="" cols="4"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
+            <HeaderTemplate>
+            <h5 class="modal-title">Details of non-agricultural economic activity(ies) carried out by one or more household member in last 365 days</h5>
+            </HeaderTemplate>
+            <BodyTemplate>
+                @if (fields != null)
+                {
+                    <EditForm EditContext="@editContext" OnValidSubmit="@SaveQ5">
+                    <FluentValidationValidator />
+                    <div class="container-fluid">
+                        <div class="row g-3">
+                            <!-- Serial Number -->
+                            <div class="col-md-6">
+                                <label class="form-label">1. Serial Number of Row</label>
+                                <input class="form-control form-control-sm" value="@fields.SerialNumber" disabled />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Activity Description -->
+                            <div class="col-md-12">
+                                <label class="form-label">2. Description of activity</label>
+                                <input class="form-control form-control-sm" value="@fields.ActivityName" disabled />
+                                <ValidationMessage For="@(() => fields.ActivityName)" />
+                            </div>
+                        </div>
+
+                        <div class="row g-6">
+                            <!-- NIC code -->
+                            <div class="col-md-12">
+                                <label class="form-label">3. NIC code (2-digit)</label>
+                                <select class="form-select w-100 is_sso"
+                                        value="@fields.NicCode"
+                                        @onchange="OnNicCodeChanged"
+                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    <option value="">Select</option>
+                                    @foreach (var item in Block_4_Constants.NIC_CODES)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => fields.NicCode)" />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- 4 & 5 in the same row -->
+                            <!-- Whether the business is seasonal -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    4. Whether the business is seasonal (yes-1 / no-2)
+                                </label>
+                                <select class="form-select w-100 is_sso"
+                                        @bind="fields.BusinessSeasonal"
+                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    <option value="">Select</option>
+                                    @foreach (var item in Block_4_Constants.Q4_15)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => fields.BusinessSeasonal)" />
+                            </div>
+
+                            <!-- No of months -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    5. Number of months of operation during last 365 days
+                                </label>
+                                <input class="form-control form-control-sm"
+                                       @bind="fields.NumberOfMonths"
+                                       disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                <ValidationMessage For="@(() => fields.NumberOfMonths)" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-outline-primary"
+                                    @onclick="@(() => HandleModal("CLOSE"))">
+                                Close
+                            </button>
+                        </div>
+                    </EditForm>
+                }
+            </BodyTemplate>
+
+
+        </Modal>
+
+    <Modal @ref="comment_vm.AddModal" Title="Comment" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.Large">
+        <BodyTemplate>
+            <div class="mb-3">
+                <div class="row mb-2">
+                    @* <div class="col-6"> *@
+                    @*     <label class="form-label fw-bold"> *@
+                    @*         <span class="badge bg-primary me-2">1</span>Select row *@
+                    @*     </label> *@
+                    @*     <select class="form-select w-100" @bind="comment_vm.Serialnumber"> *@
+                    @*         <option value="">Select</option> *@
+                    @*         @if (RowList != null) *@
+                    @*         { *@
+                    @*             @foreach (var item in RowList) *@
+                    @*             { *@
+                    @*                 <option value="@item">@item</option> *@
+                    @*             } *@
+                    @*         } *@
+                    @*     </select> *@
+                    @* </div> *@
+                    <div class="col-6">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">2</span>Question Number
+                        </label>
+                        <select class="form-select w-100" @bind="comment_vm.item_no">
+                            <option value="">Select</option>
+                            @if (Question != null)
+                            {
+                                @foreach (var item in Question)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <label for="commentBox" class="form-label">Enter your comment</label>
+                <textarea class="form-control" id="commentBox" rows="4" @bind="comment_vm.comment"></textarea>
+                @if (comment_vm.ShowError)
+                {
+                    <div class="text-danger mt-2">Comment cannot be empty.</div>
+                }
+            </div>
+
+            @if (CommentList != null)
+            {
+                <div style="overflow: auto;">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="min-width: 200px;">Comment</th>
+                                <th style="min-width: 100px;">Item Number</th>
+                                <th style="min-width: 50px;">Member Srl.</th>
+                                <th style="min-width: 20px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in CommentList)
+                            {
+                                <tr>
+                                    <td>@item.comment</td>
+                                    <td class="text-center">@item.item_no</td>
+                                    <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-success btn-sm me-2" @onclick="@(() => Update(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="bi bi-check-circle me-1"></i>Edit</button>
+                                        <button class="btn btn-danger btn-sm" @onclick="@(() => Delete(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="bi bi-x-circle me-1"></i>Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </BodyTemplate>
+        <FooterTemplate>
+            <Button class="btn btn-primary me-2" @onclick="@(() => Submit())"><i class="bi bi-check-circle me-1"></i>Submit</Button>
+            <Button class="btn btn-outline-primary" @onclick="@(() => Close())"><i class="bi bi-x-circle me-1"></i>Close</Button>
+        </FooterTemplate>
+    </Modal>
+
+
+    <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        <div class="d-flex">
+            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                <NavLink class="btn btn-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+            }
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+        </div>
+    </div>
+
+
+</div>
+
+@code {
+    EditContext editContext = default!;
+    Modal AddModal = default;
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    private CommonConfig commonConfig = new CommonConfig();
+    CommonList commonList = new();
+    DateTime survey_time = DateTime.Now;
+    DBQueries dQ = new();
+    CommonQueries commonQueries = new();
+    Tbl_Comments comments = new();
+    List<string> Question = new List<string>();
+    List<Tbl_Comments> CommentList = new List<Tbl_Comments>();
+    List<int> RowList = [];
+    Tbl_Block_1 block_1 = new();
+    bool is_remarks_visible = false;
+    int hhdStatus = 0;
+    CommonFunction function = new();
+    // This variable should be set based on Q4.6 selection
+    private int selectedLandOwnership = 1;
+    private List<int> selectedLandUse = new();
+    Tbl_Block_3 block_3 = new();
+    Tbl_Block_4 block_4 = new();
+    Tbl_Block_4_Q5? fields = new();
+    List<Tbl_Block_4_Q5> NICfields = new();
+    private Block_4_Q5_Validator validator = new();
+    // Stores selected land use codes
+    private List<int> SelectedLandUses = new();
+    private List<int> SelectedActivities = new();
+
+    private int selectedEconomicActivity;
+    private List<int> SelectedEconomicActivities = new();
+    private int selectedDwellingType;
+    private double? CarpetArea;
+    private int selectedStructureType;
+    private int? NumberOfRooms;
+    private int selectedLoanStatus;
+    private int selectedLoanPurpose;
+    private double? LoanRepaymentAmount;
+
+    private void ToggleSelection(int id, ChangeEventArgs e)
+    {
+        bool isChecked = (bool)e.Value;
+        if (isChecked)
+        {
+            if (!SelectedActivities.Contains(id))
+                SelectedActivities.Add(id);
+        }
+        else
+        {
+            SelectedActivities.Remove(id);
+        }
+
+        // Update model string
+        block_4.item_4 = string.Join(",", SelectedActivities);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(fields);
+        hhdStatus = await dQ.GetCurrentHHDStatus(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+        for (var i = 1; i <= 17; i++)
+        {
+            Question.Add(i.ToString());
+        }
+
+        CommentList = await comment_vm.LoadData("1");
+        comment_vm.NotifyUiUpdate += StateHasChanged;
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+        }
+
+        var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
+        int block_4_1 = block3?.Count ?? 0;
+        if(block_4 == null || block_4?.id == Guid.NewGuid())
+        {
+            block_4 = new();
+            block_4.id = Guid.NewGuid();
+            block_4.fsu_id = SessionStorage.SelectedFSUId;
+            block_4.hhd_id = SessionStorage.selected_hhd_id;
+            block_4.item_1 = block_4_1;
+        }
+        else
+        {
+            NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+        }
+
+        StateHasChanged();
+    }
+
+    async Task SaveQ5()
+    {
+        var obj = fields;
+        await dQ.Save_SCH_HIS_Block4_NICList(obj);
+        NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+        await AddModal.HideAsync();
+        StateHasChanged();
+    }
+
+    async Task HandleModal(string action = "", Tbl_Block_4_Q5? data = null)
+    {
+        try
+        {
+            if (action == "ADD")
+            {
+                fields = new Tbl_Block_4_Q5();
+                fields.id = Guid.NewGuid();
+                fields.hhd_id = SessionStorage.selected_hhd_id;
+                fields.Block4Id = block_4.id;
+                fields.SerialNumber = NICfields.Count == 0 ? 1 : NICfields.Count + 1;
+                editContext = new EditContext(fields);
+                await AddModal.ShowAsync();
+            }
+            else if (action == "UPDATE")
+            {
+                fields = data;
+                await AddModal.ShowAsync();
+            }
+            else if (action == "CLOSE")
+            {
+                await AddModal.HideAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
+    private void OnNicCodeChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int selectedNic))
+        {
+            fields.NicCode = selectedNic;
+
+            // find matching title from the lookup list
+            var nicItem = Block_4_Constants.NIC_CODES
+                .FirstOrDefault(x => x.id == selectedNic);
+
+            fields.ActivityName = nicItem?.title;
+        }
+        else
+        {
+            fields.NicCode = null;
+            fields.ActivityName = null;
+        }
+    }
+
+
+    private void ToggleEconomicActivity(int id)
+    {
+        if (SelectedEconomicActivities.Contains(id))
+            SelectedEconomicActivities.Remove(id);
+        else
+            SelectedEconomicActivities.Add(id);
+    }
+
+
+
+    private void ToggleLandUse(int id)
+    {
+        if (SelectedLandUses.Contains(id))
+            SelectedLandUses.Remove(id);
+        else
+            SelectedLandUses.Add(id);
+    }
+
+    async void Comment()
+    {
+        await comment_vm.AddModal.ShowAsync();
+    }
+    async Task Submit()
+    {
+        var data = await comment_vm.Save("1");
+        // Reset fields
+        comment_vm.Serialnumber = null;
+        comment_vm.item_no = string.Empty;
+        comment_vm.comment = string.Empty;
+        if (data > 0)
+        {
+            CommentList = await comment_vm.LoadData("1");
+        }
+        StateHasChanged();
+    }
+
+    async void Close()
+    {
+        await comment_vm.AddModal.HideAsync();
+
+    }
+    async void Delete(Tbl_Comments data)
+    {
+        var DeleteResult = await comment_vm.Delete(data);
+        if (DeleteResult > 0)
+        {
+            CommentList = await comment_vm.LoadData("1");
+        }
+        StateHasChanged();
+
+    }
+
+     void Update(Tbl_Comments data)
+    {
+        comment_vm.LoadDataById(data);
+    }
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    async Task HandleDelete(Guid id)
+    {
+        int item_index = NICfields.FindIndex(l => l.id == id);
+        if (item_index != -1)
+        {
+            NICfields[item_index].is_deleted = true;
+            await dQ.DeleteBlock4_NICList(id);
+            toastService.ShowSuccess("Row deleted successfully!");
+            NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+        }
+        else
+        {
+            toastService.ShowError("Not Able to delete row, Please try again!");
+        }
+    }
+
+    public async Task HandleSubmit(bool is_go_next)
+    {
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            
+        }
+
+       
+    }
+}
