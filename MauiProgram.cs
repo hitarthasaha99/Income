@@ -33,6 +33,7 @@ namespace Income
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_1_VM>();
             builder.Services.AddSingleton<Viewmodels.SCH0_0.Block_2_2_VM>();
             builder.Services.AddSingleton<Comment_vm>();
+            builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             builder.Services.AddValidatorsFromAssemblyContaining<Block7Validator>();
             builder.Services.AddValidatorsFromAssemblyContaining<Block_4_Validator>();
             builder.Services.AddValidatorsFromAssemblyContaining<Block_4_Q5_Validator>();

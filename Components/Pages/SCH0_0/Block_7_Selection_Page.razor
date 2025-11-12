@@ -412,7 +412,7 @@
                 foreach (var item in result.Households)
                 {
                     item.isInitialySelected = item.isSelected;
-                    item.SSS = item.SelectedPostedSSS.GetValueOrDefault();
+                    //item.SSS = item.SelectedPostedSSS.GetValueOrDefault();
                     await SCH_0_0_Queries.Update_SCH0_0_Block_7(item);
                     SessionStorage.selection_done = true;
                 }

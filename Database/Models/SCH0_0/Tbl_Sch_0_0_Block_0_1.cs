@@ -28,7 +28,7 @@ namespace Income.Database.Models.SCH0_0
         [MaxLength(50)]
         public string? Block_0_6 { get; set; }
         //sample sub unit number
-        public int? block_0_7 { get; set; }
+        public int? Block_0_7 { get; set; }
         //serial number of sample FSU
         [MaxLength(50)]
         public string? Block_1_1 { get; set; }
@@ -63,25 +63,13 @@ namespace Income.Database.Models.SCH0_0
 
         //population of village or number of household of UFS block
         public int? Block_1_13 { get; set; }
-        //FOD sub-region
-        //[MaxLength(50)]
-        //public string Block_1_12 { get; set; }
-        //frame code
-        //public int Block_1_13 { get; set; }
-        //frame population / households
         //approx.present population
-        [Required(ErrorMessage = "Approx. present population is required")]
         public int? Block_1_14 { get; set; }
 
         //total number of hgs/sbs formed (D)
         public int? Block_1_15 { get; set; }
 
-        ////approx population of SU
-        //public int? Block_1_16 { get; set; }
-        ////No of sub division of SU to be formed D1
-        //public int? Block_1_17 { get; set; }
         //survey code
-        [Required(ErrorMessage = "Survey code is required")]
         public int? Block_1_16 { get; set; }
         //reason for substitution of original sample (code) (for codes 4 – 7 in item 17)
         public int? Block_1_17 { get; set; }
@@ -89,6 +77,23 @@ namespace Income.Database.Models.SCH0_0
         //remarks
         [MaxLength(2000)]
         public string? remarks { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_2_1 { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_2_2 { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_3 { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_4 { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_5 { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_6 { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_7 { get; set; } = null;
+        [MaxLength(2000)]
+        public string? remarks_block_7_selection { get; set; } = null;
+
         //Block 4 items
         public int? sample_su_number { get; set; }
         public int? approximate_population_su { get; set; }

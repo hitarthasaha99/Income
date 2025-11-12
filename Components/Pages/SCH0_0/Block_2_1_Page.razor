@@ -138,6 +138,19 @@
         StateHasChanged();
     }
 
+    private void ResetSerialNumbers()
+    {
+        int serial = 1;
+        foreach (var item in block_2_1_VM.tbl_Sch_0_0_block_2_1)
+        {
+            if (item.is_deleted != true)
+            {
+                item.serial_no = serial;
+                serial++;
+            }
+        }
+    }
+
     async Task HandleSubmit(string action)
     {
         //Rules -
