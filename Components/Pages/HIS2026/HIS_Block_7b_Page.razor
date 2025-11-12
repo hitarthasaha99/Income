@@ -1,0 +1,310 @@
+﻿@page "/dashboard/his/block_7b"
+@using Blazored.FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+
+<div class="pb-5">
+    <CommonContentHeader/>
+    @* 7.6 *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header d-flex align-items-center justify-content-between bg-transparent">
+            <h5 class="card-title m-0">
+                <span class="text-primary me-1">Block 7b:</span>
+                Income from Self-employment - Allied Activity in Agriculture
+            </h5>
+        </div>
+        <div class="row px-3 py-2">
+            <div class="col">
+                For Agricultural Establishment engaged in allied activities (including animal husbandry, poultry, bee keeping, forestry, fishery related activities <span class="text-primary">(entry against any one or more of S. no 3-6 of Q4.4 of Block 4 is selected)</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th colspan="3" class="bg-transparent text-start">
+                                <label class="form-label fs-6 fw-bold m-0">
+                                    <span class="badge bg-primary me-1">Q7.6</span>
+                                    Receipts from sale during last 365 days
+                                </label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width: 50px;">S. No.</th>
+                            <th>Description </th>
+                            <th>Sale value (in Rs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Fish & fishery products</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Dairy products (e.g. milk and related raw products)</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Poultry products (e.g. egg)</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Cattle and other livestock animals (e.g. cattle, buffalo, goat, sheep, pig, poultry, duck etc.) </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Wool and other related products</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Skin, hide, bones, etc. of cattle and other livestock animals </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Honey, beeswax etc. </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Silk and its products</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Lac, gum, resin etc. </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>Timber, bamboo, wood etc.</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>Others</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td class="fw-bold">Total (sum of entries at s. nos. 01-11)  </td>
+                            <td>
+                                <input class="form-control form-control-sm" disabled />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @* 7.7 *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th colspan="3" class="bg-transparent text-start">
+                                <label class="form-label fs-6 fw-bold m-0">
+                                    <span class="badge bg-primary me-1">Q7.7</span>
+                                    Expenses incurred by the household during last 365 days on inputs used for production activity
+                                </label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width: 50px;">S. No.</th>
+                            <th>Input description</th>
+                            <th>Total expenditure incurred (in Rs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Animal / fish seeds</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Manures and fertilizers</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Animal feeds and fodder </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Veterinary services (for breeding, health services) and animal medicines charges</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Diesel, electricity and other fuel </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Labour cost (human & animal)</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Cost of hiring, repair and maintenance of machinery and equipment.</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Lease rent for land </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Interest on loan availed for production activity and cost of insurance / premium for livestock, equipment and other inputs used for farming activity </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>Transportation & packaging charges </td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>Others</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td class="fw-bold">Total (sum of entries at s. nos. 01-11)  </td>
+                            <td>
+                                <input class="form-control form-control-sm" disabled />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @* 7.8 and 7b.9 *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center mb-0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="badge bg-primary me-1">Q7.8</div>
+                            </td>
+                            <td>Imputed value of any of the items (as mentioned in Q7.6) consumed by the household or bartered to other households out of total production during last 365 days (in whole no. of Rs.)</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="badge bg-primary me-1">Q7b.9</div>
+                            </td>
+                            <td>Gross Profit / Loss before tax realized by the establishment during last 365 days (in whole no. of Rs.)</td>
+                            <td>
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" />
+                                @* <div class="text-warning"></div> *@
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @* Remarks Card *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header">
+            <h5 class="card-title m-0">
+                Remarks
+            </h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control w-100" rows="4"></textarea>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-primary me-2"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-outline-primary">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+}
