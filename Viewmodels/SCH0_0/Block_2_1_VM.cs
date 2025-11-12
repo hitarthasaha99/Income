@@ -55,6 +55,7 @@ namespace Income.Viewmodels.SCH0_0
                     return;
                 }
                 tbl_Sch_0_0_block_2_1[index].is_deleted = true;
+                ResetSerialNumbers();
                 OnPropertyChanged(nameof(tbl_Sch_0_0_block_2_1));
                 CalculateTotalPopulationPercentage();
                 return;
@@ -63,6 +64,19 @@ namespace Income.Viewmodels.SCH0_0
             {
                 ToastService.ShowError("Error While Deleting Row!");
                 return;
+            }
+        }
+
+        private void ResetSerialNumbers()
+        {
+            int serial = 1;
+            foreach (var item in tbl_Sch_0_0_block_2_1)
+            {
+                if (item.is_deleted != true)
+                {
+                    item.serial_no = serial;
+                    serial++;
+                }
             }
         }
 
