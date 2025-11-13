@@ -5,31 +5,38 @@
 @inject IToastService toastService
 @inject IJSRuntime jsRuntime
 
-<div  class="login-bg">
-    <div class="login-card">
-        <div class="d-flex align-center justify-content-between">
-            <img src="images/nsso75logo.svg" class="login-logo" />
-            <span class="badge text-bg-light-primary rounded-pill mb-2 h-25">@version_code</span>
-       </div>
-        <div class="mb-3">
-            <span class="badge text-bg-light-primary rounded-pill">National Household Income Survey</span>
+<section class="h-100 login-bg">
+	<div class="container h-100">
+		<div class="row justify-content-sm-center h-100">
+			<div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-10">
+                <div class="card shadow-lg rounded-5">
+                    <div class="card-body p-5">
+                        <div class="d-flex align-items-center border-bottom border-2 mb-3 pb-3 flex-wrap">
+                            <img src="images/nsso75logo.svg" alt="logo" width="130">
+                            <div class="custom-badge ms-auto">
+                                <div class="badge badge-outline badge-warning text-uppercase semibold">@version_code</div>
+                            </div>
+                        </div>
+                        <p class="text-primary text-uppercase semibold">National Household Income Survey</p>
+                        <h1 class="fs-4 card-title fw-bold mb-1">Welcome Back !</h1>
+                        <p class="mb-3 fs-4">Login</p>
+                        <div class="mb-3">
+                            <label class="form-label">User ID *</label>
+                            <input type="text" class="form-control" placeholder="Enter User ID" @bind="UserDetails.username">
+                            <ValidationComponent @ref="user_id" field_name="User ID" field_value="@UserDetails.username" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password *</label>
+                            <PasswordInput @bind-Value="@UserDetails.password" class="m-0" placeholder="Enter Password" Style="margin: 0 !important" />
+                            <ValidationComponent @ref="pass" field_name="Password" field_value="@UserDetails.password" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
+                        </div>
+                        <button class="btn btn-primary w-100 mt-2" disabled="@is_busy" onclick="@Login">@(is_busy ? "Please Wait..." : "Login")<Spinner style="margin-left: 10px;" Type="SpinnerType.Grow" Size="SpinnerSize.Small" Visible="@is_busy" /></button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <h2>Welcome</h2>
-        <h5>Login</h5>
-        <div class="mb-3">
-            <label class="form-label">User ID *</label>
-            <input type="text" class="form-control" placeholder="Enter User ID" @bind="UserDetails.username">
-            <ValidationComponent @ref="user_id" field_name="User ID" field_value="@UserDetails.username" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Password *</label>
-            <PasswordInput @bind-Value="@UserDetails.password" class="m-0" placeholder="Enter Password" Style="margin: 0 !important"/>
-            <ValidationComponent @ref="pass" field_name="Password" field_value="@UserDetails.password" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
-        </div>
-        <button class="btn btn-primary w-100" disabled="@is_busy" onclick="@Login">@(is_busy ? "Please Wait..." : "Login")<Spinner style="margin-left: 10px;" Type="SpinnerType.Grow" Size="SpinnerSize.Small" Visible="@is_busy"/></button>
     </div>
-</div>
-
+</section>
 <ConfirmDialog @ref="data_deletion_ref" />
 
 @code {
