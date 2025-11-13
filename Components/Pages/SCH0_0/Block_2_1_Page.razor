@@ -9,11 +9,13 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 
+
 <div class="my-2">
     <CommonContentHeader 
     SelectedFsuId="@SelectedFsuId"
     survey_time="@survey_time" 
     />
+    <ConfirmDialog @ref="dialog" />
     <div class="card card-style2">
         <div class="card-header  d-flex align-items-center">
             <h3 class="card-title m-0 d-flex align-items-center">
@@ -93,6 +95,8 @@
     DateTime survey_time = DateTime.Now;
     CommonQueries commonQueries = new();
     DBQueries sch_0_0_Queries = new();
+    private ConfirmDialog dialog = default!;
+
     private List<string> validationErrors = new();
     private string validationMessage = "";
     bool is_sel;
@@ -112,8 +116,13 @@
             if (double.TryParse(input, out var value))
             {
                 row.percentage = value;
-                block_2_1_VM.HandleChange(e, row.id, "percentage");
             }
+            else
+            {
+                row.percentage = null;
+            }
+            block_2_1_VM.HandleChange(e, row.id, "percentage");
+
         }
         else
         {
@@ -134,7 +143,7 @@
             block_code = CommonEnum.sch_0_0_block_2_1.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
-        await block_2_1_VM.Init();
+        await block_2_1_VM.Init(toastService);
         StateHasChanged();
     }
 
@@ -158,13 +167,14 @@
         //2. No hamlet name can be empty
         //3. Hamlet percentage cannot be zero/empty
         //4. Allow till one decimal place
+        //5. Hamlets must have % of population within 5% variation. If not - show a warning
 
         if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2");
             return;
         }
-        
+
         var result = block_2_1_VM.Validate();
         if (result != null && result.Errors.Count > 0)
         {
@@ -176,20 +186,61 @@
             return;
         }
 
-        var response = await sch_0_0_Queries.SaveSCH0Block2_1(block_2_1_VM.tbl_Sch_0_0_block_2_1);
-        if (response == null || response == 0)
+
+        bool withinRange = block_2_1_VM.ArePercentagesWithinRange(block_2_1_VM.tbl_Sch_0_0_block_2_1);
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+
+        if(!withinRange)
         {
-            toastService.ShowError("Error in saving data");
-            return;
+            var confirmation = await dialog.ShowAsync(
+            title: "Alert",
+            message1: "All the hamlets need to have more or less equal population. Do you want to continue?",
+            confirmDialogOptions: options);
+            if (confirmation)
+            {
+                // proceed
+                await Save(action);
+            }
+            else
+            {
+            }
         }
-        if (action == "SAVE")
+        else
         {
-            return;
+            await Save(action);
         }
-        else if (action == "NEXT")
+
+    }
+
+    async Task Save(string action)
+    {
+        try
         {
-            NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2");
+            var response = await sch_0_0_Queries.SaveSCH0Block2_1(block_2_1_VM.tbl_Sch_0_0_block_2_1);
+            if (response == null || response == 0)
+            {
+                toastService.ShowError("Error in saving data");
+                return;
+            }
+            if (action == "SAVE")
+            {
+                return;
+            }
+            else if (action == "NEXT")
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2");
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+        finally
+        {
+            
         }
     }
+
+    
 }
 

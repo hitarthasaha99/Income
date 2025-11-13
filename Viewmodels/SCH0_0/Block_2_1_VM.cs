@@ -1,4 +1,5 @@
 ﻿using BlazorBootstrap;
+using Blazored.Toast.Services;
 using BootstrapBlazor.Components;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Income.Common;
@@ -13,14 +14,16 @@ namespace Income.Viewmodels.SCH0_0
     public partial class Block_2_1_VM : BaseVM
     {
         public event Action NotifyUiUpdate;
-        Blazored.Toast.Services.ToastService ToastService = new Blazored.Toast.Services.ToastService();
+        private IToastService _toastService;
+
         DBQueries SCH_0_0_Queries = new();
         public List<Tbl_Sch_0_0_Block_2_1> tbl_Sch_0_0_block_2_1 { get; set; } = new();
         [ObservableProperty]
         private double total_population_percentage = 0;
         DBQueries dB = new();
         CommonQueries cQ = new();
-        public Block_2_1_VM()
+        int D = 0;
+        public Block_2_1_VM(IToastService toastService)
         {
             // block_4_1 = new Tbl_Sch_0_0_Block_4_1();
         }
@@ -30,9 +33,9 @@ namespace Income.Viewmodels.SCH0_0
             var newRow = new Tbl_Sch_0_0_Block_2_1
             {
                 id = Guid.NewGuid(),
-                serial_no = tbl_Sch_0_0_block_2_1.Count + 1,
+                serial_no = tbl_Sch_0_0_block_2_1.Count(x => x.is_deleted == false) + 1,
                 hamlet_name = string.Empty,
-                percentage = 0,
+                percentage = null,
                 is_deleted = false
             };
             tbl_Sch_0_0_block_2_1.Add(newRow);
@@ -45,13 +48,18 @@ namespace Income.Viewmodels.SCH0_0
             {
                 if (row == null)
                 {
-                    ToastService.ShowError("Row Not Found!");
+                    _toastService.ShowError("Row Not Found!");
                     return;
                 }
                 int index = tbl_Sch_0_0_block_2_1.FindIndex(k => k.id == row.id);
                 if (index == -1)
                 {
-                    ToastService.ShowError("Row Not Found!");
+                    _toastService.ShowError("Row Not Found!");
+                    return;
+                }
+                if (row.serial_no <= D)
+                {
+                    _toastService.ShowError("Cannot delete pre-listed entries");
                     return;
                 }
                 tbl_Sch_0_0_block_2_1[index].is_deleted = true;
@@ -62,7 +70,7 @@ namespace Income.Viewmodels.SCH0_0
             }
             catch (Exception ex)
             {
-                ToastService.ShowError("Error While Deleting Row!");
+                _toastService.ShowError("Error While Deleting Row!");
                 return;
             }
         }
@@ -128,13 +136,18 @@ namespace Income.Viewmodels.SCH0_0
             }
         }
 
-        public async Task Init()
+        public async Task Init(IToastService toastService)
         {
+            _toastService = toastService;
             tbl_Sch_0_0_block_2_1 = await SCH_0_0_Queries.FetchSCH0Block2_1Data();
             tbl_Sch_0_0_block_2_1 = tbl_Sch_0_0_block_2_1.OrderBy(k => k.serial_no).ToList();
+            var fsu_response = await cQ.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+            if (fsu_response != null)
+            {
+                D = fsu_response.totalsu.GetValueOrDefault();
+            }    
             if (tbl_Sch_0_0_block_2_1 == null || tbl_Sch_0_0_block_2_1.Count == 0)
             {
-                var fsu_response = await cQ.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
                 if (fsu_response != null)
                 {
                     for (int i =1; i <= fsu_response.totalsu; i++)
@@ -178,6 +191,22 @@ namespace Income.Viewmodels.SCH0_0
             }
 
             return result;
+        }
+
+        public bool ArePercentagesWithinRange(IEnumerable<Tbl_Sch_0_0_Block_2_1> items, double allowedDifference = 5.0)
+        {
+            var validPercentages = items
+                .Where(x => x.percentage.HasValue)
+                .Select(x => x.percentage.Value)
+                .ToList();
+
+            if (validPercentages.Count <= 1)
+                return true; // Only one or none — trivially within range
+
+            double min = validPercentages.Min();
+            double max = validPercentages.Max();
+
+            return (max - min) <= allowedDifference;
         }
 
     }

@@ -23,7 +23,7 @@
         </div>
         @if (editContext != null)
         {
-            <EditForm EditContext="@editContext" OnValidSubmit="@(() => HandleSubmit(is_go_next))">
+            <EditForm EditContext="@editContext">
                 <FluentValidationValidator @ref="validator" />
                 <div class="row px-4">
                     <div class="mb-3 col-4">
@@ -115,7 +115,7 @@
 
                         <div class="mb-3 col-4">
                             <label class="form-label fw-bold"><span class="badge bg-primary me-2">14</span>Approx. present population</label>
-                            <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(SessionStorage.hamlet_selection_done || !block_0_1_VM.EnablePopulation)" />
+                            <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" readonly="@(SessionStorage.hamlet_selection_done || !block_0_1_VM.EnablePopulation)" />
                             <ValidationMessage For="@(() => block_0_1_VM.block_0_1.Block_1_14)" />
                             @if (IsBlock_1_14_ErrorMessageVisible)
                             {
@@ -176,11 +176,11 @@
                 <div class="d-flex justify-content-between mb-3">
                     <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
                     <div class="d-flex">
-                        <button type="submit" class="btn btn-primary me-2"
+                        <button type="button" class="btn btn-primary me-2" @onclick="() => HandleSubmit(false)"
                                 hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))">
                             <i class="bi bi-floppy-fill me-1"></i>Save
                         </button>
-                        <button type="submit" class="btn btn-outline-primary" @onclick="() => is_go_next = true">
+                        <button type="button" class="btn btn-outline-primary" @onclick="() => HandleSubmit(true)">
                             Next<i class="bi bi-chevron-right ms-1"></i>
                         </button>
                     </div>
@@ -263,23 +263,71 @@
 
     async Task HandleSubmit(bool goNext)
     {
-        is_go_next = goNext;
-
-        toastService.ShowSuccess("Data successfully validated and saved.");
-        await block_0_1_VM.Save();
-        //CheckAndSaveBlock1_14_Warning
-        //Navigation rules -
-        // 1. For rural FSU (Block_1_5 = 1) and D > 1 (Block_1_15) -> Hamlet formation page (2.1)
-        // 2. For rural FSU (Block_1_5 = 1) and D = 1 (Block_1_15) -> Block 4 (No hamlets formed)
-        // 3. For urban FSU (Block_1_5 = 2), irrespective of D (Block_1_15) -> Hamlet selection page (2.2)
-        // 4. If Block_1_16 (Survey code) != 1 or 4, go to Field Operation
-        if (is_go_next)
+        try
         {
-            if (block_0_1_VM.block_0_1.Block_1_16 == 1 || block_0_1_VM.block_0_1.Block_1_16 == 4)
+            // Trigger full form validation
+            var isValid = editContext?.Validate() ?? false;
+
+            if(goNext && SessionStorage.hamlet_selection_done)
             {
-                if (block_0_1_VM.block_0_1.Block_1_5 == 1)
+                Navigate();
+                return;
+            }
+
+            if (!isValid)
+            {
+                toastService.ShowError("Please correct the highlighted validation errors before proceeding.");
+                return;
+            }
+
+            // Save data
+            var saveSuccess = await block_0_1_VM.Save();
+
+            if (!saveSuccess)
+            {
+                toastService.ShowError("Failed to save data. Please try again.");
+                return;
+            }
+
+            // Show confirmation after successful validation + save
+            toastService.ShowSuccess("Data successfully validated and saved.");
+
+            // If this is only a Save (not Next), stop here
+            if (!goNext)
+            {
+                return;
+            }
+            Navigate();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in HandleSubmit: {ex.Message}");
+            toastService.ShowError("An unexpected error occurred while processing the form.");
+        }
+    }
+
+    private void Navigate()
+    {
+        try
+        {
+            // ✅ Navigation logic after successful save
+            var model = block_0_1_VM.block_0_1;
+            var sector = model.Block_1_5 ?? 0;
+            var totalSU = model.Block_1_15 ?? 0;
+            var surveyCode = model.Block_1_16 ?? 0;
+
+            // Navigation rules:
+            // 1. For rural FSU (sector = 1) and D > 1 (Block_1_15) → Hamlet formation page (2.1)
+            // 2. For rural FSU (sector = 1) and D = 1 (Block_1_15) → Block 4 (no hamlets formed)
+            // 3. For urban FSU (sector = 2) → Hamlet selection page (2.2)
+            // 4. If survey code != 1 or 4 → Field operation (FSU cannot be surveyed)
+
+            if (surveyCode == 1 || surveyCode == 4)
+            {
+                if (sector == 1)
                 {
-                    if (block_0_1_VM.block_0_1.Block_1_15 > 1)
+                    if (totalSU > 1)
                         NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_1");
                     else
                         NavigationManager.NavigateTo("/dashboard/sch0.0/block_4");
@@ -294,5 +342,10 @@
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
             }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in Navigate: " + ex.Message);
+        }
     }
+
 }

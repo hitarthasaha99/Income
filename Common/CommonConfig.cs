@@ -35,17 +35,17 @@ namespace Income.Common
         //Test
         public static readonly string PostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APITourism/";
         public static readonly string CommonAPIPostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APICommon/api/SURVEY/";
-        public static readonly string APITOURISMURL = "https://stagesurvey1.esigma.mospi.gov.in/APITourism/api/SURVEY/v1/";
+        public static readonly string APIIncomeURL = "https://stagesurvey1.esigma.mospi.gov.in/APITourism/api/SURVEY/v1/";
 
         //Staging
-        //public static readonly string PostAddress = "http://115.124.119.108:83/ApiTourism/";
+        //public static readonly string PostAddress = "http://115.124.119.108:83/ApiIncome/";
         //public static readonly string CommonAPIPostAddress = "http://115.124.119.108:83/ApiCommon/api/SURVEY/";
-        //public static readonly string APITOURISMURL = "http://115.124.119.108:83/ApiTourism/api/SURVEY/v1/";
+        //public static readonly string APIIncomeURL = "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/";
 
         //PROD
-        //public static readonly string PostAddress = "https://esigma.mospi.gov.in/apITOURISM/";
+        //public static readonly string PostAddress = "https://esigma.mospi.gov.in/apIIncome/";
         //public static readonly string CommonAPIPostAddress = "https://esigma.mospi.gov.in/apIcOMMON/";
-        //public static readonly string APITOURISMURL = "https://esigma.mospi.gov.in/apITOURISM/api/SURVEY/v1/";
+        //public static readonly string APIIncomeURL = "https://esigma.mospi.gov.in/apIIncome/api/SURVEY/v1/";
 
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Income.Common
         public const string LOGIN_API = "v1/UtilityMaster/AuthenticateSurveyUserAsync";
         public const string FETCH_FSU_LIST_BY_USER_ID = "TourismSurvey/GetFsuListByUserId?v_userid=";
         public const string FETCH_SAVED_RESPONSES_BY_FSU_ID = "GetTourismResponseDetailsByFsuIdAndStatus/";
-        public const string SAVE_SUBMITTED_RESPONSE = "UpSertTourismResponseAsync";
+        public const string SAVE_SUBMITTED_RESPONSE = "UpSertIncomeResponseAsync";
         public static string CHECK_CAPI_VERSION = $"v1/UtilityMaster/GetCapiApkVersionByUsername?survey_id={SessionStorage.surveyId}";
         public static string LOGOUT_API = "v1/UtilityMaster/LogoutUser?v_userName=";
 

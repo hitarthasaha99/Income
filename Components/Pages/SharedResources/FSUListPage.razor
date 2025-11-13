@@ -458,7 +458,7 @@
                 preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
                 
                 List<Tbl_Sch_0_0_Block_7> OldFsuWiseBlockData = new List<Tbl_Sch_0_0_Block_7>();
-                var response = await commonService.GetAsync(CommonConfig.APITOURISMURL,$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
+                var response = await commonService.GetAsync(CommonConfig.APIIncomeURL,$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
                 if (response != null)
                 {
                     var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(response);
@@ -478,7 +478,7 @@
 
                             await UpdateFsu(item.fsuHouses);
                             var houses = item.fsuHouses != null && item.fsuHouses.Count > 0 ? item.fsuHouses.Count : 0;
-                            var saved_response = await commonService.GetAsync(CommonConfig.APITOURISMURL,$"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{item.fsu_id}/{item.lookupFsuSubmitStatus}");
+                            var saved_response = await commonService.GetAsync(CommonConfig.APIIncomeURL,$"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{item.fsu_id}/{item.lookupFsuSubmitStatus}");
                             if (!string.IsNullOrEmpty(saved_response))
                             {
                                 // saved_fsu_responses.Add(saved_response);

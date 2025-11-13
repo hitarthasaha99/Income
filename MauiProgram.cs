@@ -42,7 +42,7 @@ namespace Income
             //builder.Services.AddFluentValidationAutoValidation();
 
             builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
-
+            builder.Services.AddBlazoredToast();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

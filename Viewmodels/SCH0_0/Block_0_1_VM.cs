@@ -147,6 +147,7 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_12_Selected = Block_0_1_Constants.FrameCode.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_12))?.title ?? string.Empty;
                 Block_1_16_Selected = block_0_1.Block_1_16 != null ? CommonList.LOOKUP_CONST_SURVEY_CODE.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_16))?.title : string.Empty;
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
+                ShowItem17 = block_0_1.Block_1_17 != null;
                 EnablePopulation = !SessionStorage.selection_done;
             }
             OnPropertyChanged(nameof(block_0_1));
@@ -155,7 +156,7 @@ namespace Income.Viewmodels.SCH0_0
         private bool _isAdd = true;
         private Guid _id;
 
-        public async Task Save()
+        public async Task<bool> Save()
         {
             try
             {
@@ -178,11 +179,12 @@ namespace Income.Viewmodels.SCH0_0
                 {
                     await SCH_0_0_Queries.SaveBlock1(block_0_1);
                 }
+                return true;
 
             }
             catch (Exception ex)
             {
-
+                return false;
             }
         }
 
