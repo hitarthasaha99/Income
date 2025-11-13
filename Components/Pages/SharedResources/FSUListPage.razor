@@ -7,18 +7,23 @@
 @inject NetworkService commonService;
 @inject IToastService toastService
 
-<div>
-    <div class="d-flex justify-content-between my-2">
-        <p style="font-weight: bold; font-size: 25px;">FSU List</p>
-        <div>
-            <NavLink class="btn btn-outline-dark" onclick="@Fsu_Load">Reload <i class="bi bi-arrow-clockwise"></i></NavLink>
+<div class="main-content">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h3 class="page-heading m-0">FSU List</h3>
+        <div class="ms-auto">
+            <NavLink class="btn btn-sm btn-dark text-white d-flex align-items-center" onclick="@Fsu_Load">Reload <i class="fi fi-rr-rotate-right ms-2"></i></NavLink>
         </div>
     </div>
-    <div class="card-style2 w-100">
-        <div class="table-card w-100">
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">FSU List</h3>
+            <div class="card-tools">
+                <input class="form-control" placeholder="Search..." @oninput="@((ChangeEventArgs e) => HandleSearch(e))" />
+            </div>
+        </div>
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <input class="form-control w-25 float-end my-2 me-2" placeholder="Search..." @oninput="@((ChangeEventArgs e) => HandleSearch(e))" />
-                <table class="table mb-0">
+                <table class="table table-bordered table-striped mb-0 custom-badge">
                     <thead class="text-uppercase">
                         <tr>
                             @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
@@ -41,15 +46,15 @@
                                 <tr>
                                     @if(SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
                                     {
-                                        <td><input class="form-check-input" type="checkbox" style="width: 20px; height: 20px" onchange="@((ChangeEventArgs args) => _handleCheckbox(args, item))" checked="@((selected_guid.Contains(item.fsu_id) ? true : false))" /></td>
+                                        <td><input class="form-check-input" type="checkbox" onchange="@((ChangeEventArgs args) => _handleCheckbox(args, item))" checked="@((selected_guid.Contains(item.fsu_id) ? true : false))" /></td>
                                     }
                                     <td>@item.subrnd</td>
                                     <td>@item.fsu_id</td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <i style="font-size: 20px;" class="bi bi-geo-alt-fill text-danger"></i>
-                                            <div class="ms-2" style="font-size: 12px;">
-                                                <p class="m-0"><span class="text-secondary fst-italic">Village/ Town - @item.fsuname</span></p>
+                                            <div class="ms-2 text-secondary">
+                                                <p class="m-0 fst-italic">Village/ Town - <span class="text-primary">@item.fsuname</span></p>
                                                 <div class="d-flex">
                                                     <p class="m-0"><span class="text-secondary fst-italic">IV Unit</span> - <span class="text-primary">@item.iv_unit</span></p>
                                                     <p class="ms-3 mb-0"><span class="text-secondary fst-italic">Block</span> - <span class="text-primary">@item.block</span></p>
@@ -59,12 +64,12 @@
                                     </td>
                                     <td>@item.framepop</td>
                                     <td>
-                                        <span class="badge rounded-pill bg-warning text-dark" style="font-size: 15px;">-</span>
+                                        <div class="badge badge-warning">-</div>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
-                                            <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-outline-primary">HIS26</NavLink>
+                                            <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
 @*                                             <NavLink @onclick="@(() => HandleRefresh(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
  *@                                        </div>
                                     </td>

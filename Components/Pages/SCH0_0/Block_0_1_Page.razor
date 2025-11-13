@@ -10,16 +10,16 @@
 @using System.Linq.Expressions
 @inject IToastService toastService
 
-<div class="my-2">
+<div class="main-content">
     <CommonContentHeader 
         SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time"
     />
 
     
-    <div class="card-style2 my-4">
-        <div class="w-100 pb-3 ps-4 pt-3 mb-3" style="border-bottom: 1.5px solid black;">
-            <p class="fs-5 m-0"><span class="text-primary me-2">[0]</span>Descriptive identification of sample FSU</p>
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title"><span class="text-Primary fw-bolder me-2">[0]</span>Descriptive identification of sample FSU</h3>
         </div>
         @if (editContext != null)
         {
