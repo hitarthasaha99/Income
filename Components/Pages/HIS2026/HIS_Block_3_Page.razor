@@ -3,23 +3,25 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @using FluentValidation
+@using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Microsoft.AspNetCore.Components.Forms
-@inject IJSRuntime JSRuntime
-
-
 <div class="my-2">
+    <!-- Header component showing selected FSU and survey time -->
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+
     <div class="card card-style2">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">Block 3: demographic and other particulars of household members </span>
             </h3>
+            <!-- Button to open modal to add new household member -->
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal"><i class="bi bi-plus"></i>Add</button>
         </div>
 
         <div class="card-body p-0">
             <div class="table-responsive">
+                <!-- Table displaying household members -->
                 <table class="table table-bordered table-striped mb-0 text-center">
                     <thead>
                         <tr>
@@ -79,6 +81,7 @@
                     </tbody>
                 </table>
 
+                <!-- Remarks textarea -->
                 <div class="mb-3 px-2">
                     <label for="remarksTextarea" class="form-label">Remarks</label>
                     <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
@@ -87,6 +90,7 @@
         </div>
     </div>
 
+    <!-- Navigation buttons -->
     <div class="d-flex justify-content-between mb-3">
         <NavLink class="btn btn-outline-primary" href="/back">
             <i class="bi bi-chevron-left me-1"></i>
@@ -107,14 +111,13 @@
         </div>
     </div>
 
-    <!-- Modal Popuop From block -->
+    <!-- Modal Popup for Adding a new member -->
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true"
          data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <EditForm Model="@newMember" OnValidSubmit="HandleSaveClicked">
+                <EditForm Model="@newMember" OnValidSubmit="HandleAddMember">
                     <DataAnnotationsValidator />
-                    <ValidationSummary />
 
                     <div class="modal-header">
                         <h5 class="modal-title" id="addModalLabel">Add Item</h5>
@@ -123,24 +126,32 @@
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="row">
+                                <!-- Sl no input (readonly) -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">1.</span> Sl no.
                                     </label>
                                     <input type="text" class="form-control form-control-sm" value="@(block3Members.Count + 1)" disabled />
                                 </div>
+
+                                <!-- Name of Member input -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">2.</span> Name of Member
                                     </label>
-                                    <InputText id="nameInput" class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" />
-                                    <div></div>
+                                    <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" @oninput="ClearNameError" />
+                                    @if (!string.IsNullOrEmpty(nameError))
+                                    {
+                                        <small class="text-danger">@nameError</small>
+                                    }
                                 </div>
+
+                                <!-- Relation to head select -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">3.</span> Relation to head (code)
                                     </label>
-                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_3">
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_3" @oninput="ClearRelationError">
                                         <option value="">-Select-</option>
                                         <option value="1">self-1</option>
                                         <option value="2">spouse of head-2</option>
@@ -152,41 +163,84 @@
                                         <option value="8">brother/sister/brother-in-law/sister-in-law/other relatives-8</option>
                                         <option value="9">servants/employees/other non-relatives-9 </option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(relationError))
+                                    {
+                                        <small class="text-danger">@relationError</small>
+                                    }
                                 </div>
+
+                                <!-- Gender select -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">4.</span> Gender (code)
                                     </label>
-                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.gender">
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.gender" @oninput="genderClear">
                                         <option value="">-Select-</option>
                                         <option value="1">male-1</option>
                                         <option value="2">female-2</option>
                                         <option value="3">transgender-3</option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(genderError))
+                                    {
+                                        <small class="text-danger">@genderError</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(genderWarning))
+                                    {
+                                        <div class="text-success" role="alert">@genderWarning</div>
+                                    }
+
                                 </div>
+
+
+                                <!-- Age input -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">5.</span> Age(years)
                                     </label>
-                                    <InputNumber id="ageInput" class="form-control form-control-sm" @bind-Value="newMember.age" />
+                                    <InputNumber class="form-control form-control-sm" @bind-Value="newMember.age" @oninput="ageClear" />
+                                    @if (!string.IsNullOrEmpty(ageError))
+                                    {
+                                        <small class="text-danger">@ageError</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ageWarning))
+                                    {
+                                        <small class="text-success">@ageWarning</small>
+                                    }
+                                    <!-- For education-age warnings -->
+                                    @if (!string.IsNullOrEmpty(eduAgeWarning))
+                                    {
+                                        <div class="text-success">@eduAgeWarning</div>
+                                    }
                                 </div>
+
+                                <!-- Marital status select -->
                                 <div class="col-sm-6 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">6.</span> Marital status (code)
                                     </label>
-                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_6">
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_6" @oninput="clearItem_6">
                                         <option value="">-Select-</option>
                                         <option value="1">never married – 1</option>
                                         <option value="2">currently married (including living together) – 2</option>
                                         <option value="3">widowed – 3</option>
                                         <option value="4">divorced/separated – 4</option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(item_6Error))
+                                    {
+                                        <small class="text-danger">@item_6Error</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(maritalStatusWarning))
+                                    {
+                                        <small class="text-success">@maritalStatusWarning</small>
+                                    }
                                 </div>
+
+                                <!-- Highest education level select -->
                                 <div class="col-sm-12 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">7.</span> Highest level of complete education (code)
                                     </label>
-                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_7">
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_7" @oninput="ClearItem7">
                                         <option value="">-Select-</option>
                                         <option value="1">not literate (i.e. not able to read or write a simple message with understanding in any language) -01 </option>
                                         <option value="2">literate without formal schooling (like NFEC, AEC, TLC, literate without any schooling, etc.)-02 </option>
@@ -199,14 +253,25 @@
                                         <option value="9">graduate -10 </option>
                                         <option value="10">postgraduate and above - 11 </option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(item_7Error))
+                                    {
+                                        <small class="text-danger">@item_7Error</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(eduAgeWarning))
+                                    {
+                                        <div class="text-success">@eduAgeWarning</div>
+                                    }
+
                                 </div>
+
+                                <!-- Activity status during 30 days -->
                                 <h4>Activity status (During 30 days)</h4>
                                 <div class="row">
                                     <div class="col-sm-6 mb-3">
                                         <label class="form-label fw-bold d-flex align-items-start">
                                             <span class="me-2">8.</span> Primary
                                         </label>
-                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_8">
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_8" @oninput="ClearItem8">
                                             <option value="">-Select-</option>
                                             <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                             <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
@@ -224,13 +289,23 @@
                                             <option value="14">unfit for work due to disability or illness – 14 </option>
                                             <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                         </InputSelect>
+                                        @if (!string.IsNullOrEmpty(item_8Error))
+                                        {
+                                            <small class="text-danger">@item_8Error</small>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item_8Warning))
+                                        {
+                                            <div class="text-success">@item_8Warning</div>
+                                        }
                                     </div>
+                                    @* Item9 *@
                                     <div class="col-sm-6 mb-3">
                                         <label class="form-label fw-bold d-flex align-items-start">
                                             <span class="me-2">9.</span> Secondary
                                         </label>
-                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_9">
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_9" @oninput="ClearItem9">
                                             <option value="">-Select-</option>
+                                            <!-- Same options as above -->
                                             <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                             <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
                                             <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
@@ -247,17 +322,29 @@
                                             <option value="14">unfit for work due to disability or illness – 14 </option>
                                             <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                         </InputSelect>
+                                        @if (!string.IsNullOrEmpty(item_9Error))
+                                        {
+                                            <div class="text-danger">
+                                                @item_9Error
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item_9Warning))
+                                        {
+                                            <div class="text-success">@item_9Warning</div>
+                                        }
                                     </div>
                                 </div>
 
+                                <!-- Activity status during 365 days -->
                                 <h4>Activity status (During 365 days)</h4>
                                 <div class="row">
                                     <div class="col-sm-6 mb-3">
                                         <label class="form-label fw-bold d-flex align-items-start">
                                             <span class="me-2">10.</span> Primary
                                         </label>
-                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_10">
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_10" @oninput="ClearItem10">
                                             <option value="">-Select-</option>
+                                            <!-- Same options as above for primary -->
                                             <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                             <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
                                             <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
@@ -274,13 +361,23 @@
                                             <option value="14">unfit for work due to disability or illness – 14 </option>
                                             <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                         </InputSelect>
+                                        @if (!string.IsNullOrEmpty(item_10Error))
+                                        {
+                                            <div class="text-danger small mt-1">@item_10Error</div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item_10Warning))
+                                        {
+                                            <div class="text-success">@item_10Warning</div>
+                                        }
                                     </div>
+                                    @* Iter11 *@
                                     <div class="col-sm-6 mb-3">
                                         <label class="form-label fw-bold d-flex align-items-start">
                                             <span class="me-2">11.</span> Secondary
                                         </label>
-                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_11">
+                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_11" @oninput="ClearItem11">
                                             <option value="">-Select-</option>
+                                            <!-- Same options as above for secondary -->
                                             <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                             <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
                                             <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
@@ -297,23 +394,39 @@
                                             <option value="14">unfit for work due to disability or illness – 14 </option>
                                             <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                         </InputSelect>
+                                        @if (!string.IsNullOrEmpty(item_11Error))
+                                        {
+                                            <div class="text-danger small mt-1">
+                                                @item_11Error
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item_11Warning))
+                                        {
+                                            <div class="text-success">@item_11Warning</div>
+                                        }
                                     </div>
                                 </div>
 
+                                <!-- Item 12 -->
                                 <div class="col-sm-12 mb-3">
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">12.</span> whether a beneficiary of any Central/ State Government social assistance scheme as on date of survey (yes-1/ no-2)
                                     </label>
-                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_12">
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_12" @oninput="ClearItem12Error">
                                         <option value="">-Select-</option>
                                         <option value="1">yes-1</option>
                                         <option value="2">no-2</option>
                                     </InputSelect>
+                                    @if (!string.IsNullOrEmpty(item_12Error))
+                                    {
+                                        <div class="text-danger small mt-1">@item_12Error</div>
+                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <!-- Save button to submit the form -->
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-floppy-fill me-1"></i>
                             Save
@@ -331,38 +444,462 @@
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
 
-    private List<Tbl_Block_3> block3Members = new();
+    // List for holding household members data
+    private List<Tbl_Block_3>  block3Members = new();
     private Tbl_Block_3 newMember = new Tbl_Block_3();
+    private String? nameError = null;
+    private string? relationError = null;
+    // Errors and warnings for fields
+    private string? genderError = null;
+    private string? genderWarning = null;
 
-    private async Task<bool> ValidateJsInputs()
+    private string? ageError = null;
+    private string? item_6Error = null;
+    private string? item_7Error = null;
+    private string? item_8Error = null;
+    private string? item_9Error = null;
+    private string? item_10Error = null;
+    private string? item_11Error = null;
+    private string? item_12Error = null;
+    //Age Warning
+    private string? ageWarning = null;
+    private string? maritalStatusWarning = null;
+    private string? eduAgeWarning = null;
+    private string? item_8Warning = null;
+    private string? item_9Warning = null;
+
+    private string? item_10Warning = null;
+    private string? item_11Warning = null;
+
+
+
+    protected override async Task OnInitializedAsync()
     {
-        bool isNameValid = await JSRuntime.InvokeAsync<bool>("validationHelpers.validateName");
-        if (!isNameValid)
-            return false;
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_3",
+            block_title = "HIS Block 3",
+            block_code = CommonEnum.sch_0_0_block_7.ToString(),
+        };
 
-        bool isAgeValid = await JSRuntime.InvokeAsync<bool>("validationHelpers.validateAge");
-        if (!isAgeValid)
-            return false;
-
-        return true;
+        // await commonQueries.InsertVisitedBlock(vb);
+        // var block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+        // if (block_0_1 != null)
+        // {
+        //     block_1_obj = block_0_1;
+        //     SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
+        // }
+        // var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+        // if (response != null && response.Count > 0)
+        // {
+        //     ListItems = new();
+        //     ListItems = response.OrderBy(x => x.Block_7_1).ToList();
+        //     StateHasChanged();
+        // }
+        StateHasChanged();
     }
 
-    // Merged HandleSaveClicked with validation and save logic
-    private async Task HandleSaveClicked()
-    {
-        if (!await ValidateJsInputs())
-            return;
+    bool error = false;
 
-        newMember.serial_no = block3Members.Count + 1;
+
+    //Onclick Method.....................................
+    private void genderClear()
+    {
+        ClearGenderError();
+        CheckGenderWarning();
+        StateHasChanged();
+
+    }
+    private void ageClear()
+    {
+        ClearAgeError();
+        // CheckAgeWarnings();
+        StateHasChanged();
+        // CheckEduAgeWarnings();
+    }
+
+    private void clearItem_6()
+    {
+        clearItem_6Error();
+        // CheckMaritalStatusWarning();
+        StateHasChanged();
+    }
+    private void ClearItem7()
+    {
+        ClearItem7Error();
+        // CheckEduAgeWarnings();
+    }
+    private void ClearItem8()
+    {
+        ClearItem8Error();
+        // CheckItem8Warning();
+        StateHasChanged();
+    }
+    private void ClearItem9()
+    {
+        ClearItem9Error();
+        // CheckItem9Warning();
+        StateHasChanged();
+    }
+    private void ClearItem10()
+    {
+        ClearItem10Error();
+        // CheckItem10Warning();
+        StateHasChanged();
+    }
+    private void ClearItem11()
+    {
+        ClearItem11Error();
+        // CheckItem11Warning();
+        StateHasChanged();
+    }
+    //ValiDator Method-------------------------------------------
+    private void Validate()
+    {
+        error = false; // Reset error flag
+
+        int nextSerialNo = block3Members.Count + 1;
+
+
+        // Name validation: not blank and only letters/spaces
+        if (string.IsNullOrWhiteSpace(newMember.item_2))
+        {
+            nameError = "Please enter a name.";
+            error = true;
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(newMember.item_2, @"^[a-zA-Z ]+$"))
+        {
+            nameError = "Name must contain only letters and spaces.";
+            error = true;
+        }
+        else
+        {
+            nameError = null;
+        }
+
+        //sl.no4 Hard Check
+
+        if (!(newMember.item_3.HasValue && newMember.item_3 >= 1 && newMember.item_3 <= 9))
+        {
+            relationError = "H004(i): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else if (nextSerialNo == 1 && newMember.item_3 != 1)
+        {
+            relationError = "H004(ii): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else if (nextSerialNo > 1 && newMember.item_3 == 1)
+        {
+            relationError = "H004(ii): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else if (newMember.item_3 == 1 && block3Members.Any(m => m.item_3 == 1))
+        {
+            relationError = "H004(iii): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            relationError = null;
+        }
+
+
+
+        // sl.no 5 Hard Check
+        if (!(newMember.gender.HasValue && (newMember.gender == 1 || newMember.gender == 2 || newMember.gender == 3)))
+        {
+            genderError = "H005(i): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            genderError = null;
+        }
+
+
+
+
+        // 5. Age Error Check
+        if (!newMember.age.HasValue || newMember.age < 1 || newMember.age > 120)
+        {
+            ageError = "H006(i): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            ageError = null;
+        }
+
+        //sl.no7 hard check
+        if (!(newMember.item_6.HasValue && newMember.item_6 >= 1 && newMember.item_6 <= 4))
+        {
+            item_6Error = "H007(i): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            item_6Error = null;
+
+            // Rule ii) If entry in Col.3 == 2, then entry in Col.6 must be 2
+            if (newMember.item_3 == 2 && newMember.item_6 != 2)
+            {
+                item_6Error = "H007(ii): Invalid Entry, Please check the entryies recorded against cols. 3 & 6";
+                error = true;
+            }
+            // Rule iii) If entry in Col.3 == 3 or 4, then entry in Col.6 must NOT be 1
+            else if ((newMember.item_3 == 3 || newMember.item_3 == 4) && newMember.item_6 == 1)
+            {
+                item_6Error = "H007(iii): Invalid Entry, Please check the entryies recorded against cols. 3 & 6";
+                error = true;
+            }
+            // Rule iv) If entry in Col.3 == 5, then entry in Col.6 must be 1
+            else if (newMember.item_3 == 5 && newMember.item_6 != 1)
+            {
+                item_6Error = "H007(iv): Invalid Entry, Please check the entryies recorded against cols. 3 & 6";
+                error = true;
+            }
+        }
+
+
+        //sl.no8 hard check
+        if (!newMember.item_7.HasValue ||!((newMember.item_7 >= 1 && newMember.item_7 <= 8) || newMember.item_7 == 10 || newMember.item_7 == 11))
+        {
+            item_7Error = "H008(i): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            item_7Error = null;
+        }
+
+
+
+        //sl.no8 Col8 hard check
+
+        if (!newMember.item_8.HasValue || !(newMember.item_8 >= 1 && newMember.item_8 <= 15))
+        {
+            item_8Error = "H008(i): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            item_8Error = null;
+        }
+
+        //col9 Error
+        if (newMember.item_8.HasValue && newMember.item_8 >= 1 && newMember.item_8 <= 13)
+        {
+            if (!newMember.item_9.HasValue || newMember.item_9 < 1 || newMember.item_9 > 15)
+            {
+                item_9Error = "H009(i): Invalid Entry, Please check the entry";
+                error = true;
+            }
+            else
+            {
+                item_9Error = null;
+            }
+        }
+        else
+        {
+            if (newMember.item_9.HasValue)
+            {
+                item_9Error = "H009(i): Entry in Col.9 must be empty if no admissible code in Col.8";
+                error = true;
+            }
+            else
+            {
+                item_9Error = null;
+            }
+        }
+
+
+        //Col 10
+
+        // Validate Col.10 (item_10) admissible codes: 1 to 15
+        if (!newMember.item_10.HasValue || newMember.item_10 < 1 || newMember.item_10 > 15)
+        {
+            item_10Error = "H0010(i)Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            item_10Error = null;
+        }
+
+        // col11
+        if (newMember.item_10.HasValue && newMember.item_10 >= 1 && newMember.item_10 <= 13)
+        {
+            if (!newMember.item_11.HasValue || newMember.item_11 < 1 || newMember.item_11 > 15)
+            {
+                item_11Error = "H0011(i): Invalid Entry, Please check the entry";
+                error = true;
+            }
+            else if (newMember.item_10 == newMember.item_11)
+            {
+                item_11Error = "H0011(iii): Please recheck entries recorded against cols. 10 & 11.";
+                error = true;
+            }
+            else
+            {
+                item_11Error = null;
+            }
+        }
+        else
+        {
+            if (newMember.item_11.HasValue)
+            {
+                item_11Error = "Error: Column 11 must be empty if column 10 does not have code 1-13";
+                error = true;
+            }
+            else
+            {
+                item_11Error = null;
+            }
+        }
+
+
+        // sl.no12 hard check
+
+        if (newMember.age.HasValue && newMember.age >= 15)
+        {
+            // When age is 15 or above, entry must be 1 or 2
+            if (!newMember.item_12.HasValue || (newMember.item_12 != 1 && newMember.item_12 != 2))
+            {
+                item_12Error = "H0012(ii): Invalid Entry, Please check the entry";
+                error = true;
+            }
+            else
+            {
+                item_12Error = null;
+            }
+        }
+        else
+        {
+            // When age less than 15, entry in item_12 should be null or empty
+            if (newMember.item_12.HasValue)
+            {
+                item_12Error = "H0012(i):Invalid Entry, Please check the entry";
+                error = true;
+            }
+            else
+            {
+                item_12Error = null;
+            }
+        }
+
+
+
+
+
+    }
+    //Warning Section.....................................................................
+
+    //Gender Warning
+
+    private void CheckGenderWarning()
+    {
+        var head = block3Members.FirstOrDefault(m => m.item_3 == 1);
+        var spouse = newMember;
+
+        if (head != null && head.gender.HasValue)
+        {
+            if (spouse != null && spouse.item_3 == 2 && spouse.gender.HasValue && spouse.gender == head.gender)
+            {
+                genderWarning = "W: Gender of head and spouse should not be the same. Please verify.";
+                StateHasChanged();
+                return;
+            }
+
+            // other checks...
+        }
+
+        genderWarning = null;
+        StateHasChanged();
+    }
+
+
+
+    
+
+    // Clear All Errors After Input Anything.................................
+    private void ClearNameError() => nameError = null;
+    private void ClearRelationError() => relationError = null;
+    private void ClearGenderError() => genderError = null;
+    private void ClearAgeError() => ageError = null;
+    private void clearItem_6Error() => item_6Error = null;
+    private void ClearItem7Error() => item_7Error = null;
+    private void clearItem7Error() => item_8Error = null;
+    private void ClearItem8Error() => item_8Error = null;
+    private void ClearItem9Error() => item_9Error = null;
+    private void ClearItem10Error() => item_10Error = null;
+    private void ClearItem11Error() => item_11Error = null;
+    private void ClearItem12Error() => item_12Error = null;
+
+
+
+    // Logic: Add member to List when form is submitted
+    private void HandleAddMember()
+    {
+        // Clear all previous errors before validation
+        nameError = null;
+        relationError = null;
+        genderError = null;
+        ageError = null;
+        item_6Error = null;
+        item_7Error = null;
+        item_8Error = null;
+        item_9Error = null;
+        item_10Error = null;
+        item_11Error = null;
+        item_12Error = null;
+        genderWarning = null;
+        ageWarning = null;
+        maritalStatusWarning = null;
+        eduAgeWarning = null;
+        item_8Warning = null;
+        item_9Warning = null;
+        item_10Warning = null;
+        item_11Warning = null;
+
+        Validate();
+
+        if (error)
+        {
+            // Stop processing because validations failed
+            return;
+        }
+
+        int nextSerialNo = block3Members.Count + 1;
+
+        // If all checks pass, add member
         newMember.id = Guid.NewGuid();
+        newMember.serial_no = nextSerialNo;
         block3Members.Add(newMember);
 
-        newMember = new Tbl_Block_3();
+        // Clear all error and warning messages after save
+        nameError = null;
+        relationError = null;
+        genderError = null;
+        ageError = null;
+        item_6Error = null;
+        item_7Error = null;
+        item_8Error = null;
+        item_9Error = null;
+        item_10Error = null;
+        item_11Error = null;
+        item_12Error = null;
+        genderWarning = null;
+        ageWarning = null;
+        maritalStatusWarning = null;
+        eduAgeWarning = null;
+        item_8Warning = null;
+        item_9Warning = null;
+        item_10Warning = null;
+        item_11Warning = null;
 
-        // Optionally close modal here
-        // JSRuntime.InvokeVoidAsync("bootstrap.Modal.getInstance", "#addModal").ContinueWith(jsTask =>
-        // {
-        //     JSRuntime.InvokeVoidAsync("bootstrap.Modal.getInstance", "#addModal").Result.Hide();
-        // });
+        newMember = new Tbl_Block_3();
+        toastService.ShowSuccess("Member added successfully!");
     }
 }
+

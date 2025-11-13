@@ -3,6 +3,7 @@ using Income.Database.Models.Common;
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -18,6 +19,8 @@ namespace Income.Database.Models.HIS_2026
         //s.no.
         public int? serial_no { get; set; }
         //name of member
+        //[Required(ErrorMessage = "Name is required")]
+        //[RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "Name must only contain letters and spaces")]
         public string? item_2 { get; set; }
         //relation to head(code)
         public int? item_3 { get; set; }
