@@ -374,6 +374,7 @@
         }
         else if (selectedValue == "2")
         {
+            fields.Block_7_3 = ReturnHHDSamplingSerialNumber();
         }
 
     }
@@ -814,17 +815,25 @@
 
     private void OnHeadNameInput(ChangeEventArgs e)
     {
-        fields.Block_7_4 = e.Value?.ToString() ?? string.Empty;
+        string input = e.Value?.ToString() ?? string.Empty;
 
+        // Allow only A-Z, a-z and space
+        string filtered = new string(input.Where(c => char.IsLetter(c) || c == ' ').ToArray());
+
+        // Assign filtered value
+        fields.Block_7_4 = filtered;
+
+        // Clear the validation message for this field
         var fieldIdentifier = editContext.Field(nameof(fields.Block_7_4));
         messageStore.Clear(fieldIdentifier);
         editContext.NotifyValidationStateChanged();
 
-        // Optional: if you want live revalidation after clearing:
+        // Optional: validate again
         editContext.Validate();
 
         StateHasChanged();
     }
+
 
     private void OnHHDSizeInput(ChangeEventArgs e)
     {

@@ -12,7 +12,7 @@ namespace Income.Database.Models.SCH0_0
         public bool is_selected { get; set; } = false;
         public int? serial_number { get; set; }
         public string? serial_no_of_hamlets_in_su { get; set; }
-        public double Percentage { get; set; }
+        public double? Percentage { get; set; } = 0.0;
         public string? HamletName { get; set; }
         public string SampleHgSbNumber { get; set; } = string.Empty;
         [MaxLength(50)]

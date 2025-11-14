@@ -167,11 +167,10 @@
         //2. No hamlet name can be empty
         //3. Hamlet percentage cannot be zero/empty
         //4. Allow till one decimal place
-        //5. Hamlets must have % of population within 5% variation. If not - show a warning
 
         if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2");
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2R");
             return;
         }
 
@@ -187,28 +186,29 @@
         }
 
 
-        bool withinRange = block_2_1_VM.ArePercentagesWithinRange(block_2_1_VM.tbl_Sch_0_0_block_2_1);
-        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        //bool withinRange = block_2_1_VM.ArePercentagesWithinRange(block_2_1_VM.tbl_Sch_0_0_block_2_1);
+        await Save(action);
+        // var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
 
-        if(!withinRange)
-        {
-            var confirmation = await dialog.ShowAsync(
-            title: "Alert",
-            message1: "All the hamlets need to have more or less equal population. Do you want to continue?",
-            confirmDialogOptions: options);
-            if (confirmation)
-            {
-                // proceed
-                await Save(action);
-            }
-            else
-            {
-            }
-        }
-        else
-        {
-            await Save(action);
-        }
+        // if(!withinRange)
+        // {
+        //     var confirmation = await dialog.ShowAsync(
+        //     title: "Alert",
+        //     message1: "All the hamlets need to have more or less equal population. Do you want to continue?",
+        //     confirmDialogOptions: options);
+        //     if (confirmation)
+        //     {
+        //         // proceed
+        //         await Save(action);
+        //     }
+        //     else
+        //     {
+        //     }
+        // }
+        // else
+        // {
+        //     await Save(action);
+        // }
 
     }
 
@@ -228,7 +228,14 @@
             }
             else if (action == "NEXT")
             {
-                NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2");
+                if (SessionStorage.FSU_Sector == 1)
+                {
+                    NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2R");
+                }
+                else if (SessionStorage.FSU_Sector == 2)
+                {
+                    NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2U");
+                }
             }
         }
         catch (Exception ex)
