@@ -202,6 +202,7 @@ namespace Income.Viewmodels.SCH0_0
                 if (!ShowItem17)
                 {
                     block_0_1.Block_1_17 = null;
+                    block_0_1.remarks_block_1_17 = string.Empty;
                 }
                 block_0_1.Block_1_16 = Convert.ToInt16(val);
                 OnPropertyChanged(nameof(block_0_1));
@@ -210,7 +211,7 @@ namespace Income.Viewmodels.SCH0_0
             }
             catch (Exception ex)
             {
-
+                block_0_1.Block_1_16 = null;
             }
         }
     }

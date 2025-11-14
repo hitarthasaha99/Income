@@ -302,24 +302,25 @@
                     .OrderBy(x => x)
                     .ToList();
 
-                decimal B = 0;
+                double B = 0;
                 int landCount = landAreas.Count;
 
                 if (landCount > 0)
                 {
-                    double percentileIndex = 0.6 * (landCount - 1);
-                    int lowerIndex = (int)Math.Floor(percentileIndex);
-                    int upperIndex = (int)Math.Ceiling(percentileIndex);
+                    B = Percentile_NPlus1(landAreas, 60);
+                    // double percentileIndex = 0.6 * (landCount - 1);
+                    // int lowerIndex = (int)Math.Floor(percentileIndex);
+                    // int upperIndex = (int)Math.Ceiling(percentileIndex);
 
-                    B = (decimal)(landAreas[lowerIndex] +
-                        (landAreas[upperIndex] - landAreas[lowerIndex]) * (percentileIndex - lowerIndex));
+                    // B = (decimal)(landAreas[lowerIndex] +
+                    //     (landAreas[upperIndex] - landAreas[lowerIndex]) * (percentileIndex - lowerIndex));
                 }
 
                 // ---- Assign A & B to each member of this household type ----
                 foreach (var item in items)
                 {
                     item.a = A;
-                    item.b = B;
+                    item.b = (decimal)B;
                 }
             }
 
@@ -434,6 +435,47 @@
             preloadService.Hide();
         }
     }
+
+    public static double Percentile_NPlus1(IList<double> sequence, double percentile)
+    {
+        if (sequence == null || sequence.Count == 0)
+            throw new ArgumentException("Sequence cannot be empty.");
+
+        if (percentile < 0 || percentile > 100)
+            throw new ArgumentException("Percentile must be between 0 and 100.");
+
+        var data = sequence.OrderBy(x => x).ToList();
+        int n = data.Count;
+
+        if (n == 1)
+            return data[0];
+
+        // Position based on Hazen's (n + 1) method
+        double position = (percentile / 100.0) * (n + 1);
+
+        // If position is below 1 → return first value
+        if (position <= 1)
+            return data[0];
+
+        // If position is above n → return last value
+        if (position >= n)
+            return data[n - 1];
+
+        // Find lower and upper neighbours
+        int lowerIndex = (int)Math.Floor(position) - 1;  // convert to 0-based
+        int upperIndex = (int)Math.Ceiling(position) - 1;
+
+        // Interpolation weight
+        double weight = position - Math.Floor(position);
+
+        // If exact integer position → return that value
+        if (lowerIndex == upperIndex)
+            return data[lowerIndex];
+
+        return data[lowerIndex] + weight * (data[upperIndex] - data[lowerIndex]);
+    }
+
+
 
 
     // private async Task CalculateSSS()

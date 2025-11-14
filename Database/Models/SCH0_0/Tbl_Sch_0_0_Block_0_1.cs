@@ -73,6 +73,7 @@ namespace Income.Database.Models.SCH0_0
         public int? Block_1_16 { get; set; }
         //reason for substitution of original sample (code) (for codes 4 – 7 in item 17)
         public int? Block_1_17 { get; set; }
+        public string? remarks_block_1_17 { get; set; } = string.Empty;
         public string? state_code { get; set; } = string.Empty;
         //remarks
         [MaxLength(2000)]
