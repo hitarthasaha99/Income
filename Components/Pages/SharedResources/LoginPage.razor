@@ -53,7 +53,7 @@
     public bool is_error { get; set; } = false;
     DeviceInfoService deviceInfoService = new DeviceInfoService();
     ConfirmDialog data_deletion_ref = default;
-    string version_code = "v " + VersionTracking.CurrentVersion;
+    string version_code = "V " + CommonConfig.APP_VERSION;
 
     public async Task Login()
     {

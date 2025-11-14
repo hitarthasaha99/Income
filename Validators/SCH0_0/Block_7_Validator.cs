@@ -43,7 +43,7 @@ namespace Income.Validators.SCH0_0
                 RuleFor(x => x.Block_7_5).NotEmpty().WithMessage("Household size is required");
                 RuleFor(x => x.Block_7_6).NotEmpty().WithMessage("Education level is required").When(x => SessionStorage.FSU_Sector == 2);
                 RuleFor(x => x.Block_7_7).NotEmpty().WithMessage("Household type is required");
-                RuleFor(x => x.Block_7_8).NotEmpty().WithMessage("Total amount of land owned is required");
+                RuleFor(x => x.Block_7_8).NotEmpty().WithMessage("Total amount of land owned is required").When(x => SessionStorage.FSU_Sector == 1);
                 RuleFor(x => x.Block_7_9).NotEmpty().WithMessage("Please enter a value");
             });
         }
