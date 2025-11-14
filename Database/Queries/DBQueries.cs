@@ -629,6 +629,29 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<Tbl_Sch_0_0_Block_7?> GetCurrentHHD(int fsuID, int hhd_id)
+        {
+            try
+            {
+                var hhd = await _database.Table<Tbl_Sch_0_0_Block_7>()
+                    .Where(x => x.fsu_id == fsuID && x.Block_7_3 == hhd_id)
+                    .FirstOrDefaultAsync();
+                if (hhd != null)
+                {
+                    return hhd;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            finally
+            {
+
+            }
+        }
+
         //Mark casualty
         public async Task<int> MarkCasualty(int casualtyHouseholdId)
         {
