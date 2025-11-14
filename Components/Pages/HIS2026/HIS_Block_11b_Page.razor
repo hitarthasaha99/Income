@@ -56,10 +56,10 @@
 
 
     @* Model Popup When Click Add Button *@
-    <div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal fade" id="addModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <EditForm Model="@table11B">
+                <EditForm Model="@table11B" OnInvalidSubmit="handleSave">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -81,29 +81,42 @@
                                 <label class="form-label fw-bold">
                                     2. Name of Member
                                 </label>
-                                <InputText @bind-Value="table11B.item_2"
+                                <InputText @bind-Value="table11B.item_2" @oninput="clearItem2Error"
                                            class="form-control form-control-sm"
                                            id="memberName"
+                                           autocomplete="off"
+                                           autocapitalize="off"
+                                           autocorrect="off"
+                                           spellcheck="false"
                                            onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)" />
+
+                                @if (!string.IsNullOrEmpty(item_2Error))
+                                {
+                                    <small class="text-danger">@item_2Error</small>
+                                }
                             </div>
 
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label fw-bold">
                                     3. Whether paid any direct tax during last financial year? (yes-1, no-2)
                                 </label>
-                                <InputSelect @bind-Value="table11B.item_3"
+                                <InputSelect @bind-Value="table11B.item_3" @oninput="clearItem_3"
                                              class="form-select form-select-sm">
                                     <option value="">-Select-</option>
                                     <option value="1">1-yes</option>
                                     <option value="2">2-no</option>
 
                                 </InputSelect>
+                                @if (!string.IsNullOrEmpty(item_3Error))
+                                {
+                                    <small class="text-danger">@item_3Error</small>
+                                }
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label fw-bold">
                                     4. Amount of direct tax paid (net of refunds) in last financial year (in Rs.)
                                 </label>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" @bind-value="table11B.item_4" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" @bind-value="table11B.item_4" disabled="@(!is11B_4Enable)" />
                             </div>
                         </div>
                     </div>
@@ -130,19 +143,93 @@
     private Tbl_Block_11b table11B = new();
     //Store Data Using List
     private List<Tbl_Block_11b> showDataTable11B = new();
+    private bool error = false;
+    private String? item_2Error = null;
+    private string? item_3Error = null;
+    private bool is11B_4Enable = false;
+
+
+
+    //onInput method in 11B.3
+    private void clearItem_3(ChangeEventArgs e)
+    {
+        item_3Condition(e);
+        clearItem3Error();
+    }
 
     //Validate And Hard Check All Field
     private void handleValidation()
     {
-        
+        error = false;
+        if (string.IsNullOrWhiteSpace(table11B.item_2))
+        {
+            item_2Error = "Name must be filled";
+            error = true;
+        }
+        else
+        {
+            item_2Error = null;
+        }
+        if (table11B.item_3 == null || table11B.item_3 == 0)
+        {
+            item_3Error = "H76(ii): Invalid Entry, Please check the entry";
+            error = true;
+        }
+        else
+        {
+            item_3Error = null;
+        }
     }
-    //Save Data And show List
-    private void handleSave()
-    {
-        table11B.item_1 = showDataTable11B.Count + 1;
 
+
+    //Check the 11b_3 yes then enable 11b_4 input field
+    private void item_3Condition(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (value == "1")
+        {
+            // If YES → enable
+            is11B_4Enable = true;
+        }
+        else
+        {
+            // If NO or blank → disable + clear
+            is11B_4Enable = false;
+            table11B.item_4 = null; // Clear value
+        }
+
+        // Clear the Q3 error if user selects anything
+        item_3Error = null;
+    }
+
+    //Save Data And show List
+    private async void handleSave()
+    {
+        handleValidation();
+        if (error)
+        {
+            return;
+        }
+
+        table11B.item_1 = showDataTable11B.Count + 1;
         showDataTable11B.Add(table11B);
 
-        table11B = new Tbl_Block_11b(); // reset form
+        // Reset form model
+        table11B = new Tbl_Block_11b();
+
+        // Reset UI state
+        is11B_4Enable = false;
+        item_3Error = null;
+        item_2Error = null;
+        await JSRuntime.InvokeVoidAsync("closeModal", "addModal");
+        toastService.ShowSuccess("Member added successfully!");
     }
+
+
+
+
+    //Clear all error when input any thing
+    private void clearItem2Error() => item_2Error = null;
+    private void clearItem3Error() => item_3Error = null;
 }
