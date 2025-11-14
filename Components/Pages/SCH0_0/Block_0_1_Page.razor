@@ -7,7 +7,10 @@
 @using FluentValidation
 @using Microsoft.AspNetCore.Components.Forms
 
-<div class="main-content">
+<EditForm Model="@block_0_1_VM.block_0_1" OnValidSubmit="@(() => HandleSubmit(false))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="main-content">
     <CommonContentHeader 
         SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time"
@@ -15,49 +18,49 @@
 
     <div class="card custom-card">
         <div class="card-header">
-            <h3 class="card-title"><span class="text-Primary fw-bolder me-2">[0]</span>Descriptive identification of sample FSU</h3>
+            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[0]</span>Descriptive identification of sample FSU</h3>
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label"><span class="badge bg-primary me-2">1</span>State / UT</label>
+                        <label class="form-label"><span class="form-badge">1</span>State / UT</label>
                         <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_0_1">
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label"><span class="badge bg-primary me-2">2</span>District</label>
+                        <label class="form-label"><span class="form-badge">2</span>District</label>
                         <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_0_2">
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label"><span class="badge bg-primary me-2">3</span>Sub-District/Tehsill</label>
+                        <label class="form-label"><span class="form-badge">3</span>Sub-District/Tehsill</label>
                         <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_0_3">
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label"><span class="badge bg-primary me-2">4</span>Village Name / Town</label>
+                        <label class="form-label"><span class="form-badge">4</span>Village Name / Town</label>
                         <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_0_4">
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label"><span class="badge bg-primary me-2">5</span>Investigator Unit No</label>
+                        <label class="form-label"><span class="form-badge">5</span>Investigator Unit No</label>
                         <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_0_5">
                     </div>
                 </div>
-               <div class="col-sm-4">
+               <div class="col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label"><span class="badge bg-primary me-2">6</span>Block No</label>
+                        <label class="form-label"><span class="form-badge">6</span>Block No</label>
                         <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_0_6">
                     </div>
                </div>
-                @* <div class="col-sm-4">
+                @* <div class="col-sm-12">
                     <div class="mb-3"> 
-                        <label class="form-label"><span class="badge bg-primary me-2">7</span>Sample Sub-unit (SU)</label> 
+                        <label class="form-label"><span class="form-badge">7</span>Sample Sub-unit (SU)</label> 
                          <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.block_0_7"> 
                      </div>
                 </div> *@
@@ -65,169 +68,178 @@
         </div>
         
     </div>
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[1]</span>Identification of sample FSU</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">1</span>Serial number of sample FSU</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_1">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">2</span>Round Number</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_2">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">3</span>Schedule Number</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_3">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">4</span>Sample</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.Block_1_4_Selected">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">5</span>Sector</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.Block_1_5_Selected">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">6</span>NSS Region Code</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_6">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">7</span>District Code</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_7">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">8</span>Stratum Number</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_8">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">9</span>Sub-stratum Number</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_9">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">10</span>Sub-round Number</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_10">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">11</span>FOD sub-region Code</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_11">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">12</span>Frame Code</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.Block_1_12_Selected">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">13</span>Population of village or number of households of UFS Block</label>
+                        <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_13">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">14</span>Approx. present population</label>
+                        <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(SessionStorage.hamlet_selection_done && block_0_1_VM.EnablePopulation)" />
 
-    <EditForm Model="@block_0_1_VM.block_0_1" OnValidSubmit="@(() => HandleSubmit(false))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="card custom-card">
-            <div class="card-header">
-                <h3 class="card-title"><span class="text-Primary fw-bolder me-2">[1]</span>Identification of sample FSU</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">1</span>Serial number of sample FSU</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_1">
-                        </div>
+                        @if (IsBlock_1_14_ErrorMessageVisible)
+                        {
+                            <div class="text-success mt-1 fw-bold">
+                                @Block_1_14_ErrorMessage
+                            </div>
+                        }
                     </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">2</span>Round Number</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_2">
-                        </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">15</span>Total number of SUs to be formed (D)</label>
+                        <input type="text" class="form-control" placeholder="" disabled value="@block_0_1_VM.block_0_1.Block_1_15">
                     </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">3</span>Schedule Number</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_3">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">4</span>Sample</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.Block_1_4_Selected">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">5</span>Sector</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.Block_1_5_Selected">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">6</span>NSS Region Code</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_6">
-                        </div>
-                    </div>
-                   <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">7</span>District Code</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_7">
-                        </div>
-                   </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">8</span>Stratum Number</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_8">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">9</span>Sub-stratum Number</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_9">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">10</span>Sub-round Number</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_10">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">11</span>FOD sub-region Code</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_11">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">12</span>Frame Code</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.Block_1_12_Selected">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">13</span>Population of village or number of households of UFS Block</label>
-                            <input type="text" class="form-control" placeholder="" disabled @bind="block_0_1_VM.block_0_1.Block_1_13">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">14</span>Approx. present population</label>
-                            <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(SessionStorage.hamlet_selection_done && block_0_1_VM.EnablePopulation)" />
-
-                            @if (IsBlock_1_14_ErrorMessageVisible)
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3" EditContext="EditContext">
+                        <label class="form-label"><span class="form-badge">16</span>Survey Code</label>
+                        <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => block_0_1_VM.SurveyCodeSelectionChanged(e))">
+                            <option value="">Select</option>
+                            @if (block_0_1_VM.survey_code_list != null && block_0_1_VM.survey_code_list.Count > 0)
                             {
-                                <div class="text-success mt-1 fw-bold">
-                                    @Block_1_14_ErrorMessage
-                                </div>
+                                @foreach (var item in block_0_1_VM.survey_code_list)
+                                {
+                                    <option value="@item.id">@item.title</option>
+                                }
                             }
-                        </div>
+                        </select>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3">
-                            <label class="form-label"><span class="badge bg-primary me-2">15</span>Total number of SUs to be formed (D)</label>
-                            <input type="text" class="form-control" placeholder="" disabled value="@block_0_1_VM.block_0_1.Block_1_15">
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3" EditContext="EditContext">
-                            <label class="form-label"><span class="badge bg-primary me-2">16</span>Survey Code</label>
-                            <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => block_0_1_VM.SurveyCodeSelectionChanged(e))">
-                                <option value="">Select</option>
-                                @if (block_0_1_VM.survey_code_list != null && block_0_1_VM.survey_code_list.Count > 0)
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3" hidden="@(!block_0_1_VM.ShowItem17)">
+                        <label class="form-label">
+                            <span class="form-badge">17</span>
+                            Reason for substitution of original sample (code)
+                        </label>
+                        <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" @bind="block_0_1_VM.block_0_1.Block_1_17">
+                            <option value="">Select</option>
+                            @if (block_0_1_VM.substitution_reason_list != null && block_0_1_VM.substitution_reason_list.Count > 0)
+                            {
+                                @foreach (var item in block_0_1_VM.substitution_reason_list)
                                 {
-                                    @foreach (var item in block_0_1_VM.survey_code_list)
-                                    {
-                                        <option value="@item.id">@item.title</option>
-                                    }
+                                    <option value="@item.id">@item.title</option>
                                 }
-                            </select>
-                        </div>
+                            }
+                        </select>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="mb-3" hidden="@(!block_0_1_VM.ShowItem17)">
-                            <label class="form-label">
-                                <span class="badge bg-primary me-2">17</span>
-                                Reason for substitution of original sample (code)
-                            </label>
-                            <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" @bind="block_0_1_VM.block_0_1.Block_1_17">
-                                <option value="">Select</option>
-                                @if (block_0_1_VM.substitution_reason_list != null && block_0_1_VM.substitution_reason_list.Count > 0)
-                                {
-                                    @foreach (var item in block_0_1_VM.substitution_reason_list)
-                                    {
-                                        <option value="@item.id">@item.title</option>
-                                    }
-                                }
-                            </select>
-
-                        </div>
+                </div>
+                @* When user will select code 9 - others in q.17 the 17.1 will be enabled *@
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">17.1</span>
+                            Reason 
+                        </label>
+                        <textarea type="text"rows="1" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="card custom-card">
-            <div class="card-header">
-                <h3 class="card-title"><span class="text-Primary fw-bolder me-2">18</span>Remarks</h3>
-            </div>
-            <div class="card-body">
-                <textarea disabled="@SessionStorage.hamlet_selection_done" type="text" class="form-control disabled w-100" placeholder="" rows="4" value="@block_0_1_VM.block_0_1.remarks"></textarea>
-            </div>
+    </div>
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title"><span class="text-primary fw-bolder me-2">18</span>Remarks</h3>
         </div>
-        <div class="d-flex justify-content-between mb-3">
-            <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
-            <div class="d-flex">
-                <button class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
-                <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
-            </div>
+        <div class="card-body">
+            <textarea disabled="@SessionStorage.hamlet_selection_done" type="text" class="form-control disabled w-100" placeholder="" rows="4" value="@block_0_1_VM.block_0_1.remarks"></textarea>
         </div>
-    </EditForm>    
+    </div> 
 </div>
-
+<div class="footer">
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <button class="btn btn-outline-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+            </div>
+        </div>
+    </div>
+</div>
+</EditForm>   
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();

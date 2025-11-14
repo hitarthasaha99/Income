@@ -14,107 +14,131 @@
 
 
 <GlobalErrorBoundary>
-    <div class="my-2">
+    <div class="main-content">
         <CommonContentHeader SelectedFsuId="@SelectedFsuId"
-                             survey_time="@survey_time" />
+        survey_time="@survey_time" />
+        <div class="card custom-card">
+            <!-- 🔹 Sticky Top Action Header -->
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span class="text-primary me-2">[Block 7]</span>List of households and selection of households for Schedule on HIS
+                </h3>
+                <div class="card-tools">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => CalculateSSS())">
+                            <i class="fi fi-rr-calculator me-1"></i>Calc SSS
+                        </button>
 
-        
-        <!-- 🔹 Sticky Top Action Header -->
-        <div class="card-header d-flex align-items-center sticky-top bg-white" style="z-index: 20;">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-1">[Block 7]</span>
-                List of households and selection of households for Schedule on HIS
-            </h3>
+                        <button class="btn btn-primary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
+                            <i class="fi fi-rr-checkbox me-1"></i>Selection
+                        </button>
 
-            <div class="ms-auto d-flex gap-2">
-                <button class="btn btn-primary btn-sm d-flex align-items-center" hidden="@SessionStorage.selection_done" @onclick="@(() => CalculateSSS())">
-                    <i class="bi bi-calculator"></i> <span class="ms-1">Calc SSS</span>
-                </button>
+                        <button class="btn btn-outline-primary btn-sm" @onclick="@(() => ResetSelection())">
+                            <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                <button class="btn btn-primary btn-sm d-flex align-items-center" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
-                    <i class="bi bi-check2-square"></i> <span class="ms-1">Selection</span>
-                </button>
-
-                <button class="btn btn-primary btn-sm d-flex align-items-center" @onclick="@(() => ResetSelection())">
-                    <i class="bi bi-arrow-clockwise"></i> <span class="ms-1">Reset Selection</span>
-                </button>
-
+            <!-- 🔹 Scrollable table -->
+            <div class="card-body p-0">
+                <div class="table-responsive table-wrapper">
+                    <table class="table table-striped table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th>Srl.No.</th>
+                                <th>House Number</th>
+                                <th>Is the house used only for non-residential purposes? (yes-1, no-2)</th>
+                                <th>Household Serial Number</th>
+                                <th>Name of the head of the household</th>
+                                <th>Household Size</th>
+                                <th>Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</th>
+                                <th>Household Type</th>
+                                <th>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</th>
+                                <th>Usual monthly consumption expenditure of the household (Rs.)</th>
+                                <th>SSS number for Schedule HIS 2026</th>
+                                <th>Selected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>(0)</th>
+                                <th>(1)</th>
+                                <th>(2)</th>
+                                <th>(3)</th>
+                                <th>(4)</th>
+                                <th>(5)</th>
+                                <th>(6)</th>
+                                <th>(7)</th>
+                                <th>(8)</th>
+                                <th>(9)</th>
+                                <th>(10)</th>
+                                <th>(11)</th>
+                            </tr>
+                            @if (ListItems != null && ListItems.Count > 0)
+                            {
+                                foreach (var item in ListItems)
+                                {
+                                    if (item.is_deleted != true)
+                                    {
+                                        <tr>
+                                            <td>@item.Block_7_1</td>
+                                            <td>@item.Block_7_2</td>
+                                            <td>@item.is_household</td>
+                                            <td>@item.Block_7_3</td>
+                                            <td>@item.Block_7_4</td>
+                                            <td>@item.Block_7_5</td>
+                                            <td>@item.Block_7_6</td>
+                                            <td>@item.Block_7_7</td>
+                                            <td>@item.Block_7_8</td>
+                                            <td>@item.Block_7_9</td>
+                                            <td>@item.SSS</td>
+                                            <td>
+                                                <div class="siteCustomCheckbox">
+                                                    <label>
+                                                        <input type="checkbox" @bind="item.isSelected" disabled />
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- 🔹 Scrollable table -->
-        <div class="card-body p-0" style="max-height: 65vh; overflow-y: auto;">
-            <table class="table table-striped table-bordered mb-0">
-                <thead class="table-light sticky-top" style="top: 1px; z-index: 10;">
-                    <tr>
-                        <th>Srl.No.</th>
-                        <th>House Number</th>
-                        <th>Is the house used only for non-residential purposes? (yes-1, no-2)</th>
-                        <th>Household Serial Number</th>
-                        <th>Name of the head of the household</th>
-                        <th>Household Size</th>
-                        <th>Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</th>
-                        <th>Household Type</th>
-                        <th>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</th>
-                        <th>Usual monthly consumption expenditure of the household (Rs.)</th>
-                        <th>SSS number for Schedule HIS 2026</th>
-                        <th>Selected</th>
-                    </tr>
-                    <tr>
-                        <th>(0)</th>
-                        <th>(1)</th>
-                        <th>(2)</th>
-                        <th>(3)</th>
-                        <th>(4)</th>
-                        <th>(5)</th>
-                        <th>(6)</th>
-                        <th>(7)</th>
-                        <th>(8)</th>
-                        <th>(9)</th>
-                        <th>(10)</th>
-                        <th>(11)</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @if (ListItems != null && ListItems.Count > 0)
-                    {
-                        foreach (var item in ListItems)
-                        {
-                            if (item.is_deleted != true)
-                            {
-                                <tr>
-                                    <td>@item.Block_7_1</td>
-                                    <td>@item.Block_7_2</td>
-                                    <td>@item.is_household</td>
-                                    <td>@item.Block_7_3</td>
-                                    <td>@item.Block_7_4</td>
-                                    <td>@item.Block_7_5</td>
-                                    <td>@item.Block_7_6</td>
-                                    <td>@item.Block_7_7</td>
-                                    <td>@item.Block_7_8</td>
-                                    <td>@item.Block_7_9</td>
-                                    <td>@item.SSS</td>
-                                    <td><input type="checkbox" @bind="item.isSelected" disabled /></td>
-                                </tr>
-                            }
-                        }
-                    }
-                </tbody>
-            </table>
+        @* Remarks Card *@
+        <div class="card custom-card">
+            <div class="card-header">
+                <h3 class="card-title">Remarks</h3>
+            </div>
+            <div class="card-body">
+                <textarea type="text" class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+            </div>
         </div>
     </div>
 
     <!-- 🔹 Footer Navigation (Always visible) -->
-    <div class="d-flex justify-content-between mt-3">
-        <NavLink class="btn btn-outline-primary" onclick="@GoBack">
-            <i class="bi bi-chevron-left me-1"></i>Back
-        </NavLink>
-
-        <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit("NEXT"))">
-            Next<i class="bi bi-chevron-right ms-1"></i>
-        </NavLink>
+    <div class="footer">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="d-flex">
+                    <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
+                        <i class="fi fi-rr-angle-left me-1"></i>Back
+                    </NavLink>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="d-flex align-items-center justify-content-end">
+                    <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
+                        Next<i class="fi fi-rr-angle-right ms-1"></i>
+                    </NavLink>
+                </div>
+            </div>
+        </div>
     </div>
 </GlobalErrorBoundary>
 

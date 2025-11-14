@@ -6,33 +6,40 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 
-<div class="my-2">
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                          survey_time="@survey_time" />
-    <div class="card card-style2">
-        @* Enumerator Comments *@
-        <div class="card-header d-flex align-items-center">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-2">[Block 9]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
+    @* Enumerator Comments *@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[Block 9]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
             </h3>
         </div>
-        <div class="card-body p-2">
-            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO))" class="form-control w-100" cols="5" @bind="EnumeratorRemarks"></textarea>
-        </div>
-
-        @* Supervisor Comments *@
-        <div class="card-header d-flex align-items-center">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-2">[Block 10]</span> Remarks by Field Supervisor (FS)/Senior Statistical Officer (SSO)
-            </h3>
-        </div>
-        <div class="card-body p-2">
-            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" cols="5" @bind="SupervisorRemarks"></textarea>
+        <div class="card-body">
+            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO))" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
         </div>
     </div>
-    <div class="d-flex justify-content-end mb-3">
-        <NavLink class="btn btn-outline-primary me-2" hidden="@(SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
-        <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+    @* Supervisor Comments *@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[Block 10]</span> Remarks by Field Supervisor (FS)/Senior Statistical Officer (SSO)
+            </h3>
+        </div>
+        <div class="card-body">
+            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks"></textarea>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="d-flex justify-content-end">
+                <NavLink class="btn btn-outline-primary me-2" hidden="@(SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+            </div>
+        </div>
     </div>
 </div>
 

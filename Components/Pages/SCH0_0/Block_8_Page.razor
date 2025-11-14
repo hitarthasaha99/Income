@@ -6,15 +6,15 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 
-<div class="my-2">
+<div class="main-content">
     <CommonContentHeader 
         SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time" 
     />
-    <div class="card card-style2">
-        <div class="card-header d-flex align-items-center">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-2">[Block 8]</span>Particulars of sampling of households
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[Block 8]</span>Particulars of sampling of households
             </h3>
         </div>
         <div class="card-body p-0">
@@ -139,24 +139,39 @@
                             <td>@total_col_8_total</td>
                             <td>@total_casualty</td>
                         </tr>
-                        
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    <div class="d-flex justify-content-between mt-3">
-        <NavLink class="btn btn-outline-primary" onclick="@GoBack">
-            <i class="bi bi-chevron-left me-1"></i>Back
-        </NavLink>
-
-        <NavLink class="btn btn-outline-primary" @onclick="@HandleSubmit">
-            Next<i class="bi bi-chevron-right ms-1"></i>
-        </NavLink>
+    @* Remarks Card *@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+        </div>
     </div>
 </div>
-
+<div class="footer">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <NavLink class="btn btn-outline-secondary" @onclick="GoBack">
+                    <i class="fi fi-rr-angle-left me-1"></i>Back
+                </NavLink>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex justify-content-end">
+                <NavLink class="btn btn-primary" @onclick="@HandleSubmit">
+                    Next<i class="fi fi-rr-angle-right ms-1"></i>
+                </NavLink>
+            </div>
+        </div>
+    </div> 
+</div>
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
