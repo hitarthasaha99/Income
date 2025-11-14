@@ -290,7 +290,7 @@ namespace Income.Common
 #endif
                 // Get the app's local folder
                 string timestamp = DateTime.Now.ToString("yyyy-MMM-dd_HH-mm-ss-fff");
-                string filePath = Path.Combine(documentsPath, "TRAVEL_JSON", $"{baseFileName}_{timestamp}.json");
+                string filePath = Path.Combine(documentsPath, "Income_JSON", $"{baseFileName}_{timestamp}.json");
 
                 // Extract directory path
                 string directoryPath = Path.GetDirectoryName(filePath);
@@ -333,7 +333,7 @@ namespace Income.Common
                     documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 }
 
-                string ExportPath = Path.Combine(documentsPath, "TRAVEL_EXPORT");
+                string ExportPath = Path.Combine(documentsPath, "Income_EXPORT");
 
                 // Create the folder if it doesn't exist
                 if (!Directory.Exists(ExportPath))
@@ -342,7 +342,7 @@ namespace Income.Common
                 }
 
 
-                string[] fileNames = { "TRAVEL.db3" };
+                string[] fileNames = { "Income.db3" };
                 string sourceFile = FileSystem.AppDataDirectory;
                 string sourcePath = string.Empty;
                 string targetLogPath = string.Empty;

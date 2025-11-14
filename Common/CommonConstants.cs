@@ -45,7 +45,7 @@ namespace Income.Common
         public const string REG_EXP_20_CHARS_REMARKS = "/^(?=.*\\S).{20,}$/";
         public const string DASH_VALUE = "--";
         public const string REG_EXP_6_DIGIT_PINCODE = "/^(9|[1-9][0-9]{5})$/";
-        public const string SURVEY_TYPE_ID = "1113";
+        public const string SURVEY_TYPE_ID = "1116";
         public const string REG_EXP_AGE = "/^(100|[1-9][0-9]?)$/";
         public const string REG_EXP_INDIAN_MOBILE_NUMBER = "/^(?:\\+91|91|0)?[6-9]\\d{9}|^999$/";
 

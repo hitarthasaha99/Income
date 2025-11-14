@@ -24,8 +24,13 @@ namespace Income.Database.Models.HIS_2026
         // Q4.3 – Religion (Hinduism-1, Islam-2, Christianity-3, etc.)
         public int? item_3 { get; set; }
 
-        // Q4.4 – Agricultural activities (multiple select; store codes as comma-separated string)
-        public string? item_4 { get; set; }
+        // Q4.4 – Agricultural activities (multiple select)
+        public bool? item_4_1 { get; set; }
+        public bool? item_4_2 { get; set; }
+        public bool? item_4_3 { get; set; }
+        public bool? item_4_4 { get; set; }
+        public bool? item_4_5 { get; set; }
+        public bool? item_4_6 { get; set; }
 
         // Q4.5 – Non-agricultural economic activities (table; can be serialized JSON or comma-separated IDs)
         public string? item_5 { get; set; }

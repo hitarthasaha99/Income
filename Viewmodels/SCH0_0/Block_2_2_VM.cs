@@ -30,6 +30,11 @@ namespace Income.Viewmodels.SCH0_0
         public async Task Init()
         {
             tbl_Sch_0_0_Block_2_1 = await SCH_0_0_Queries.FetchSCH0Block2_1Data();
+            if (tbl_Sch_0_0_Block_2_1 != null && tbl_Sch_0_0_Block_2_1.Count > 0)
+            {
+                tbl_Sch_0_0_Block_2_1 = tbl_Sch_0_0_Block_2_1.Where(x => x.is_deleted == false).ToList();
+                tbl_Sch_0_0_Block_2_1 = tbl_Sch_0_0_Block_2_1.OrderBy(k => k.serial_no).ToList();
+            }
             tbl_Sch_0_0_Block_2_2 = await SCH_0_0_Queries.FetchSCH0Block2_2Data();
             var fsu_response = Tbl_Fsu_List = await cQ.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
 
@@ -93,6 +98,20 @@ namespace Income.Viewmodels.SCH0_0
             }
         }
 
+        public void CalculateTotalPopulationPercentage_Urban()
+        {
+            try
+            {
+
+                CalculateTotalPercentage();
+                OnPropertyChanged(nameof(tbl_Sch_0_0_Block_2_2));
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         public void CalculateTotalPercentage()
         {
             double total = 0;
@@ -100,7 +119,7 @@ namespace Income.Viewmodels.SCH0_0
             {
                 if (!item.is_deleted.GetValueOrDefault())
                 {
-                    total += item.Percentage;
+                    total += item.Percentage.GetValueOrDefault();
                 }
             }
             Total_population_percentage = total;
@@ -112,7 +131,7 @@ namespace Income.Viewmodels.SCH0_0
             {
                 List<Tbl_Sch_0_0_Block_2_2> list = [];
                 var percentages = tbl_Sch_0_0_Block_2_2
-                          .Select(row => row.Percentage) // Extract Percentage values.
+                          .Select(row => row.Percentage.GetValueOrDefault()) // Extract Percentage values.
                           .ToList();
                 double minValue = percentages.Min();
                 double maxValue = percentages.Max();
@@ -175,6 +194,10 @@ namespace Income.Viewmodels.SCH0_0
                         OnPropertyChanged(nameof(tbl_Sch_0_0_Block_2_2));
                         NotifyUiUpdate?.Invoke();
                     }
+                    else
+                    {
+
+                    }
                 }
             }
             catch (Exception ex)
@@ -200,7 +223,7 @@ namespace Income.Viewmodels.SCH0_0
             try
             {
                 var percentages = tbl_Sch_0_0_Block_2_2
-                          .Select(row => row.Percentage) // Extract Percentage values.
+                          .Select(row => row.Percentage.GetValueOrDefault()) // Extract Percentage values.
                           .ToList();
                 double minValue = percentages.Min();
                 double maxValue = percentages.Max();
@@ -218,7 +241,7 @@ namespace Income.Viewmodels.SCH0_0
             ResetSerialPopulationsList();
             try
             {
-                double total = tbl_Sch_0_0_Block_2_2.Sum(row => row.Percentage);
+                double total = tbl_Sch_0_0_Block_2_2.Sum(row => row.Percentage.GetValueOrDefault());
                 if (total != 100)
                     result.Errors.Add("Total percentage must be equal to 100.");
 
@@ -227,6 +250,15 @@ namespace Income.Viewmodels.SCH0_0
 
                 if(tbl_Sch_0_0_Block_2_2.Any(row => row.serial_no_of_hamlets_in_su?.Split(',').Length == 0))
                     result.Errors.Add("At least one hamlet must be specified for each SU.");
+
+                if (Tbl_Fsu_List.totalsu == 0)
+                {
+                    result.Errors.Add("Total SU cannot be zero.");
+                }
+                else if (Tbl_Fsu_List.selsu > Tbl_Fsu_List.totalsu)
+                {
+                    result.Errors.Add("Selected SU cannot be greater than Total SU.");
+                }
 
                 foreach (var item in tbl_Sch_0_0_Block_2_2)
                 {
@@ -264,6 +296,38 @@ namespace Income.Viewmodels.SCH0_0
                             result.Errors.Add($"Invalid hamlet serial number {s} found in serial number of SU {item.serial_number}");
                         }
                     }
+                }
+
+                result.IsValid = result.Errors.Count == 0;
+            }
+            catch (Exception ex)
+            {
+                result.Errors.Add("An unexpected error occurred during validation.");
+                result.IsValid = false;
+            }
+
+            return result;
+        }
+
+        public ValidationResult ValidateUrban()
+        {
+            var result = new ValidationResult();
+            try
+            {
+                double total = tbl_Sch_0_0_Block_2_2.Sum(row => row.Percentage.GetValueOrDefault());
+                if (total != 100)
+                    result.Errors.Add("Total percentage must be equal to 100.");
+
+                if (tbl_Sch_0_0_Block_2_2.Any(row => row.Percentage == 0))
+                    result.Errors.Add("Hamlet percentage cannot be zero.");
+
+                if (Tbl_Fsu_List.totalsu == 0)
+                {
+                    result.Errors.Add("Total SU cannot be zero.");
+                }
+                else if (Tbl_Fsu_List.selsu > Tbl_Fsu_List.totalsu)
+                {
+                    result.Errors.Add("Selected SU cannot be greater than Total SU.");
                 }
 
                 result.IsValid = result.Errors.Count == 0;
