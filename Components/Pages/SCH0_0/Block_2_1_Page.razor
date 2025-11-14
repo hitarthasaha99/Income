@@ -9,21 +9,20 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 
-
-<div class="my-2">
+<div class="main-content">
     <CommonContentHeader 
     SelectedFsuId="@SelectedFsuId"
     survey_time="@survey_time" 
     />
     <ConfirmDialog @ref="dialog" />
-    <div class="card card-style2">
-        <div class="card-header  d-flex align-items-center">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-2">[Block 2.1]</span>List of hamlets (only for rural samples with SU formation)
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[Block 2.1]</span>List of hamlets (only for rural samples with SU formation)
             </h3>
             @if (!SessionStorage.hamlet_selection_done)
             {
-                <button class="btn btn-primary btn-sm d-flex align-items-center ms-auto" @onclick="@(() => block_2_1_VM.AddRow())"><i class="bi bi-plus"></i> <span>Add</span></button>
+                <button class="btn btn-primary btn-sm ms-auto" @onclick="@(() => block_2_1_VM.AddRow())"><i class="bi bi-plus"></i> <span>Add</span></button>
             }
         </div>
         <div class="card-body p-0">
@@ -57,10 +56,9 @@
                                         @if (!SessionStorage.hamlet_selection_done)
                                         {
                                             <td>
-                                                <button class="btn btn-sm btn-danger d-flex align-items-center" hidden="@(SessionStorage.hamlet_selection_done)" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="bi bi-trash me-2"></i><span>Delete</span></button>
+                                            <button class="btn btn-link fs-6 text-danger" hidden="@(SessionStorage.hamlet_selection_done)" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="fi fi-rr-trash me-2"></i></button>
                                             </td>
                                         }
-                                        
                                     </tr>
                                 }
                             }
@@ -68,27 +66,44 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="2"></th>
-                            <th colspan="2">@block_2_1_VM.Total_population_percentage.ToString() %</th>
+                            <td colspan="2" class="bg-success"></td>
+                            <td class="bg-success text-success fw-bolder">Total Population:- <span>@block_2_1_VM.Total_population_percentage.ToString() %</span></td>
+                            <td class="bg-success"></td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
     </div>
-
-    <div class="d-flex justify-content-between mb-3">
-        <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1" ></i>Back</NavLink>
-        <div class="d-flex">
-            <NavLink class="btn btn-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit("SAVE"))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
-            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit("NEXT"))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea type="text" class="form-control disabled w-100" placeholder="" rows="4"></textarea>
         </div>
     </div>
-
-    <div class="mt-1">
-        <p class="m-0" style="color: white;">Test</p>
+</div>
+<div class="footer">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <NavLink class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</NavLink>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-outline-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit("SAVE"))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+            </div>
+        </div>
     </div>
 </div>
+
+    @* <div class="mt-1">
+        <p class="m-0" style="color: white;">Test</p>
+    </div> *@
+
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;

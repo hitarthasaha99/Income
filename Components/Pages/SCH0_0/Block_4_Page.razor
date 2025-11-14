@@ -6,41 +6,40 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 
-<div class="my-2">
+<div class="main-content">
     <CommonContentHeader 
     SelectedFsuId="@SelectedFsuId"
     survey_time="@survey_time" 
     />
-    <div class="card card-style2">
-        <div class="card-header  d-flex align-items-center">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-2">[4]</span>Identification of selected sub-unit and formation of
-                sub-division
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[4]</span>Identification of selected sub-unit and formation of sub-division
             </h3>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-sm-6">
-                    <div class="form-group mb-3">
-                        <label for="" class="mb-2 d-flex align-items-start">
-                            <span class="form-badge">1. </span> Sample sub-unit(SU) number
+                    <div class="mb-3">
+                        <label for="" class="form-label">
+                            <span class="form-badge">1</span> Sample sub-unit(SU) number
                         </label>
                         <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_0_1.sample_su_number">
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <div class="form-group mb-3">
-                        <label for="" class="mb-2 d-flex align-items-start">
-                            <span class="form-badge">2. </span> Approximate population of the SU
+                    <div class="mb-3">
+                        <label for="" class="form-label">
+                            <span class="form-badge">2</span> Approximate population of the SU
                         </label>
                         <input disabled type="number" class="form-control form-control-sm" id="" value="@block_0_1.approximate_population_su" @onchange="@((ChangeEventArgs e) => HandleChange(e))">
                         <ValidationComponent @ref="population_ref" is_error="@is_error" field_name="Approximate population of the SU" />
                     </div>
                 </div>
-                <div class="col-sm-12">
-                    <div class="form-group">
-                        <label for="" class="mb-2 d-flex align-items-start">
-                            <span class="form-badge">3. </span> Number of Sub-divisions of SU to be formed(D1)
+                <div class="col-sm-6">
+                    <div>
+                        <label for="" class="form-label">
+                            <span class="form-badge">3</span> Number of Sub-divisions of SU to be formed(D1)
                         </label>
                         <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_0_1.number_of_sub_division_of_su_to_be_formed">
                     </div>
@@ -48,15 +47,31 @@
             </div>
         </div>
     </div>
-    <div class="d-flex justify-content-between mb-3">
-        <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</NavLink>
-        <div class="d-flex">
-            @* <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink> *@
-            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+    @* Remarks Card *@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control disabled w-100" placeholder="" rows="4"></textarea>
         </div>
     </div>
 </div>
-
+<div class="footer">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <NavLink class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</NavLink>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                @* <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink> *@
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+            </div>
+        </div>
+    </div>
+</div>
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();

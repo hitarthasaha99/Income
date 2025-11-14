@@ -9,7 +9,7 @@
 	<div class="container h-100">
 		<div class="row justify-content-sm-center h-100">
 			<div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-10">
-                <div class="card shadow-lg rounded-5">
+                <div class="card shadow-lg rounded-4">
                     <div class="card-body p-5">
                         <div class="d-flex align-items-center border-bottom border-2 mb-3 pb-3 flex-wrap">
                             <img src="images/nsso75logo.svg" alt="logo" width="130">
@@ -30,7 +30,7 @@
                             <PasswordInput @bind-Value="@UserDetails.password" class="m-0" placeholder="Enter Password" Style="margin: 0 !important" />
                             <ValidationComponent @ref="pass" field_name="Password" field_value="@UserDetails.password" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
                         </div>
-                        <button class="btn btn-primary w-100 mt-2" disabled="@is_busy" onclick="@Login">@(is_busy ? "Please Wait..." : "Login")<Spinner style="margin-left: 10px;" Type="SpinnerType.Grow" Size="SpinnerSize.Small" Visible="@is_busy" /></button>
+                        <button class="btn btn-primary w-100 mt-2 d-flex justify-content-center" disabled="@is_busy" onclick="@Login">@(is_busy ? "Please Wait..." : "Login")<Spinner style="margin-left: 10px;" Type="SpinnerType.Grow" Size="SpinnerSize.Small" Visible="@is_busy" /></button>
                     </div>
                 </div>
             </div>
