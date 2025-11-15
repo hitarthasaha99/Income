@@ -11,6 +11,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject PreloadService preloadService
+@inject ILoggingService Logger
 
 
 <GlobalErrorBoundary>
@@ -25,6 +26,10 @@
                 </h3>
                 <div class="card-tools">
                     <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => OpenGenerateModal())">
+                            <i class="fi fi-rr-calculator me-1"></i>Generate
+                        </button>
+
                         <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => CalculateSSS())">
                             <i class="fi fi-rr-calculator me-1"></i>Calc SSS
                         </button>
@@ -35,6 +40,10 @@
 
                         <button class="btn btn-outline-primary btn-sm" @onclick="@(() => ResetSelection())">
                             <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection
+                        </button>
+
+                        <button class="btn btn-outline-primary btn-sm" @onclick="@(() => DeleteAllHHDS())">
+                            <i class="fi fi-rr-rotate-left me-1"></i>Delete All Households
                         </button>
                     </div>
                 </div>
@@ -140,11 +149,43 @@
             </div>
         </div>
     </div>
+
+    <Modal @ref="ModalRef" Size="ModalSize.Large">
+    <HeaderTemplate>
+        <h5 class="modal-title">Generate Households</h5>
+    </HeaderTemplate>
+
+    <BodyTemplate>
+        <div class="mb-3">
+            <label>Sector: @sector</label>
+        </div>
+
+            @foreach (var sss in ValidSss)
+            {
+                <div class="input-group mb-2">
+                    <span class="input-group-text" style="width: 80px;">@sss</span>
+                    <input type="number"
+                           class="form-control"
+                           @bind="InputCounts[sss]"
+                           min="0" />
+                </div>
+            }
+    </BodyTemplate>
+
+    <FooterTemplate>
+            <Button @onclick="@(() => Generate())">Generate</Button>
+        <Button @onclick="Cancel">Cancel</Button>
+    </FooterTemplate>
+</Modal>
 </GlobalErrorBoundary>
 
 
 
 @code {
+    private Modal ModalRef;
+
+    public Dictionary<int, int> InputCounts { get; set; } = new();
+    public List<int> ValidSss { get; set; } = new();
     EditContext editContext;
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     DateTime survey_time = DateTime.Now;
@@ -161,6 +202,12 @@
     ValidationComponent size_ref = new();
     CommonList commonList = new();
     private ValidationMessageStore messageStore;
+    private readonly Dictionary<int, int[]> SssMap = new()
+{
+    { 1, new[] { 11,12,21,22,31,32,40,90 } },
+    { 2, new[] { 11,121,122,21,221,222,40,90 } }
+};
+
 
     CommonFunction commonFunctions = new();
     bool is_error = false;
@@ -184,8 +231,57 @@
         if (block_0_1 != null)
         {
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
+            if (sector == 1)
+                ValidSss = new() { 11, 12, 21, 22, 31, 32, 40, 90 };
+            else
+                ValidSss = new() { 11, 121, 122, 21, 221, 222, 40, 90 };
+
+            foreach (var sss in ValidSss)
+                InputCounts[sss] = 0;
         }
         await LoadData();
+        await Logger.LogInfo($"Block 7 Loaded for {SessionStorage.SelectedFSUId}");
+    }
+
+    private async Task Generate()
+    {
+        var list = new List<Tbl_Sch_0_0_Block_7>();
+
+        foreach (var (sss, count) in InputCounts)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                list.Add(new Tbl_Sch_0_0_Block_7
+                {
+                    id = Guid.NewGuid(),
+                    SSS = sss,
+                    Stratum = GetStratum(sss),
+                    isInitialySelected = false,
+                    is_household = 2,
+                    isSelected = false,
+                    fsu_id = SessionStorage.SelectedFSUId
+                });
+            }
+        }
+        await SCH_0_0_Queries.SaveBulkBlock7(list);
+        await ModalRef.HideAsync();
+        await LoadData();
+    }
+
+    private async Task OpenGenerateModal()
+    {
+        await ModalRef.ShowAsync();
+    }
+
+    private async Task Cancel()
+    {
+        await ModalRef.HideAsync();
+    }
+
+    private int GetStratum(int sss)
+    {
+        var firstDigit = int.Parse(sss.ToString()[0].ToString());
+        return firstDigit * 10;
     }
 
     private async Task LoadData()
@@ -229,6 +325,22 @@
         }
     }
 
+    private async Task DeleteAllHHDS()
+    {
+        try
+        {
+            await SCH_0_0_Queries.DeleteAllHHDS();
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Getting error during deleting all households: {ex}, Please try again!");
+        }
+        finally
+        {
+            preloadService.Hide();
+        }
+    }
 
     private async Task CalculateSSS()
     {
@@ -476,194 +588,11 @@
     }
 
 
-
-
-    // private async Task CalculateSSS()
-    // {
-    //     //1. Separate logic for rural (consider both A and B) and urban (only A)
-    //     //2. A - Arrange usual monthly consumption expenditure (Block_7_9) in ascending order and find median (This will be determined for individual household types - Block_7_7)
-    //     //3. B - Arrange land area (Block_7_8) in ascending order and find 60th percentile value (This will be determined for individual household types - Block_7_7)
-    //     //4. Calculate SSS using formula below -
-    //     /*
-    //      * Rural:
-    //      * SSS - 11 = Block_7_7 = 1 and Block_7_8 < B
-    //      * SSS - 12 = Block_7_7 = 1 and Block_7_8 >= B
-    //      * SSS - 21 = Block_7_7 = 2 and Block_7_9 < A
-    //      * SSS - 22 = Block_7_7 = 2 and Block_7_9 >= A
-    //      * SSS - 31 = Block_7_7 = 3 and Block_7_9 < A
-    //      * SSS - 32 = Block_7_7 = 3 and Block_7_9 >= A
-    //      * SSS - 40 = Block_7_7 = 4
-    //      * SSS - 90 = Block_7_7 = 9
-    //      * Urban:
-    //      * SSS - 11 = Block_7_7 = 1 and Block_7_9 < A
-    //      * SSS - 121 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
-    //      * SSS - 122 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [7,8,10,11]
-    //      * SSS - 21 = Block_7_7 = 2 and Block_7_9 < A
-    //      * SSS - 221 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
-    //      * SSS - 222 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [7,8,10,11]
-    //      * SSS - 40 = Block_7_7 = 3
-    //      * SSS - 90 = Block_7_7 in [4,9]
-    //      */
-    //     try
-    //     {
-    //         preloadService.Show(SpinnerColor.Info, "Assigning SSS");
-    //         // Fetch data
-    //         var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
-
-    //         if (response == null || response.Count == 0)
-    //             return;
-
-    //         response = response.Where(x => x.is_household == 2).ToList(); // Consider only households
-    //         // --- Calculate A: median of Block_7_9 ---
-    //         var allExpenditure = response.Where(x => x.UMPCE.HasValue)
-    //                          .Select(x => (decimal)x.UMPCE.Value)
-    //                          .OrderBy(x => x)
-    //                          .ToList();
-
-    //         decimal A = 0;
-    //         int count = allExpenditure.Count;
-
-    //         if (count > 0)
-    //         {
-    //             if (count % 2 == 1)
-    //                 A = allExpenditure[count / 2];
-    //             else
-    //                 A = (allExpenditure[(count / 2) - 1] + allExpenditure[count / 2]) / 2;
-    //         }
-
-
-    //         // --- Calculate B: 60th percentile of Block_7_8 ---
-    //         var landAreas = response.Where(x => x.Block_7_8.HasValue)
-    //                                 .Select(x => x.Block_7_8.Value)
-    //                                 .OrderBy(x => x)
-    //                                 .ToList();
-    //         decimal B = 0;
-    //         int landCount = landAreas.Count;
-    //         if (landCount > 0)
-    //         {
-    //             double percentileIndex = 0.6 * (landCount - 1);
-    //             int lowerIndex = (int)Math.Floor(percentileIndex);
-    //             int upperIndex = (int)Math.Ceiling(percentileIndex);
-    //             B = (decimal)(landAreas[lowerIndex] + (landAreas[upperIndex] - landAreas[lowerIndex]) * (percentileIndex - lowerIndex));
-    //         }
-
-    //         // --- Assign A and B to each household ---
-    //         foreach (var item in response)
-    //         {
-    //             item.a = A;
-    //             item.b = B;
-    //         }
-
-    //         // --- Assign SSS based on sector ---
-    //         foreach (var item in response)
-    //         {
-    //             int block7 = item.Block_7_7 ?? 0;
-    //             var expenditure = item.UMPCE ?? 0;
-    //             double landArea = item.Block_7_8 ?? 0;
-    //             int education = item.Block_7_6 ?? 0;
-
-    //             if (sector == 1) // Rural
-    //             {
-    //                 switch (block7)
-    //                 {
-    //                     case 1:
-    //                         item.SSS = landArea < (double)B ? 11 : 12;
-    //                         item.Stratum = 10;
-    //                         break;
-    //                     case 2:
-    //                         item.SSS = expenditure < (int)A ? 21 : 22;
-    //                         item.Stratum = 20;
-    //                         break;
-    //                     case 3:
-    //                         item.SSS = expenditure < (int)A ? 31 : 32;
-    //                         item.Stratum = 30;
-    //                         break;
-    //                     case 4:
-    //                         item.SSS = 40;
-    //                         item.Stratum = 40;
-    //                         break;
-    //                     case 9:
-    //                         item.SSS = 90;
-    //                         item.Stratum = 90;
-    //                         break;
-    //                     default:
-    //                         item.SSS = 0;
-    //                         item.Stratum = 0;
-    //                         break;
-    //                 }
-    //             }
-    //             else if (sector == 2) // Urban
-    //             {
-    //                 switch (block7)
-    //                 {
-    //                     case 1:
-    //                         item.Stratum = 10;
-    //                         if (expenditure < (int)A)
-    //                             item.SSS = 11;
-    //                         else if (new int[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
-    //                             item.SSS = 121;
-    //                         else if (new int[] { 7, 8, 10, 11 }.Contains(education))
-    //                             item.SSS = 122;
-    //                         else
-    //                             item.SSS = 0;
-    //                         break;
-
-    //                     case 2:
-    //                         item.Stratum = 20;
-    //                         if (expenditure < (int)A)
-    //                             item.SSS = 21;
-    //                         else if (new int[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
-    //                             item.SSS = 221;
-    //                         else if (new int[] { 7, 8, 10, 11 }.Contains(education))
-    //                             item.SSS = 222;
-    //                         else
-    //                             item.SSS = 0;
-    //                         break;
-
-    //                     case 3:
-    //                         item.Stratum = 40;
-    //                         item.SSS = expenditure < (int)A ? 40 : 0;
-    //                         break;
-
-    //                     case 4:
-    //                     case 9:
-    //                         item.Stratum = 90;
-    //                         item.SSS = 90;
-    //                         break;
-
-    //                     default:
-    //                         item.Stratum = 0;
-    //                         item.SSS = 0;
-    //                         break;
-    //                 }
-    //             }
-    //         }
-
-    //         // Optionally: Save updated response to database here
-    //         var update = await SCH_0_0_Queries.SaveSSSToDatabase(response);
-    //         if (update == 1)
-    //         {
-    //             toastService.ShowSuccess("SSS assignment successful");
-    //             await LoadData();
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         // Handle/log exception
-    //         Console.WriteLine(ex.Message);
-    //     }
-    //     finally
-    //     {
-    //         preloadService.Hide();
-    //     }
-    // }
-
     async Task DoSelection()
     {
         try
         {
             preloadService.Show(SpinnerColor.Info, "Doing Selection, Please wait...");
-            List<SSSItem> s1List = new List<SSSItem>();
 
             await SCH_0_0_Queries.UpdateAllRowsForColumnAsync(SessionStorage.SelectedFSUId);
             var existingListingData = await SCH_0_0_Queries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
@@ -674,54 +603,124 @@
                 toastService.ShowError("Please calculate SSS before doing selection, Please try again!");
                 return;
             }
-
             if (existingListingData.Count > 0)
             {
-                var config = SelectionConfigFactory.Build(sector);
-                var selector = new HouseholdSelector(config, randomSeed: 42);
-                var result = selector.Select(existingListingData, sector);
+                var service = new HouseholdSelectionService();
+                var households = existingListingData;
+                int sectorType = sector; // 1 = Rural, 2 = Urban
 
-                foreach (var item in result.Households)
-                {
-                    item.isInitialySelected = item.isSelected;
-                    //item.SSS = item.SelectedPostedSSS.GetValueOrDefault();
-                    await SCH_0_0_Queries.Update_SCH0_0_Block_7(item);
-                    SessionStorage.selection_done = true;
-                }
+                var result = service.SelectHouseholds(households, sectorType);
 
-                Debug.WriteLine("Selected households:");
-                //Update selection flag at FSU level
-                var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
-                if (fsu != null)
+                if (result.Success)
                 {
-                    fsu.is_selection_done = true;
-                    await commonQueries.UpdateFSU(fsu);
-                }
-                foreach (var hh in result.Households.Where(h => h.isSelected))
-                {
-                    Debug.WriteLine($"Id={hh.Block_7_3} Stratum={hh.Stratum} FromSSS={hh.SelectedFromSSS} PostedSSS={hh.SelectedPostedSSS}");
-                }
+                    foreach (var item in result.SelectedHouseholds)
+                    {
+                        item.isInitialySelected = item.isSelected;
+                        //item.SSS = item.SelectedPostedSSS.GetValueOrDefault();
+                        await SCH_0_0_Queries.Update_SCH0_0_Block_7(item);
+                        SessionStorage.selection_done = true;
+                    }
 
-                Debug.WriteLine("\nLogs:");
-                foreach (var log in result.Logs)
-                {
-                    Debug.WriteLine($"{log.HouseholdId} origSSS={log.OriginalSSS} posted={log.PostedSSS} note={log.Reason}");
+                    Debug.WriteLine("Selected households:");
+                    //Update selection flag at FSU level
+                    var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+                    if (fsu != null)
+                    {
+                        fsu.is_selection_done = true;
+                        await commonQueries.UpdateFSU(fsu);
+                    }
+                    Debug.WriteLine($"Total households selected: {result.SelectedHouseholds.Count}");
+
+                    foreach (var msg in result.Messages)
+                    {
+                        Debug.WriteLine(msg.Value);
+                    }
+
+                    // Process selected households
+                    foreach (var hh in result.SelectedHouseholds)
+                    {
+                        Debug.WriteLine($"HH {hh.Block_7_3}: SSS {hh.SSS} -> Posted as SSS {hh.SelectedPostedSSS}");
+                    }
                 }
                 toastService.ShowSuccess("Selection done successfully!");
                 await LoadData();
-
             }
 
         }
         catch (Exception ex)
         {
-            toastService.ShowError($"Getting error during selection: {ex}, Please try again!");
+            Console.WriteLine(ex.Message);
         }
         finally
         {
             preloadService.Hide();
         }
+
     }
+
+    // async Task DoSelection()
+    // {
+    //     try
+    //     {
+    //         preloadService.Show(SpinnerColor.Info, "Doing Selection, Please wait...");
+
+    //         await SCH_0_0_Queries.UpdateAllRowsForColumnAsync(SessionStorage.SelectedFSUId);
+    //         var existingListingData = await SCH_0_0_Queries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+    //         var sss_selection_done = existingListingData.Any(x => x.SSS != 0);
+
+    //         if (sss_selection_done == false)
+    //         {
+    //             toastService.ShowError("Please calculate SSS before doing selection, Please try again!");
+    //             return;
+    //         }
+
+    //         if (existingListingData.Count > 0)
+    //         {
+    //             var config = SelectionConfigFactory.Build(sector);
+    //             var selector = new HouseholdSelector(config, randomSeed: 42);
+    //             var result = selector.Select(existingListingData, sector);
+
+    //             foreach (var item in result.Households)
+    //             {
+    //                 item.isInitialySelected = item.isSelected;
+    //                 //item.SSS = item.SelectedPostedSSS.GetValueOrDefault();
+    //                 await SCH_0_0_Queries.Update_SCH0_0_Block_7(item);
+    //                 SessionStorage.selection_done = true;
+    //             }
+
+    //             Debug.WriteLine("Selected households:");
+    //             //Update selection flag at FSU level
+    //             var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+    //             if (fsu != null)
+    //             {
+    //                 fsu.is_selection_done = true;
+    //                 await commonQueries.UpdateFSU(fsu);
+    //             }
+    //             foreach (var hh in result.Households.Where(h => h.isSelected))
+    //             {
+    //                 Debug.WriteLine($"Id={hh.Block_7_3} Stratum={hh.Stratum} FromSSS={hh.SelectedFromSSS} PostedSSS={hh.SelectedPostedSSS}");
+    //             }
+
+    //             Debug.WriteLine("\nLogs:");
+    //             foreach (var log in result.Logs)
+    //             {
+    //                 Debug.WriteLine($"{log.HouseholdId} origSSS={log.OriginalSSS} posted={log.PostedSSS} note={log.Reason}");
+    //             }
+    //             toastService.ShowSuccess("Selection done successfully!");
+    //             await LoadData();
+
+    //         }
+
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         toastService.ShowError($"Getting error during selection: {ex}, Please try again!");
+    //     }
+    //     finally
+    //     {
+    //         preloadService.Hide();
+    //     }
+    // }
 
     async Task HandleSubmit(string action = "")
     {

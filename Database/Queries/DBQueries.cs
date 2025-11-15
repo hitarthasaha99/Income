@@ -501,6 +501,28 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> DeleteAllHHDS()
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Sch_0_0_Block_7>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId).ToListAsync();
+                if (exists != null && exists.Count > 0)
+                {
+                    foreach (var item in exists)
+                    {
+                        int deleted = await _database.DeleteAsync(item);
+                    }
+
+                }
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting household: " + ex.Message);
+                return 0;
+            }
+        }
+
         public async Task<int> SaveSSSToDatabase(List<Tbl_Sch_0_0_Block_7> households)
         {
             if (households == null || households.Count == 0)
@@ -602,7 +624,7 @@ namespace Income.Database.Queries
         public Task<List<Tbl_Sch_0_0_Block_7>> Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(int fsu_id)
         {
             return _database.Table<Tbl_Sch_0_0_Block_7>()
-                            .Where(x => x.fsu_id == fsu_id && x.is_household == 2)
+                            .Where(x => x.fsu_id == fsu_id && x.is_household == 2 && (x.is_deleted == null || x.is_deleted == false))
                             .ToListAsync();
         }
 

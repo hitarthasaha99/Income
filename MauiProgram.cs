@@ -42,6 +42,8 @@ namespace Income
             //builder.Services.AddFluentValidationAutoValidation();
 
             builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
+            builder.Services.AddSingleton<ILoggingService, LoggingService>();
+
             builder.Services.AddBlazoredToast();
 
 #if DEBUG
