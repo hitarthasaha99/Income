@@ -1116,5 +1116,90 @@ namespace Income.Database.Queries
                 return 0;
             }
         }
+
+        //Warning and Comment related queries
+        public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
+        {
+            int result = 0;
+
+            if (warnings == null || !warnings.Any())
+                return result;
+
+            foreach (var warning in warnings)
+            {
+                if (warning == null)
+                    continue;
+
+                if (warning.id == Guid.Empty)
+                    warning.id = Guid.NewGuid(); // Ensure a valid ID
+
+                var existing = await _database.Table<Tbl_Warning>()
+                    .Where(w => w.id == warning.id)
+                    .FirstOrDefaultAsync();
+
+                if (existing != null)
+                {
+                    await _database.UpdateAsync(warning);
+                    result++;
+                }
+                else
+                {
+                    await _database.InsertAsync(warning);
+                    result++;
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "HIS")
+        {
+            //if (SessionStorage.user_role == CommonConstants.USER_CODE_JSO)
+            //{
+            //    return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && (x.is_deleted == false || x.is_deleted == null) && x.warning_status == 1 && x.hhd_id == hhd_id).ToListAsync();
+            //}
+            //else
+            //{
+            //    return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && (x.is_deleted == false || x.is_deleted == null) && x.warning_status == 2 && x.hhd_id == hhd_id).ToListAsync();
+            //}
+            if (schedule == "0")
+            {
+                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+            }
+            else
+            {
+                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.is_deleted == false || x.is_deleted == null) && x.hhd_id == hhd_id).ToListAsync();
+            }
+
+        }
+
+        public async Task<List<Tbl_Warning>> GetWarningTableDataForSerial(int fsuId, int hddId, string block, int serial)
+        {
+            return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.block == block && x.serial_number == serial && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+        }
+
+        public Task<int> DeleteWarningTableDataForSerial(int fsuId, int hddId, string block, int serial, Guid id)
+        {
+            var data = _database.QueryAsync<Tbl_Warning>($"SELECT * FROM Tbl_Warning WHERE fsu_id == {fsuId} AND hhd_id == {hddId}  AND warning_status == 1");
+            if (data.Result.Count != 0)
+            {
+                var result = _database.ExecuteAsync($"DELETE FROM Tbl_Warning WHERE fsu_id == {fsuId} AND hhd_id == {hddId}");
+                if (result?.Result > 0)
+                {//Delete child
+                    _database.ExecuteAsync($"DELETE FROM Tbl_Warning WHERE fsu_id == {fsuId} AND hhd_id == {hddId} AND parent_id == {id}");
+                }
+                return result;
+            }
+            else
+            {
+                var result = _database.ExecuteAsync($"UPDATE Tbl_Warning SET is_deleted = true WHERE fsu_id == {fsuId} AND hhd_id == {hddId} AND id == {id}");
+                if (result?.Result > 0)
+                {//Delete child
+                    _database.ExecuteAsync($"UPDATE Tbl_Warning SET is_deleted = true WHERE fsu_id == {fsuId} AND hhd_id == {hddId} AND parent_id == {id}");
+                }
+                return result;
+            }
+
+        }
     }
 }

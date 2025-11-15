@@ -1,10 +1,12 @@
 ﻿@page "/dashboard/sch0.0/block_11"
 @using Income.Database.Models.Common
 @using Income.Database.Models.SCH0_0
+@using Income.Viewmodels
 @layout Income.Components.Layout.DashboardLayout
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
+@inject Warning_VM warningVM
 
 <div class="main-content">
     <CommonContentHeader 
@@ -16,6 +18,8 @@
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">[Block 11]</span>Particulars of sampling of households
             </h3>
+            <Button Disabled="@SessionStorage.FSU_Submitted" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-disk me-1"></i>Validate</Button>
+
         </div>
         <div class="card-body">
             <div class="row">
@@ -47,22 +51,30 @@
                     </div>
                 </div>
                <div class="col-sm-12">
-                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-                    {
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">2.1</span>Date of end of field work
-                            </label>
-                            <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_end_date" disabled>
-                        </div>
-                    }
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">2.1</span>Date of end of field work
+                        </label>
+                        <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_end_date" disabled>
+                    </div>
                </div>
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
                             <span class="form-badge">3</span>total time taken to canvass the schedule by the team of enumerator (SE/JSO) (in hours)
                         </label>
-                        <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.time_taken">
+                        <input type="text"
+                                disabled="@(SessionStorage.FSU_Submitted)"
+                               class="form-control is_sso"
+                               value="@tbl_Sch_0_0_FieldOperation.time_taken"
+                               onkeypress="return event.key.match(/^[0-9]$/)"
+                               @oninput="TimeTakenChanged" />
+
+                            @if (!string.IsNullOrEmpty(StatusMessage))
+                            {
+                                <div class="@StatusClass">@StatusMessage</div>
+                            }
+
                     </div>
                 </div>
                 <div class="col-sm-12">
@@ -74,13 +86,13 @@
                         <div class="d-flex align-items-center">
                             <div class="customRadioButton me-5">
                                 <label class="d-flex align-items-center">
-                                    <input type="radio" id="Yes" name="yesRemarks">
+                                    <input disabled type="radio" id="Yes" name="yesRemarks">
                                     <span class="label-text ms-2">Yes</span>
                                 </label>
                             </div>
                             <div class="customRadioButton">
                                 <label class="d-flex align-items-center">
-                                    <input type="radio" id="No" name="yesRemarks">
+                                    <input disabled type="radio" id="No" name="yesRemarks">
                                     <span class="label-text ms-2">No</span>
                                 </label>
                             </div>
@@ -147,7 +159,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea type="text" class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+            <textarea type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control disabled w-100" @bind="@remarks" placeholder="" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -162,7 +174,7 @@
             <div class="d-flex justify-content-end">
                 @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
                 {
-                    <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                    <Button Disabled="@SessionStorage.FSU_Submitted" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Exit<i class="fi fi-rr-cross-circle ms-1"></i></NavLink>
             </div>
@@ -173,6 +185,7 @@
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     DateTime survey_time = DateTime.Now;
+    Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     Tbl_Sch_0_0_FieldOperation tbl_Sch_0_0_FieldOperation = new();
     CommonQueries commonQueries = new();
     DBQueries DBQueries = new();
@@ -180,6 +193,11 @@
     private string end_date = string.Empty;
     private bool remarks_block_9_10_yes = false;
     private bool remarks_elsewhere_yes = false;
+    private bool remarks_block_11 = false;
+    int surveyCode = 0;
+    string StatusMessage = "";
+    string StatusClass = "";
+    string? remarks = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -191,6 +209,8 @@
             }
         }
     }
+
+    private string? timeTakenError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -205,15 +225,22 @@
             };
             await commonQueries.InsertVisitedBlock(vb);
             var block_1 = await DBQueries.FetchBlock1();
+            if (block_1 != null)
+            {
+                block_0_1 = block_1;
+                surveyCode = block_1.Block_1_16.GetValueOrDefault();
+                remarks = block_0_1.remarks_block_11;
+            }
             tbl_Sch_0_0_FieldOperation = await DBQueries.FetchBlock2();
             if (tbl_Sch_0_0_FieldOperation == null)
             {
                 tbl_Sch_0_0_FieldOperation = new Tbl_Sch_0_0_FieldOperation
                 {
                     id = Guid.NewGuid(),
+                    field_work_start_date = block_1.survey_timestamp,
+                    field_work_end_date = DateTime.Now,
                     fsu_id = SelectedFsuId,
                     enumerator_name = SessionStorage.user_name,
-                    field_work_start_date = DateTime.Now,
                 };
             }
             else
@@ -221,11 +248,16 @@
                 if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                 {
                     tbl_Sch_0_0_FieldOperation.supervisor_name = SessionStorage.user_name;
-                    tbl_Sch_0_0_FieldOperation.field_work_end_date = DateTime.Now;
                 }
             }
 
             remarks_block_9_10_yes = !string.IsNullOrEmpty(block_1?.EnumeratorRemarks) || !string.IsNullOrEmpty(block_1?.SupervisorRemarks);
+            remarks_elsewhere_yes = !string.IsNullOrEmpty(block_1?.remarks_block_2_2) || !string.IsNullOrEmpty(block_1?.remarks_block_3) ||
+                                    !string.IsNullOrEmpty(block_1?.remarks_block_4) || !string.IsNullOrEmpty(block_1?.remarks_block_5) ||
+                                    !string.IsNullOrEmpty(block_1?.remarks_block_6) || !string.IsNullOrEmpty(block_1?.remarks_block_7) ||
+                                    !string.IsNullOrEmpty(block_1?.remarks_block_7_selection);
+
+            remarks_block_11 = !string.IsNullOrEmpty(block_1?.remarks_block_11);
 
             StateHasChanged();
             return;
@@ -241,6 +273,90 @@
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
+
+    private void TimeTakenChanged(ChangeEventArgs e)
+    {
+        StatusMessage = string.Empty;
+        var txt = e.Value?.ToString() ?? "";
+        // Validate and convert to integer
+        if (int.TryParse(txt, out int value))
+        {
+            tbl_Sch_0_0_FieldOperation.time_taken = value;
+            //Warning - if time < 5
+            if ((surveyCode == 1 || surveyCode == 4) && value < 5)
+            {
+                StatusClass = "text-success";
+                StatusMessage = "W000: Time taken should be > 5 hours";
+            }
+            //For zero case - time should be < 5
+            else if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
+            {
+                StatusClass = "text-success";
+                StatusMessage = "W000: Time taken should be < 5 hours";
+            }
+        }
+        else
+        {
+            tbl_Sch_0_0_FieldOperation.time_taken = null;       // or null if nullable
+            // StatusMessage = "Invalid entry";
+            // StatusClass = "text-danger";  // red
+        }
+    }
+
+    private bool HardChecksFailed()
+    {
+        try
+        {
+            StatusMessage = string.Empty;
+            if (surveyCode == 1 || surveyCode == 4)
+            {
+                //(iii) surveycode = 1 or 4 -> time should be zero
+                if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
+                {
+                    StatusMessage = "H000: Time taken cannot be blank or zero";
+                    StatusClass = "text-danger";
+                }
+                //(vi) surveycode = 1 or 4 -> time should be between 5 and 60
+                else if (tbl_Sch_0_0_FieldOperation.time_taken < 5 || tbl_Sch_0_0_FieldOperation.time_taken > 60)
+                {
+                    StatusMessage = "H000: Time taken must be between 5 and 60 hours";
+                    StatusClass = "text-danger";
+                }
+            }
+            return !string.IsNullOrEmpty(StatusMessage);
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    private bool WarningsPresent()
+    {
+        try
+        {
+            StatusMessage = string.Empty;
+            int value = tbl_Sch_0_0_FieldOperation.time_taken.GetValueOrDefault();
+            //Warning - if time < 5
+            if ((surveyCode == 1 || surveyCode == 4) && value < 5)
+            {
+                StatusClass = "text-success";
+                StatusMessage = "W000: Time taken should be > 5 hours";
+            }
+            //For zero case - time should be < 5
+            else if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
+            {
+                StatusClass = "text-success";
+                StatusMessage = "W000: Time taken should be < 5 hours";
+            }
+            return !string.IsNullOrEmpty(StatusMessage);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public async Task HandleSubmit(bool is_go_next)
     {
 
@@ -248,9 +364,23 @@
         {
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
+                bool isInvalid = HardChecksFailed();
+                if (isInvalid)
+                {
+                    toastService.ShowError("Please address pending errors");
+                    //return;
+                }
+                if (WarningsPresent())
+                {
+                    warningVM.AddWarning(StatusMessage, "0", "11", "3");
+                }
                 var res = await DBQueries.SaveBlock2(tbl_Sch_0_0_FieldOperation);
                 if (res.GetValueOrDefault() > 0)
                 {
+                    block_0_1.remarks_block_11 = remarks;
+                    await DBQueries.SaveBlock1(block_0_1);
+                    await warningVM.SaveWarningAsync(false, warningVM.WarningList, "0", "11", 0);
+                    await DBQueries.UpsertWarningAsync(warningVM.WarningList);
                     toastService.ShowSuccess("Data saved successfully");
                     if (is_go_next)
                     {
@@ -264,6 +394,11 @@
                     return;
                 }
             }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/fsulist");
+                return;
+            }
         }
         catch (Exception ex)
         {
@@ -271,18 +406,12 @@
         }
         finally
         {
-            
+
         }
     }
 
-    private async Task LoadData()
+    private void OpenValidatePage()
     {
-        try
-        {
-            
-        }
-        catch (Exception ex)
-        {
-        }
+        NavigationManager.NavigateTo($"/dashboard/validate_page?schedule={0}");
     }
 }

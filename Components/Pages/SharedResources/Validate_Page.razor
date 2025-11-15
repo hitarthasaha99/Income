@@ -1,0 +1,447 @@
+﻿@page "/dashboard/validate_page"
+@using Income.Database.Models.Common
+@using Income.Viewmodels
+@layout Income.Components.Layout.DashboardLayout
+@inject PreloadService preloadService
+@inject IToastService toastService
+@inject Warning_VM Warning_VM
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div class="my-2">
+    <CommonContentHeader 
+    SelectedFsuId="@SelectedFsuId"
+    survey_time="@survey_time" 
+    />
+    <div class="d-flex align-items-center mb-3 alert-info-popup">
+        <div class="outerCircle outerWarning">
+            <div class="innerCircle innerWarning"><i class="bi bi-exclamation-triangle"></i></div>
+        </div>
+        <div class="ms-2 text-start">
+            <h5 class="text-dark fw-bold fs-16 mb-1">@((ParentWarning?.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).Count() ?? 0)) Warnings Found</h5>
+        </div>
+        <div class="ms-auto" style="min-width: 200px;">
+            <div class="form-group mb-0">
+                <p class="text-muted mb-2"><strong>Filter Warning-</strong></p>
+                <select class="form-select form-select-sm" value="@selectedFilter" @onchange="OnFilterChanged">
+                    <option value="1">ALL</option>
+                    <option value="2">Accepted</option>
+                    <option value="3">Pending/Reject</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@* Comment Card *@
+@if (ParentWarning != null && ParentWarning.Count > 0)
+{
+    @foreach (var top in ParentWarning)
+    {
+        <div class="card discussion-item custom-badge warningWrap mb-4">
+            <div class="py-2 card-header">
+                <div class="mb-0 card-title h5">Warning</div>
+            </div>
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="user-panel d-flex"> 
+                        <div class="image avatar-latter color1 ms-0" style="width:48px; height:48px;">
+                            @(new string(top?.user_name?.Trim().Where(char.IsLetter).Take(2).ToArray()))
+                        </div>
+                        <div class="info">
+                            <strong class="d-block" style="line-height: 12px;">@(top.user_name)</strong>
+                            <small>@(common.GetUserRoleName(top.role_code))</small> 
+                        </div> 
+                    </div>
+                    <div class="ms-auto">
+                        <ul class="stats other-info">
+                            <li class="d-flex align-items-center">
+                                <a onclick="@(() =>NavigateWarning(top) )"><i class="bi bi-eye"></i></a>
+                                @*                                 <h4 class="mb-0">@(top?.serial_number)</h4>
+ *@                            </li>
+                            <li class="d-flex align-items-center">
+                                @*                                 <i class="bi bi-calendar"></i>
+ *@                                <h4 class="mb-0">@(top?.created_on?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h2>
+                    <span class="sl-no-label">
+                        <label>@(top?.serial_number)</label>
+                        <small>SL No.</small>
+                    </span>
+                    <span class="title-dis ps-3">@(top?.warning_message)</span>
+                </h2>
+                <hr />
+                <ul class="stats justify-content-between pb-3">
+                    <li class="d-flex align-items-center">
+                        <h3 class="mb-0 me-5">HHD No.</h3>
+                        <p class="text-danger mb-0">
+                            @(top?.hhd_id == 0 ? "-" : top?.hhd_id)
+                        </p>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <h3 class="mb-0 me-5">Block</h3>
+                        <p class="text-success mb-0">
+                            @(top?.block)
+                        </p>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <h3 class="mb-0 me-5">Item</h3>
+                        <p class="text-info mb-0">
+                            @(top?.item_no)
+                        </p>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <h3 class="mb-0 me-5">SCH</h3>
+                        <p class="text-warning mb-0">
+                            @(top?.schedule)
+                        </p>
+                    </li>
+                </ul>
+                @if (ChildWarning != null && ChildWarning.Count > 0)
+                {
+                    @foreach (var Child in ChildWarning.OrderBy(x=> x?.created_on))
+                    {
+                        @if (Child?.parent_comment_id == top?.id)
+                        {
+                            <div class="card-header border-top ps-5 bg-transparent">
+                                <div class="d-flex">
+                                    <div class="user-panel d-flex"> 
+                                        <div class="image avatar-latter color2 me-0" style="width:38px; height:38px; font-size: 15px;">
+                                            @(new string(Child?.user_name?.Trim().Where(char.IsLetter).Take(2).ToArray()))
+                                        </div>
+                                        <div class="info" style="padding-left:14px;"> 
+                                            <div class="d-flex align-items-center"> 
+                                                <strong class="d-block me-4" style="line-height: 12px;">@(Child?.user_name)</strong>
+                                                <div class="badge color3 fw-bold">@((Child?.role_code == SessionStorage.user_role) ? "ME" : "")</div>
+                                                @if (Child.warning_status == 4 || Child.warning_status == 2 || Child.warning_status == 5)
+                                                {
+                                                    <div class="badge color1 fw-bold ms-1">ACCEPTED</div>
+                                                }
+                                                else if (Child.warning_status == 3)
+                                                {
+                                                    <div class="badge color3 fw-bold ms-1">REJECTED</div>
+                                                }
+                                            </div>
+                                            <small>@(common.GetUserRoleName(Child.role_code))</small>
+                                        </div> 
+                                    </div>
+                                    <div class="ms-auto">
+                                        <ul class="stats other-info">
+                                            <li class="d-flex">
+                                                @*                                                 <i class="bi bi-calendar"></i>
+ *@                                                <h4 class="mb-0">@(Child?.created_on?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
+                                            </li>
+                                            @* <li class="d-flex"> *@
+                                            @*     <i class="bi bi-pencil"></i> *@
+                                            @*     <h4 class="mb-0">Edit</h4> *@
+                                            @* </li> *@
+                                        </ul>
+                                    </div>
+                                </div>
+                                @* <input type="radio" id="@(Child.id)" Label="Accept"  checked ="@((Child.warning_status == 4 || Child.warning_status ==2 )? true : false)" disabled /> *@
+                                @* <label class="form-check-label" for="acceptRadio">Accept</label> *@
+
+                                @* <input type="radio" id="@(Child.id)" Label="Reject" checked="@((Child.warning_status == 3 )? true : false)" disabled /> *@
+                                @* <label class="form-check-label" for="rejectRadio">Reject</label> *@
+
+                                <p class="ps-5 mb-0">@(Child?.remarks)</p>
+                            </div>
+                        }
+                    }
+                }
+
+                <div class="card-header border-top ps-5 bg-transparent">
+                    <form class="form-inline d-flex w-100">
+                        @if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+                        {
+                            //<RadioInput Name="EnableNotifications" Label="Accept" @bind-Value="Warning_VM.Is_Accepted" />
+                            // <RadioInput Name="EnableNotifications" Label="Reject" @bind-Value="Warning_VM.IsRejected" />
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id=@($"acceptRadio_{top.id}")
+                                name="EnableNotifications" @onchange="(() => OnAccept())" />
+                                <label class="form-check-label" for="acceptRadio">Accept</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id=@($"rejectRadio_{top.id}")
+                                name="EnableNotifications" @onchange="(() => OnReject())" />
+                                <label class="form-check-label" for="rejectRadio">Reject</label>
+                            </div>
+                        }
+                        <div class="form-group mx-sm-3 mb-2 ps-4" style="width:70%;">
+                            <input type="text" class="form-control" placeholder="Enter Remarks" @bind="Warning_VM.warningcoment.remarks" disabled="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO) && top?.warning_status == 4)">
+                        </div>
+                        <NavLink type="submit" class="btn btn-primary mb-2" @onclick="(()=> Validate(top))">Submit</NavLink>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    bool ShowVisitedBlock = false;
+    private CommonConfig commonConfig = new CommonConfig();
+    CommonList commonList = new();
+    DateTime survey_time = DateTime.Now;
+    List<Tbl_Warning?> WarningList = new List<Tbl_Warning?>();
+    List<Tbl_Warning?> ParentWarning = new List<Tbl_Warning?>();
+    List<Tbl_Warning?> ChildWarning = new List<Tbl_Warning?>();
+    CommonFunction common = new CommonFunction();
+    private string selectedFilter = "3"; // Default filter to show Rejected warnings
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Schedule { get; set; }
+    private Task OnAccept()
+    {
+        Warning_VM.Is_Accepted = true;
+        Warning_VM.IsRejected = false;
+        return Task.CompletedTask;
+    }
+    private Task OnReject()
+    {
+        Warning_VM.Is_Accepted = false;
+        Warning_VM.IsRejected = true;
+        return Task.CompletedTask;
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+        var schedule = Schedule;
+    }
+
+    private async void Validate(Tbl_Warning topWarning)
+    {   int Result = 0;
+        Result = await Warning_VM.ValidateWarning(topWarning);
+        if(Result>0)
+        {
+            toastService.ShowSuccess("Validation Successful ,Success");
+            await JSRuntime.InvokeVoidAsync("uncheckRadioById", $"acceptRadio_{topWarning.id}");
+            await JSRuntime.InvokeVoidAsync("uncheckRadioById", $"rejectRadio_{topWarning.id}");
+            await Refresh();
+        }
+        else if (Result == -1)
+        {
+            toastService.ShowWarning("Add remarks");
+            return;
+
+        }
+        else
+        {
+            toastService.ShowError("Validation Failed, Please try again");
+            return;
+        }
+    }
+
+
+    private void NavigateWarning(Tbl_Warning warningObj)
+    {
+        try
+        {
+            SessionStorage.selected_hhd_id = warningObj.hhd_id ?? 0;
+            SessionStorage.SelectedFSUId = warningObj.fsu_id;
+            switch (warningObj.block)
+            {
+                case "1":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block0_1");
+                        break;
+                    }
+                case "2":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_2");
+                        break;
+                    }
+                case "3":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_3");
+                        break;
+                    }
+                case "4":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_4");
+                        break;
+                    }
+                case "4.1":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_4_2");
+                        break;
+                    }
+                case "4.2":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_4_2");
+                        break;
+                    }
+                case "5.1":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block5_1");
+                        break;
+                    }
+                case "5.2":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block5_2");
+                        break;
+                    }
+                case "6.1":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block6_1");
+                        break;
+                    }
+                case "6.2":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block6_2");
+                        break;
+                    }
+                case "7":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_7");
+                        break;
+                    }
+                case "8.1":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_8_1");
+                        break;
+                    }
+                case "8":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_8");
+                        break;
+                    }
+                case "9.1":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block9_1");
+                        break;
+                    }
+                case "9":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_9");
+                        break;
+                    }
+                case "10":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_10");
+                        break;
+                    }
+                case "11":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_10");
+                        break;
+                    }
+                default:
+                    toastService.ShowError("Navigation not possible");
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+
+    private async Task Refresh()
+    {
+        try
+        {
+            if (Schedule == "0")
+            {
+                WarningList = await Warning_VM.GetAllWarning("0");
+            }
+            else
+            {
+                WarningList = await Warning_VM.GetAllWarning();
+            }
+            if (selectedFilter == "1")
+            {
+                ParentWarning = WarningList.Where(x => x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+            }
+            else if (selectedFilter == "2" && SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 4 || x?.warning_status == 2 || x?.warning_status == 5)).ToList();
+            }
+            else if (selectedFilter == "2" && SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO)
+            {
+                ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 4 || x?.warning_status == 5)).ToList();
+            }
+            else if (selectedFilter == "2" && SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+            {
+                ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 5)).ToList();
+            }
+            else if (selectedFilter == "3" && SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1)).ToList();
+            }
+            else if (selectedFilter == "3" && SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO)
+            {
+                ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1 || x?.warning_status == 2)).ToList();
+            }
+            else if (selectedFilter == "3" && SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+            {
+                ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1 || x?.warning_status == 2 || x?.warning_status == 4)).ToList();
+            }
+            // ParentWarning = WarningList.Where(x => x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+            ChildWarning = WarningList.Where(item => item.parent_comment_id != null || item.parent_comment_id != Guid.Empty).OrderBy(x => x.created_on).ToList();
+            StateHasChanged();
+            return;
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Error while refreshing the page: " + ex.Message);
+            return;
+
+        }
+    }
+    private void OnFilterChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            selectedFilter = e.Value?.ToString();
+            if (WarningList != null && WarningList.Count() > 0)
+            {
+                if (selectedFilter == "1")
+                {
+                    ParentWarning = WarningList.Where(x => x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+                }
+                else if (selectedFilter == "2" && SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                {
+                    ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 4 || x?.warning_status == 2 || x?.warning_status == 5)).ToList();
+                }
+                else if (selectedFilter == "2" && SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO)
+                {
+                    ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 4 || x?.warning_status == 5)).ToList();
+                }
+                else if (selectedFilter == "2" && SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                {
+                    ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 5)).ToList();
+                }
+                else if (selectedFilter == "3" && SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                {
+                    ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1)).ToList();
+                }
+                else if (selectedFilter == "3" && SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO)
+                {
+                    ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1 || x?.warning_status == 2)).ToList();
+                }
+                else if (selectedFilter == "3" && SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                {
+                    ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1 || x?.warning_status == 2 || x?.warning_status == 4)).ToList();
+                }
+            }
+            StateHasChanged();
+            return;
+        }
+		catch (Exception ex)
+		{
+			toastService.ShowError("Error while filtering warnings: " + ex.Message);
+			return ;
+		}
+    }
+
+}

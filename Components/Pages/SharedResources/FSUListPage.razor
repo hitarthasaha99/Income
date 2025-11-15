@@ -347,7 +347,7 @@
 
             }
             SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
-            SessionStorage.selection_done = FsuData?.FirstOrDefault().is_selection_done ?? false;
+            SessionStorage.selection_done = await FSU_Selection_Done(fsu_id);
             SessionStorage.selected_hhd_seq = 0;
             SessionStorage.selected_hhd_id = 0;
             string page_name = block_name == "sch0.0" ? "block0_1" : "ssu_page";
@@ -358,6 +358,28 @@
             toastService.ShowError($"Error while navigating to block: {ex.Message}");
             return;
         }    
+    }
+
+    async Task<bool> FSU_Selection_Done(int fsu_id)
+    {
+        try
+        {
+            var hhd_list = await dB.GetBlock7Data(fsu_id);
+            if (hhd_list != null && hhd_list.Count > 0)
+            {
+                bool selection_done = hhd_list.Any(x => x.isSelected);
+                return selection_done;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+        finally
+        {
+            
+        }
     }
 
     // async Task HandleFinalSubmisssion()

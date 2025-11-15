@@ -44,6 +44,9 @@ namespace Income
             builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
             builder.Services.AddSingleton<ILoggingService, LoggingService>();
 
+            builder.Services.AddSingleton<Viewmodels.Warning_VM>();
+
+
             builder.Services.AddBlazoredToast();
 
 #if DEBUG
