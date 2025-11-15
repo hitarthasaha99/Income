@@ -7,6 +7,8 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Warning_VM warningVM
+@inject ILoggingService Logger
+
 
 <div class="main-content">
     <CommonContentHeader 
@@ -174,7 +176,7 @@
             <div class="d-flex justify-content-end">
                 @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
                 {
-                    <Button Disabled="@SessionStorage.FSU_Submitted" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
+                    <Button hidden="@SessionStorage.FSU_Submitted" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Exit<i class="fi fi-rr-cross-circle ms-1"></i></NavLink>
             </div>
@@ -379,7 +381,7 @@
                 {
                     block_0_1.remarks_block_11 = remarks;
                     await DBQueries.SaveBlock1(block_0_1);
-                    await warningVM.SaveWarningAsync(false, warningVM.WarningList, "0", "11", 0);
+                    //await warningVM.SaveWarningAsync(false, warningVM.WarningList, "0", "11", 0);
                     await DBQueries.UpsertWarningAsync(warningVM.WarningList);
                     toastService.ShowSuccess("Data saved successfully");
                     if (is_go_next)

@@ -144,8 +144,20 @@ namespace Income.Database.Queries
         {
             try
             {
+                List<Tbl_Visited_Blocks> list = [];
+                Tbl_Visited_Blocks tbl_visited_block = new()
+                {
+                    block_uri = "/dashboard/fsulist",
+                    block_title = "FSU List",
+                    block_code = CommonEnum.fsu_list_page.ToString()
+                };
+                list.Add(tbl_visited_block);
                 var items = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id, block_uri, block_title, block_code FROM Tbl_Visited_Blocks tvb WHERE tvb.fsu_id = ? and tvb.hhd_id = ?", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
-                return items != null && items.Count > 0 ? items : null;
+                if (items != null && items.Count > 0)
+                {
+                    list.AddRange(items);
+                }
+                return list;
             }
             catch (Exception ex)
             {

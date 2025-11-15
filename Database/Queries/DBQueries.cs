@@ -95,11 +95,12 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_2_2>?> FetchSCH0Block2_2Data()
+        public async Task<List<Tbl_Sch_0_0_Block_2_2>?> FetchSCH0Block2_2Data(int fsu_id = 0)
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                fsu_id = fsu_id == 0 ? SessionStorage.SelectedFSUId : fsu_id;
+                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = ? AND tenant_id = ?", fsu_id, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)

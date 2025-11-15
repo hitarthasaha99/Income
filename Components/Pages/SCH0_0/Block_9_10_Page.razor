@@ -5,6 +5,8 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
+@inject ILoggingService Logger
+
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId"
@@ -17,7 +19,7 @@
             </h3>
         </div>
         <div class="card-body">
-            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO))" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
+            <textarea disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
         </div>
     </div>
     @* Supervisor Comments *@

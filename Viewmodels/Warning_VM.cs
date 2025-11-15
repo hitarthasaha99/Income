@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BootstrapBlazor.Components;
 using Income.Common;
 using Income.Database.Models.Common;
@@ -7,7 +8,7 @@ using Income.Database.Queries;
 
 namespace Income.Viewmodels
 {
-    public  class Warning_VM
+    public class Warning_VM
     {
         public List<Tbl_Warning> WarningList = [];
 
@@ -33,24 +34,26 @@ namespace Income.Viewmodels
         public bool IsRejected { get; set; }
         public Tbl_Warning warningcoment { get; set; } = new();
 
-        public async Task SaveWarningAsync(bool isAdd, List<Tbl_Warning> Data, string schedule, string Block, int serialNo)
+        public async Task SaveWarningAsync(bool isAdd, string schedule, string Block, int serialNo)
         {
-            var warningCount = _tempWarnings;
+            var warnings = _tempWarnings;
+            List<Tbl_Warning> warningList = [];
 
             if (!isAdd)
             {
-                if (warningCount.Count() == 0)
-                {//delete all existing
-                    foreach (var warning in Data.Where(x => x.serial_number == serialNo))
+                if (warnings.Count() == 0)
+                {
+                    //delete all existing
+                    foreach (var warning in warnings.Where(x => x.serial_number == serialNo))
                     {
                         warning.is_deleted = true;
                     }
                 }
                 else
                 {
-                    foreach (var warning in warningCount)
+                    foreach (var warning in warnings)
                     {
-                        var exist = Data.Where(x => x.item_no == warning.item_no && (x.is_deleted == false || x.is_deleted == null)).FirstOrDefault();
+                        var exist = warnings.Where(x => x.item_no == warning.item_no && (x.is_deleted == false || x.is_deleted == null)).FirstOrDefault();
                         if (exist != null)
                         {
                             warning.id = exist.id;
@@ -60,9 +63,9 @@ namespace Income.Viewmodels
                     }
 
                     // Get warnings in Data for the same serial number that are not in _tempWarnings
-                    var remainingWarnings = Data
+                    var remainingWarnings = warnings
                         .Where(exist => exist.serial_number == serialNo &&
-                                        !warningCount.Any(temp => temp.id == exist.id))
+                                        !warnings.Any(temp => temp.id == exist.id))
                         .ToList();
 
 
@@ -75,18 +78,20 @@ namespace Income.Viewmodels
             }
 
 
-            foreach (var warning in warningCount)
+            foreach (var warning in warnings)
             {
                 if (warning.id == Guid.Empty)
                 {
                     warning.id = Guid.NewGuid();
                     warning.serial_number = serialNo;
-                    Data.Add(warning);
+                    warningList.Add(warning);
                 }
             }
+
+            await dQ.UpsertWarningAsync(warningList);
         }
 
-        public async Task DeleteWarning(int serialNo,string block)
+        public async Task DeleteWarning(string schedule, string block, int serialNo)
         {
             try
             {

@@ -348,6 +348,8 @@
             }
             SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
             SessionStorage.selection_done = await FSU_Selection_Done(fsu_id);
+            SessionStorage.hamlet_selection_done = SessionStorage.selection_done ? true : await CheckHamletSelection(fsu_id);
+            SessionStorage.FSU_Submitted = SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             SessionStorage.selected_hhd_seq = 0;
             SessionStorage.selected_hhd_id = 0;
             string page_name = block_name == "sch0.0" ? "block0_1" : "ssu_page";
@@ -378,7 +380,29 @@
         }
         finally
         {
-            
+
+        }
+    }
+
+    async Task<bool> CheckHamletSelection(int fsu_id)
+    {
+        try
+        {
+            var su_list = await dB.FetchSCH0Block2_2Data(fsu_id);
+            if (su_list != null && su_list.Count > 0)
+            {
+                bool selection_done = su_list.Any(x => x.IsChecked);
+                return selection_done;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+        finally
+        {
+
         }
     }
 

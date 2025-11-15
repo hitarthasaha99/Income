@@ -1,5 +1,6 @@
 ﻿@page "/dashboard/sch0.0/block0_1"
 @using Blazored.FluentValidation
+@using Income.Viewmodels
 @using Income.Viewmodels.SCH0_0
 @layout Income.Components.Layout.DashboardLayout
 @inject Block_0_1_VM block_0_1_VM
@@ -9,6 +10,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Linq.Expressions
 @inject IToastService toastService
+@inject ILoggingService Logger
+@inject Warning_VM warningVM
 
 @if (editContext != null)
 {
@@ -158,15 +161,15 @@
                         <div class="col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label"><span class="form-badge">14</span>Approx. present population</label>
-                                <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(SessionStorage.hamlet_selection_done && block_0_1_VM.EnablePopulation)" />
+                                <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(block_0_1_VM.DisablePopulation)" />
                                 <ValidationMessage For="@(() => block_0_1_VM.block_0_1.Block_1_14)" />
-                            </div>
-                            @if (IsBlock_1_14_ErrorMessageVisible)
-                            {
-                                <div class="text-success mt-1 fw-bold">
-                                    @Block_1_14_ErrorMessage
-                                </div>
-                            }
+                                @if (IsBlock_1_14_ErrorMessageVisible)
+                                {
+                                    <div class="text-success mt-1 fw-bold">
+                                        @Block_1_14_ErrorMessage
+                                    </div>
+                                }
+                            </div>                     
                         </div>
                     </div>
                     <div class="col-sm-12">
@@ -228,7 +231,7 @@
                 <h3 class="card-title"><span class="text-primary fw-bolder me-2">18</span>Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea disabled="@SessionStorage.hamlet_selection_done" type="text" class="form-control disabled w-100" placeholder="" rows="4" @bind="block_0_1_VM.block_0_1.remarks"></textarea>
+                <textarea disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control disabled w-100" placeholder="" rows="4" @bind="block_0_1_VM.block_0_1.remarks"></textarea>
             </div>
         </div>
         <div class="footer">
@@ -260,11 +263,13 @@
     string Block_1_14_ErrorMessage = string.Empty;
     string Block_1_17_ErrorMessage = string.Empty;
     private FluentValidationValidator? validator;
+    DBQueries DBQueries = new();
     private void ValidatePopulation(ChangeEventArgs e)
     {
         try
         {
             IsBlock_1_14_ErrorMessageVisible = false;
+            Block_1_14_ErrorMessage = string.Empty;
             if (e.Value != null && e.Value != "")
             {
                 block_0_1_VM.block_0_1.Block_1_14 = Convert.ToInt32(e.Value);
@@ -331,14 +336,15 @@
     {
         try
         {
-            // Trigger full form validation
-            var isValid = editContext?.Validate() ?? false;
 
             if(goNext && SessionStorage.hamlet_selection_done)
             {
                 Navigate();
                 return;
             }
+
+            // Trigger full form validation
+            var isValid = editContext?.Validate() ?? false;
 
             if (!isValid)
             {
@@ -356,7 +362,12 @@
             }
 
             // Show confirmation after successful validation + save
-            toastService.ShowSuccess("Data successfully validated and saved.");
+            toastService.ShowSuccess("Data successfully validated and saved");
+            if(!string.IsNullOrEmpty(Block_1_14_ErrorMessage))
+            {
+                warningVM.AddWarning(Block_1_14_ErrorMessage, "0", "1", "14");
+                await warningVM.SaveWarningAsync(false, "0", "1", 0);
+            }
 
             // If this is only a Save (not Next), stop here
             if (!goNext)

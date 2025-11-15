@@ -5,6 +5,8 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
+@inject ILoggingService Logger
+
 
 <div class="main-content">
     <CommonContentHeader 
@@ -53,7 +55,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -83,6 +85,7 @@
     bool is_error = false;
     CommonFunction commonFunction = new();
     CommonConfig commonConfig = new();
+    string? remarks = string.Empty;
 
     async void GoBack()
     {
@@ -155,13 +158,45 @@
 
     async Task HandleSubmit(bool go_next)
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_7");
+            }
+            return;
+        }
+        block_0_1.remarks_block_4 = remarks;
         var update = await Queries.SaveBlock1(block_0_1);
         if (update.GetValueOrDefault() != 0)
         {
             if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
             else
+            {
+                if (block_2_2 != null && block_2_2.Count == 0)
+                {
+                    var data = new Tbl_Sch_0_0_Block_2_2
+                    {
+                        id = Guid.NewGuid(),
+                        fsu_id = SessionStorage.SelectedFSUId,
+                        serial_number = 1,
+                        Percentage = 100,
+                        HamletName = "H1",
+                        IsChecked = true,
+                        SampleHgSbNumber = "1",
+                        SamplingSerialNumberOfTheHgSb = "0",
+
+                    };
+                    List<Tbl_Sch_0_0_Block_2_2> list = [];
+                    list.Add(data);
+
+                    await Queries.SaveSCH0Block2_2(list);
+                }
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_7");
+            }
         }
         else
         {

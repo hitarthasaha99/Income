@@ -3,11 +3,15 @@
 @inject IJSRuntime JSRuntime
 @using Income.Database.Models.Common
 @using Income.Database.Models.SCH0_0
+@using Income.Viewmodels
 @using Income.Viewmodels.SCH0_0
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject PreloadService preloadService
 @inject Block_2_2_VM block_2_2_VM
+@inject ILoggingService Logger
+@inject Warning_VM warningVM
+
 
 <div class="main-content">
     <CommonContentHeader 
@@ -86,7 +90,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -113,6 +117,8 @@
     CommonQueries commonQueries = new();
     DBQueries SCH_0_0_Queries = new();
     private ConfirmDialog dialog = default!;
+    string? remarks = string.Empty;
+    Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
 
     async void GoBack()
     {
@@ -144,6 +150,7 @@
             };   
         await commonQueries.InsertVisitedBlock(vb);
         await block_2_2_VM.Init();
+        block_0_1 = await SCH_0_0_Queries.FetchBlock1();
     }
 
     async void DoSelection()
@@ -170,6 +177,8 @@
                 {
                     preloadService.Show(SpinnerColor.Light, "Processing, please wait");
                     block_2_2_VM.DoSelection();
+                    warningVM.AddWarning("W000: All the sub-units need to have more or less equal population", "0", "2.2", "4");
+                    await warningVM.SaveWarningAsync(false, "0", "2.2", 0);
                     toastService.ShowSuccess("SU selection done successfully");
                     preloadService.Hide();
                 }
@@ -197,6 +206,11 @@
     {
         try
         {
+            if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{false}");
+                return;
+            }
             if (block_2_2_VM.Total_population_percentage != 100)
             {
                 toastService.ShowError("Total population percentage should be 100%");
@@ -207,6 +221,8 @@
             }
             else
             {
+                block_0_1.remarks_block_2_2 = remarks;
+                await SCH_0_0_Queries.SaveBlock1(block_0_1);
                 NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{false}");
             }
         }

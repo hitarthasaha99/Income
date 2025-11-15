@@ -125,7 +125,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea type="text" class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+                <textarea type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind = "@remarks" rows="4"></textarea>
             </div>
         </div>
     </div>
@@ -201,6 +201,7 @@
     ValidationComponent head_name_ref = new();
     ValidationComponent size_ref = new();
     CommonList commonList = new();
+    Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     private ValidationMessageStore messageStore;
     private readonly Dictionary<int, int[]> SssMap = new()
 {
@@ -211,6 +212,7 @@
 
     CommonFunction commonFunctions = new();
     bool is_error = false;
+    private string? remarks = string.Empty;
 
     async void GoBack()
     {
@@ -724,6 +726,8 @@
 
     async Task HandleSubmit(string action = "")
     {
+        block_0_1.remarks_block_7_selection = remarks;
+        await SCH_0_0_Queries.SaveBlock1(block_0_1);
         NavigationManager.NavigateTo("/dashboard/sch0.0/block_8");
         return;
     }

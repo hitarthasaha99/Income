@@ -26,5 +26,6 @@ namespace Income.Database.Models.Common
         public string? role_code { get; set; }
         public string? user_name { get; set; }
         public string? schedule { get; set; }
+        public string? block_guid { get; set; }
     }
 }

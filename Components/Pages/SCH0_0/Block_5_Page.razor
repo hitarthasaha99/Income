@@ -5,6 +5,8 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
+@inject ILoggingService Logger
+
 
 <div class="main-content">
     <CommonContentHeader 
@@ -60,7 +62,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="@remarks" placeholder="" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -90,6 +92,8 @@
     List<Tbl_Sch_0_0_Block_5> block_5 = new();
     double? total_population_percentage = new();
     bool is_selection_done = false;
+    string? remarks = string.Empty;
+    Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
 
     async void GoBack()
     {
@@ -140,6 +144,11 @@
     }
     async Task HandleSubmit(string action)
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{true}");
+            return;
+        }
         if (total_population_percentage != 100)
         {
             toastService.ShowError("Total population percentage should be 100%");
@@ -173,6 +182,8 @@
                     toastService.ShowError($"Error while storing data into database, Please try again!");
                     return;
                 }
+                block_0_1.remarks_block_5 = remarks;
+                await SCH_0_0_Queries.SaveBlock1(block_0_1);
                 return;
             }
             else if (action == "NEXT")
