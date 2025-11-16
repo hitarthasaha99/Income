@@ -438,7 +438,7 @@
             {
                 Tbl_Sch_0_0_Block_7 obj = new();
                 obj.id = Guid.NewGuid();
-                obj.is_household = (gen.NextDouble() < 0.8) ? 2 : 1;
+                obj.is_household = (gen.NextDouble() < 0.95) ? 2 : 1;
                 obj.Block_7_1 = max_srl_no++;
                 obj.Block_7_2 = $"H-{obj.Block_7_1}";
                 obj.Block_7_3 = obj.is_household == 2 ? max_hhd_srl_no++ : 0;

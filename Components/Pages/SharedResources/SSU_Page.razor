@@ -338,7 +338,7 @@
 			if (data.hhdStatus == 0 || data.hhdStatus == 11)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
-				//SessionStorage.selected_hhd_seq = data.seq_no;
+				SessionStorage.selected_hhd_seq = data.SSS_household_id.GetValueOrDefault();
 				SessionStorage.selected_hhd_size = data.Block_7_5.GetValueOrDefault();
 				preloadService.Show(SpinnerColor.Light, "Fetching location details...");
 				SessionStorage.location = await funcs.fetchGeoLocation();

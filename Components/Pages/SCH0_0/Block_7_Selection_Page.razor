@@ -622,8 +622,9 @@
                         await SCH_0_0_Queries.Update_SCH0_0_Block_7(item);
                         SessionStorage.selection_done = true;
                     }
+                    await SCH_0_0_Queries.AssignSSSHouseholdIds();
 
-                    Debug.WriteLine("Selected households:");
+                    await Logger.LogInfo("Selected households:");
                     //Update selection flag at FSU level
                     var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
                     if (fsu != null)
@@ -631,17 +632,17 @@
                         fsu.is_selection_done = true;
                         await commonQueries.UpdateFSU(fsu);
                     }
-                    Debug.WriteLine($"Total households selected: {result.SelectedHouseholds.Count}");
+                    await Logger.LogInfo($"Total households selected: {result.SelectedHouseholds.Count}");
 
                     foreach (var msg in result.Messages)
                     {
-                        Debug.WriteLine(msg.Value);
+                        await Logger.LogInfo(msg.Value);
                     }
 
                     // Process selected households
                     foreach (var hh in result.SelectedHouseholds)
                     {
-                        Debug.WriteLine($"HH {hh.Block_7_3}: SSS {hh.SSS} -> Posted as SSS {hh.SelectedPostedSSS}");
+                        await Logger.LogInfo($"HH {hh.Block_7_3}: SSS {hh.SSS} -> Posted as SSS {hh.SelectedPostedSSS}");
                     }
                 }
                 toastService.ShowSuccess("Selection done successfully!");

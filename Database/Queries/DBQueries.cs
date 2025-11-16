@@ -757,6 +757,39 @@ namespace Income.Database.Queries
             return _database.UpdateAsync(data);
         }
 
+        public async Task AssignSSSHouseholdIds()
+        {
+            // Group by SSS
+            try
+            {
+                var items = await GetBlock7Data(SessionStorage.SelectedFSUId);
+                if (items != null && items.Count > 0)
+                {
+                    var groups = items
+                        .Where(x => x.isInitialySelected == true)
+                        .GroupBy(x => x.SSS);
+
+                    foreach (var group in groups)
+                    {
+                        int serial = 1;
+
+                        // Order by Block_7_3 and assign serial
+                        foreach (var item in group.OrderBy(x => x.Block_7_3))
+                        {
+                            item.SSS_household_id = serial++;
+                            await _database.UpdateAsync(item);
+                        }
+                    }
+                }
+                
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+
 
         public async Task<List<Tbl_Sch_0_0_Block_7>> GetSelectedBlock7List(int Fsu_id)
         {
