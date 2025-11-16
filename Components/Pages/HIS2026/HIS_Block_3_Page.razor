@@ -180,7 +180,7 @@
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">3.</span> Relation to head (code)
                                     </label>
-                                    <select class="form-select form-select-sm" value="@newMember.item_3" @onchange="ClearRelationError">
+                                    <select class="form-select form-select-sm" value="@newMember.item_3" @onchange="item_3_changed">
                                         <option value="">-Select-</option>
                                         <option value="1">self-1</option>
                                         <option value="2">spouse of head-2</option>
@@ -529,13 +529,32 @@
 
     bool error = false;
 
-    private void genderClear()
+    private void genderClear(ChangeEventArgs e)
     {
         ClearGenderError();
+
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            newMember.gender = null;
+        else
+            newMember.gender = int.Parse(value);
         CheckGenderWarning();
         StateHasChanged();
 
     }
+
+    private void item_3_changed(ChangeEventArgs e)
+    {
+        ClearRelationError();
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            newMember.item_3 = null;
+        else
+            newMember.item_3 = int.Parse(value);
+    }
+
     private void ageClear()
     {
         ClearAgeError();
@@ -981,7 +1000,7 @@
 
     async void HandleSubmit(string action="")
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_4");
+        NavigationManager.NavigateTo("/dashboard/his/block_4_1");
     }
 }
 

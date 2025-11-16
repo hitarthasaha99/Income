@@ -492,9 +492,9 @@ namespace Income.Database.Queries
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
-                        return deleted;
                     }
                     await ReserializeHHD(exists);
+                    return 1;
                 }
                 return 0;
             }
@@ -1046,9 +1046,9 @@ namespace Income.Database.Queries
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
-                        return deleted;
                     }
                     await ReserializeMemberList(exists);
+                    return 1;
                 }
                 return 0;
             }
@@ -1198,8 +1198,9 @@ namespace Income.Database.Queries
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
-                        return deleted;
                     }
+                    await ReserializeNICList();
+                    return 1;
                 }
                 return 0;
             }
@@ -1207,6 +1208,28 @@ namespace Income.Database.Queries
             {
                 Console.WriteLine("Error deleting item " + ex.Message);
                 return 0;
+            }
+        }
+
+        private async Task ReserializeNICList()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block4_NICList();
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach(var item in items)
+                    {
+                        item.SerialNumber = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 

@@ -1,0 +1,357 @@
+﻿@page "/dashboard/his/block_4_1"
+@using Blazored.FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Database.Models.SCH0_0
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+
+<div class="pb-5">
+
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
+                         survey_time="@survey_time" />
+
+    <div class="card-style2 p-2">
+        <div class="w-100 card-header d-flex justify-content-between">
+            <p class="fs-5 m-0"><span class="text-primary me-2">[4]</span>Household Characteristics</p>
+            <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-outline-primary"><i class="bi bi-chat-left-text me-2"></i>Comment</NavLink>
+        </div>
+        <div class="card-container mt-2">
+            @if (block_4 != null)
+            {
+                <EditForm Model="block_4">
+                    <div class="row card-body">
+
+                        <!--4.1-->
+                        <div class="mb-4 col-md-4">
+                            <label class="form-label fw-bold">
+                                <span class="badge bg-primary me-2">1</span>Household Size
+                            </label>
+                            <input type="text" class="form-control" placeholder="" value="@block_4?.item_1" disabled>
+                            @if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
+                            {
+                                <div class="text-success mt-1 fw-bold">
+                                    @Block_4_1_ErrorMessage
+                                </div>
+                            }
+                        </div>
+                        <!--4.2-->
+                        <div class="mb-4 col-md-4">
+                            <label class="form-label fw-bold">
+                                <span class="badge bg-primary me-2">2</span>Social Group
+                            </label>
+                            <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_2" @onchange="item_2_changed">
+                                <option value="">Select</option>
+                                @if (commonList.LOOKUP_CONST_CASTE != null && commonList.LOOKUP_CONST_CASTE.Count > 0)
+                                {
+                                    @foreach (var item in commonList.LOOKUP_CONST_CASTE)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                }
+                            </select>
+                            @if (!string.IsNullOrEmpty(Block_4_2_ErrorMessage))
+                            {
+                                <small class="text-danger">@Block_4_2_ErrorMessage</small>
+                            }
+                        </div>
+                        <!--4.3-->
+                        <div class="mb-4 col-md-4">
+                            <label class="form-label fw-bold">
+                                <span class="badge bg-primary me-2">3</span>Religion
+                            </label>
+                            <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_3" @onchange="item_3_changed">
+                                <option value="">Select</option>
+                                @if (commonList.LOOKUP_CONST_RELIGION != null && commonList.LOOKUP_CONST_RELIGION.Count > 0)
+                                {
+                                    @foreach (var item in commonList.LOOKUP_CONST_RELIGION)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                }
+                            </select>
+                            @if (!string.IsNullOrEmpty(Block_4_3_ErrorMessage))
+                            {
+                                <small class="text-danger">@Block_4_3_ErrorMessage</small>
+                            }
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="col-12">
+                            <hr class="border border-primary border-2 opacity-50 my-3" />
+                        </div>
+
+                        <!--4.4-->
+                        <div class="mb-4 col-12">
+                            <label class="form-label fw-bold"> <span class="badge bg-primary me-2">4</span>Agricultural activities carried out by one or more household members in last 365 days </label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle text-center">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50px;">S. No.</th>
+                                            <th class="text-start">Description of Activity</th>
+                                            <th style="width: 80px;">Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td class="text-start">Cultivation of crops / fruits / vegetables / spices</td>
+                                            <td> <input type="checkbox" @bind="block_4.item_4_1" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td class="text-start">Cultivation of flowers</td>
+                                            <td> <input type="checkbox" @bind="block_4.item_4_2" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td class="text-start">Animal husbandry</td>
+                                            <td> <input type="checkbox" @bind="block_4.item_4_3" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td class="text-start">Fisheries</td>
+                                            <td> <input type="checkbox" @bind="block_4.item_4_4" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td class="text-start">Agroforestry activity</td>
+                                            <td> <input type="checkbox" @bind="@block_4.item_4_5" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+                                            <td class="text-start">Others (bee keeping, sericulture, lac culture, ancillary etc.)</td>
+                                            <td> <input type="checkbox" @bind="block_4.item_4_6" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                @if (!string.IsNullOrEmpty(Block_4_4_ErrorMessage))
+                                {
+                                    <small class="text-danger">@Block_4_4_ErrorMessage</small>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+                        <div class="d-flex">
+                            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                            {
+                                <button type="button" class="btn btn-primary me-2 is_sso action" @onclick="@(() => Save())">
+                                    <i class="bi bi-floppy-fill me-1"></i>Save
+                                </button>
+                            }
+                            <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+            
+            
+        </div>
+    </div>
+</div>
+
+@code {
+    private CommonConfig commonConfig = new CommonConfig();
+    CommonList commonList = new();
+    DateTime survey_time = DateTime.Now;
+    DBQueries dQ = new();
+    CommonQueries commonQueries = new();
+    Tbl_Block_1 block_1 = new();
+    bool is_remarks_visible = false;
+    int hhdStatus = 0;
+    CommonFunction function = new();
+    Tbl_Sch_0_0_Block_7 hhd = new();
+    Tbl_Block_3 block_3 = new();
+    Tbl_Block_4? block_4;
+
+    bool Q4Needed = false;
+    EditContext editContext;
+    //Warning messages
+    private string Block_4_1_ErrorMessage = string.Empty;
+    private string Block_4_2_ErrorMessage = string.Empty;
+    private string Block_4_3_ErrorMessage = string.Empty;
+    private string Block_4_4_ErrorMessage = string.Empty;
+
+
+    private void item_2_changed(ChangeEventArgs e)
+    {
+        ClearItem2Error();
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_2 = null;
+        else
+            block_4.item_2 = int.Parse(value);
+    }
+
+    private void item_3_changed(ChangeEventArgs e)
+    {
+        ClearItem3Error();
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_3 = null;
+        else
+            block_4.item_3 = int.Parse(value);
+    }
+
+    void ClearItem2Error()
+    {
+        Block_4_2_ErrorMessage = string.Empty;
+    }
+
+    void ClearItem3Error()
+    {
+        Block_4_3_ErrorMessage = string.Empty;
+    }
+
+    void ClearItem4Error()
+    {
+        Block_4_4_ErrorMessage = string.Empty;
+    }
+
+    bool Validate()
+    {
+        ClearItem2Error();
+        ClearItem3Error();
+        ClearItem4Error();
+        //item 2
+        if (block_4?.item_2 == null)
+        {
+            Block_4_2_ErrorMessage = $"H014: Invalid Entry, Please check the entry";
+        }
+        if (block_4?.item_3 == null)
+        {
+            Block_4_3_ErrorMessage = $"H015: Invalid Entry, Please check the entry";
+        }
+        if (Q4Needed)
+        {
+            var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
+            if (!items.Any(x => x == true))
+            {
+                Block_4_4_ErrorMessage = $"H016: Please check the entry recorded against col.s 8-10 , block 3";
+            }
+        }
+        return string.IsNullOrEmpty(Block_4_2_ErrorMessage) && string.IsNullOrEmpty(Block_4_3_ErrorMessage) && string.IsNullOrEmpty(Block_4_4_ErrorMessage);
+    }
+
+    async Task Save(bool is_go_next = false)
+    {
+        try
+        {
+            if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_4_2");
+                return;
+            }
+            bool isValid = Validate();
+            if (isValid)
+            {
+                var saved = await dQ.Save_SCH_HIS_Block4(block_4);
+                if (saved > 0)
+                {
+                    if(is_go_next)
+                    {
+                        NavigationManager.NavigateTo("/dashboard/his/block_4_2");
+                    }
+                    else
+                    {
+                        toastService.ShowSuccess("Data saved succesfully");
+                    }
+                }
+                else
+                {
+                    toastService.ShowError("Unable to save");
+                }
+            }
+            else
+            {
+                toastService.ShowError("Please address pending errors");
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+
+    //Warning message validators
+    void CheckWarnings()
+    {
+        try
+        {
+            //Warning for member count mismatch
+            if (hhd != null && hhd.Block_7_5 != block_4?.item_1)
+            {
+                Block_4_1_ErrorMessage = $"W013(ii): Mismatch between number of listed members and members in Block 3";
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+        }
+
+        hhd = await dQ.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+        var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3 != null && block3.Count > 0)
+        {
+            Q4Needed = block3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1);
+        }
+        block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
+        int block_4_1 = block3?.Count ?? 0;
+
+        if(block_4 == null)
+        {
+            block_4 = new();
+            block_4.id = Guid.NewGuid();
+            block_4.fsu_id = SessionStorage.SelectedFSUId;
+            block_4.hhd_id = SessionStorage.selected_hhd_id;
+            block_4.item_1 = block_4_1;
+            if (hhd != null && hhd.Block_7_5 != block_4_1)
+            {
+                Block_4_1_ErrorMessage = $"W013(ii): Mismatch between number of listed members and members in Block 3";
+            }
+        }
+        else
+        {
+            CheckWarnings();
+        }
+        editContext = new EditContext(block_4);
+
+        StateHasChanged();
+    }
+
+
+    async void Close()
+    {
+        await comment_vm.AddModal.HideAsync();
+
+    }
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+}

@@ -1,0 +1,429 @@
+﻿@page "/dashboard/his/block_4_2"
+@using Blazored.FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Database.Models.SCH0_0
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+
+<div class="pb-5">
+
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                         survey_time="@survey_time" />
+
+    <div class="card-style2 p-2">
+        <div class="w-100 card-header d-flex justify-content-between">
+            <p class="fs-5 m-0"><span class="text-primary me-2">[4]</span>Household Characteristics</p>
+        </div>
+        <div class="card-container mt-2">
+            <EditForm Model="fields">
+                <FluentValidationValidator />
+                <div class="row card-body">
+                    <!--4.5-->
+                    <div class="mb-4 col-12">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">5</span>
+                            Details of non-agricultural economic activity(ies) carried out by one or more household members in last 365 days
+                        </label>
+
+                        <!-- Add Button -->
+                        <div class="d-flex justify-content-end mb-2">
+                            <button class="btn btn-sm btn-outline-primary is_sso"
+                                    @onclick="@(() => HandleModal("ADD"))"
+                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                <i class="bi bi-plus-lg me-1"></i>Add Activity
+                            </button>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle text-center">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px;">S. No.</th>
+                                        <th class="text-start">Description of Activity</th>
+                                        <th style="width: 100px;">NIC Code (2 digit)</th>
+                                        <th style="width: 130px;">Seasonal? (Yes – 1 / No – 2)</th>
+                                        <th style="width: 180px;">Months of Operation (last 365 days)</th>
+                                        <th style="width: 150px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (NICfields != null && NICfields.Count > 0)
+                                    {
+                                        foreach (var item in NICfields)
+                                        {
+                                            if (item.is_deleted != true)
+                                            {
+                                                <tr>
+                                                    <td>@item.SerialNumber</td>
+                                                    <td>@item.ActivityName</td>
+                                                    <td>@item.NicCode</td>
+                                                    <td>@item.BusinessSeasonal</td>
+                                                    <td>@item.NumberOfMonths</td>
+
+                                                    <td class="d-flex align-items-center">
+                                                        <button class="btn btn-sm btn-primary me-2"
+                                                                @onclick="@(() => HandleModal("UPDATE", item))">
+                                                            <i class="bi bi-pencil-square me-1"></i>Edit
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger"
+                                                                @onclick="@(() => HandleDelete(item.id))">
+                                                            <i class="bi bi-trash me-1"></i>Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Block_4_5_ErrorMessage))
+                    {
+                        <small class="text-danger">@Block_4_5_ErrorMessage</small>
+                    }
+
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+                    <div class="d-flex">
+                        <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                    </div>
+                </div>
+            </EditForm>
+
+        </div>
+    </div>
+
+    <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
+        <HeaderTemplate>
+            <h5 class="modal-title">Details of non-agricultural economic activity(ies) carried out by one or more household member in last 365 days</h5>
+        </HeaderTemplate>
+        <BodyTemplate>
+            @if (fields != null)
+            {
+                <EditForm EditContext="editContext">
+                    <FluentValidationValidator />
+                    <div class="container-fluid">
+                        <div class="row g-3">
+                            <!-- Serial Number -->
+                            <div class="col-md-6">
+                                <label class="form-label">1. Serial Number of Row</label>
+                                <input class="form-control form-control-sm" value="@fields.SerialNumber" disabled />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Activity Description -->
+                            <div class="col-md-12">
+                                <label class="form-label">2. Description of activity</label>
+                                <input class="form-control form-control-sm" @bind="@fields.ActivityName" disabled />
+                                <ValidationMessage For="@(() => fields.ActivityName)" />
+                            </div>
+                        </div>
+
+                        <div class="row g-6">
+                            <!-- NIC code -->
+                            <div class="col-md-12">
+                                <label class="form-label">3. NIC code (2-digit)</label>
+                                <select class="form-select w-100 is_sso"
+                                        value="@fields.NicCode"
+                                        @onchange="OnNicCodeChanged"
+                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    <option value="">Select</option>
+                                    @foreach (var item in Block_4_Constants.NIC_CODES)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => fields.NicCode)" />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- 4 & 5 in the same row -->
+                            <!-- Whether the business is seasonal -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    4. Whether the business is seasonal (yes-1 / no-2)
+                                </label>
+                                <select class="form-select w-100 is_sso"
+                                        value="@fields.BusinessSeasonal"
+                                        @onchange="BusinessSeasonalChanged"
+                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    <option value="">Select</option>
+                                    @foreach (var item in Block_4_Constants.Q4_15)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => fields.BusinessSeasonal)" />
+                            </div>
+
+                            <!-- No of months -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    5. Number of months of operation during last 365 days
+                                </label>
+                                <input class="form-control form-control-sm"
+                                       @bind="fields.NumberOfMonths"
+                                       @oninput="OnMonthsInput"
+                                       disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                <ValidationMessage For="@(() => fields.NumberOfMonths)" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button" @onclick="@(() => Validate())" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-outline-primary"
+                                @onclick="@(() => HandleModal("CLOSE"))">
+                            Close
+                        </button>
+                    </div>
+                </EditForm>
+            }
+        </BodyTemplate>
+
+
+    </Modal>
+</div>
+
+@code {
+    EditContext editContext = default!;
+    Modal AddModal = default!;
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    private CommonConfig commonConfig = new CommonConfig();
+    DateTime survey_time = DateTime.Now;
+    DBQueries dQ = new();
+    int hhdStatus = 0;
+    Tbl_Sch_0_0_Block_7 hhd = new();
+    Tbl_Block_3 block_3 = new();
+    Tbl_Block_4? block_4;
+    Tbl_Block_4_Q5? fields = new();
+    List<Tbl_Block_4_Q5> NICfields = new();
+    bool Q5Needed = false;
+    private string Block_4_5_ErrorMessage = string.Empty;
+
+    async void Validate()
+    {
+        bool isValid = editContext.Validate();
+        if (isValid)
+        {
+            await SaveQ5();
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+        }
+
+        var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3 != null && block3.Count > 0)
+        {
+            Q5Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2 || x.item_10 == 2);
+        }
+        block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
+
+        if (block_4 != null)
+        {
+            NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+            editContext = new EditContext(fields);
+        }
+        else
+        {
+            toastService.ShowError("Unexpected error: Block 4 data not found");
+        }
+
+        StateHasChanged();
+    }
+
+    async Task LoadData()
+    {
+        Block_4_5_ErrorMessage = string.Empty;
+        NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+        StateHasChanged();
+    }
+
+    async Task SaveQ5()
+    {
+        var obj = fields;
+        if(NICfields != null && NICfields.Count > 0 && NICfields.Any(x => x.NicCode == fields.NicCode))
+        {
+            toastService.ShowError("Cannot add the same NIC code again");
+            return;
+        }
+        await dQ.Save_SCH_HIS_Block4_NICList(obj);
+        NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+        await AddModal.HideAsync();
+        StateHasChanged();
+        await LoadData();
+    }
+
+    async Task HandleModal(string action = "", Tbl_Block_4_Q5? data = null)
+    {
+        try
+        {
+            if (action == "ADD")
+            {
+                fields = new Tbl_Block_4_Q5();
+                fields.id = Guid.NewGuid();
+                fields.hhd_id = SessionStorage.selected_hhd_id;
+                fields.Block4Id = block_4.id;
+                fields.SerialNumber = NICfields.Count == 0 ? 1 : NICfields.Count + 1;
+                editContext = new EditContext(fields);
+                await AddModal.ShowAsync();
+            }
+            else if (action == "UPDATE")
+            {
+                fields = data;
+                await AddModal.ShowAsync();
+            }
+            else if (action == "CLOSE")
+            {
+                await AddModal.HideAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
+    private void OnMonthsInput(ChangeEventArgs e)
+    {
+        var raw = e.Value?.ToString() ?? "";
+
+        // Keep only digits
+        raw = new string(raw.Where(char.IsDigit).ToArray());
+
+        // Convert to int? safely
+        int number;
+        if (int.TryParse(raw, out number))
+        {
+            // Bound between 1 and 12
+            if (number < 1) number = 1;
+            if (number > 12) number = 12;
+
+            fields.NumberOfMonths = number;
+        }
+        else
+        {
+            fields.NumberOfMonths = null;
+        }
+
+        // Clear validation errors immediately
+        editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => fields.NumberOfMonths));
+    }
+
+    private void BusinessSeasonalChanged(ChangeEventArgs e)
+    {
+        // Update manually because @bind updates AFTER onchange
+        var value = e.Value?.ToString();
+        fields.BusinessSeasonal = string.IsNullOrEmpty(value)
+            ? null
+            : int.Parse(value);
+
+        // Clear validation error
+        editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => fields.BusinessSeasonal)
+        );
+    }
+
+
+
+    private void OnNicCodeChanged(ChangeEventArgs e)
+    {
+        string? val = e.Value?.ToString();
+        // Clear validation error
+        editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => fields.NicCode));
+        if (int.TryParse(e.Value?.ToString(), out int selectedNic))
+        {
+            fields.NicCode = selectedNic;
+
+            // find matching title from the lookup list
+            var nicItem = Block_4_Constants.NIC_CODES
+                .FirstOrDefault(x => x.id == selectedNic);
+
+            fields.ActivityName = nicItem?.title;
+        }
+        else if (val == "Others")
+        {
+            fields.ActivityName = "Others";
+            fields.NicCode = null;
+        }
+        else
+        {
+            fields.NicCode = null;
+            fields.ActivityName = null;
+        }
+    }
+
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    async Task HandleDelete(Guid id)
+    {
+        int item_index = NICfields.FindIndex(l => l.id == id);
+        if (item_index != -1)
+        {
+            NICfields[item_index].is_deleted = true;
+            await dQ.DeleteBlock4_NICList(id);
+            toastService.ShowSuccess("Row deleted successfully!");
+            await LoadData();
+        }
+        else
+        {
+            toastService.ShowError("Not Able to delete row, Please try again!");
+        }
+    }
+
+    void HandleSubmit(bool is_go_next)
+    {
+        Block_4_5_ErrorMessage = string.Empty;
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            NavigationManager.NavigateTo("dashboard/his/block_4_3");
+            return;
+        }
+        if (Q5Needed)
+        {
+            if(NICfields != null && NICfields.Count == 0)
+            {
+                Block_4_5_ErrorMessage = $"H017(i): Please check the entry recorded against col.s 8-10 , block 3";
+                toastService.ShowError("Please resolve pending errors");
+                return;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("dashboard/his/block_4_3");
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("dashboard/his/block_4_3");
+        }
+    }
+}

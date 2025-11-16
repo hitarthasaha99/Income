@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace Income.Common.HIS2026
 {
+    public class Tbl_Lookup_NIC
+    {
+        public int? id { get; set; }
+        public string? lookup_type { get; set; }
+        public string? title { get; set; }
+    }
+
     public class Block_4_Constants
     {
         public static readonly List<Tbl_Lookup> Q4_4_AgriculturalActivities =
@@ -78,7 +85,7 @@ namespace Income.Common.HIS2026
             new() { id = 3, title = "Both 1 & 2 - 3" },
         ];
 
-        public static readonly List<Tbl_Lookup> NIC_CODES =
+        public static readonly List<Tbl_Lookup_NIC> NIC_CODES =
         [
             new() { id = 10,  title = "Manufacture of Food Products - 10" },
             new() { id = 11,  title = "Manufacture of Beverages - 11" },
@@ -155,7 +162,7 @@ namespace Income.Common.HIS2026
             new() { id = 95,  title = "Repair of Computers and Personal and Household Goods - 95" },
             new() { id = 96,  title = "Other Personal Service Activities - 96" },
             new() { id = 0,   title = "Cotton Ginning, Cleaning and Bailing (01632) - 00" },
-            new() { id = 999,  title = "Others" },
+            new() { id = null,  title = "Others" },
         ];
     }
 }
