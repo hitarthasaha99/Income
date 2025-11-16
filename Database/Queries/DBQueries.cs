@@ -1137,7 +1137,7 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4)
+        public async Task<int> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4)
         {
             try
             {
@@ -1156,7 +1156,7 @@ namespace Income.Database.Queries
             catch (Exception ex)
             {
                 Console.WriteLine($"Error While saving SCH HIS Block 4: {ex.Message}");
-                return null;
+                return 0;
             }
         }
 

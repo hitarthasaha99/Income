@@ -94,6 +94,12 @@
                                 }
                             </div>
                             <ValidationMessage For="@(() => block_4.item_8)" />
+                            @if (!string.IsNullOrEmpty(Item8WarningMessage))
+                            {
+                                <div class="text-success mt-1 fw-bold">
+                                    @Item8WarningMessage
+                                </div>
+                            }
                         </div>
 
                         <!-- Divider -->
@@ -110,7 +116,8 @@
                                     Does the household perform any economic activity on any building/structure during last 365 days?
                                 </label>
                                 <select class="form-select w-100 is_sso"
-                                        @bind="block_4.item_9"
+                                        value="@block_4.item_9"
+                                        @onchange="item_9_changed"
                                         disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
                                     <option value="">Select</option>
                                     @foreach (var item in Block_4_Constants.Q4_9)
@@ -118,6 +125,7 @@
                                         <option value="@item.id">@item.title</option>
                                     }
                                 </select>
+                                <ValidationMessage For="@(() => block_4.item_9)" />
                             </div>
 
                             <!--4.10-->
@@ -140,6 +148,13 @@
                                         </div>
                                     }
                                 </div>
+                                <ValidationMessage For="@(() => block_4.item_10)" />
+                                @if (!string.IsNullOrEmpty(Item10WarningMessage))
+                                {
+                                    <div class="text-success mt-1 fw-bold">
+                                        @Item10WarningMessage
+                                    </div>
+                                }
                             </div>
                         </div>
 
@@ -151,7 +166,8 @@
                                     <span class="badge bg-primary me-2">11</span>Type of dwelling unit
                                 </label>
                                 <select class="form-select w-100 is_sso"
-                                        @bind="block_4.item_11"
+                                        value="@block_4.item_11"
+                                        @onchange="item_11_changed"
                                         disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
                                     <option value="">Select</option>
                                     @foreach (var item in Block_4_Constants.Q4_11)
@@ -159,27 +175,30 @@
                                         <option value="@item.id">@item.title</option>
                                     }
                                 </select>
+                                <ValidationMessage For="@(() => block_4.item_11)" />
                             </div>
 
                             <!--4.12-->
-                            <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0)">
+                            <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0 || block_4.item_11 == null)">
                                 <label class="form-label fw-bold">
                                     <span class="badge bg-primary me-2">12</span>Carpet area (sq. ft.)
                                 </label>
                                 <input type="number"
                                        class="form-control is_sso"
-                                       placeholder="e.g. 600"
-                                       @bind="block_4.item_12"
+                                       value="@block_4.item_12"
+                                       @oninput="OnItem12Changed"
                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                <ValidationMessage For="@(() => block_4.item_12)" />
                             </div>
 
                             <!--4.13-->
-                            <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0)">
+                            <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0 || block_4.item_11 == null)">
                                 <label class="form-label fw-bold">
                                     <span class="badge bg-primary me-2">13</span>Type of structure
                                 </label>
                                 <select class="form-select w-100 is_sso"
-                                        @bind="block_4.item_13"
+                                        value="@block_4.item_13"
+                                        @oninput="OnItem13Changed"
                                         disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
                                     <option value="">Select</option>
                                     @foreach (var item in Block_4_Constants.Q4_13)
@@ -187,18 +206,20 @@
                                         <option value="@item.id">@item.title</option>
                                     }
                                 </select>
+                                <ValidationMessage For="@(() => block_4.item_13)" />
                             </div>
 
                             <!--4.14-->
-                            <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0)">
+                            <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0 || block_4.item_11 == null)">
                                 <label class="form-label fw-bold">
                                     <span class="badge bg-primary me-2">14</span>Number of rooms
                                 </label>
                                 <input type="number"
                                        class="form-control is_sso"
-                                       placeholder="e.g. 3"
-                                       @bind="block_4.item_14"
+                                       value="@block_4.item_14"
+                                       @oninput="OnItem14Changed"
                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                <ValidationMessage For="@(() => block_4.item_14)" />
                             </div>
                         </div>
 
@@ -210,7 +231,8 @@
                                     <span class="badge bg-primary me-2">15</span>Outstanding loan from financial institution?
                                 </label>
                                 <select class="form-select w-100 is_sso"
-                                        @bind="block_4.item_15"
+                                        value="@block_4.item_15"
+                                        @oninput="OnItem15Changed"
                                         disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
                                     <option value="">Select</option>
                                     @foreach (var item in Block_4_Constants.Q4_15)
@@ -218,6 +240,7 @@
                                         <option value="@item.id">@item.title</option>
                                     }
                                 </select>
+                                <ValidationMessage For="@(() => block_4.item_15)" />
                             </div>
 
                             <!--4.16-->
@@ -226,7 +249,8 @@
                                     <span class="badge bg-primary me-2">16</span>Purpose of the loan
                                 </label>
                                 <select class="form-select w-100 is_sso"
-                                        @bind="block_4.item_16"
+                                        value="@block_4.item_16"
+                                        @oninput="OnItem16Changed"
                                         disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
                                     <option value="">Select</option>
                                     @foreach (var item in Block_4_Constants.Q4_16)
@@ -234,6 +258,8 @@
                                         <option value="@item.id">@item.title</option>
                                     }
                                 </select>
+                                <ValidationMessage For="@(() => block_4.item_16)" />
+
                             </div>
 
                             <!--4.17-->
@@ -244,15 +270,16 @@
                                 </label>
                                 <input type="number"
                                        class="form-control is_sso"
-                                       placeholder="e.g. 2500"
-                                       @bind="block_4.item_17"
+                                       value="@block_4.item_17"
+                                       @oninput="OnItem17Changed"
                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                <ValidationMessage For="@(() => block_4.item_17)" />
                             </div>
                         </div>
 
                         <div class="mb-3 col-12">
                             <label class="form-label fw-bold">Remarks</label>
-                            <textarea type="text" class="form-control is_sso" disabled="@(SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO))" placeholder="" cols="4"></textarea>
+                            <textarea type="text" class="form-control is_sso" disabled="@(SessionStorage.FSU_Submitted))" placeholder="" cols="4"></textarea>
                         </div>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
@@ -348,7 +375,9 @@
     DateTime survey_time = DateTime.Now;
     int hhdStatus = 0;
     Tbl_Sch_0_0_Block_7? hhd;
+    List<Tbl_Block_3> block_3_list = [];
     Tbl_Block_4? block_4;
+    List<Tbl_Block_4_Q5> block_4_nic_list = [];
     DBQueries dQ = new();
 
     Tbl_Comments comments = new();
@@ -372,6 +401,10 @@
     private int selectedLoanPurpose;
     private double? LoanRepaymentAmount;
 
+    private string Item8WarningMessage = string.Empty;
+    private string Item10WarningMessage = string.Empty;
+    private string Item16WarningMessage = string.Empty;
+
     EditContext editContext;
     private Block_4_Validator validator = new();
     private ValidationMessageStore messageStore;
@@ -393,19 +426,31 @@
 
         hhdStatus = await dQ.GetCurrentHHDStatus(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
 
-        var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
-        if (block3 != null && block3.Count > 0)
-        {
-            //Q4Needed = block3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1);
-        }
+        block_3_list = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
         block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
         if (block_4 != null)
         {
+            SelectedLandUses = block_4.item_8?
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(x => int.TryParse(x.Trim(), out var v) ? v : -1)
+                                .Where(v => v != -1)
+                                .ToList()
+                                ?? new List<int>();
+
+            SelectedEconomicActivities = block_4.item_10?
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(x => int.TryParse(x.Trim(), out var v) ? v : -1)
+                                .Where(v => v != -1)
+                                .ToList()
+                                ?? new List<int>();
+
             editContext = new EditContext(block_4);
             messageStore = new ValidationMessageStore(editContext);
             editContext.OnFieldChanged += EditContext_OnFieldChanged;
 
         }
+        block_4_nic_list = await dQ.Fetch_SCH_HIS_Block4_NICList();
         StateHasChanged();
     }
 
@@ -449,6 +494,224 @@
         else
         {
             block_4.item_7 = null;
+        }
+    }
+
+    private void ToggleLandUse(int id)
+    {
+        if (SelectedLandUses.Contains(id))
+            SelectedLandUses.Remove(id);
+        else
+            SelectedLandUses.Add(id);
+
+        block_4.item_8 = SelectedLandUses.Any() ? string.Join(",", SelectedLandUses) : string.Empty;
+        editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_8));
+
+        //Warnings for Item 8
+        CheckWarningForItem8();
+        StateHasChanged();
+    }
+
+    void CheckWarningForItem8()
+    {
+        try
+        {
+            Item8WarningMessage = string.Empty;
+            bool block_4_4_any_checked = block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() || block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault();
+            if ((SelectedLandUses.Contains(1) || SelectedLandUses.Contains(2) || SelectedLandUses.Contains(3)) && !block_4_4_any_checked)
+            {
+                Item8WarningMessage = $"W020(ii): Please check the entry against Q4.4";
+            }
+            if (SelectedLandUses.Contains(4) && block_4_nic_list.Count == 0)
+            {
+                Item8WarningMessage = $"W020(iii): Please check the entry against Q4.5";
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private void item_9_changed(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_9 = null;
+        else
+        {
+            block_4.item_9 = int.Parse(value);
+            if (block_4.item_9 == 4)
+            {
+                SelectedEconomicActivities = [];
+            }
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_9));
+        }
+    }
+
+    private void ToggleEconomicActivity(int id)
+    {
+        if (SelectedEconomicActivities.Contains(id))
+            SelectedEconomicActivities.Remove(id);
+        else
+            SelectedEconomicActivities.Add(id);
+
+        block_4.item_10 = SelectedEconomicActivities.Any() ? string.Join(",", SelectedEconomicActivities) : string.Empty;
+        editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_10));
+
+        //Warnings for Item 10
+        CheckWarningForItem10();
+        StateHasChanged();
+    }
+
+    void CheckWarningForItem10()
+    {
+        try
+        {
+            Item8WarningMessage = string.Empty;
+            bool block_4_4_any_checked = block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() || block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault();
+            if ((SelectedLandUses.Contains(1) || SelectedLandUses.Contains(2) || SelectedLandUses.Contains(3)) && !block_4_4_any_checked)
+            {
+                Item10WarningMessage = $"W022(ii): Please check the entry against Q4.4";
+            }
+            if (SelectedLandUses.Contains(4) && block_4_nic_list.Count == 0)
+            {
+                Item10WarningMessage = $"W022(iii): Please check the entry against Q4.5";
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private void item_11_changed(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_11 = null;
+        else
+        {
+            block_4.item_11 = int.Parse(value);
+            if (block_4.item_11 == 5)
+            {
+                block_4.item_12 = null;
+            }
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_11));
+        }
+    }
+
+    private void OnItem12Changed(ChangeEventArgs args)
+    {
+        if (decimal.TryParse(args.Value?.ToString(), out var result))
+        {
+            block_4.item_12 = result;
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_12));
+        }
+        else
+        {
+            block_4.item_12 = null;
+        }
+    }
+
+    private void OnItem13Changed(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_13 = null;
+        else
+        {
+            block_4.item_13 = int.Parse(value);
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_13));
+        }
+    }
+
+    private void OnItem14Changed(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_14 = null;
+        else
+        {
+            block_4.item_14 = int.Parse(value);
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_14));
+        }
+    }
+
+    private void OnItem15Changed(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_15 = null;
+        else
+        {
+            block_4.item_15 = int.Parse(value);
+            if (block_4.item_15 == 2)
+            {
+                block_4.item_16 = null;
+                block_4.item_17 = null;
+            }
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_15));
+        }
+    }
+
+    private void OnItem16Changed(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_16 = null;
+        else
+        {
+            block_4.item_16 = int.Parse(value);
+            CheckWarningForItem16();
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_16));
+        }
+    }
+
+    void CheckWarningForItem16()
+    {
+        try
+        {
+            Item16WarningMessage = string.Empty;
+            bool block_4_4_any_checked = block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() || block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault();
+            if ((block_4.item_16 == 2 || block_4.item_16 == 3) && (!block_4_4_any_checked && block_4_nic_list.Count == 0))
+            {
+                Item8WarningMessage = $"W028(ii): Please check the entry against Q4.4 and/or Q4.5";
+            }
+            
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private void OnItem17Changed(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            block_4.item_17 = null;
+        else
+        {
+            block_4.item_17 = int.Parse(value);
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_17));
         }
     }
 
@@ -497,30 +760,6 @@
         return;
     }
 
-    private void ToggleEconomicActivity(int id)
-    {
-        if (SelectedEconomicActivities.Contains(id))
-            SelectedEconomicActivities.Remove(id);
-        else
-            SelectedEconomicActivities.Add(id);
-    }
-
-
-
-    private void ToggleLandUse(int id)
-    {
-        if (SelectedLandUses.Contains(id))
-            SelectedLandUses.Remove(id);
-        else
-            SelectedLandUses.Add(id);
-
-        block_4.item_8 = SelectedLandUses.Any() ? string.Join(",", SelectedLandUses) : string.Empty;
-        editContext?.NotifyFieldChanged(
-            FieldIdentifier.Create(() => block_4.item_8));
-
-        //Warnings for Item 8
-    }
-
     private async Task Save(bool is_go_next = false)
     {
         if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
@@ -543,7 +782,11 @@
             editContext.NotifyValidationStateChanged();
             if (result.IsValid)
             {
-                await dQ.Save_SCH_HIS_Block4(block_4);
+                int save = await dQ.Save_SCH_HIS_Block4(block_4);
+                if (save > 0)
+                {
+                    toastService.ShowSuccess("Data succesfully saved");
+                }
                 if (is_go_next)
                 {
                     NavigationManager.NavigateTo("dashboard/his/block_5");
