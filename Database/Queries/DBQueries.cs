@@ -1,4 +1,6 @@
 ﻿using Blazored.Toast.Services;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Income.Common;
 using Income.Database.Models.Common;
 using Income.Database.Models.HIS_2026;
@@ -492,6 +494,7 @@ namespace Income.Database.Queries
                         int deleted = await _database.DeleteAsync(exists);
                         return deleted;
                     }
+                    await ReserializeHHD(exists);
                 }
                 return 0;
             }
@@ -499,6 +502,59 @@ namespace Income.Database.Queries
             {
                 Console.WriteLine("Error deleting household: " + ex.Message);
                 return 0;
+            }
+        }
+
+        private async Task ReserializeHHD(Tbl_Sch_0_0_Block_7 deleted)
+        {
+            try
+            {
+                var households = await GetBlock7Data(SessionStorage.SelectedFSUId);
+                if (households != null && households.Count > 0)
+                {
+                    //1. Re-serialize Block_7_1 for all records after the deleted entry
+                    // Order by current serial
+                    var allOrdered = households.OrderBy(h => h.Block_7_1).ToList();
+
+                    // Identify deleted serial position
+                    int deletedSerial1 = deleted.Block_7_1 ?? 0;
+
+                    // Start from the next serial
+                    int nextSerial = deletedSerial1;
+
+                    foreach (var h in allOrdered.Where(h => h.Block_7_1 > deletedSerial1))
+                    {
+                        nextSerial++;
+                        h.Block_7_1 = nextSerial;
+                    }
+
+                    //2. Re-serialize Block_7_3 for is_household = 2 after deleted entry
+                    // Consider only households with is_household = 2
+                    var onlyHhd = allOrdered
+                        .Where(h => h.is_household == 2)
+                        .OrderBy(h => h.Block_7_3)
+                        .ToList();
+
+                    // Find deleted household's Block_7_3 position (only if it was household=2)
+                    int deletedSerial3 = deleted.is_household == 2 ? deleted.Block_7_3 ?? 0 : 0;
+
+                    int nextHhdSerial = deletedSerial3;
+
+                    foreach (var h in onlyHhd.Where(h => h.Block_7_3 > deletedSerial3))
+                    {
+                        nextHhdSerial++;
+                        h.Block_7_3 = nextHhdSerial;
+                    }
+
+                    foreach (var hhd in households)
+                    {
+                        await _database.UpdateAsync(hhd);
+                    }
+                }
+            }
+            catch
+            {
+
             }
         }
 
@@ -992,6 +1048,7 @@ namespace Income.Database.Queries
                         int deleted = await _database.DeleteAsync(exists);
                         return deleted;
                     }
+                    await ReserializeMemberList(exists);
                 }
                 return 0;
             }
@@ -999,6 +1056,41 @@ namespace Income.Database.Queries
             {
                 Console.WriteLine("Error deleting household member: " + ex.Message);
                 return 0;
+            }
+        }
+
+        private async Task ReserializeMemberList(Tbl_Block_3 deleted)
+        {
+            try
+            {
+                var members = await Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+                if (members != null && members.Count > 0)
+                {
+                    //1. Re-serialize Block_7_1 for all records after the deleted entry
+                    // Order by current serial
+                    var allOrdered = members.OrderBy(h => h.serial_no).ToList();
+
+                    // Identify deleted serial position
+                    int deletedSerial1 = deleted.serial_no ?? 0;
+
+                    // Start from the next serial
+                    int nextSerial = deletedSerial1;
+
+                    foreach (var h in allOrdered.Where(h => h.serial_no > deletedSerial1))
+                    {
+                        nextSerial++;
+                        h.serial_no = nextSerial;
+                    }
+
+                    foreach (var member in members)
+                    {
+                        await _database.UpdateAsync(member);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 
