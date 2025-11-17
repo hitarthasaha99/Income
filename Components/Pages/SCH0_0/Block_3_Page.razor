@@ -5,6 +5,8 @@
 @inject IJSRuntime JSRuntime
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
+@inject ILoggingService Logger
+
 
 <div class="main-content">
     <CommonContentHeader 
@@ -24,14 +26,17 @@
                 {
                     <img src="@file.file_image_source" alt="sketch map" title="Sketch Map" height="400" width="800" />
                 }
-                <div class="d-flex align-items-center mt-3">
-                    <button class="btn btn-outline-primary d-flex align-items-center me-2" @onclick="@(() => FileHandler("CAMERA"))"><i class="fi fi-rr-camera me-2"></i>Open Camera</button>
-                    <button class="btn btn-primary d-flex align-items-center me-2" @onclick="@(() => FileHandler("GALLERY"))"><i class="fi fi-ss-mode-landscape me-2"></i>Choose from gallery</button>
-                    @if (!string.IsNullOrEmpty(file.file_image_source))
-                     {
-                        <button class="btn btn-danger d-flex align-items-center p-2 px-3" @onclick="DeleteFile"><i class="fi fi-rr-trash fs-5"></i></button>
-                     }
-                 </div>
+                @if(!SessionStorage.selection_done)
+                {
+                    <div class="d-flex align-items-center mt-3">
+                        <button class="btn btn-outline-primary d-flex align-items-center me-2" hidden=@SessionStorage.FSU_Submitted @onclick="@(() => FileHandler("CAMERA"))"><i class="fi fi-rr-camera me-2"></i>Open Camera</button>
+                        <button class="btn btn-primary d-flex align-items-center me-2" hidden=@SessionStorage.FSU_Submitted @onclick="@(() => FileHandler("GALLERY"))"><i class="fi fi-ss-mode-landscape me-2"></i>Choose from gallery</button>
+                        @if (!string.IsNullOrEmpty(file.file_image_source))
+                        {
+                            <button class="btn btn-danger d-flex align-items-center p-2 px-3" hidden=@SessionStorage.FSU_Submitted @onclick="DeleteFile"><i class="fi fi-rr-trash fs-5"></i></button>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -40,7 +45,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -76,6 +81,8 @@
     DateTime survey_time = DateTime.Now;
     CommonQueries CommonQueries = new CommonQueries();
     DBQueries SCH_0_0_Querie = new();
+    string? remarks = string.Empty;
+    Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
 
     async void GoBack()
     {
@@ -94,6 +101,7 @@
         block = is_sub_unit ? "[Block 6]" : "[Block 3]";
         block_heading = is_sub_unit ? "sketch map of sub-division formation" : "Sketch map of sub-units (SU) formation";
         await CommonQueries.InsertVisitedBlock(vb);
+        block_0_1 = await SCH_0_0_Querie.FetchBlock1();
         Tbl_Sch_0_0_Block_3? response = await SCH_0_0_Querie.GetFileData(is_sub_unit ? 1 : 0);
         if (response != null)
         {
@@ -193,6 +201,18 @@
         //NavigationManager.NavigateTo("/dashboard/sch0.0/block_4_1");
         try
         {
+            if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                if (is_sub_unit)
+                {
+                    NavigationManager.NavigateTo("/dashboard/sch0.0/block_7");
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/dashboard/sch0.0/block_4");
+                }
+                return;
+            }
             if (string.IsNullOrEmpty(file.file_image_source))
             {
                 toastService.ShowError("Please select a file");
@@ -205,6 +225,8 @@
                 toastService.ShowError("Getting Error while saving file, please try agian!");
                 return;
             }
+            block_0_1.remarks_block_3 = remarks;
+            await SCH_0_0_Querie.SaveBlock1(block_0_1);
             if (type == "NEXT")
             {
                 if(is_sub_unit)

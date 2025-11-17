@@ -120,11 +120,11 @@
 
 
 @code {
-    int SelectedFsuId = SessionStorage.SelectedFSUId;
-    bool ShowVisitedBlock = false;
-    DateTime survey_time = DateTime.Now;
-    List<Tbl_Sch_0_0_Block_7>? hhd_list = new();
-    CommonQueries commonQueries = new();
+	int SelectedFsuId = SessionStorage.SelectedFSUId;
+	bool ShowVisitedBlock = false;
+	DateTime survey_time = DateTime.Now;
+	List<Tbl_Sch_0_0_Block_7>? hhd_list = new();
+	CommonQueries commonQueries = new();
 	DBQueries dQ = new();
 	CommonConfig commonConfig = new();
 	CommonFunction commonFunction = new();
@@ -338,13 +338,14 @@
 			if (data.hhdStatus == 0 || data.hhdStatus == 11)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
-				//SessionStorage.selected_hhd_seq = data.seq_no;
+				SessionStorage.selected_hhd_seq = data.SSS_household_id.GetValueOrDefault();
 				SessionStorage.selected_hhd_size = data.Block_7_5.GetValueOrDefault();
 				preloadService.Show(SpinnerColor.Light, "Fetching location details...");
 				SessionStorage.location = await funcs.fetchGeoLocation();
 				preloadService.Show(SpinnerColor.Light, "Updating location details...");
 				//await dQ.SaveHhdStatus(data.Block_7_3, 10, SessionStorage.SelectedFSUId);
 				preloadService.Hide();
+				SessionStorage.FSU_Submitted = false;
 				NavigationManager.NavigateTo("/dashboard/his/block0_1");
 			}
 			else

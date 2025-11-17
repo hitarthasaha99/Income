@@ -13,17 +13,29 @@ namespace Income.Validators.HIS2026
     {
         public Block_4_Q5_Validator()
         {
+            //Item 3: NIC code
+            RuleFor(x => x.NicCode)
+                .Must((model, nic) =>
+                {
+                    // If ActivityName is "Others", NULL NicCode is allowed
+                    if (model.ActivityName == "Others")
+                        return true;
+
+                    // Otherwise NicCode must be selected
+                    return nic != null;
+                })
+                .WithMessage("Please select a NIC code");
             // Item 4: Business Seasonal (must be selected)
             RuleFor(x => x.BusinessSeasonal)
                 .NotNull()
-                .WithMessage("Please select whether the business is seasonal (Yes or No)");
+                .WithMessage("H017(ii): Invalid Entry, Please check the entry");
 
             // Item 5: Number of months (required and within 1–12 range)
             RuleFor(x => x.NumberOfMonths)
                 .NotNull()
-                .WithMessage("Please enter the number of months of operation")
+                .WithMessage("H017(iii): Invalid Entry, Please check the entry")
                 .InclusiveBetween(1, 12)
-                .WithMessage("Number of months must be between 1 and 12");
+                .WithMessage("H017(iii): Invalid Entry, Please check the entry");
         }
     }
 

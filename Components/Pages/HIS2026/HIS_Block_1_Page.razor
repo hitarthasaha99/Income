@@ -408,7 +408,13 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_3");
             }
         }
-        
+
+        if (block_1.survey_code == null)
+        {
+            toastService.ShowError("Please select a survey code");
+            return;
+        }
+
         var response = await dQ.Save_SCH_HIS_Block1(block_1);
         if (response != 1)
         {
@@ -428,10 +434,6 @@
                 }
                 else
                 {
-                    // if (block_1.survey_code != init_survey_code)
-                    // {
-                    //     await commonQueries.DeleteBlockDataForCasulaty();
-                    // }
                     NavigationManager.NavigateTo("/dashboard/his/block_3");
                 }
             }

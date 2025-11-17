@@ -76,7 +76,7 @@
             is_error = false;
             StateHasChanged();
             var deleteduserinfo = await CommonQueries.GetDeletedUserDetailsAsync();
-            if (UserDetails.username.ToUpper() != deleteduserinfo?.username?.ToUpper())
+            if (deleteduserinfo != null && UserDetails.username.ToUpper() != deleteduserinfo?.username?.ToUpper())
             {  // delete old user data if user is not same as deleted user
                 // Delete all block data for the user
                 // Take confirmation before deletion

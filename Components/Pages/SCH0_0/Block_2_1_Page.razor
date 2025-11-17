@@ -8,6 +8,8 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
+@inject ILoggingService Logger
+
 
 <div class="main-content">
     <CommonContentHeader 
@@ -80,7 +82,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea type="text" class="form-control disabled w-100" placeholder="" rows="4"></textarea>
+            <textarea type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="@remarks" placeholder="" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -111,7 +113,8 @@
     CommonQueries commonQueries = new();
     DBQueries sch_0_0_Queries = new();
     private ConfirmDialog dialog = default!;
-
+    string remarks = string.Empty;
+    Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     private List<string> validationErrors = new();
     private string validationMessage = "";
     bool is_sel;
@@ -159,6 +162,7 @@
         };
         await commonQueries.InsertVisitedBlock(vb);
         await block_2_1_VM.Init(toastService);
+        block_0_1 = await sch_0_0_Queries.FetchBlock1();
         StateHasChanged();
     }
 
@@ -185,7 +189,14 @@
 
         if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2R");
+            if (SessionStorage.FSU_Sector == 1)
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2R");
+            }
+            else if (SessionStorage.FSU_Sector == 2)
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2U");
+            }
             return;
         }
 
@@ -201,29 +212,9 @@
         }
 
 
-        //bool withinRange = block_2_1_VM.ArePercentagesWithinRange(block_2_1_VM.tbl_Sch_0_0_block_2_1);
         await Save(action);
-        // var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
-
-        // if(!withinRange)
-        // {
-        //     var confirmation = await dialog.ShowAsync(
-        //     title: "Alert",
-        //     message1: "All the hamlets need to have more or less equal population. Do you want to continue?",
-        //     confirmDialogOptions: options);
-        //     if (confirmation)
-        //     {
-        //         // proceed
-        //         await Save(action);
-        //     }
-        //     else
-        //     {
-        //     }
-        // }
-        // else
-        // {
-        //     await Save(action);
-        // }
+        block_0_1.remarks_block_2_1 = remarks;
+        await sch_0_0_Queries.SaveBlock1(block_0_1);
 
     }
 

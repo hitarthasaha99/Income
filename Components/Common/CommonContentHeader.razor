@@ -13,14 +13,25 @@
                 <h3 class="page-heading m-0 ms-2">HHD ID: @SessionStorage.selected_hhd_id</h3>
             }
         </div>
-    </div>   
+    </div>
     <div class="card custom-card" hidden="@((ShowVisitedBlock == true ? false : true))">
         <div class="card-body d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-start">
                 <i class="fi fi-ss-marker text-danger fs-3"></i>
                 <div class="ms-2">
                     <label class="form-label">Coordinate</label>
-                    <p class="mb-0 fw-bolder">@location</p>
+                    <p class="mb-0 fw-bolder">
+                        @if (isLocationLoading)
+                        {
+                            // Display a simple inline indicator (using a common Bootstrap spinner and text)
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            <span>Loading...</span>
+                        }
+                        else
+                        {
+                            @location
+                        }
+                    </p>
                 </div>
             </div>
             <div class="d-flex align-items-start">
@@ -30,8 +41,8 @@
                     <p class="mb-0 fw-bolder">@Time</p>
                 </div>
             </div>
-            @if (ShowVisitedBlock) 
-            { 
+            @if (ShowVisitedBlock)
+            {
                 <div class="form-group w-25">
                     <label class="form-label">Switch To Visited Block</label>
                     <select class="form-select form-select-sm w-100" id="exampleFormControlSelect1" @onchange="@((ChangeEventArgs e) => HandleBlockNavigation(e))">
@@ -54,11 +65,15 @@
     [Parameter]
     public int SelectedFsuId { get; set; }
     [Parameter]
-    public DateTime? survey_time { get; set; } = SessionStorage.survey_timestamp;    
+    public DateTime? survey_time { get; set; } = SessionStorage.survey_timestamp;
     [Parameter]
     public string? page_name { get; set; } = string.Empty;
     [Parameter]
     public bool ShowVisitedBlock { get; set; } = true;
+
+    // 1. New variable for location loading state
+    private bool isLocationLoading = false;
+
     CommonQueries commonQueries = new CommonQueries();
     List<Tbl_Visited_Blocks>? visited_Blocks = new();
     int hhd_id = SessionStorage.selected_hhd_id;
@@ -69,6 +84,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        // No change needed here for this problem
         StateHasChanged();
         return;
     }
@@ -83,9 +99,12 @@
         NavigationManager.NavigateTo(page_name);
         return;
     }
+
     protected override async Task OnInitializedAsync()
     {
+        // **Part 1: Initial/Quick Load (Visited Blocks and Time)**
         visited_Blocks = new();
+        // This is kept synchronous or quick to load initially
         var result = await commonQueries.GetVisitedBlocks()!;
         SelectedFsuId = SessionStorage.SelectedFSUId;
         if (result != null && result.Count > 0)
@@ -94,16 +113,30 @@
         }
         Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+        // **Part 2: Asynchronous Location Load**
         if (string.IsNullOrEmpty(SessionStorage.location) && ShowVisitedBlock == true)
         {
-            preloadService.Show(SpinnerColor.Light, "Fetching Location Details...");
-            location = await funcs.fetchGeoLocation();
+            // 2. Set loading state to true and immediately call StateHasChanged()
+            isLocationLoading = true;
+            StateHasChanged(); // Update the UI to show the 'Loading...' spinner
+
+            // 3. Remove the full-page preloadService calls
+            // preloadService.Show(SpinnerColor.Light, "Fetching Location Details..."); // REMOVED
+
+            location = await funcs.fetchGeoLocation(); // Start fetching location
+
+            // 4. Update the location and set loading state back to false
+            isLocationLoading = false;
         }
         else
         {
             location = SessionStorage.location;
         }
-        preloadService.Hide();
+
+        // 5. Remove the full-page preloadService.Hide()
+        // preloadService.Hide(); // REMOVED
+
+        // 6. Ensure final UI update after location is fetched (if it was loading)
         StateHasChanged();
         return;
     }

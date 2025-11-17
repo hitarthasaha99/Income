@@ -1,5 +1,6 @@
 ﻿using Blazored.Toast;
 using FluentValidation;
+using Income.Database.Models.HIS_2026;
 using Income.Services;
 using Income.Validators.HIS2026;
 using Income.Validators.SCH0_0;
@@ -37,11 +38,18 @@ namespace Income
             builder.Services.AddValidatorsFromAssemblyContaining<Block7Validator>();
             builder.Services.AddValidatorsFromAssemblyContaining<Block_4_Validator>();
             builder.Services.AddValidatorsFromAssemblyContaining<Block_4_Q5_Validator>();
+            builder.Services.AddScoped<IValidator<Tbl_Block_4>, Block_4_Validator>();
+
 
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             //builder.Services.AddFluentValidationAutoValidation();
 
             builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
+            builder.Services.AddSingleton<ILoggingService, LoggingService>();
+
+            builder.Services.AddSingleton<Viewmodels.Warning_VM>();
+
+
             builder.Services.AddBlazoredToast();
 
 #if DEBUG

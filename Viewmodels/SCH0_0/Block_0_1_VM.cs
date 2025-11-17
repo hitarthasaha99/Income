@@ -67,7 +67,7 @@ namespace Income.Viewmodels.SCH0_0
         public ValidationComponent substitution_reason = new();
         public DBQueries SCH_0_0_Queries = new();
         public bool is_error = false;
-        public bool EnablePopulation = false;
+        public bool DisablePopulation = false;
         public bool EnableItem16 = false;
 
         [ObservableProperty]
@@ -134,7 +134,7 @@ namespace Income.Viewmodels.SCH0_0
                     Block_1_17_Selected = null;
                     block_0_1.remarks = string.Empty;
                     EnableItem16 = true;
-                    EnablePopulation = true;
+                    DisablePopulation = false;
                     ShowItem17 = false;
                     //DisplayCoordinates = FormattedCoordinates;
                 }
@@ -148,7 +148,7 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_16_Selected = block_0_1.Block_1_16 != null ? CommonList.LOOKUP_CONST_SURVEY_CODE.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_16))?.title : string.Empty;
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
                 ShowItem17 = block_0_1.Block_1_17 != null;
-                EnablePopulation = !SessionStorage.selection_done;
+                DisablePopulation = SessionStorage.hamlet_selection_done;
             }
             OnPropertyChanged(nameof(block_0_1));
         }
@@ -193,24 +193,25 @@ namespace Income.Viewmodels.SCH0_0
             try
             {
                 var val = args.Value.ToString();
-                EnablePopulation = (val == "1" || val == "4") && !SessionStorage.selection_done;
+                DisablePopulation = SessionStorage.selection_done ? true : (val != "1" && val != "4");
                 ShowItem17 = val == "4" || val == "5" || val == "6" || val == "7";
-                if (!EnablePopulation)
+                if (DisablePopulation)
                 {
                     block_0_1.Block_1_14 = 0;
                 }
                 if (!ShowItem17)
                 {
                     block_0_1.Block_1_17 = null;
+                    block_0_1.remarks_block_1_17 = string.Empty;
                 }
                 block_0_1.Block_1_16 = Convert.ToInt16(val);
                 OnPropertyChanged(nameof(block_0_1));
-                OnPropertyChanged(nameof(EnablePopulation));
+                OnPropertyChanged(nameof(DisablePopulation));
                 NotifyUiUpdate.Invoke();
             }
             catch (Exception ex)
             {
-
+                block_0_1.Block_1_16 = null;
             }
         }
     }

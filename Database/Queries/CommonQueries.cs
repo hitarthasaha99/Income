@@ -128,10 +128,11 @@ namespace Income.Database.Queries
                 var is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ?", block_data.block_code);
                 if (is_exist == null || is_exist.Count == 0)
                 {
+                    block_data.id = Guid.NewGuid();
+                    block_data.fsu_id = SessionStorage.SelectedFSUId;
+                    block_data.hhd_id = SessionStorage.selected_hhd_id;
                     await _database.InsertAsync(block_data);
-                    return;
                 }
-                return;
             }
             catch (Exception)
             {
@@ -143,8 +144,20 @@ namespace Income.Database.Queries
         {
             try
             {
-                var items = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id, block_uri, block_title, block_code FROM Tbl_Visited_Blocks");
-                return items != null && items.Count > 0 ? items : null;
+                List<Tbl_Visited_Blocks> list = [];
+                Tbl_Visited_Blocks tbl_visited_block = new()
+                {
+                    block_uri = "/dashboard/fsulist",
+                    block_title = "FSU List",
+                    block_code = CommonEnum.fsu_list_page.ToString()
+                };
+                list.Add(tbl_visited_block);
+                var items = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id, block_uri, block_title, block_code FROM Tbl_Visited_Blocks tvb WHERE tvb.fsu_id = ? and tvb.hhd_id = ?", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+                if (items != null && items.Count > 0)
+                {
+                    list.AddRange(items);
+                }
+                return list;
             }
             catch (Exception ex)
             {
