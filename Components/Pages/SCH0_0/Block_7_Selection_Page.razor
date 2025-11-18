@@ -293,8 +293,13 @@
         {
             ListItems?.Clear();
             ListItems?.AddRange(response.OrderBy(x => x.Block_7_1).ToList());
-            StateHasChanged();
         }
+        else
+        {
+            ListItems?.Clear();
+        }
+        StateHasChanged();
+
     }
 
     private async Task ResetSelection()

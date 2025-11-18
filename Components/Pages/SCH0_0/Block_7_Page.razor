@@ -103,18 +103,19 @@
                                             </div>
                                         </td>
 
-                                        <td class="d-flex align-items-center">
-                                            <button class="btn btn-link me-3 fs-6"
-                                                        hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleModal("UPDATE", item))">
-                                                <i class="fi fi-rr-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-link fs-6 text-danger"
-                                                        hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleDelete(item.id))">
-                                                <i class="fi fi-rr-trash"></i>
-                                            </button>
-                                        </td>
+                                        @if (!SessionStorage.selection_done)
+                                            {
+                                                <td class="d-flex align-items-center">
+                                                    <button class="btn btn-link me-3 fs-6"
+                                                            @onclick="@(() => HandleModal("UPDATE", item))">
+                                                        <i class="fi fi-rr-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-link fs-6 text-danger"
+                                                            @onclick="@(() => HandleDelete(item.id))">
+                                                        <i class="fi fi-rr-trash"></i>
+                                                    </button>
+                                                </td>
+                                            }
                                     </tr>
                                 }
                             }
