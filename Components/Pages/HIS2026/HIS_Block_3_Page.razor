@@ -5,6 +5,7 @@
 @using FluentValidation
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
+@using Income.Database.Models.SCH0_0
 @using Income.Viewmodels
 @using Microsoft.AspNetCore.Components.Forms
 @inject IJSRuntime JSRuntime
@@ -23,7 +24,7 @@
             </h3>
             <div class="card-tools">
                 <div class="d-flex align-items-center" hidden="@SessionStorage.FSU_Submitted">
-                   @*  <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
+                    @*  <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
                         <i class="fi fi-rr-settings me-1"></i>Generate
                     </button> *@
                     <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
@@ -47,13 +48,13 @@
                             <th rowspan="3">age (years)</th>
                             <th rowspan="3">marital status(code)</th>
                             <th rowspan="3">highest educational level attained(code)</th>
-                            <th colspan="4">activity status</th>
+                            <th class="text-center" colspan="4">activity status</th>
                             <th rowspan="3" style="min-width:200px">whether a beneficiary of any Central/State Government social assistance scheme as on date of survey(<i>yes-1/no-2</i>)</th>
-                            <th rowspan="3">action</th>
+                            <th class="text-center" rowspan="3">action</th>
                         </tr>
                         <tr>
-                            <th colspan="2">during 30 days</th>
-                            <th colspan="2">during 365 days</th>
+                            <th class="text-center" colspan="2">during 30 days</th>
+                            <th class="text-center" colspan="2">during 365 days</th>
                         </tr>
                         <tr>
                             <th>primary(code)</th>
@@ -137,9 +138,9 @@
         </div>
     </div>
 </div>
-    
 
-<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
+
+<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false"  Fullscreen="ModalFullscreen.MediumDown">
     <HeaderTemplate>
         <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
     </HeaderTemplate>
@@ -148,10 +149,10 @@
             <div class="modal-content">
                 <EditForm Model="@newMember">
 
-                    <div class="modal-header">
+                    @* <div class="modal-header">
                         <h5 class="modal-title" id="addModalLabel">Add Item</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+                    </div> *@
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="row">
@@ -168,7 +169,12 @@
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">2.</span> Name of Member
                                     </label>
-                                    <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" @oninput="ClearNameError" />
+                                    <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" @oninput="ClearNameError" autocomplete="off"
+                                               onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+                                               autocorrect="off"
+                                               autocapitalize="off"
+                                               spellcheck="false" />
+
                                     @if (!string.IsNullOrEmpty(nameError))
                                     {
                                         <small class="text-danger">@nameError</small>
@@ -203,7 +209,7 @@
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">4.</span> Gender (code)
                                     </label>
-                                    <select class="form-select form-select-sm" value="@newMember.gender" @onchange= "genderClear">
+                                    <select class="form-select form-select-sm" value="@newMember.gender" @onchange="genderClear">
                                         <option value="">-Select-</option>
                                         <option value="1">male-1</option>
                                         <option value="2">female-2</option>
@@ -226,19 +232,19 @@
                                     <label class="form-label fw-bold d-flex align-items-start">
                                         <span class="me-2">5.</span> Age(years)
                                     </label>
-                                    <InputNumber class="form-control form-control-sm" @bind-Value="newMember.age" @onchange="ageClear" />
-                                    @if (!string.IsNullOrEmpty(ageError))
-                                    {
-                                        <small class="text-danger">@ageError</small>
-                                    }
+                                    <InputNumber @bind-Value="newMember.age"
+                                                 class="form-control no-spinner form-control-sm"
+                                                 onkeypress="return event.key >= '0' && event.key <= '9'"
+                                                 @oninput="(e) => ageClear(e)" />
+
                                     @if (!string.IsNullOrEmpty(ageWarning))
                                     {
-                                        <small class="text-success">@ageWarning</small>
+                                        <div class="text-success" role="alert">@ageWarning</div>
                                     }
-                                    <!-- For education-age warnings -->
-                                    @if (!string.IsNullOrEmpty(eduAgeWarning))
+
+                                    @if (!string.IsNullOrEmpty(ageRelationWarning))
                                     {
-                                        <div class="text-success">@eduAgeWarning</div>
+                                        <div class="text-success" role="alert">@ageRelationWarning</div>
                                     }
                                 </div>
 
@@ -260,7 +266,7 @@
                                     }
                                     @if (!string.IsNullOrEmpty(maritalStatusWarning))
                                     {
-                                        <small class="text-success">@maritalStatusWarning</small>
+                                        <div class="text-success" role= "alert">@maritalStatusWarning</div>
                                     }
                                 </div>
 
@@ -273,22 +279,22 @@
                                         <option value="">-Select-</option>
                                         <option value="1">not literate (i.e. not able to read or write a simple message with understanding in any language) -01 </option>
                                         <option value="2">literate without formal schooling (like NFEC, AEC, TLC, literate without any schooling, etc.)-02 </option>
-                                        <option value="3">literate with formal education below primary-03 </option>
+                                        <option value="3">below primary-03</option>
                                         <option value="4">primary -04 </option>
                                         <option value="5">upper primary/middle -05 </option>
                                         <option value="6">secondary -06 </option>
                                         <option value="7">higher secondary -07 </option>
                                         <option value="8">diploma /certificate course - 08 </option>
-                                        <option value="9">graduate -10 </option>
-                                        <option value="10">postgraduate and above - 11 </option>
+                                        <option value="10">graduate -10 </option>
+                                        <option value="11">postgraduate and above - 11 </option>
                                     </InputSelect>
                                     @if (!string.IsNullOrEmpty(item_7Error))
                                     {
                                         <small class="text-danger">@item_7Error</small>
                                     }
-                                    @if (!string.IsNullOrEmpty(eduAgeWarning))
+                                    @if (!string.IsNullOrEmpty(item_7Warning))
                                     {
-                                        <div class="text-success">@eduAgeWarning</div>
+                                        <div class="text-success" role="alert">@item_7Warning</div>
                                     }
 
                                 </div>
@@ -433,6 +439,10 @@
                                         {
                                             <div class="text-success">@item_11Warning</div>
                                         }
+                                        @if (!string.IsNullOrEmpty(singleUserWarning))
+                                        {
+                                            <div class="text-success">@item_11Warning</div>
+                                        }
                                     </div>
                                 </div>
 
@@ -463,15 +473,17 @@
         <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId"><i class="fi fi-rr-disk me-1"></i>@((isAdd ? "Save" : "Update"))</button>
     </FooterTemplate>
 </Modal>
-    
+
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
     Modal AddModal = default!;
     // List for holding household members data
-    private List<Tbl_Block_3>  block3Members = new();
-    private Tbl_Block_3 newMember = new Tbl_Block_3();
+    private List<Tbl_Block_3> block3Members = new();
+    private Tbl_Block_3 newMember = new();
+    Tbl_Sch_0_0_Block_7 hhd = new();
+
     private String? nameError = null;
     private string? relationError = null;
     // Errors and warnings for fields
@@ -489,10 +501,11 @@
     //Age Warning
     private string? ageWarning = null;
     private string? maritalStatusWarning = null;
-    private string? eduAgeWarning = null;
+    private string? item_7Warning = null;
     private string? item_8Warning = null;
     private string? item_9Warning = null;
-
+    private string? ageRelationWarning = null;
+    private string? singleUserWarning = null;
     private string? item_10Warning = null;
     private string? item_11Warning = null;
 
@@ -515,6 +528,7 @@
             block_title = "HIS Block 3",
             block_code = CommonEnum.sch_0_0_block_7.ToString(),
         };
+        hhd = await DBQueries.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
 
         await commonQueries.InsertVisitedBlock(vb);
         await LoadData();
@@ -555,25 +569,53 @@
             newMember.item_3 = int.Parse(value);
     }
 
-    private void ageClear()
+    private void ageClear(ChangeEventArgs e)
     {
         ClearAgeError();
-        // CheckAgeWarnings();
-        StateHasChanged();
-        // CheckEduAgeWarnings();
+
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            newMember.age = null;
+        else
+            newMember.age = int.Parse(value);
+
+        checkAgeWarning();           // Check age >= 120
+        checkAgeReletionWarning();   // Check relation rule (age < head age)
+        checkSingleUser();
     }
 
-    private void clearItem_6()
+
+
+    private void clearItem_6(ChangeEventArgs e)
     {
-        clearItem_6Error();
-        // CheckMaritalStatusWarning();
+        clearItem_6Error();  // Clear previous error/warning
+
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            newMember.item_6 = null;
+        else
+            newMember.item_6 = int.Parse(value);
+
+        checkItem_6Warning();    // Rule: If item_6 != 1 → age >= 15
+
         StateHasChanged();
     }
-    private void ClearItem7()
+
+    private void ClearItem7(ChangeEventArgs e)
     {
-        ClearItem7Error();
-        // CheckEduAgeWarnings();
+        item_7Error = null;
+
+        if (int.TryParse(e.Value?.ToString(), out int v))
+            newMember.item_7 = v;
+        else
+            newMember.item_7 = null;
+
+        CheckItem7Warning();
     }
+
+
     private void ClearItem8()
     {
         ClearItem8Error();
@@ -667,15 +709,15 @@
 
 
         // 5. Age Error Check
-        if (!newMember.age.HasValue || newMember.age < 1 || newMember.age > 120)
-        {
-            ageError = "H006(i): Invalid Entry, Please check the entry";
-            error = true;
-        }
-        else
-        {
-            ageError = null;
-        }
+        // if (!newMember.age.HasValue || newMember.age < 1 || newMember.age > 120)
+        // {
+        //     ageError = "H006(i): Invalid Entry, Please check the entry";
+        //     error = true;
+        // }
+        // else
+        // {
+        //     ageError = null;
+        // }
 
         //sl.no7 hard check
         if (!(newMember.item_6.HasValue && newMember.item_6 >= 1 && newMember.item_6 <= 4))
@@ -709,7 +751,7 @@
 
 
         //sl.no8 hard check
-        if (!newMember.item_7.HasValue ||!((newMember.item_7 >= 1 && newMember.item_7 <= 8) || newMember.item_7 == 10 || newMember.item_7 == 11))
+        if (!newMember.item_7.HasValue || !((newMember.item_7 >= 1 && newMember.item_7 <= 8) || newMember.item_7 == 10 || newMember.item_7 == 11))
         {
             item_7Error = "H008(i): Invalid Entry, Please check the entry";
             error = true;
@@ -840,7 +882,7 @@
 
     }
 
-    //Gender Warning
+    //Gender Warning..............................................
 
     private void CheckGenderWarning()
     {
@@ -861,6 +903,238 @@
         genderWarning = null;
         StateHasChanged();
     }
+
+    private void checkAgeWarning()
+    {
+        ageWarning = null;
+
+        if (newMember.age.HasValue)
+        {
+            if (newMember.age.Value >= 120)
+                ageWarning = "W006(i): Invalid Entry, Please check the entry";
+        }
+
+        StateHasChanged();
+    }
+
+
+    //Age Retetion Warning..............................
+
+    private void checkAgeReletionWarning()
+    {
+        ageRelationWarning = null;
+
+        var head = block3Members.FirstOrDefault(m => m.item_3 == 1);
+        var spouse = block3Members.FirstOrDefault(m => m.item_3 == 2);
+
+        if (newMember.age == null)
+            return;
+
+        int memberAge = newMember.age.Value;
+        int? headAge = head?.age;
+        int? spouseAge = spouse?.age;
+
+        // Cannot check rules that require head age
+        if (headAge == null)
+            return;
+
+        // -------------------------------------------------------------
+        // RULE (ii): Relation = 3–6 → age < head age
+        // -------------------------------------------------------------
+        if (newMember.item_3 is 3 or 4 or 5 or 6)
+        {
+            if (memberAge >= headAge.Value)
+            {
+                ageRelationWarning = "W006(ii): Age must be less than Head of Household.";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // RULE (iii): Relation = 7 → age > head age
+        // -------------------------------------------------------------
+        if (newMember.item_3 == 7)
+        {
+            if (memberAge <= headAge.Value)
+            {
+                ageRelationWarning = "W006(iii): Age must be more than Head of Household.";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // RULE (iv): Relation = 3–5 → age difference ≥ 15 yrs (Head & Spouse)
+        // -------------------------------------------------------------
+        if (newMember.item_3 is 3 or 4 or 5)
+        {
+            if (Math.Abs(memberAge - headAge.Value) < 15)
+            {
+                ageRelationWarning = "W006(iv): Age difference with Head must be ≥ 15 years.";
+                StateHasChanged();
+                return;
+            }
+
+            if (spouseAge != null && Math.Abs(memberAge - spouseAge.Value) < 15)
+            {
+                ageRelationWarning = "W006(iv): Age difference with Spouse must be ≥ 15 years.";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // RULE (v): Relation = 6 → age difference ≥ 32 yrs (Head & Spouse)
+        // -------------------------------------------------------------
+        if (newMember.item_3 == 6)
+        {
+            if (Math.Abs(memberAge - headAge.Value) < 32)
+            {
+                ageRelationWarning = "W006(v): Age difference with Head must be ≥ 32 years.";
+                StateHasChanged();
+                return;
+            }
+
+            if (spouseAge != null && Math.Abs(memberAge - spouseAge.Value) < 32)
+            {
+                ageRelationWarning = "W006(v): Age difference with Spouse must be ≥ 32 years.";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // RULE (vi): Relation = 7 → age difference ≥ 15 yrs (Head & Spouse)
+        // -------------------------------------------------------------
+        if (newMember.item_3 == 7)
+        {
+            if (Math.Abs(memberAge - headAge.Value) < 15)
+            {
+                ageRelationWarning = "W006(vi): Age difference with Head must be ≥ 15 years.";
+                StateHasChanged();
+                return;
+            }
+
+            if (spouseAge != null && Math.Abs(memberAge - spouseAge.Value) < 15)
+            {
+                ageRelationWarning = "W006(vi): Age difference with Spouse must be ≥ 15 years.";
+                StateHasChanged();
+                return;
+            }
+        }
+
+
+        StateHasChanged();
+    }
+
+
+    private void checkSingleUser()
+    {
+        singleUserWarning = null;
+
+        if (hhd.Block_7_5.HasValue)
+        {
+            // Rule: If household size is 1, age must be ≥ 6
+            if (hhd.Block_7_5.Value < 6)
+            {
+                singleUserWarning = "W006(ii): For a single-member household, age must be ≥ 6 years.";
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    //Marital status Warning..........................
+
+    private void checkItem_6Warning()
+    {
+        maritalStatusWarning = null;
+
+        if (newMember.item_6 == null || newMember.age == null)
+            return;
+
+        int maritalStatus = newMember.item_6.Value;
+        int age = newMember.age.Value;
+
+        // Rule: if marital-status != 1 → age must be >= 15
+        if (maritalStatus != 1 && age < 15)
+        {
+            maritalStatusWarning = "W007(v): Please check the entryies recorded against cols. 3 & 5";
+        }
+
+        StateHasChanged();
+    }
+
+    //Education warning
+
+    private void CheckItem7Warning()
+    {
+        item_7Warning = null;
+        int? age = newMember.age;
+        int? edu = newMember.item_7;
+
+        if (!age.HasValue || !edu.HasValue)
+            return;
+
+        // Rule iii: If 4 <= age <= 6, edu must be <= 3
+        if (age >= 4 && age <= 6 && edu > 3)
+        {
+            item_7Warning = "W008(iii): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+
+        // Rule iv: If 7 <= age <= 11, edu must be <= 4
+        if (age >= 7 && age <= 11 && edu > 4)
+        {
+            item_7Warning = "W008(iv): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+
+        // Rule v: edu = 5, age >= 12
+        if (edu == 5 && age < 12)
+        {
+            item_7Warning = "W008(v): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+
+        // Rule vi: edu = 6, age >= 14
+        if (edu == 6 && age < 14)
+        {
+            item_7Warning = "W008(vi): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+
+        // Rule vii: edu = 7, age >= 16
+        if (edu == 7 && age < 16)
+        {
+            item_7Warning = "W008(vii): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+
+        // Rule viii: edu = 8, age >= 14
+        if (edu == 8 && age < 14)
+        {
+            item_7Warning = "W008(viii): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+
+        // Rule ix: edu = 10, age >= 19
+        if (edu == 10 && age < 19)
+        {
+            item_7Warning = "W008(ix): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+
+        // Rule x: edu = 11, age >= 21
+        if (edu == 11 && age < 21)
+        {
+            item_7Warning = "W008(x): Please check the entries recorded against Cols. 7 & 5";
+            return;
+        }
+    }
+
+
 
 
     // Clear All Errors After Input Anything.................................
@@ -894,7 +1168,7 @@
         genderWarning = null;
         ageWarning = null;
         maritalStatusWarning = null;
-        eduAgeWarning = null;
+        item_7Warning = null;
         item_8Warning = null;
         item_9Warning = null;
         item_10Warning = null;
@@ -998,7 +1272,7 @@
 
     }
 
-    async void HandleSubmit(string action="")
+    async void HandleSubmit(string action = "")
     {
         NavigationManager.NavigateTo("/dashboard/his/block_4_1");
     }
