@@ -1,0 +1,33 @@
+﻿@page "/dashboard/his/block_A"
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Viewmodels
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+<div class="main-content">
+     <CommonContentHeader />
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - A]</span>Monthly Household Income from different sources.</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+
+}
