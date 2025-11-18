@@ -40,7 +40,13 @@
                             foreach (var item in block_5)
                             {
                                 <tr>
-                                    <td><input type="checkbox" disabled @bind="item.IsChecked"></td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" disabled @bind="item.IsChecked">
+                                            </label>
+                                        </div>
+                                    </td>
                                     <td>@item.serial_number</td>
                                     <td><input type="number" disabled="@(is_selection_done)" class="form-control form-control-sm" value="@item.Percentage.ToString()" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)" @oninput="(e) => HandleChange(e, item.id)" /></td>
                                 </tr>
@@ -48,8 +54,9 @@
                         }
                     </tbody>
                     <tfoot>
-                        <tr class="text-center">
-                            <td colspan="5" class="bg-success text-success fw-bolder">Total Population:- <span>@total_population_percentage %</span></td>
+                        <tr>
+                            <td colspan="2" class="bg-success"></td>
+                            <td class="bg-success text-success fw-bolder">Total Population:- <span>@total_population_percentage %</span></td>
                         </tr>
                     </tfoot>
                 </table>
