@@ -472,7 +472,7 @@
             return;
         }
         int total_listed_population = ListItems.Sum(x => x.Block_7_5.GetValueOrDefault());
-        int no_of_sd = block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault();
+        int no_of_sd = block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault() == 0 ? 1 : block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault();
         int su_population = block_1_obj.approximate_population_su.GetValueOrDefault();
 
         int approx_population_fsu = block_1_obj.Block_1_14.GetValueOrDefault();

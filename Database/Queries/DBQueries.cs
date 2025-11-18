@@ -524,8 +524,7 @@ namespace Income.Database.Queries
 
                     foreach (var h in allOrdered.Where(h => h.Block_7_1 > deletedSerial1))
                     {
-                        nextSerial++;
-                        h.Block_7_1 = nextSerial;
+                        h.Block_7_1 = nextSerial++;
                     }
 
                     //2. Re-serialize Block_7_3 for is_household = 2 after deleted entry
@@ -542,8 +541,7 @@ namespace Income.Database.Queries
 
                     foreach (var h in onlyHhd.Where(h => h.Block_7_3 > deletedSerial3))
                     {
-                        nextHhdSerial++;
-                        h.Block_7_3 = nextHhdSerial;
+                        h.Block_7_3 = nextHhdSerial++;
                     }
 
                     foreach (var hhd in households)

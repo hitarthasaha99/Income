@@ -148,6 +148,14 @@
             return;
         }
         var blockUri = e.Value.ToString();
+        if (blockUri == "/dashboard/sch0.0/block_3")
+        {
+            blockUri = "/dashboard/sch0.0/block_3/false";
+        }
+        else if (blockUri == "/dashboard/sch0.0/block_6")
+        {
+            blockUri = "/dashboard/sch0.0/block_3/true";
+        }
         NavigationManager.NavigateTo(blockUri);
         return;
     }
