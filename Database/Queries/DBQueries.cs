@@ -346,11 +346,24 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<List<Tbl_Sch_0_0_Block_7>> GetBlock7Data(int fsuID)
+        public async Task<List<Tbl_Sch_0_0_Block_7>> GetBlock7Data(int fsuID = 0)
         {
             try
             {
                 List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                return data_set != null && data_set.Count > 0 ? data_set : new();
+            }
+            catch (Exception ex)
+            {
+                return new List<Tbl_Sch_0_0_Block_7>();
+            }
+        }
+
+        public async Task<List<Tbl_Sch_0_0_Block_7>> GetBlock7DataWithDeleted()
+        {
+            try
+            {
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set != null && data_set.Count > 0 ? data_set : new();
             }
             catch (Exception ex)

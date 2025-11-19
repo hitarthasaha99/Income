@@ -28,6 +28,66 @@ namespace Income.Services
             }
         }
 
+        //public async Task<HttpResponseMessage> PostAsync(string controller, string action, object parameter)
+        //{
+        //    try
+        //    {
+        //        using (var client = new HttpClient())
+        //        {
+        //            client.BaseAddress = new Uri(Constants.PostAddress);
+        //            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", SessionDetail.Token);
+        //            client.DefaultRequestHeaders.Accept.Clear();
+        //            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //            client.Timeout = TimeSpan.FromSeconds(300);
+
+        //            string apiURL = $"api/SURVEY/v1/{controller}/{action}";
+
+        //            // Serialize and zip
+        //            string json = JsonConvert.SerializeObject(parameter);
+        //            var zippedJson = ZipString(json); // assuming this returns byte[]
+        //            var zippedJsonBytes = UnzipBytes(zippedJson);
+
+        //            await WriteJsonToFileAsync(json); // still store uncompressed json locally
+
+        //            // Create gzipped content
+        //            using (var content = new ByteArrayContent(zippedJsonBytes))
+        //            {
+        //                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        //                content.Headers.ContentEncoding.Add("gzip");
+
+        //                var response = await client.PostAsync(apiURL, content);
+
+        //                if (!response.IsSuccessStatusCode)
+        //                {
+        //                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        //                    {
+        //                        await AppShell.Current.DisplayAlert("Alert", "Session expired, please login again.", "OK");
+        //                    }
+
+        //                    var responseContent = await response.Content.ReadAsStringAsync();
+        //                    CommonService.LogInfo($"Error {action}: {responseContent}");
+        //                }
+
+        //                return response;
+        //            }
+        //        }
+        //    }
+        //    catch (HttpRequestException hex)
+        //    {
+        //        CommonService.LogInfo($"Error {hex.Message}");
+        //        if (hex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        //        {
+        //            await AppShell.Current.DisplayAlert("Alert", "Session expired, please login again.", "OK");
+        //        }
+        //        return null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        CommonService.LogInfo($"Error {ex.Message}");
+        //        return null;
+        //    }
+        //}
+
         public async Task<Login_Response_Model>? LoginService(Tbl_User_Details _User_Details)
         {
             try
