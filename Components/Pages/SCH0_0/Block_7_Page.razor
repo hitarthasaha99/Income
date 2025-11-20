@@ -215,6 +215,7 @@
                             <div class="mb-3">
                                 <label class="form-label"><span class="form-badge">4</span>Name of Head of Household</label>
                                 <InputText class="form-control"
+                                           maxlength="50"
                                             onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
                                             @bind-Value="fields.Block_7_4"
                                             @oninput="OnHeadNameInput"/>
@@ -299,10 +300,10 @@
                         <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                             <div>
                                 <label class="form-label"><span class="form-badge">9</span>Usual Monthly Consumption Expenditure</label>
-                                <InputNumber class="form-control no-spinner"
+                                <input class="form-control no-spinner"
                                                 step="any"
-                                                @bind-Value="fields.Block_7_9"
-                                                oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+                                                value="@fields.Block_7_9"
+                                       oninput="@(() => OnMonthlyExpInputText)" />
                                 <ValidationMessage For="@(() => fields.Block_7_9)" />
                             </div>
                         </div>
@@ -386,6 +387,44 @@
         }
     }
 
+    private void OnMonthlyExpInputText(ChangeEventArgs e)
+    {
+        var input = e.Value?.ToString() ?? string.Empty;
+
+        // Keep only digits
+        var numericOnly = new string(input.Where(char.IsDigit).ToArray());
+
+        // If empty, treat as zero and exit
+        if (string.IsNullOrWhiteSpace(numericOnly))
+        {
+            fields.Block_7_9 = 0;
+            return;
+        }
+
+        // TryParse safely handles invalid values and overflow
+        if (int.TryParse(numericOnly, out int parsedValue))
+        {
+            fields.Block_7_9 = parsedValue;
+        }
+        else
+        {
+            // Overflow or unexpected numeric parsing failure
+            // Decide how you want to handle it:
+            // Option A: Set to max int
+            //fields.Block_7_9 = int.MaxValue;
+
+            // Option B: Set to zero
+             fields.Block_7_9 = 0;
+        }
+
+        editContext?.NotifyFieldChanged(
+    FieldIdentifier.Create(() => fields.Block_7_9));
+
+        StateHasChanged();
+    }
+
+
+
     private void OnIsHouseholdChanged(ChangeEventArgs e)
     {
         var selectedValue = e.Value?.ToString();
@@ -466,6 +505,13 @@
     {
         string firstWarning = string.Empty;
         string secondWarning = string.Empty;
+
+        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && ListItems.Count == 0)
+        {
+            toastService.ShowError("Please add a household/establishment before proceeding");
+            return;
+        }
+
         if(SessionStorage.FSU_Submitted)
         {
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
@@ -662,6 +708,9 @@
             ShowPopulationWarning = false;
             PopulationWarningMessage = string.Empty;
         }
+
+        editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => fields.Block_7_5));
 
         StateHasChanged();
     }
