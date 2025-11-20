@@ -301,9 +301,10 @@
                             <div>
                                 <label class="form-label"><span class="form-badge">9</span>Usual Monthly Consumption Expenditure</label>
                                 <input class="form-control no-spinner"
-                                                step="any"
+                                                type="number"
+                                                step="1"
                                                 value="@fields.Block_7_9"
-                                       oninput="@(() => OnMonthlyExpInputText)" />
+                                       @oninput="OnMonthlyExpInputText" />
                                 <ValidationMessage For="@(() => fields.Block_7_9)" />
                             </div>
                         </div>

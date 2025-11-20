@@ -161,7 +161,7 @@
                         <div class="col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label"><span class="form-badge">14</span>Approx. present population</label>
-                                <InputNumber type="number" class="form-control" @bind-Value="block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(block_0_1_VM.DisablePopulation)" />
+                                <input type="number" class="form-control" value="@block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(block_0_1_VM.DisablePopulation)" />
                                 <ValidationMessage For="@(() => block_0_1_VM.block_0_1.Block_1_14)" />
                                 @if (IsBlock_1_14_ErrorMessageVisible)
                                 {
@@ -214,7 +214,7 @@
                         </div>
                     </div>
                     @* When user will select code 9 - others in q.17 the 17.1 will be enabled *@
-                    <div class="col-sm-12" hidden="@(!block_0_1_VM.ShowItem17)">
+                    <div class="col-sm-12" hidden="@(!block_0_1_VM.ShowItem17RemarksField)">
                         <div class="mb-3">
                             <label class="form-label">
                                 <span class="form-badge">17.1</span>
@@ -270,45 +270,66 @@
         {
             IsBlock_1_14_ErrorMessageVisible = false;
             Block_1_14_ErrorMessage = string.Empty;
-            if (e.Value != null && e.Value != "")
+
+            var raw = e.Value?.ToString() ?? "";
+
+            // ❌ Block scientific notation and decimal characters
+            raw = raw.Replace("e", "")
+                     .Replace("E", "")
+                     .Replace("+", "")
+                     .Replace("-", "")
+                     .Replace(".", "");
+
+            // Keep only digits
+            var numericOnly = new string(raw.Where(char.IsDigit).ToArray());
+
+            // If empty → treat as null
+            if (string.IsNullOrWhiteSpace(numericOnly))
             {
-                block_0_1_VM.block_0_1.Block_1_14 = Convert.ToInt32(e.Value);
-            }
-            else
-            {
-                block_0_1_VM.block_0_1.Block_1_14 = null;
+                block_0_1_VM.block_0_1.Block_1_14 = 0;
+                return;
             }
 
-            editContext?.NotifyFieldChanged(editContext.Field(nameof(block_0_1_VM.block_0_1.Block_1_14)));
-            var _block_1_14 = Convert.ToInt32(e.Value);
+            // TryParse for safety
+            if (!int.TryParse(numericOnly, out int value))
+            {
+                block_0_1_VM.block_0_1.Block_1_14 = null;
+                return;
+            }
+
+            block_0_1_VM.block_0_1.Block_1_14 = value;
+
+            editContext?.NotifyFieldChanged(
+                editContext.Field(nameof(block_0_1_VM.block_0_1.Block_1_14))
+            );
+
+            // Your existing logic
             int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
-            int _block_1_13 = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
+            int framePop = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
+
             if (sector == 1)
             {
-                double change = ((double)(_block_1_14 - _block_1_13) / _block_1_13) * 100;
-                if (Math.Abs(change) >= 20)
+                if (framePop > 0)
                 {
-                    IsBlock_1_14_ErrorMessageVisible = true;
-                    Block_1_14_ErrorMessage = "W: Wide variation in approximate population and frame population";
-                }
-                else
-                {
-                    IsBlock_1_14_ErrorMessageVisible = false;
+                    double change = ((double)(value - framePop) / framePop) * 100;
+                    if (Math.Abs(change) >= 20)
+                    {
+                        IsBlock_1_14_ErrorMessageVisible = true;
+                        Block_1_14_ErrorMessage =
+                            "W: Wide variation in approximate population and frame population";
+                    }
                 }
             }
             else if (sector == 2)
             {
-                int maxValue = (int)(_block_1_13 * 4 * 1.2);
-                int minValue = (int)(_block_1_13 * 4 * 0.80);
+                int maxValue = (int)(framePop * 4 * 1.2);
+                int minValue = (int)(framePop * 4 * 0.80);
 
-                if (_block_1_14 < minValue || _block_1_14 > maxValue)
+                if (value < minValue || value > maxValue)
                 {
                     IsBlock_1_14_ErrorMessageVisible = true;
-                    Block_1_14_ErrorMessage = "W: Wide variation in approximate population and frame population";
-                }
-                else
-                {
-                    IsBlock_1_14_ErrorMessageVisible = false;
+                    Block_1_14_ErrorMessage =
+                        "W: Wide variation in approximate population and frame population";
                 }
             }
         }
@@ -316,8 +337,8 @@
         {
             Console.WriteLine("Error in ValidatePopulation: " + ex.Message);
         }
-
     }
+
 
     async void GoBack()
     {
@@ -450,6 +471,8 @@
             if (short.TryParse(val, out short result))
             {
                 block_0_1_VM.block_0_1.Block_1_17 = result;
+                block_0_1_VM.ShowItem17RemarksField = block_0_1_VM.ShowItem17 && block_0_1_VM.block_0_1.Block_1_17.GetValueOrDefault() == 9;
+
             }
             else
             {

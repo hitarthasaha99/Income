@@ -82,6 +82,8 @@ namespace Income.Viewmodels.SCH0_0
         private string? _block_1_17_Selected = string.Empty;
         [ObservableProperty]
         private bool _showItem17 = false;
+        [ObservableProperty]
+        private bool _showItem17RemarksField = false;
 
         public Block_0_1_VM()
         {
@@ -148,6 +150,7 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_16_Selected = block_0_1.Block_1_16 != null ? CommonList.LOOKUP_CONST_SURVEY_CODE.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_16))?.title : string.Empty;
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
                 ShowItem17 = block_0_1.Block_1_17 != null;
+                ShowItem17RemarksField = ShowItem17 && block_0_1.Block_1_17.GetValueOrDefault() == 9;
                 DisablePopulation = SessionStorage.hamlet_selection_done;
             }
             OnPropertyChanged(nameof(block_0_1));
@@ -195,6 +198,7 @@ namespace Income.Viewmodels.SCH0_0
                 var val = args.Value.ToString();
                 DisablePopulation = SessionStorage.selection_done ? true : (val != "1" && val != "4");
                 ShowItem17 = val == "4" || val == "5" || val == "6" || val == "7";
+                ShowItem17RemarksField = ShowItem17 && block_0_1.Block_1_17.GetValueOrDefault() == 9;
                 if (DisablePopulation)
                 {
                     block_0_1.Block_1_14 = 0;
