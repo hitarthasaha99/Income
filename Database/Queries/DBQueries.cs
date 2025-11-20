@@ -112,30 +112,30 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveBlock4_2A(Tbl_Sch_0_0_Block_4 tbl_Sch_0_0_Block_4_2A)
+        public async Task<int?> SaveBlock4(Tbl_Sch_0_0_Block_4 tbl_Sch_0_0_Block_4)
         {
             try
             {
                 int status = new();
-                var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4>().Where(x => x.id == tbl_Sch_0_0_Block_4_2A.id).ToListAsync();
+                var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4>().Where(x => x.id == tbl_Sch_0_0_Block_4.id).ToListAsync();
                 if (check_existence != null && check_existence.Count > 0)
                 {
-                    status = await _database.UpdateAsync(tbl_Sch_0_0_Block_4_2A);
+                    status = await _database.UpdateAsync(tbl_Sch_0_0_Block_4);
                 }
                 else
                 {
-                    status = await _database.InsertAsync(tbl_Sch_0_0_Block_4_2A);
+                    status = await _database.InsertAsync(tbl_Sch_0_0_Block_4);
                 }
                 return status;
             }
             catch (Exception ex)
             {
-                toastService.ShowError($"Error While saving SCH 0 Block 4.2A: {ex.Message}");
+                toastService.ShowError($"Error While saving SCH 0 Block 4: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<Tbl_Sch_0_0_Block_4?> GetBlock4_2A()
+        public async Task<Tbl_Sch_0_0_Block_4?> GetBlock4()
         {
             try
             {
@@ -332,6 +332,7 @@ namespace Income.Database.Queries
                 return null;
             }
         }
+
 
         public async Task<Tbl_Sch_0_0_Block_7> GetBlock7DataByHHD(int hhd_id = 0)
         {

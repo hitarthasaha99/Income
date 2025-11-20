@@ -26,7 +26,7 @@
                         <label for="" class="form-label">
                             <span class="form-badge">1</span> Sample sub-unit(SU) number
                         </label>
-                        <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_0_1.sample_su_number">
+                        <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_4.sample_su_number">
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -34,7 +34,7 @@
                         <label for="" class="form-label">
                             <span class="form-badge">2</span> Approximate population of the SU
                         </label>
-                        <input disabled type="number" class="form-control form-control-sm" id="" value="@block_0_1.approximate_population_su" @onchange="@((ChangeEventArgs e) => HandleChange(e))">
+                        <input disabled="@(!AllowEdit)" type="number" class="form-control form-control-sm no-spinner" id="" value="@block_4.approximate_population_su" @oninput="HandleChange">
                         <ValidationComponent @ref="population_ref" is_error="@is_error" field_name="Approximate population of the SU" />
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                         <label for="" class="form-label">
                             <span class="form-badge">3</span> Number of Sub-divisions of SU to be formed(D1)
                         </label>
-                        <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_0_1.number_of_sub_division_of_su_to_be_formed">
+                        <input type="text" class="form-control form-control-sm" id="" disabled @bind="block_4.number_of_sub_division_of_su_to_be_formed">
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" rows="4"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="remarks" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -78,6 +78,8 @@
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     List<Tbl_Sch_0_0_Block_2_2> block_2_2 = new();
+    Tbl_Sch_0_0_Block_4? block_4 = new();
+    List<Tbl_Sch_0_0_Block_5>? block_5 = new();
     DateTime survey_time = DateTime.Now;
     CommonQueries commonQueries = new();
     DBQueries Queries = new();
@@ -86,6 +88,7 @@
     CommonFunction commonFunction = new();
     CommonConfig commonConfig = new();
     string? remarks = string.Empty;
+    bool AllowEdit = false;
 
     async void GoBack()
     {
@@ -104,25 +107,40 @@
         await commonQueries.InsertVisitedBlock(vb);
         block_0_1 = await Queries.FetchBlock1() ?? new();
         block_2_2 = await Queries.FetchSCH0Block2_2Data() ?? new();
-
+        block_4 = await Queries.GetBlock4() ?? null;
+        block_5 = await Queries.FetchSCH0Block5Data();
         var selected_su = block_2_2.Find(k => k.IsChecked == true);
-        if (block_0_1 != null)
+
+        if(block_4 == null)
         {
-            if (selected_su != null)
+            block_4 = new();
+            block_4.id = Guid.NewGuid();
+            if (block_0_1 != null)
             {
-                block_0_1.sample_su_number = selected_su?.serial_number;
-                var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
-                block_0_1.approximate_population_su = (int)calc;
-                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
-                block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
-            }
-            else
-            {
-                block_0_1.sample_su_number = 1;
-                block_0_1.approximate_population_su = block_0_1.Block_1_14;
-                block_0_1.number_of_sub_division_of_su_to_be_formed = 0;
+                if (selected_su != null)
+                {
+                    block_4.sample_su_number = selected_su?.serial_number;
+                    var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
+                    block_4.approximate_population_su = (int)calc;
+                    int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+                    block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
+                }
+                else
+                {
+                    block_4.sample_su_number = 1;
+                    block_4.approximate_population_su = block_0_1.Block_1_14;
+                    block_4.number_of_sub_division_of_su_to_be_formed = 1;
+                }
+                AllowEdit = block_0_1.Block_1_15 > 1 && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO;
             }
         }
+        else
+        {
+            AllowEdit = !(block_5 != null && block_5.Count > 0 && block_5.Any(x => x.IsChecked == true));
+        }
+
+        remarks = block_0_1?.remarks_block_4;
+
 
         StateHasChanged();
         return;
@@ -135,15 +153,16 @@
             string value = eventArgs.Value.ToString();
             if (string.IsNullOrEmpty(value))
             {
-                block_0_1.approximate_population_su = 0;
-                block_0_1.number_of_sub_division_of_su_to_be_formed = 0;
+                block_4.approximate_population_su = 0;
+                block_4.number_of_sub_division_of_su_to_be_formed = 1;
                 StateHasChanged();
                 return;
             }
             else
             {
-                block_0_1.approximate_population_su = Convert.ToInt32(value);
-                //tbl_Sch_0_0_Block_4_2A.number_of_sub_division_of_su_to_be_formed = commonFunction.CalculateNoOfSUToBeFormed(false, tbl_Sch_0_0_Block_4_2A.approximate_population_su);
+                block_4.approximate_population_su = Convert.ToInt32(value);
+                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+                block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
                 StateHasChanged();
                 return;
             }
@@ -170,6 +189,7 @@
         }
         block_0_1.remarks_block_4 = remarks;
         var update = await Queries.SaveBlock1(block_0_1);
+        var update_block_4 = await Queries.SaveBlock4(block_4);
         if (update.GetValueOrDefault() != 0)
         {
             if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)

@@ -377,6 +377,7 @@
         if (block_0_1 != null)
         {
             block_1_obj = block_0_1;
+            remarks = block_1_obj.remarks_block_7;
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
         }
         var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
@@ -557,7 +558,8 @@
         }
 
         block_1_obj.remarks_block_7 = remarks;
-        await SCH_0_0_Queries.SaveBlock1(block_1_obj);
+        if(block_1_obj.id != Guid.Empty)
+            await SCH_0_0_Queries.SaveBlock1(block_1_obj);
 
         // If message exists, show confirm dialog
         if (!string.IsNullOrWhiteSpace(validationMessage))

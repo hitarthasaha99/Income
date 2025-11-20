@@ -233,6 +233,7 @@
         if (block_0_1 != null)
         {
             this.block_0_1 = block_0_1;
+            remarks = block_0_1.remarks_block_7_selection;
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
             if (sector == 1)
                 ValidSss = new() { 11, 12, 21, 22, 31, 32, 40, 90 };
@@ -735,8 +736,8 @@
     async Task HandleSubmit(string action = "")
     {
         block_0_1.remarks_block_7_selection = remarks;
-        await SCH_0_0_Queries.SaveBlock1(block_0_1);
+        if (block_0_1.id != Guid.Empty)
+            await SCH_0_0_Queries.SaveBlock1(block_0_1);
         NavigationManager.NavigateTo("/dashboard/sch0.0/block_8");
-        return;
     }
 }
