@@ -11,14 +11,14 @@
 @inject ILoggingService Logger
 
 
-<div class="my-2">
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                          survey_time="@survey_time" />
     <ConfirmDialog @ref="dialog" />
-    <div class="card card-style2">
-        <div class="card-header d-flex align-items-center">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-2">[Block 2.2]</span>List of sub-units (SU) and identification of selected SU
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[Block 2.2]</span>List of sub-units (SU) and identification of selected SU
             </h3>
         </div>
         <div class="card-body p-0">
@@ -44,7 +44,13 @@
                             foreach (var item in block_2_2_VM.tbl_Sch_0_0_Block_2_2)
                             {
                                 <tr>
-                                    <td><input type="checkbox" disabled @bind="item.IsChecked"></td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" disabled @bind="item.IsChecked">
+                                            </label>
+                                        </div>
+                                    </td>
                                     <td>@item.serial_number</td>
                                     <td>
                                         <input value="@item.Percentage"
@@ -63,28 +69,42 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="2"></td>  @* Empty cells for first three columns *@
-                            <td class="bg-success text-white text-center fw-bold">
-                                Total Population % - @block_2_2_VM.Total_population_percentage
+                            <td colspan="2" class="bg-success"></td>
+                            <td class="bg-success text-success fw-bolder">
+                                Total Population - <span>@block_2_2_VM.Total_population_percentage </span>%
                             </td>
-                            <td></td>  @* Last column (selected SU) remains blank *@
+                            <td class="bg-success"></td>  @* Last column (selected SU) remains blank *@
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
     </div>
-    <div class="d-flex justify-content-between mb-3">
-        <NavLink class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</NavLink>
-        <div class="d-flex">
-            <NavLink class="btn btn-primary me-2" hidden="@(!block_2_2_VM.AllowSelection)" @onclick="@(() => DoSelection())"><i class="bi bi-floppy-fill me-1"></i>Do Selection</NavLink>
-            @* <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink> *@
-            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+</div>
+<div class="footer">
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control disabled w-100" rows="2"></textarea>
         </div>
     </div>
-
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center">
+                <NavLink class="btn btn-outline-secondary d-flex align-items-center" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</NavLink>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-outline-primary me-2" hidden="@(!block_2_2_VM.AllowSelection)" @onclick="@(() => DoSelection())"><i class="fi fi-rr-checkbox me-1"></i>Do Selection</NavLink>
+                @* <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink> *@
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+            </div>
+        </div>
+    </div>
 </div>
-
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     DateTime survey_time = DateTime.Now;
