@@ -45,7 +45,9 @@ namespace Income.SurveyLibrary
         { 21, new List<int> { 22, 11, 12, 10, 31, 32, 30, 40, 90 } },
         { 22, new List<int> { 21, 12, 11, 10, 32, 31, 30, 40, 90 } },
         { 31, new List<int> { 32, 21, 22, 20, 11, 12, 10, 40, 90 } },
-        { 32, new List<int> { 31, 22, 21, 20, 12, 11, 10, 40, 90 } }
+        { 32, new List<int> { 31, 22, 21, 20, 12, 11, 10, 40, 90 } },
+        { 40, new List<int> { 11, 12, 10, 21, 22, 20, 31, 32, 30, 90 } },
+        { 90, new List<int> { 11, 12, 10, 21, 22, 20, 31, 32, 30, 40 } }
     };
 
         // Compensation priority orders - Urban (Scenario 1: Stratum shortfall)
@@ -65,7 +67,9 @@ namespace Income.SurveyLibrary
         { 122, new List<int> { 121, 11, 222, 221, 21, 20, 40, 90 } },
         { 21, new List<int> { 221, 222, 11, 121, 122, 10, 40, 90 } },
         { 221, new List<int> { 222, 21, 121, 122, 11, 10, 40, 90 } },
-        { 222, new List<int> { 221, 21, 122, 121, 11, 10, 40, 90 } }
+        { 222, new List<int> { 221, 21, 122, 121, 11, 10, 40, 90 } },
+        { 40, new List<int> { 11, 121, 122, 10, 21, 221, 222, 20, 90 } },
+        { 90, new List<int> { 21, 221, 222, 20, 11, 121, 122, 10, 40 } }
     };
 
         public class SelectionResult

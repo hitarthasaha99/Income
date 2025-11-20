@@ -8,7 +8,8 @@
 @inject IToastService toastService
 @inject Warning_VM warningVM
 @inject ILoggingService Logger
-
+@inject NetworkService networkService
+@inject ILoggingService loggingService
 
 <div class="main-content">
     <CommonContentHeader 
@@ -20,6 +21,7 @@
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">[Block 11]</span>Particulars of sampling of households
             </h3>
+            <Button hidden class="btn btn-primary is_sso action" @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
             <Button Disabled="@SessionStorage.FSU_Submitted" class="btn btn-primary is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-memo-circle-check me-1"></i>Validate</Button>
 
         </div>
@@ -49,7 +51,7 @@
                         <label class="form-label">
                             <span class="form-badge">2.1</span>Date of start of field work
                         </label>
-                        <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_start_date" disabled>
+                        <input type="text" class="form-control is_sso" @bind="block_0_1.survey_timestamp" disabled>
                     </div>
                 </div>
                <div class="col-sm-12">
@@ -88,13 +90,13 @@
                         <div class="d-flex align-items-center">
                             <div class="customRadioButton me-5">
                                 <label class="d-flex align-items-center">
-                                    <input disabled type="radio" id="Yes" name="yesRemarks">
+                                    <input disabled type="radio" id="Yes" checked="@(!string.IsNullOrEmpty(remarks))" name="yesRemarks">
                                     <span class="label-text ms-2">Yes</span>
                                 </label>
                             </div>
                             <div class="customRadioButton">
                                 <label class="d-flex align-items-center">
-                                    <input disabled type="radio" id="No" name="yesRemarks">
+                                    <input disabled type="radio" id="No" checked="@(string.IsNullOrEmpty(remarks))" name="yesRemarks">
                                     <span class="label-text ms-2">No</span>
                                 </label>
                             </div>
@@ -247,6 +249,7 @@
             }
             else
             {
+
                 if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                 {
                     tbl_Sch_0_0_FieldOperation.supervisor_name = SessionStorage.user_name;
@@ -384,6 +387,7 @@
                     //await warningVM.SaveWarningAsync(false, warningVM.WarningList, "0", "11", 0);
                     await DBQueries.UpsertWarningAsync(warningVM.WarningList);
                     toastService.ShowSuccess("Data saved successfully");
+                    StateHasChanged();
                     if (is_go_next)
                     {
                         NavigationManager.NavigateTo("/dashboard/fsulist");
@@ -409,6 +413,56 @@
         finally
         {
 
+        }
+    }
+
+    private async Task SubmitData()
+    {
+        try
+        {
+            Submission_Model data = new();
+            data.IncomeSchHISDto = null;
+
+            //Fetch SCH0 Data
+            data.IncomeSch00block0 = await DBQueries.FetchBlock1();
+            data.IncomeSch00block2_1 = await DBQueries.FetchSCH0Block2_1Data();
+            data.IncomeSch00block2_2 = await DBQueries.FetchSCH0Block2_2Data();
+            var block_3 = await DBQueries.GetFileData(0);
+            var block_6 = await DBQueries.GetFileData(1);
+            data.IncomeSch00block3 = new() { block_3, block_6 };
+            data.IncomeSch00block_4 = new();
+            data.IncomeSch00block_5 = await DBQueries.FetchSCH0Block5Data();
+            data.IncomeSch00block_7 = await DBQueries.GetBlock7DataWithDeleted();
+            data.IncomeSch00block_11 = await DBQueries.FetchBlock2();
+            data.IncomeSch00WarningList = await DBQueries.GetWarningList(schedule: "0");
+
+            string json = JsonConvert.SerializeObject(data);
+            Upsert_Model payload = new()
+            {
+                fsu_id = SessionStorage.SelectedFSUId.ToString(),
+                submitted_json_data = json,
+                survey_id = SessionStorage.surveyId,
+                created_on = DateTime.Now
+            };
+
+            if ((SessionStorage.user_role == CommonConstants.USER_CODE_JSO) || (SessionStorage.user_role == CommonConstants.USER_CODE_JSO2))
+            {
+                payload.lookup_fsu_submit_status = 80;  //status will be 80 when enumerator submits (only for SCH0)
+                payload.lookup_fsu_sub_submit_status = 21; // status = 21 when submitting to SSO
+            }
+
+            if ((SessionStorage.user_role == CommonConstants.USER_CODE_SSO || SessionStorage.user_role == CommonConstants.USER_CODE_SSO))
+            {
+                payload.lookup_fsu_submit_status = 80;
+                payload.lookup_fsu_sub_submit_status = 12; // status = 12 when referring back to ENM
+            }
+
+            string final_payload = JsonConvert.SerializeObject(payload);
+            await loggingService.LogInfo(final_payload);
+        }
+        catch (Exception ex)
+        {
+            
         }
     }
 
