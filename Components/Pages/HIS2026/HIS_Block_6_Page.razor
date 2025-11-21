@@ -1,0 +1,177 @@
+﻿@page "/dashboard/his/block_6"
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@using FluentValidation
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Database.Models.SCH0_0
+@using Income.Viewmodels
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+@inject ILoggingService loggingService
+@inject Warning_VM warningVM
+<div class="main-content">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+    <div class="card custom-card">
+        <!-- 🔹 Sticky Top Action Header -->
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary me-2">[Block 3]</span>demographic and other particulars of household members
+            </h3>
+            <div class="card-tools">
+                <div class="d-flex align-items-center" hidden="@SessionStorage.FSU_Submitted">
+                    <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
+                        <i class="fi fi-rr-plus me-1"></i>Add
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <!-- Scrollable table -->
+        <div class="card-body p-0">
+            <div class="table-responsive table-wrapper">
+                <!-- Table displaying household members -->
+                <table class="table table-striped table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th>Q.no.</th>
+                            <th>Question description</th>
+                            <th>Reference Period</th>
+                            <th>Casual workers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Fullscreen="ModalFullscreen.MediumDown">
+    <HeaderTemplate>
+        <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
+    </HeaderTemplate>
+    <BodyTemplate>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <EditForm Model="@newMember">
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <!-- Sl no input (readonly) -->
+                                <div class="col-sm-6 mb-3">
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">1.</span> Sl no.
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" value="@(newMember.serial_no)" disabled />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
+        <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId"><i class="fi fi-rr-disk me-1"></i>@((isAdd ? "Save" : "Update"))</button>
+    </FooterTemplate>
+</Modal>
+
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    private CommonConfig commonConfig = new CommonConfig();
+    DateTime survey_time = DateTime.Now;
+    Modal AddModal = default!;
+    private List<Tbl_Block_6> block6Members = new();
+    private Tbl_Block_6 newMember = new();
+    bool isAdd = false;
+    bool error = false;
+    DBQueries dBQueries = new();
+
+    async Task HandleModal(string action = "", Tbl_Block_6? data = null)
+    {
+        try
+        {
+            if (action == "ADD")
+            {
+                isAdd = true;
+                if (data == null)
+                {
+                    newMember = new();
+                    newMember.serial_no = ReturnCurrentMemberSerialNumber();
+                    newMember.id = Guid.NewGuid();
+                }
+                else
+                {
+                    newMember = data;
+                }
+
+                await AddModal.ShowAsync();
+            }
+            else if (action == "UPDATE")
+            {
+                isAdd = false;
+                if (data != null)
+                {
+                    newMember = data;
+                    await AddModal.ShowAsync();
+                }
+            }
+            else
+            {
+                await AddModal.HideAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+    int ReturnCurrentMemberSerialNumber()
+    {
+        try
+        {
+            if (block6Members != null && block6Members.Count > 0)
+            {
+                return block6Members.Count + 1;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        catch
+        {
+            return 1;
+        }
+    }
+    private async Task LoadData()
+    {
+        block6Members = await dBQueries.Fetch_SCH_HIS_Block6(SessionStorage.selected_hhd_id);
+        StateHasChanged();
+    }
+
+    private async Task HandleAddMember()
+    {
+
+        // Validate();
+
+        if (error)
+        {
+            toastService.ShowError("Please resolve pending errors");
+            return;
+        }
+
+        await dBQueries.Save_SCH_HIS_Block6(newMember);
+        toastService.ShowSuccess("Member added successfully!");
+        await AddModal.HideAsync();
+        await LoadData();
+
+    }
+}
