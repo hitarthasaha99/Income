@@ -70,7 +70,7 @@
                                 </div>
                                 <div>
                                     <label class="form-label fw-bold d-flex align-items-start">
-                                        <span class="me-2">Q6.1 number of days worked in last month (no.)  (Last month)</span>
+                                        <span class="me-2">Q6.1</span> number of days worked in last month (no.) (Last month)
                                     </label>
 
                                     <InputNumber @bind-Value="newMember.item_1"
@@ -83,9 +83,10 @@
                                                  max="31"
                                                  maxlength="2"
                                                  @oninput="item1OnInput"
-                                                 onkeypress="return event.key >= '0' && event.key <= '9';">
+                                                 onkeypress="if (this.value.length >= 2) return false; return event.key >= '0' && event.key <= '9';">
                                     </InputNumber>
                                 </div>
+
 
                                 <div>
                                     <label class="form-label fw-bold d-flex align-items-start">
@@ -163,30 +164,23 @@
 
     private void item1OnInput(ChangeEventArgs e)
     {
-        var text = e.Value?.ToString();
-
-        if (string.IsNullOrWhiteSpace(text))
+        if (int.TryParse(e.Value?.ToString(), out int value))
+        {
+            if (value > 31)
+                newMember.item_1 = 31;
+            else if (value < 1)
+                newMember.item_1 = 1;
+            else
+                newMember.item_1 = value;
+        }
+        else
         {
             newMember.item_1 = null;
-            handleCalculateIncome();
-            return;
         }
-
-        if (!int.TryParse(text, out int v))
-        {
-            newMember.item_1 = null;
-            handleCalculateIncome();
-            return;
-        }
-
-        if (text.Length > 2) v = 31; 
-        if (v < 1) v = 1;
-        if (v > 31) v = 31;
-
-        newMember.item_1 = v;
 
         handleCalculateIncome();
     }
+
 
 
     private void item2OnInput(ChangeEventArgs e)
