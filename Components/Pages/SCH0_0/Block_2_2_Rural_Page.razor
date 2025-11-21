@@ -75,7 +75,7 @@
                         }
                     </tbody>
                     <tfoot>
-                        <tr class="text-center">
+                        <tr>
                             <td colspan="3" class="bg-success"></td>
                             <td class="bg-success text-success fw-bolder">Total Population:- <span>@block_2_2_VM.Total_population_percentage %</span></td>
                             <td class="bg-success"></td>
@@ -85,16 +85,16 @@
             </div>
         </div>
     </div>
+</div>
+<div class="footer">
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="4"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
         </div>
     </div>
-</div>
-<div class="footer">
     <div class="row">
         <div class="col-sm-6">
             <div class="d-flex align-items-center">
@@ -103,8 +103,8 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-outline-primary me-2" hidden="@(!block_2_2_VM.AllowSelection)" @onclick="@(() => DoSelection())"><i class="bi bi-floppy-fill me-1"></i>Do Selection</NavLink>
-                @* <NavLink class="btn btn-outline-primary d-flex align-items-center me-2" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink> *@
+                <NavLink class="btn btn-outline-primary me-2" hidden="@(!block_2_2_VM.AllowSelection)" @onclick="@(() => DoSelection())"><i class="fi fi-rr-checkbox me-1"></i>Do Selection</NavLink>
+                @* <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink> *@
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
