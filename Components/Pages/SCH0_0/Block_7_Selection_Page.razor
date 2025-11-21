@@ -231,6 +231,7 @@
         var block_0_1 = await SCH_0_0_Queries.FetchBlock1();
         if (block_0_1 != null)
         {
+            this.block_0_1 = block_0_1;
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
             if (sector == 1)
                 ValidSss = new() { 11, 12, 21, 22, 31, 32, 40, 90 };
@@ -292,8 +293,13 @@
         {
             ListItems?.Clear();
             ListItems?.AddRange(response.OrderBy(x => x.Block_7_1).ToList());
-            StateHasChanged();
         }
+        else
+        {
+            ListItems?.Clear();
+        }
+        StateHasChanged();
+
     }
 
     private async Task ResetSelection()
@@ -330,6 +336,7 @@
     {
         try
         {
+            await ResetSelection();
             await SCH_0_0_Queries.DeleteAllHHDS();
             await LoadData();
         }

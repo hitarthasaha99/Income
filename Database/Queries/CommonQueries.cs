@@ -125,7 +125,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ?", block_data.block_code);
+                var is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ? AND tvb.fsu_id = ?", block_data.block_code, SessionStorage.SelectedFSUId);
                 if (is_exist == null || is_exist.Count == 0)
                 {
                     block_data.id = Guid.NewGuid();

@@ -103,18 +103,19 @@
                                             </div>
                                         </td>
 
-                                        <td class="d-flex align-items-center">
-                                            <button class="btn btn-link me-3 fs-6"
-                                                        hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleModal("UPDATE", item))">
-                                                <i class="fi fi-rr-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-link fs-6 text-danger"
-                                                        hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleDelete(item.id))">
-                                                <i class="fi fi-rr-trash"></i>
-                                            </button>
-                                        </td>
+                                        @if (!SessionStorage.selection_done)
+                                            {
+                                                <td class="d-flex align-items-center">
+                                                    <button class="btn btn-link me-3 fs-6"
+                                                            @onclick="@(() => HandleModal("UPDATE", item))">
+                                                        <i class="fi fi-rr-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-link fs-6 text-danger"
+                                                            @onclick="@(() => HandleDelete(item.id))">
+                                                        <i class="fi fi-rr-trash"></i>
+                                                    </button>
+                                                </td>
+                                            }
                                     </tr>
                                 }
                             }
@@ -470,7 +471,7 @@
             return;
         }
         int total_listed_population = ListItems.Sum(x => x.Block_7_5.GetValueOrDefault());
-        int no_of_sd = block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault();
+        int no_of_sd = block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault() == 0 ? 1 : block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault();
         int su_population = block_1_obj.approximate_population_su.GetValueOrDefault();
 
         int approx_population_fsu = block_1_obj.Block_1_14.GetValueOrDefault();
