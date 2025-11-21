@@ -56,7 +56,7 @@
                                         <input value="@item.Percentage"
                                                @oninput="(e) => OnInputChanged(e, item)"
                                                disabled="@(!block_2_2_VM.AllowSelection)"
-                                               onkeypress="return /[0-9,]/.test(event.key)" />
+                                               onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)" />
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center justify-content-between m-0 p-0">

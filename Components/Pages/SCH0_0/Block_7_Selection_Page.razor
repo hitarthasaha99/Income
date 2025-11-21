@@ -232,6 +232,7 @@
         if (block_0_1 != null)
         {
             this.block_0_1 = block_0_1;
+            remarks = block_0_1.remarks_block_7_selection;
             SessionStorage.FSU_Sector = sector = block_0_1.Block_1_5.GetValueOrDefault();
             if (sector == 1)
                 ValidSss = new() { 11, 12, 21, 22, 31, 32, 40, 90 };
@@ -318,6 +319,17 @@
                 {
                     fsu.is_selection_done = false;
                     await commonQueries.UpdateFSU(fsu);
+                }
+
+                var suList = await SCH_0_0_Queries.FetchSCH0Block2_2Data();
+                if (suList != null && suList.Count > 0)
+                {
+                    foreach(var item in suList)
+                    {
+                        item.IsChecked = false;
+                        item.is_selected = false;
+                        await SCH_0_0_Queries.SaveSCH0Block2_2(suList);
+                    }
                 }
                 await LoadData();
             }
@@ -667,75 +679,20 @@
 
     }
 
-    // async Task DoSelection()
-    // {
-    //     try
-    //     {
-    //         preloadService.Show(SpinnerColor.Info, "Doing Selection, Please wait...");
-
-    //         await SCH_0_0_Queries.UpdateAllRowsForColumnAsync(SessionStorage.SelectedFSUId);
-    //         var existingListingData = await SCH_0_0_Queries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
-    //         var sss_selection_done = existingListingData.Any(x => x.SSS != 0);
-
-    //         if (sss_selection_done == false)
-    //         {
-    //             toastService.ShowError("Please calculate SSS before doing selection, Please try again!");
-    //             return;
-    //         }
-
-    //         if (existingListingData.Count > 0)
-    //         {
-    //             var config = SelectionConfigFactory.Build(sector);
-    //             var selector = new HouseholdSelector(config, randomSeed: 42);
-    //             var result = selector.Select(existingListingData, sector);
-
-    //             foreach (var item in result.Households)
-    //             {
-    //                 item.isInitialySelected = item.isSelected;
-    //                 //item.SSS = item.SelectedPostedSSS.GetValueOrDefault();
-    //                 await SCH_0_0_Queries.Update_SCH0_0_Block_7(item);
-    //                 SessionStorage.selection_done = true;
-    //             }
-
-    //             Debug.WriteLine("Selected households:");
-    //             //Update selection flag at FSU level
-    //             var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
-    //             if (fsu != null)
-    //             {
-    //                 fsu.is_selection_done = true;
-    //                 await commonQueries.UpdateFSU(fsu);
-    //             }
-    //             foreach (var hh in result.Households.Where(h => h.isSelected))
-    //             {
-    //                 Debug.WriteLine($"Id={hh.Block_7_3} Stratum={hh.Stratum} FromSSS={hh.SelectedFromSSS} PostedSSS={hh.SelectedPostedSSS}");
-    //             }
-
-    //             Debug.WriteLine("\nLogs:");
-    //             foreach (var log in result.Logs)
-    //             {
-    //                 Debug.WriteLine($"{log.HouseholdId} origSSS={log.OriginalSSS} posted={log.PostedSSS} note={log.Reason}");
-    //             }
-    //             toastService.ShowSuccess("Selection done successfully!");
-    //             await LoadData();
-
-    //         }
-
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         toastService.ShowError($"Getting error during selection: {ex}, Please try again!");
-    //     }
-    //     finally
-    //     {
-    //         preloadService.Hide();
-    //     }
-    // }
+    
 
     async Task HandleSubmit(string action = "")
     {
         block_0_1.remarks_block_7_selection = remarks;
-        await SCH_0_0_Queries.SaveBlock1(block_0_1);
+        if (block_0_1.id != Guid.Empty)
+            await SCH_0_0_Queries.SaveBlock1(block_0_1);
+
+        var selectionDone = ListItems.Any(x => x.isSelected);
+        if (!selectionDone)
+        {
+            toastService.ShowError($"Cannot proceed without selection");
+            return;
+        }
         NavigationManager.NavigateTo("/dashboard/sch0.0/block_8");
-        return;
     }
 }

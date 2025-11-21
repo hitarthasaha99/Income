@@ -112,30 +112,30 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> SaveBlock4_2A(Tbl_Sch_0_0_Block_4 tbl_Sch_0_0_Block_4_2A)
+        public async Task<int?> SaveBlock4(Tbl_Sch_0_0_Block_4 tbl_Sch_0_0_Block_4)
         {
             try
             {
                 int status = new();
-                var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4>().Where(x => x.id == tbl_Sch_0_0_Block_4_2A.id).ToListAsync();
+                var check_existence = await _database.Table<Tbl_Sch_0_0_Block_4>().Where(x => x.id == tbl_Sch_0_0_Block_4.id).ToListAsync();
                 if (check_existence != null && check_existence.Count > 0)
                 {
-                    status = await _database.UpdateAsync(tbl_Sch_0_0_Block_4_2A);
+                    status = await _database.UpdateAsync(tbl_Sch_0_0_Block_4);
                 }
                 else
                 {
-                    status = await _database.InsertAsync(tbl_Sch_0_0_Block_4_2A);
+                    status = await _database.InsertAsync(tbl_Sch_0_0_Block_4);
                 }
                 return status;
             }
             catch (Exception ex)
             {
-                toastService.ShowError($"Error While saving SCH 0 Block 4.2A: {ex.Message}");
+                toastService.ShowError($"Error While saving SCH 0 Block 4: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<Tbl_Sch_0_0_Block_4?> GetBlock4_2A()
+        public async Task<Tbl_Sch_0_0_Block_4?> GetBlock4()
         {
             try
             {
@@ -332,6 +332,7 @@ namespace Income.Database.Queries
                 return null;
             }
         }
+
 
         public async Task<Tbl_Sch_0_0_Block_7> GetBlock7DataByHHD(int hhd_id = 0)
         {
@@ -542,19 +543,30 @@ namespace Income.Database.Queries
 
                     //2. Re-serialize Block_7_3 for is_household = 2 after deleted entry
                     // Consider only households with is_household = 2
-                    var onlyHhd = allOrdered
-                        .Where(h => h.is_household == 2)
-                        .OrderBy(h => h.Block_7_3)
-                        .ToList();
 
-                    // Find deleted household's Block_7_3 position (only if it was household=2)
-                    int deletedSerial3 = deleted.is_household == 2 ? deleted.Block_7_3 ?? 0 : 0;
+                    int hhdSrl = 1;
+                    //var onlyHhd = allOrdered
+                    //    .Where(h => h.is_household == 2)
+                    //    .OrderBy(h => h.Block_7_3)
+                    //    .ToList();
 
-                    int nextHhdSerial = deletedSerial3;
+                    //// Find deleted household's Block_7_3 position (only if it was household=2)
+                    //int deletedSerial3 = deleted.is_household == 2 ? deleted.Block_7_3 ?? 0 : 0;
 
-                    foreach (var h in onlyHhd.Where(h => h.Block_7_3 > deletedSerial3))
+                    //int nextHhdSerial = deletedSerial3;
+
+
+
+                    foreach(var hhd in allOrdered)
                     {
-                        h.Block_7_3 = nextHhdSerial++;
+                        if(hhd.is_household == 2)
+                        {
+                            hhd.Block_7_3 = hhdSrl++;
+                        }
+                        else
+                        {
+                            hhd.Block_7_3 = 0;
+                        }
                     }
 
                     foreach (var hhd in households)
