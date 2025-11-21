@@ -74,57 +74,73 @@
                     <span class="title-dis ps-3">@(top?.warning_message)</span>
                 </h2>
                 <hr />
-                <ul class="stats other-info justify-content-between pb-3">
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">SSS</h3>
-                        <p class="text-danger mb-0">
-                           1
-                        </p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">HHD No.</h3>
-                        <p class="text-success mb-0">
-                            @(top?.hhd_id == 0 ? "-" : top?.hhd_id)
-                        </p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">Member Srl. No.</h3>
-                        <p class="text-info mb-0">
-                            3
-                        </p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">Block</h3>
-                        <p class="text-warning mb-0">
-                            @(top?.block)
-                        </p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">Item</h3>
-                        <p class="text-danger mb-0">
-                            @(top?.item_no)
-                        </p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">SCH</h3>
-                        <p class="text-success mb-0">
-                            @(top?.schedule)
-                        </p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">Case Srl. no</h3>
-                        <p class="text-info mb-0">
-                            3
-                        </p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <h3 class="mb-0 me-2">Schedule</h3>
-                        <p class="text-warning mb-0">
-                            21.1
-                        </p>
-                    </li>
-                </ul>
-                @if (ChildWarning != null && ChildWarning.Count > 0)
+                <div class="row stats other-info">
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">SSS</h3>
+                            <p class="text-danger mb-0">
+                               1
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">HHD No.</h3>
+                            <p class="text-success mb-0">
+                                @(top?.hhd_id == 0 ? "-" : top?.hhd_id)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">Member Srl. No.</h3>
+                            <p class="text-info mb-0">
+                                3
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">Block</h3>
+                            <p class="text-warning mb-0">
+                                @(top?.block)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">Item</h3>
+                            <p class="text-danger mb-0">
+                                @(top?.item_no)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">SCH</h3>
+                            <p class="text-success mb-0">
+                                @(top?.schedule)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">Case Srl. no</h3>
+                            <p class="text-info mb-0">
+                                3
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="list d-flex align-items-center mb-3">
+                            <h3 class="mb-0 me-2">Schedule</h3>
+                            <p class="text-warning mb-0">
+                                21.1
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @* @if (ChildWarning != null && ChildWarning.Count > 0)
                 {
                     @foreach (var Child in ChildWarning.OrderBy(x=> x?.created_on))
                     {
@@ -161,15 +177,15 @@
                                             @* <li class="d-flex">
                                                 <i class="bi bi-pencil"></i>
                                                 <h4 class="mb-0">Edit</h4>
-                                            </li> *@
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
-                                @* <input type="radio" id="@(Child.id)" Label="Accept"  checked ="@((Child.warning_status == 4 || Child.warning_status ==2 )? true : false)" disabled />
+                                <input type="radio" id="@(Child.id)" Label="Accept"  checked ="@((Child.warning_status == 4 || Child.warning_status ==2 )? true : false)" disabled />
                                 <label class="form-check-label" for="acceptRadio">Accept</label>
 
                                 <input type="radio" id="@(Child.id)" Label="Reject" checked="@((Child.warning_status == 3 )? true : false)" disabled />
-                                <label class="form-check-label" for="rejectRadio">Reject</label> *@
+                                <label class="form-check-label" for="rejectRadio">Reject</label>
 
                                 <h2>
                                     <span class="sl-no-label">
@@ -182,6 +198,7 @@
                         }
                     }
                 }
+             *@
             </div>
             <div class="card-header bg-transparent py-4">
                 <form class="d-flex align-items-center">
