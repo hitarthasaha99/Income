@@ -10,26 +10,6 @@ using System.Threading.Tasks;
 
 namespace Income.Validators.SCH0_0
 {
-    //public static class Block_7_Validator
-    //{
-    //    private static List<ValidationResult> results = [];
-    //    public static List<ValidationResult> Validate(Tbl_Sch_0_0_Block_7 obj, int sector)
-    //    {
-    //        //1. Item is_household cannot be null
-    //        if (obj.is_household == null)
-    //        {
-    //            results.Add(new ValidationResult
-    //            {
-    //                PropertyName = "is_household",
-    //                Severity = ValidationSeverity.Hard,
-    //                IsValid = false,
-    //                Errors = new List<string> { "Please select a value" }
-    //            });
-    //        }
-    //        //2. If is_household is 2 (no), other fields must be null
-    //        return results;
-    //    }
-    //}
     public class Block7Validator : AbstractValidator<Tbl_Sch_0_0_Block_7>
     {
         public Block7Validator()
