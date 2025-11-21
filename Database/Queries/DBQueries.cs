@@ -1339,6 +1339,61 @@ namespace Income.Database.Queries
         }
 
 
+        //Block_6
+        public async Task<List<Tbl_Block_6>> Fetch_SCH_HIS_Block6(int hhd_id, int tenant_id = 1)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_6>()
+                    .Where(x => x.fsu_id == SessionStorage.SelectedFSUId
+                                && x.hhd_id == hhd_id
+                                && x.tenant_id == tenant_id
+                                && (x.is_deleted == null || x.is_deleted == false))
+                    .ToListAsync();
+
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_6>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While fetching Block 6: {ex.Message}");
+                return new List<Tbl_Block_6>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block6(Tbl_Block_6 tbl_block_6)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_6>()
+                    .Where(x => x.id == tbl_block_6.id)
+                    .FirstOrDefaultAsync();
+
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_6);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_6);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 6: {ex.Message}");
+                return null;
+            }
+        }
+
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {
