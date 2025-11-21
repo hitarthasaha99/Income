@@ -130,7 +130,7 @@
                 </div>
                 <!-- 5.ii -->
                 <div class="col-sm-12">
-                    <div class="d-flex align-items-center mb-3">
+                    <div class="d-flex align-items-center">
                         <label class="form-label me-3 mb-0">
                             <span class="form-badge">5.ii</span>
                             Elsewhere in the schedule
@@ -155,19 +155,18 @@
                 </div>
             </div>
         </div>
-        
     </div>
+</div>
+<div class="footer">
     @* Remarks Card *@
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control disabled w-100" @bind="@remarks" placeholder="" rows="4"></textarea>
+            <textarea type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control disabled w-100" @bind="@remarks" placeholder="" rows="2"></textarea>
         </div>
     </div>
-</div>
-<div class="footer">
     <div class="row">
         <div class="col-sm-6">
             <div class=d-flex>
