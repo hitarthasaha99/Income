@@ -17,7 +17,7 @@
         <!-- 🔹 Sticky Top Action Header -->
         <div class="card-header">
             <h3 class="card-title">
-                <span class="text-primary me-2">[Block 3]</span>demographic and other particulars of household members
+                <span class="text-primary me-2">[Block 6]</span>Income from Employment – casual work
             </h3>
             <div class="card-tools">
                 <div class="d-flex align-items-center" hidden="@SessionStorage.FSU_Submitted">
@@ -68,6 +68,79 @@
                                     </label>
                                     <input type="text" class="form-control form-control-sm" value="@(newMember.serial_no)" disabled />
                                 </div>
+                                <div>
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2">Q6.1 number of days worked in last month (no.)  (Last month)</span>
+                                    </label>
+
+                                    <InputNumber @bind-Value="newMember.item_1"
+                                                 class="form-control no-spinner form-control-sm"
+                                                 autocomplete="off"
+                                                 autocorrect="off"
+                                                 autocapitalize="off"
+                                                 spellcheck="false"
+                                                 min="1"
+                                                 max="31"
+                                                 maxlength="2"
+                                                 @oninput="item1OnInput"
+                                                 onkeypress="return event.key >= '0' && event.key <= '9';">
+                                    </InputNumber>
+                                    <p>Valu Is : @newMember.item_1</p>
+
+                                </div>
+
+                                <div>
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <div class="d-flex flex-column">
+                                        <span class="me-2">Q6.2 average daily wage earned in all mode except in-kind (in whole number of Rs.)  (Last month)</span>
+                                        </div>
+                                    </label>
+                                    <InputNumber @bind-Value="newMember.item_2"
+                                                 class="form-control no-spinner form-control-sm"
+                                                 autocomplete="off"
+                                                 onkeypress="return event.key >= '0' && event.key <= '9'"
+                                                 autocorrect="off"
+                                                 autocapitalize="off"
+                                                 spellcheck="false"
+                                                 @oninput="e => { newMember.item_2 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; handleCalculateIncome(); }">
+                                    </InputNumber>
+                                    @* <input type="number" class="form-control no-spinner form-control-sm" value="@newMember.item_4" @oninput="e => { newMember.item_4 = int.TryParse(e.Value?.ToString(), out var v) ? v : 0; handleCalculateIncome(); }" /> *@
+                                    <p>Valu Is : @newMember.item_2</p>
+                                </div>
+                                <div>
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <div class="d-flex flex-column">
+                                            <span class="me-2">Q6.3 bonuses/tips received  (Last 365 days)</span>
+                                        </div>
+                                    </label>
+                                    <InputNumber @bind-Value="newMember.item_3"
+                                                 class="form-control no-spinner form-control-sm"
+                                                 autocomplete="off"
+                                                 onkeypress="return event.key >= '0' && event.key <= '9'"
+                                                 autocorrect="off"
+                                                 autocapitalize="off"
+                                                 spellcheck="false"
+                                                 @oninput="e => { newMember.item_3 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; handleCalculateIncome(); }">
+                                    </InputNumber>
+                                    @* <input type="number" class="form-control no-spinner form-control-sm" value="@newMember.item_4" @oninput="e => { newMember.item_4 = int.TryParse(e.Value?.ToString(), out var v) ? v : 0; handleCalculateIncome(); }" /> *@
+                                    <p>Valu Is : @newMember.item_3</p>
+                                </div>
+                                <div>
+                                    <label class="form-label fw-bold d-flex align-items-start">
+                                        <span class="me-2"> Total monthly income (Q6.1×Q6.2) + Q6.3/12 </span>
+                                    </label>
+                                    <InputNumber @bind-Value="newMember.item_4"
+                                                 class="form-control no-spinner form-control-sm"
+                                                 autocomplete="off"
+                                                 onkeypress="return event.key >= '0' && event.key <= '9'"
+                                                 autocorrect="off"
+                                                 autocapitalize="off"
+                                                 spellcheck="false"
+                                                 readonly>
+                                    </InputNumber>
+
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -92,6 +165,49 @@
     bool isAdd = false;
     bool error = false;
     DBQueries dBQueries = new();
+
+    private void item1OnInput(ChangeEventArgs e)
+    {
+        var inputStr = e.Value?.ToString();
+
+        // Reject input longer than 2 characters
+        if (inputStr != null && inputStr.Length > 2)
+        {
+            newMember.item_1 = null;
+            return;
+        }
+
+        if (int.TryParse(inputStr, out int value))
+        {
+            if (value > 31)
+                newMember.item_1 = 31;
+            else if (value < 1)
+                newMember.item_1 = 1;
+            else
+                newMember.item_1 = value;
+        }
+        else
+        {
+            newMember.item_1 = null;
+        }
+
+        handleCalculateIncome();
+    }
+
+
+
+    //Handle CalculateIncome
+    private void handleCalculateIncome()
+    {
+        // int item_2 = newMember.item_2 ?? 0;
+        int item_1 = newMember.item_1 ?? 0; //5.2
+        int item_2 = newMember.item_2 ?? 0; //5.3(i)
+        int item_3 = newMember.item_3 ?? 0; //5.3(ii)
+
+        int ans = (item_1 * item_2) + item_3 / 12;
+        newMember.item_4 = ans;
+        StateHasChanged();
+    }
 
     async Task HandleModal(string action = "", Tbl_Block_6? data = null)
     {
