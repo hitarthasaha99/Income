@@ -85,8 +85,6 @@
                                                  @oninput="item1OnInput"
                                                  onkeypress="return event.key >= '0' && event.key <= '9';">
                                     </InputNumber>
-                                    <p>Valu Is : @newMember.item_1</p>
-
                                 </div>
 
                                 <div>
@@ -102,10 +100,8 @@
                                                  autocorrect="off"
                                                  autocapitalize="off"
                                                  spellcheck="false"
-                                                 @oninput="e => { newMember.item_2 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; handleCalculateIncome(); }">
+                                                 @oninput="item2OnInput">
                                     </InputNumber>
-                                    @* <input type="number" class="form-control no-spinner form-control-sm" value="@newMember.item_4" @oninput="e => { newMember.item_4 = int.TryParse(e.Value?.ToString(), out var v) ? v : 0; handleCalculateIncome(); }" /> *@
-                                    <p>Valu Is : @newMember.item_2</p>
                                 </div>
                                 <div>
                                     <label class="form-label fw-bold d-flex align-items-start">
@@ -120,10 +116,9 @@
                                                  autocorrect="off"
                                                  autocapitalize="off"
                                                  spellcheck="false"
-                                                 @oninput="e => { newMember.item_3 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; handleCalculateIncome(); }">
+                                                 @oninput="item3OnInput">
+
                                     </InputNumber>
-                                    @* <input type="number" class="form-control no-spinner form-control-sm" value="@newMember.item_4" @oninput="e => { newMember.item_4 = int.TryParse(e.Value?.ToString(), out var v) ? v : 0; handleCalculateIncome(); }" /> *@
-                                    <p>Valu Is : @newMember.item_3</p>
                                 </div>
                                 <div>
                                     <label class="form-label fw-bold d-flex align-items-start">
@@ -168,28 +163,56 @@
 
     private void item1OnInput(ChangeEventArgs e)
     {
-        var inputStr = e.Value?.ToString();
+        var text = e.Value?.ToString();
 
-        // Reject input longer than 2 characters
-        if (inputStr != null && inputStr.Length > 2)
+        if (string.IsNullOrWhiteSpace(text))
         {
             newMember.item_1 = null;
+            handleCalculateIncome();
             return;
         }
 
-        if (int.TryParse(inputStr, out int value))
-        {
-            if (value > 31)
-                newMember.item_1 = 31;
-            else if (value < 1)
-                newMember.item_1 = 1;
-            else
-                newMember.item_1 = value;
-        }
-        else
+        if (!int.TryParse(text, out int v))
         {
             newMember.item_1 = null;
+            handleCalculateIncome();
+            return;
         }
+
+        if (text.Length > 2) v = 31; 
+        if (v < 1) v = 1;
+        if (v > 31) v = 31;
+
+        newMember.item_1 = v;
+
+        handleCalculateIncome();
+    }
+
+
+    private void item2OnInput(ChangeEventArgs e)
+    {
+        var text = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(text))
+            newMember.item_2 = null;
+        else if (int.TryParse(text, out int v))
+            newMember.item_2 = v;
+        else
+            newMember.item_2 = null;
+
+        handleCalculateIncome();
+    }
+
+    private void item3OnInput(ChangeEventArgs e)
+    {
+        var text = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(text))
+            newMember.item_3 = null;
+        else if (int.TryParse(text, out int v))
+            newMember.item_3 = v;
+        else
+            newMember.item_3 = null;
 
         handleCalculateIncome();
     }
@@ -199,12 +222,11 @@
     //Handle CalculateIncome
     private void handleCalculateIncome()
     {
-        // int item_2 = newMember.item_2 ?? 0;
-        int item_1 = newMember.item_1 ?? 0; //5.2
-        int item_2 = newMember.item_2 ?? 0; //5.3(i)
-        int item_3 = newMember.item_3 ?? 0; //5.3(ii)
+        int item_1 = newMember.item_1 ?? 0; 
+        int item_2 = newMember.item_2 ?? 0; 
+        int item_3 = newMember.item_3 ?? 0; 
 
-        int ans = (item_1 * item_2) + item_3 / 12;
+        int ans = (item_1 * item_2) +item_3 / 12;
         newMember.item_4 = ans;
         StateHasChanged();
     }
@@ -275,9 +297,6 @@
 
     private async Task HandleAddMember()
     {
-
-        // Validate();
-
         if (error)
         {
             toastService.ShowError("Please resolve pending errors");
