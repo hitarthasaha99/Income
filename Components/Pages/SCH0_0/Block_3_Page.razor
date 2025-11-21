@@ -102,6 +102,7 @@
         block_heading = is_sub_unit ? "sketch map of sub-division formation" : "Sketch map of sub-units (SU) formation";
         await CommonQueries.InsertVisitedBlock(vb);
         block_0_1 = await SCH_0_0_Querie.FetchBlock1();
+        remarks = block_0_1?.remarks_block_3;
         Tbl_Sch_0_0_Block_3? response = await SCH_0_0_Querie.GetFileData(is_sub_unit ? 1 : 0);
         if (response != null)
         {
