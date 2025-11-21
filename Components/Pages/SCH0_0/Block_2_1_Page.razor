@@ -163,6 +163,7 @@
         await commonQueries.InsertVisitedBlock(vb);
         await block_2_1_VM.Init(toastService);
         block_0_1 = await sch_0_0_Queries.FetchBlock1();
+        remarks = block_0_1?.remarks_block_2_1;
         StateHasChanged();
     }
 

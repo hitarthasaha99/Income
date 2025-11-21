@@ -144,13 +144,14 @@
         block_2_2_VM.NotifyUiUpdate += StateHasChanged;
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
          {
-                block_uri = "/dashboard/sch0.0/block_2_2",
+                block_uri = "/dashboard/sch0.0/block_2_2R",
                 block_title = "Sch 0.0 Block 2.2",
                 block_code = CommonEnum.sch_0_0_block_2_2.ToString(),
             };   
         await commonQueries.InsertVisitedBlock(vb);
         await block_2_2_VM.Init();
         block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+        remarks = block_0_1?.remarks_block_2_2;
     }
 
     async void DoSelection()
