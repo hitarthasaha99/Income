@@ -137,7 +137,9 @@
                         </div>
                         <div>
                             <label class="form-label fw-bold d-flex align-items-start">
-                                <span class="me-2"> <span>Q5.4</span>i) bonuses received (festival bonus, profit-sharing or production bonuses or other forms of profit-related payment, performance-based incentive)(Last 365 days)</span>
+                                <div class="d-flex flex-column">
+                                    <span class="me-2">Q5.4</span> <span> i)bonuses received (festival bonus, profit-sharing or production bonuses or other forms of profit-related payment, performance-based incentive) (Last 365 days)</span>
+                                </div>
                             </label>
                             <InputNumber @bind-Value="newMember.item_6"
                                          class="form-control no-spinner form-control-sm"
@@ -169,7 +171,7 @@
                         </div>
                         <div>
                             <label class="form-label fw-bold d-flex align-items-start">
-                                <span class="me-2"> <span>Q5.5</span>sale value of shares offered as part of employee remuneration (employee stock option)(Last 365 days)</span>
+                                <span class="me-2"> <span>Q5.5 </span> sale value of shares offered as part of employee remuneration (employee stock option)(Last 365 days)</span>
                             </label>
                             <InputNumber @bind-Value="newMember.item_8"
                                          class="form-control no-spinner form-control-sm"
@@ -185,7 +187,7 @@
                         </div>
                         <div>
                             <label class="form-label fw-bold d-flex align-items-start">
-                                <span class="me-2"> <span>Q5.6</span>leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.(Last 365 days)</span>
+                                <span class="me-2"> <span>Q5.6 </span> leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.(Last 365 days)</span>
                             </label>
                             <InputNumber @bind-Value="newMember.item_9"
                                          class="form-control no-spinner form-control-sm"
@@ -201,7 +203,7 @@
                         </div>
                         <div>
                             <label class="form-label fw-bold d-flex align-items-start">
-                                <span class="me-2"> <span>Q5.7</span>severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.(Last 365 days) </span>
+                                <span class="me-2"> <span>Q5.7 </span> severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.(Last 365 days) </span>
                             </label>
                             <InputNumber @bind-Value="newMember.item_10"
                                          class="form-control no-spinner form-control-sm"
@@ -217,7 +219,7 @@
                         </div>
                         <div>
                             <label class="form-label fw-bold d-flex align-items-start">
-                                <span class="me-2"> <span>Q5.8</span>others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc. (Last 365 days) </span>
+                                <span class="me-2"> <span>Q5.8 </span> others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc. (Last 365 days) </span>
                             </label>
                             <InputNumber @bind-Value="newMember.item_11"
                                          class="form-control no-spinner form-control-sm"
@@ -234,7 +236,7 @@
                         @* //Calculate Ans *@
                         <div>
                             <label class="form-label fw-bold d-flex align-items-start">
-                                <span class="me-2"> Total monthly income (Q5.1+Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12) </span>
+                                <span class="me-2"> Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12) </span>
                             </label>
                             <InputNumber @bind-Value="newMember.item_12"
                                          class="form-control no-spinner form-control-sm"
@@ -319,7 +321,7 @@
         int item_11 = newMember.item_11 ?? 0; //5.8
 
 
-        int ans = (item_3 + item_4 + item_5 + item_6 + item_7 + item_8 + item_9 + item_10 + item_11) / 12;
+        int ans = (item_3 + item_4 + item_5 + item_6 + item_7 + item_8 + item_9 + item_10 + item_11)/12;
         newMember.item_12 = ans;
         StateHasChanged();
     }
