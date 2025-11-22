@@ -1241,8 +1241,15 @@
         if (item_index != -1)
         {
             block3Members[item_index].is_deleted = true;
-            await DBQueries.DeleteHISBlock3(id);
-            toastService.ShowSuccess("Entry deleted successfully!");
+            var deleted = await DBQueries.DeleteHISBlock3(id);
+            if (deleted == 0)
+            {
+                toastService.ShowSuccess("Could not delete entry");
+            }
+            else
+            {
+                toastService.ShowSuccess("Entry deleted successfully!");
+            }
             await LoadData();
         }
         else

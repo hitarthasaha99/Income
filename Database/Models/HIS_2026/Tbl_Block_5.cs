@@ -40,6 +40,7 @@ namespace Income.Database.Models.HIS_2026
         public int? item_8 { get; set; }
         //Q5.9
         public int? item_9 { get; set; }
+        public bool isUpdated { get; set; } = false;
        
     }
 }

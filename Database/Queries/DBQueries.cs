@@ -5,16 +5,23 @@ using Income.Common;
 using Income.Database.Models.Common;
 using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
+using Income.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Income.Database.Queries
 {
     public class DBQueries : Database
     {
+        //public DBQueries(ILoggingService loggingService) : base (loggingService)
+        //{
+            
+        //}
         ToastService toastService = new();
 
         public async Task<int?> SaveSCH0Block2_1(List<Tbl_Sch_0_0_Block_2_1> tbl_Sch_0_0_Block_2_1)
@@ -1073,6 +1080,7 @@ namespace Income.Database.Queries
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(tbl_block_3);
+                    await UpdateOrDeleteDependentBlocks_HIS_Block_3(tbl_block_3);
                 }
                 else
                 {
@@ -1103,7 +1111,11 @@ namespace Income.Database.Queries
                     {
                         int deleted = await _database.DeleteAsync(exists);
                     }
+                    var json = System.Text.Json.JsonSerializer.Serialize(exists);
+
+                    //await _logger.LogInfo($"Deleted member - \n{json}");
                     await ReserializeMemberList(exists);
+                    await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
                     return 1;
                 }
                 return 0;
@@ -1112,6 +1124,37 @@ namespace Income.Database.Queries
             {
                 Console.WriteLine("Error deleting household member: " + ex.Message);
                 return 0;
+            }
+        }
+
+        public async Task UpdateOrDeleteDependentBlocks_HIS_Block_3(Tbl_Block_3 block_3)
+        {
+            try
+            {
+                //HIS_Block_4
+                //HIS_Block_5 - if entry having 04 in items 8 - 11 gets deleted, delete the entry from block-5 too
+                if(block_3.item_8 != 4 && block_3.item_9 != 4 && block_3.item_10 != 4 && block_3.item_11 != 4)
+                {
+                    var existingEntryBlock5 = await _database.Table<Tbl_Block_5>().Where(x => x.fk_block_3 == block_3.id).FirstOrDefaultAsync();
+                    if (existingEntryBlock5 != null)
+                    {
+                        await Delete_HIS_Block_5(existingEntryBlock5.id);
+                    }
+                }
+                //HIS_Block_6 - if entry having 05 in items 8 - 9 gets deleted
+                if (block_3.item_8 != 5 && block_3.item_9 != 5)
+                {
+                    var existingEntryBlock6 = await _database.Table<Tbl_Block_6>().Where(x => x.fk_block_3 == block_3.id).FirstOrDefaultAsync();
+                    if (existingEntryBlock6 != null)
+                    {
+                        await Delete_HIS_Block_6(existingEntryBlock6.id);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 
@@ -1288,6 +1331,50 @@ namespace Income.Database.Queries
 
             }
         }
+
+        private async Task ReserializeHISBlock5()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block5(SessionStorage.selected_hhd_id);
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private async Task ReserializeHISBlock6()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block6(SessionStorage.selected_hhd_id);
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
         //HIS Block 5
         public async Task<List<Tbl_Block_5>> Fetch_SCH_HIS_Block5(int hhd_id, int tenant_id = 1)
         {
@@ -1333,11 +1420,13 @@ namespace Income.Database.Queries
                 if (check_existence != null)
                 {
                     // update existing row
+                    tbl_block_5.isUpdated = true;
                     status = await _database.UpdateAsync(tbl_block_5);
                 }
                 else
                 {
                     // insert new row
+                    tbl_block_5.isUpdated = false;
                     status = await _database.InsertAsync(tbl_block_5);
                 }
 
@@ -1352,14 +1441,13 @@ namespace Income.Database.Queries
 
 
         //Block_6
-        public async Task<List<Tbl_Block_6>> Fetch_SCH_HIS_Block6(int hhd_id, int tenant_id = 1)
+        public async Task<List<Tbl_Block_6>> Fetch_SCH_HIS_Block6(int hhd_id)
         {
             try
             {
                 var response = await _database.Table<Tbl_Block_6>()
                     .Where(x => x.fsu_id == SessionStorage.SelectedFSUId
                                 && x.hhd_id == hhd_id
-                                && x.tenant_id == tenant_id
                                 && (x.is_deleted == null || x.is_deleted == false))
                     .ToListAsync();
 
@@ -1379,6 +1467,36 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> Delete_HIS_Block_5(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_5>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                    }
+                    string json = JsonSerializer.Serialize(exists);
+                    //await _logger.LogInfo($"Deleted Block 5 entry - \n{json}");
+                    await ReserializeHISBlock5();
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting item " + ex.Message);
+                return 0;
+            }
+        }
+
         public async Task<int?> Save_SCH_HIS_Block6(Tbl_Block_6 tbl_block_6)
         {
             try
@@ -1390,10 +1508,12 @@ namespace Income.Database.Queries
 
                 if (check_existence != null)
                 {
+                    tbl_block_6.isUpdated = true;
                     status = await _database.UpdateAsync(tbl_block_6);
                 }
                 else
                 {
+                    tbl_block_6.isUpdated = false;
                     status = await _database.InsertAsync(tbl_block_6);
                 }
                 return status;
@@ -1405,6 +1525,35 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> Delete_HIS_Block_6(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_6>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                    }
+                    string json = JsonSerializer.Serialize(exists);
+                    //await _logger.LogInfo($"Deleted Block 5 entry - \n{json}");
+                    await ReserializeHISBlock6();
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting item " + ex.Message);
+                return 0;
+            }
+        }
 
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
