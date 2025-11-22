@@ -1,0 +1,423 @@
+﻿@page "/dashboard/his/block_7a_1"
+@using Blazored.FluentValidation
+@using FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@using System.Linq.Expressions
+@using System.Reflection
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+@inject IValidator<Tbl_Block_7a_1> Validator
+
+<div class="main-content">
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
+    @* 7.1 *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header d-flex align-items-center justify-content-between bg-transparent">
+            <h5 class="card-title m-0">
+                <span class="text-primary me-1">Block 7a:</span>
+                Income from Self-employment - Crop cultivation
+            </h5>
+            @if (!SessionStorage.FSU_Submitted)
+            {
+                <div class="card-tools ms-auto">
+                    <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))"><i class="bi bi-plus me-1"></i>Add</button>
+                </div>
+            }
+            
+        </div>
+        <div class="row px-3 py-2">
+            <div class="col">
+                For Agricultural Establishment engaged in crop cultivation (includes production of cereals, pulses, oilseeds, cash-crops, vegetables, fruits, spices, flowers etc. <span class="text-primary">(entry against any one or more of S. nos. 1-2 of Q4.4 of Block 4 is selected)</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th colspan="10" class="bg-transparent text-start">
+                                <label class="form-label fs-6 fw-bold m-0">
+                                    <span class="badge bg-primary me-1 me-2">Q7.1 </span>
+                                    Details of the crops cultivated by one or more member of the household during last 365 days?
+                                </label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width: 50px;">S. No.</th>
+                            <th>Crop code (4 digits)</th>
+                            <th>unit (Kg./no.)</th>
+                            <th>Total Quantity Produced (harvested)</th>
+                            <th>Total quantity sold (out of total production) </th>
+                            <th>Total sale value(in Rs.)</th>
+                            <th>Average per unit sale value (in Rs.)</th>
+                            <th>Value of pre-harvested sale (Rs.)</th>
+                            <th>Value of by-products (Rs.)</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                            <th>(5)</th>
+                            <th>(6)</th>
+                            <th>(7)</th>
+                            <th>(8)</th>
+                            <th>(9)</th>
+                            <th>(10)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ActivityList)
+                        {
+                            <tr>
+                                <td>@item.serial_number</td>
+                                <td>@item.code</td>
+                                <td>@item.unit</td>
+                                <td>@item.item_4</td>
+                                <td>@item.item_5</td>
+                                <td>@item.item_6</td>
+                                <td>@item.item_7</td>
+                                <td>@item.item_8</td>
+                                <td>@item.item_9</td>
+                                @if (!SessionStorage.FSU_Submitted)
+                                {
+                                    <td class="d-flex align-items-center justify-content-center">
+                                        <button class="btn btn-link me-2 text-muted d-flex align-items-center" @onclick="@(() => HandleModal("UPDATE", item))"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-link text-danger d-flex align-items-center" @onclick="@(() => Delete(item))"><i class="bi bi-trash3"></i></button>
+                                    </td>
+                                }
+                                
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <button class="btn btn-outline-primary">Next<i class="bi bi-chevron-right ms-1"></i></button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
+    <HeaderTemplate>
+        <h5 class="modal-title">@((isAdd ? "Add Code" : "Update Code"))</h5>
+    </HeaderTemplate>
+    <BodyTemplate>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <EditForm EditContext="editContext">
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label mb-2 d-flex align-items-start">
+                                        <span class="badge bg-primary me-1">1</span> S. No.
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" disabled value="@activity.serial_number">
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group mb-3">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">2</span> Crop code (4 digits)
+                                        </label>
+                                        <select disabled="@SessionStorage.FSU_Submitted" class="form-select form-select-sm" value="@activity?.code"
+                                                @onchange="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => activity.code, e);
+                                                }">
+                                            <option>Select</option>
+                                            @foreach (var item in Block_7_1_Constants.CropCodes)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        </select>
+                                        @*                                             <ValidationMessage For="@(() => activity.code)" />
+ *@
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group mb-3">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">3</span> unit (Kg./no.)
+                                        </label>
+                                        <input type="number" disabled="@SessionStorage.FSU_Submitted" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                               value="@activity.unit" @onchange="e => { UpdateFieldAndValidate(() => activity.unit, e); }">
+                                        @*                                             <ValidationMessage For="@(() => activity.unit)" />
+ *@
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group mb-3">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">4</span> Total Quantity Produced (harvested)
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group mb-3">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">5</span> Total quantity sold (out of total production)
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group mb-3">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">6</span> Total sale value(in Rs.)
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group mb-3">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">7</span> Average per unit sale value (in Rs.)
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group mb-3">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">8</span> Value of pre-harvested sale (Rs.)
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="" class="form-label mb-2 d-flex align-items-start">
+                                            <span class="badge bg-primary me-1">9</span> Value of by-products (Rs.)
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+           </div>
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <button class="btn btn-outline-primary" @onclick="OnHideModalClick">Close</button>
+        <button class="btn btn-primary" @onclick="Save">Save</button>
+    </FooterTemplate>
+</Modal>
+
+
+
+@code {
+    private Modal AddModal = default!;
+    private Tbl_Block_4? block_4 = null;
+    private Tbl_Block_7a_1 activity;
+    private List<Tbl_Block_7a_1> ActivityList = [];
+    EditContext editContext;
+    DBQueries dB = new();
+    bool codeListEntryNeeded = false;
+    private ValidationMessageStore messageStore;
+    bool isAdd;
+    DateTime survey_time = DateTime.Now;
+    protected override async Task OnInitializedAsync()
+    {
+        block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
+        codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() || 
+                                block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault());
+
+        await LoadData();
+        StateHasChanged();
+    }
+
+    private async Task LoadData()
+    {
+        ActivityList = await dB.Fetch_SCH_HIS_Block7A_CodeList();
+    }
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    {
+        var identifier = FieldIdentifier.Create(field);
+
+        // Try parse
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
+        {
+            value = v;
+        }
+
+        // 1️⃣ Update the actual model field
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(activity, value);
+
+        // 2️⃣ Clear previous errors
+        messageStore?.Clear(identifier);
+
+        // 3️⃣ Notify Blazor validation system
+        editContext?.NotifyFieldChanged(identifier);
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private void OnActivityChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            activity.code = null;
+        else
+        {
+            activity.code = int.Parse(value);
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => activity.code));
+        }
+    }
+
+    private void OnUnitChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+
+        if (string.IsNullOrEmpty(value))
+            activity.unit = null;
+        else
+        {
+            activity.unit = int.Parse(value);
+            editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => activity.unit));
+        }
+    }
+
+    async Task HandleModal(string action = "", Tbl_Block_7a_1? data = null)
+    {
+        try
+        {
+            if (action == "ADD")
+            {
+                isAdd = true;
+
+                activity = new Tbl_Block_7a_1
+                {
+                    id = Guid.NewGuid(),
+                    serial_number = ActivityList.Count + 1
+                };
+                editContext = new EditContext(activity);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += EditContext_OnFieldChanged;
+                await AddModal.ShowAsync();
+            }
+            if (action == "UPDATE")
+            {
+                isAdd = false;
+
+                if (data != null)
+                {
+                    activity = data;
+                    editContext = new EditContext(activity);
+                    messageStore = new ValidationMessageStore(editContext);
+                    editContext.OnFieldChanged += EditContext_OnFieldChanged;
+                    await AddModal.ShowAsync();
+                }
+            }
+            else
+            {
+                await AddModal.HideAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+
+    private async Task OnHideModalClick()
+    {
+        await AddModal.HideAsync();
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            messageStore.Clear();
+            var result = await Validator.ValidateAsync(activity);
+            foreach (var error in result.Errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(activity, error.PropertyName);
+                messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            }
+
+            editContext.NotifyValidationStateChanged();
+            if (!result.IsValid)
+            {
+                toastService.ShowError("Please resolve pending errors");
+                return;
+            }
+            else
+            {
+                toastService.ShowSuccess("Data saved successfully");
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private async Task Delete(Tbl_Block_7a_1 item)
+    {
+        try
+        {
+            int deleted = await dB.DeleteBlock7A_CodeList(item.id);
+            if (deleted == 1)
+            {
+                toastService.ShowSuccess("Deleted successfully");
+                await LoadData();
+            }
+            else
+            {
+                toastService.ShowError("Could not delete item");
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+}

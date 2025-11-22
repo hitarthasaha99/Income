@@ -1,4 +1,5 @@
-﻿using Income.Database.Models.Common;
+﻿using Income.Common;
+using Income.Database.Models.Common;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Income.Database.Models.HIS_2026
     {
         [PrimaryKey]
         public Guid id { get; set; }
-        public int hhd_id { get; set; }
+        public int hhd_id { get; set; } = SessionStorage.selected_hhd_id;
 
         // Foreign key to Tbl_Block_4
         public Guid Block4Id { get; set; }

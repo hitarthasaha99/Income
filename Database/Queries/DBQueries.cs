@@ -1555,6 +1555,100 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<List<Tbl_Block_7a_1>> Fetch_SCH_HIS_Block7A_CodeList()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7a_1>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7a_1>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7 code list: {ex.Message}");
+                return new List<Tbl_Block_7a_1>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block7A_CodeList(Tbl_Block_7a_1 obj)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_7a_1>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(obj);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(obj);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 7a code list: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteBlock7A_CodeList(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_7a_1>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                    }
+                    await ReserializeCodeList();
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting item " + ex.Message);
+                return 0;
+            }
+        }
+
+        private async Task ReserializeCodeList()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block7A_CodeList();
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {

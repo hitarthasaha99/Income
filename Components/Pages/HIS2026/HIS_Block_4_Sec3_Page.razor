@@ -132,7 +132,7 @@
                             <div class="mb-4 col-md-8" hidden="@(block_4?.item_9 != 1 && block_4?.item_9 != 2 && block_4?.item_9 != 3)">
                                 <label class="form-label fw-bold">
                                     <span class="badge bg-primary me-2">10</span>
-                                    If codes 1–3 in Q4.9, type of economic activity(ies) (multiple select)
+                                    If codes 1–3 in Q4.9, type of economic activity(ies) household performed during last 365 days
                                 </label>
                                 <div class="d-flex flex-wrap">
                                     @foreach (var item in Block_4_Constants.Q4_10)
@@ -163,7 +163,7 @@
                             <!--4.11-->
                             <div class="mb-4 col-md-3">
                                 <label class="form-label fw-bold">
-                                    <span class="badge bg-primary me-2">11</span>Type of dwelling unit
+                                    <span class="badge bg-primary me-2">11</span>Type of dwelling unit of the household as on the date of survey
                                 </label>
                                 <select class="form-select w-100 is_sso"
                                         value="@block_4.item_11"
@@ -181,7 +181,7 @@
                             <!--4.12-->
                             <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0 || block_4.item_11 == null)">
                                 <label class="form-label fw-bold">
-                                    <span class="badge bg-primary me-2">12</span>Carpet area (sq. ft.)
+                                    <span class="badge bg-primary me-2">12</span>Carpet area of dwelling unit (in square feet) of the household
                                 </label>
                                 <input type="number"
                                        class="form-control is_sso"
@@ -194,7 +194,7 @@
                             <!--4.13-->
                             <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0 || block_4.item_11 == null)">
                                 <label class="form-label fw-bold">
-                                    <span class="badge bg-primary me-2">13</span>Type of structure
+                                    <span class="badge bg-primary me-2">13</span>Type of structure of the dwelling unit of the household
                                 </label>
                                 <select class="form-select w-100 is_sso"
                                         value="@block_4.item_13"
@@ -212,7 +212,7 @@
                             <!--4.14-->
                             <div class="mb-4 col-md-3" hidden="@(block_4.item_11 == 5 || block_4.item_11 == 0 || block_4.item_11 == null)">
                                 <label class="form-label fw-bold">
-                                    <span class="badge bg-primary me-2">14</span>Number of rooms
+                                    <span class="badge bg-primary me-2">14</span>Number of rooms in the dwelling unit of the household
                                 </label>
                                 <input type="number"
                                        class="form-control is_sso"
@@ -228,7 +228,7 @@
                             <!--4.15-->
                             <div class="mb-4 col-md-4">
                                 <label class="form-label fw-bold">
-                                    <span class="badge bg-primary me-2">15</span>Outstanding loan from financial institution?
+                                    <span class="badge bg-primary me-2">15</span>Whether the household has any outstanding loan taken from financial institution* for the purpose of construction of land/house/building/flat or to meet expenditure of economic activity or; one or more of these?
                                 </label>
                                 <select class="form-select w-100 is_sso"
                                         value="@block_4.item_15"
@@ -243,30 +243,15 @@
                                 <ValidationMessage For="@(() => block_4.item_15)" />
                             </div>
 
+                  
+
                             <!--4.16-->
                             <div class="mb-4 col-md-4" hidden="@(block_4.item_15 != 1)">
                                 <label class="form-label fw-bold">
-                                    <span class="badge bg-primary me-2">16</span>Purpose of the loan
-                                </label>
-                                <select class="form-select w-100 is_sso"
-                                        value="@block_4.item_16"
-                                        @oninput="OnItem16Changed"
-                                        disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
-                                    <option value="">Select</option>
-                                    @foreach (var item in Block_4_Constants.Q4_16)
-                                    {
-                                        <option value="@item.id">@item.title</option>
-                                    }
-                                </select>
-                                <ValidationMessage For="@(() => block_4.item_16)" />
+                                    <span class="badge bg-primary me-2">16</span>
+                                    If code 1 in Q 4.15,
+                                    Amount paid towards repayment of the loan in the last month by the household (in Rs.)?
 
-                            </div>
-
-                            <!--4.17-->
-                            <div class="mb-4 col-md-4" hidden="@(block_4.item_15 != 1)">
-                                <label class="form-label fw-bold">
-                                    <span class="badge bg-primary me-2">17</span>
-                                    Amount paid towards repayment of loan in the last month (₹)
                                 </label>
                                 <input type="number"
                                        class="form-control is_sso"
