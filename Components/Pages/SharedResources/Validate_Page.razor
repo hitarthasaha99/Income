@@ -37,7 +37,14 @@
 {
     @foreach (var top in ParentWarning)
     {
-        <div class="card discussion-item custom-badge warningWrap mb-4">
+        var wrapClass = top.warning_status switch
+        {
+            1 => "warningWrap",
+            2 => "acceptedWrap",
+            3 => "dangerWrap",
+            _ => ""
+        };
+        <div class="card discussion-item custom-badge @wrapClass mb-4">
             <div class="py-2 card-header">
                 <div class="mb-0 card-title h5">Warning</div>
             </div>
@@ -55,7 +62,7 @@
                     <div class="ms-auto">
                         <ul class="stats other-info">
                              <li>
-                                <a onclick="@(() =>NavigateWarning(top) )"><i class="fi fi-rr-eye"></i></a>
+                                @* <a onclick="@(() =>NavigateWarning(top) )"><i class="fi fi-rr-eye"></i></a> *@
                                 @*<h4 class="mb-0">@(top?.serial_number)</h4>*@                          
                             </li> 
                             <li class="d-flex align-items-center">
@@ -75,14 +82,14 @@
                 </h2>
                 <hr />
                 <div class="row stats other-info">
-                    <div class="col-sm-3">
+                    @* <div class="col-sm-3">
                         <div class="list d-flex align-items-center mb-3">
                             <h3 class="mb-0 me-2">SSS</h3>
                             <p class="text-danger mb-0">
-                               1
+                               
                             </p>
                         </div>
-                    </div>
+                    </div> *@
                     <div class="col-sm-3">
                         <div class="list d-flex align-items-center mb-3">
                             <h3 class="mb-0 me-2">HHD No.</h3>
@@ -91,14 +98,14 @@
                             </p>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    @* <div class="col-sm-3">
                         <div class="list d-flex align-items-center mb-3">
                             <h3 class="mb-0 me-2">Member Srl. No.</h3>
                             <p class="text-info mb-0">
                                 3
                             </p>
                         </div>
-                    </div>
+                    </div> *@
                     <div class="col-sm-3">
                         <div class="list d-flex align-items-center mb-3">
                             <h3 class="mb-0 me-2">Block</h3>
@@ -117,13 +124,13 @@
                     </div>
                     <div class="col-sm-3">
                         <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">SCH</h3>
+                            <h3 class="mb-0 me-2">Schedule</h3>
                             <p class="text-success mb-0">
                                 @(top?.schedule)
                             </p>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    @* <div class="col-sm-3">
                         <div class="list d-flex align-items-center mb-3">
                             <h3 class="mb-0 me-2">Case Srl. no</h3>
                             <p class="text-info mb-0">
@@ -138,7 +145,7 @@
                                 21.1
                             </p>
                         </div>
-                    </div>
+                    </div> *@
                 </div>
                 @* @if (ChildWarning != null && ChildWarning.Count > 0)
                 {
@@ -236,7 +243,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            @foreach(var item in ChildWarning.Where(x => x.parent_comment_id == top.id))
+                            {
+                                <tr>
+                                    <td>@item.serial_number</td>
+                                    <td>@item.created_on</td>
+                                    <td>@item.user_name</td>
+                                    <td>@(item.warning_status == 2 ? "Accepted" : "Rejected")</td>
+                                    <td>@item.remarks</td>
+                                </tr>
+                            }
+                            @* <tr>
                                 <td>1</td>
                                 <td>19 Nov. 2025/11:24:20</td>
                                 <td>ENM.SML.24</td>
@@ -253,7 +270,7 @@
                                     <div class="badge badge-outline badge-danger fw-bold ms-1">REJECTED</div>
                                 </td>
                                 <td>okASDASDsa</td>
-                            </tr>
+                            </tr> *@
                         </tbody>
                     </table>
                 </div>
@@ -273,7 +290,7 @@
     List<Tbl_Warning?> ParentWarning = new List<Tbl_Warning?>();
     List<Tbl_Warning?> ChildWarning = new List<Tbl_Warning?>();
     CommonFunction common = new CommonFunction();
-    private string selectedFilter = "3"; // Default filter to show Rejected warnings
+    private string selectedFilter = "2"; // Default filter to show Rejected warnings
     [Parameter]
     [SupplyParameterFromQuery]
     public string? Schedule { get; set; }
@@ -466,7 +483,7 @@
                 ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1 || x?.warning_status == 2 || x?.warning_status == 4)).ToList();
             }
             // ParentWarning = WarningList.Where(x => x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
-            ChildWarning = WarningList.Where(item => item.parent_comment_id != null || item.parent_comment_id != Guid.Empty).OrderBy(x => x.created_on).ToList();
+            ChildWarning = WarningList.Where(item => item.parent_comment_id != null).OrderBy(x => x.created_on).ToList();
             StateHasChanged();
             return;
         }
