@@ -1215,6 +1215,7 @@ namespace Income.Database.Queries
                 return new List<Tbl_Block_4_Q5>();
             }
         }
+
         public async Task<Tbl_Block_4?> Fetch_SCH_HIS_Block4(int hhd_id)
         {
             try
@@ -1676,6 +1677,282 @@ namespace Income.Database.Queries
             try
             {
                 var items = await Fetch_SCH_HIS_Block7A_CodeList();
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public async Task<Tbl_Block_7b?> Fetch_SCH_HIS_Block7B(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7b>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7B: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block7B(Tbl_Block_7b tbl_block_7b)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_7b>().Where(x => x.id == tbl_block_7b.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_7b);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_7b);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 7B: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<Tbl_Block_7c?> Fetch_SCH_HIS_Block7C(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7c>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7C: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block7C(Tbl_Block_7c tbl_block_7c)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_7c>().Where(x => x.id == tbl_block_7c.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_7c);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_7c);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 7C: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<List<Tbl_Block_7c_NIC>> Fetch_SCH_HIS_Block7_NICList()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7c_NIC>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7 NICLIST: {ex.Message}");
+                return new List<Tbl_Block_7c_NIC>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block7_NICList(Tbl_Block_7c_NIC obj)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(obj);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(obj);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 7: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteBlock7_NICList(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                    }
+                    await ReserializeBlock7NICList();
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting item " + ex.Message);
+                return 0;
+            }
+        }
+
+        private async Task ReserializeBlock7NICList()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block7_NICList();
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.SerialNumber = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public async Task<List<Tbl_Block_7c_Q10>> Fetch_SCH_HIS_Block7_Q10_List()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7c_Q10>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7 NICLIST: {ex.Message}");
+                return new List<Tbl_Block_7c_Q10>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block7_Q10_List(Tbl_Block_7c_Q10 obj)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(obj);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(obj);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 7: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteBlock7_Q10_List(Guid id)
+        {
+            try
+            {
+                var exists = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (exists != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        exists.is_deleted = true;
+                        await _database.UpdateAsync(exists);
+                    }
+                    else
+                    {
+                        int deleted = await _database.DeleteAsync(exists);
+                    }
+                    await ReserializeBlock7_Q10_List();
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error deleting item " + ex.Message);
+                return 0;
+            }
+        }
+
+        private async Task ReserializeBlock7_Q10_List()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block7_Q10_List();
                 if (items != null && items.Count > 0)
                 {
                     int s = 1;

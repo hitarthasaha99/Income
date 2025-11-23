@@ -262,6 +262,12 @@
                                     <td>
                                           <input class="form-control form-control-sm no-spinner" value="@block_7A.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled />
                                           <ValidationMessage For="@(() => block_7A.item_6)" />
+                                          @if(!string.IsNullOrEmpty(item_6_warning))
+                                        {
+                                            <div class="text-success mt-1 fw-bold">
+                                                @item_6_warning
+                                            </div>
+                                        }
                                     </td>
                                 </tr>
                             </tbody>
@@ -317,6 +323,7 @@
     bool isAdd;
     DateTime survey_date = DateTime.Now;
     string remarks = string.Empty;
+    string item_6_warning = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -329,8 +336,7 @@
                         + x.item_8.GetValueOrDefault()
                         + x.item_9.GetValueOrDefault());
         }
-        codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() ||
-                                block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault());
+        codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault());
         await LoadData();
         if (block_7A == null)
         {
@@ -380,7 +386,11 @@
            block_7A.item_2_9.GetValueOrDefault() + block_7A.item_2_10.GetValueOrDefault() + block_7A.item_2_11.GetValueOrDefault() + block_7A.item_2_12.GetValueOrDefault();
 
 
-        block_7A.item_6 = Q7_1_Sum + block_7A.item_3 + block_7A.item_5 - block_7A.item_2_13;
+        block_7A.item_6 = Q7_1_Sum + block_7A.item_3.GetValueOrDefault() + block_7A.item_5.GetValueOrDefault() - block_7A.item_2_13.GetValueOrDefault();
+        if (block_7A.item_6.HasValue)
+        {
+            CheckItem6Warning();
+        }
         // Notify Blazor that item_7 changed
         editContext?.NotifyFieldChanged(
             new FieldIdentifier(block_7A, nameof(block_7A.item_2_13))
@@ -391,6 +401,23 @@
 
         // 3️⃣ Notify Blazor validation system
         editContext?.NotifyFieldChanged(identifier);
+    }
+
+    void CheckItem6Warning()
+    {
+        try
+        {
+            item_6_warning = string.Empty;
+            if (block_7A != null && block_7A.item_6 < 0)
+            {
+                item_6_warning = $"W043: Please recheck the value";
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+        
     }
 
     private async Task Save(bool is_go_next = false)

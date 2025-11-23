@@ -49,5 +49,41 @@ namespace Income.Common
                 isUpdated = src.isUpdated
             };
         }
+
+        public static Tbl_Block_7c_NIC CloneTbl7NICList(this Tbl_Block_7c_NIC src)
+        {
+            return new Tbl_Block_7c_NIC
+            {
+                id = src.id,
+                hhd_id = src.hhd_id,
+                SerialNumber = src.SerialNumber,
+                ActivityName = src.ActivityName,
+                NicCode = src.NicCode,
+                GrossValue = src.GrossValue,
+            };
+        }
+
+        public static Tbl_Block_7c_Q10 CloneTbl7Q10List(this Tbl_Block_7c_Q10 src)
+        {
+            return new Tbl_Block_7c_Q10
+            {
+                id = src.id,
+                hhd_id = src.hhd_id,
+                serial_number = src.serial_number,
+                parent_id = src.parent_id,
+                item_10_1 = src.item_10_1,
+                item_10_2 = src.item_10_2,
+                item_10_3 = src.item_10_3,
+                item_10_4 = src.item_10_4,
+                item_10_5 = src.item_10_5,
+                item_10_6 = src.item_10_6,
+                item_10_7 = src.item_10_7,
+                item_10_8 = src.item_10_8,
+                item_10_9 = src.item_10_9,
+                item_10_10 = src.item_10_10,
+                item_10_11 = src.item_10_11,
+                isUpdated = src.isUpdated,
+            };
+        }
     }
 }

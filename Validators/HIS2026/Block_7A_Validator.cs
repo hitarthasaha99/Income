@@ -34,11 +34,13 @@ namespace Income.Validators.HIS2026
             RuleFor(x => x.item_4).NotNull().WithMessage("H043: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H043: Invalid entry, please check the entry");
             RuleFor(x => x.item_5).NotNull().WithMessage("H043: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H043: Invalid entry, please check the entry");
 
-            // item_6 → Warning if value < 0
-            RuleFor(x => x.item_6)
-                .NotNull()
-                .Must(v => v >= 0)
-                .WithMessage("W043: Value cannot be negative");
+            //RuleFor(x => x.item_6)
+            //    .NotNull()
+            //    .WithSeverity(Severity.Error) // Null IS blocking
+            //    .Must(v => v >= 0)
+            //    .WithMessage("W043: Please recheck the value")
+            //    .WithSeverity(Severity.Warning); // Warning, NOT blocking
+
         }
     }
 }

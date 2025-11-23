@@ -271,8 +271,7 @@
     protected override async Task OnInitializedAsync()
     {
         block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
-        codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() ||
-                                block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault());
+        codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault());
 
         await LoadData();
         StateHasChanged();

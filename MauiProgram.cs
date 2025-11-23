@@ -52,6 +52,7 @@ namespace Income
 
             builder.Services.AddBlazoredToast();
 
+
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();

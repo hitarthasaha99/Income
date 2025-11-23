@@ -1,0 +1,461 @@
+﻿@page "/dashboard/his/block_7c_2"
+@using Blazored.FluentValidation
+@using FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@using System.Linq.Expressions
+@using System.Reflection
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+@inject IValidator<Tbl_Block_7c_Q10> Validator
+
+<div class="pb-5">
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
+                         survey_time="@survey_date" />
+    @* 7.9 *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header d-flex align-items-center justify-content-between bg-transparent">
+            <h5 class="card-title m-0">
+                <span class="text-primary me-1">Block 7.3:</span>
+                Income from Self-employment - Non-agriculture Activity
+            </h5>
+        </div>
+        <div class="row px-3 py-2">
+            <div class="col">
+                For Non-Agricultural Establishment <span class="text-primary">(entry against col. 8 or col. 9 is code 2 for at least one member of the household) </span>
+            </div>
+
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th colspan="3" class="bg-transparent text-start">
+                                <label class="form-label fs-6 fw-bold m-0">
+                                    <span class="badge bg-primary me-1">Q7.9</span>
+                                    Operating Cost (expenses incurred by the household on inputs used for production activity) during last month
+                                </label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="min-width:50px;">sl. no.</th>
+                            <th style="min-width:150px;">raw materials (including goods purchased for trading)</th>
+                            <th style="min-width:150px;">electricity, diesel, other fuel and water charges</th>
+                            <th style="min-width:100px;">internet charges and other related expenses</th>
+                            <th style="min-width:100px;">rent for land, building, etc.</th>
+                            <th style="min-width:100px;">rental charge of machinery and equipment</th>
+                            <th style="min-width:100px;">transportation cost</th>
+                            <th style="min-width:100px;">labour cost</th>
+                            <th style="min-width:100px;">repair and maintenance</th>
+                            <th style="min-width:100px;">interest payment and insurance cost</th>
+                            <th style="min-width:100px;">others</th>
+                            <th style="min-width:100px;">total (sum of entries at s. nos. 01-10</th>
+                            <th style="min-width:150px;">Action</th>
+                        </tr>
+
+                        <tr>
+                            <th></th>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                            <th>(5)</th>
+                            <th>(6)</th>
+                            <th>(7)</th>
+                            <th>(8)</th>
+                            <th>(9)</th>
+                            <th>(10)</th>
+                            <th>(11)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ActivityList != null && ActivityList.Count > 0)
+                        {
+                            foreach (var item in ActivityList)
+                            {
+                                if (item.is_deleted != true)
+                                {
+                                    <tr>
+                                        <td>@item.serial_number</td>
+                                        <td>@item.item_10_1</td>
+                                        <td>@item.item_10_2</td>
+                                        <td>@item.item_10_3</td>
+                                        <td>@item.item_10_4</td>
+                                        <td>@item.item_10_5</td>
+                                        <td>@item.item_10_6</td>
+                                        <td>@item.item_10_7</td>
+                                        <td>@item.item_10_8</td>
+                                        <td>@item.item_10_9</td>
+                                        <td>@item.item_10_10</td>
+                                        <td>@item.item_10_11</td>
+
+                                        <td class="d-flex align-items-center">
+                                            <button class="btn btn-sm btn-primary me-2"
+                                                    @onclick="@(() => HandleModal("UPDATE", item))">
+                                                <i class="bi bi-pencil-square me-1"></i>Edit
+                                            </button>
+                                            @* <button class="btn btn-sm btn-danger"
+                                                    @onclick="@(() => HandleDelete(item.id))">
+                                                <i class="bi bi-trash me-1"></i>Delete
+                                            </button> *@
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-outline-primary" @onclick="() => Next()">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
+    <HeaderTemplate>
+        <h5 class="modal-title">Operating Cost (expenses incurred by the household on inputs used for production activity) during last month</h5>
+    </HeaderTemplate>
+    <BodyTemplate>
+        @if (editContext != null)
+        {
+            <EditForm EditContext="editContext">
+                <div class="container-fluid">
+                    <div class="row g-3">
+
+                        <!-- 1 -->
+                        <div class="col-md-12">
+                            <label class="form-label">1. raw materials (including goods purchased for trading)</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_1" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_1, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_1)" />
+                        </div>
+
+                        <!-- 2 -->
+                        <div class="col-md-12">
+                            <label class="form-label">2. electricity, diesel, other fuel and water charges</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_2" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_2, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_2)" />
+                        </div>
+
+                        <!-- 3 -->
+                        <div class="col-md-12">
+                            <label class="form-label">3. internet charges and other related expenses</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_3" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_3, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_3)" />
+                        </div>
+
+                        <!-- 4 -->
+                        <div class="col-md-12">
+                            <label class="form-label">4. rent for land, building, etc.</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_4" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_4, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_4)" />
+                        </div>
+
+                        <!-- 5 -->
+                        <div class="col-md-12">
+                            <label class="form-label">5. rental charge of machinery and equipment</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_5" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_5, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_5)" />
+                        </div>
+
+                        <!-- 6 -->
+                        <div class="col-md-12">
+                            <label class="form-label">6. transportation cost</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_6" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_6, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_6)" />
+                        </div>
+
+                        <!-- 7 -->
+                        <div class="col-md-12">
+                            <label class="form-label">7. labour cost</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_7" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_7, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_7)" />
+                        </div>
+
+                        <!-- 8 -->
+                        <div class="col-md-12">
+                            <label class="form-label">8. repair and maintenance</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_8" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_8, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_8)" />
+                        </div>
+
+                        <!-- 9 -->
+                        <div class="col-md-12">
+                            <label class="form-label">9. interest payment and insurance cost</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_9" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_9, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_9)" />
+                        </div>
+
+                        <!-- 10 -->
+                        <div class="col-md-12">
+                            <label class="form-label">10. others</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_10" disabled="@SessionStorage.FSU_Submitted"
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_10, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_10)" />
+                        </div>
+
+                        <!-- 11 (Total) -->
+                        <div class="col-md-12">
+                            <label class="form-label">11. total (sum of entries at s. nos. 01–10)</label>
+                            <input class="form-control form-control-sm" value="@fields.item_10_11" disabled
+                                   @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_11, e); }" />
+                            <ValidationMessage For="@(() => fields.item_10_11)" />
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <div class="modal-footer">
+                    <button type="button" @onclick="@(() => Save())" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-outline-primary"
+                            @onclick="@(() => HandleModal("CLOSE"))">
+                        Close
+                    </button>
+                </div>
+            </EditForm>
+        }
+    </BodyTemplate>
+
+
+</Modal>
+
+@code {
+    DateTime survey_date = DateTime.Now;
+    Modal AddModal = default!;
+    Tbl_Block_7c_Q10 fields = new();
+    List<Tbl_Block_7c_NIC> NICFields = [];
+    List<Tbl_Block_7c_Q10> ActivityList = [];
+    EditContext editContext;
+    string remarks = string.Empty;
+    DBQueries dQ = new();
+    bool Q9Needed = false;
+    ValidationMessageStore messageStore;
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+        }
+
+        var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3 != null && block3.Count > 0)
+        {
+            Q9Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2);
+        }
+        NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
+        ActivityList = await dQ.Fetch_SCH_HIS_Block7_Q10_List();
+
+        if(NICFields.Count > 0 && ActivityList.Count == 0)
+        {
+            int sl = 1;
+            foreach (var item in NICFields)
+            {
+                //create one entry each for NICFields entry
+                Tbl_Block_7c_Q10 obj = new();
+                obj.id = Guid.NewGuid();
+                obj.parent_id = item.id;
+                obj.serial_number = sl++;
+                await dQ.Save_SCH_HIS_Block7_Q10_List(obj);
+            }
+        }
+        else if (NICFields.Count > 0 && ActivityList.Count > 0 && NICFields.Count != ActivityList.Count)
+        {
+            foreach(var item in NICFields)
+            {
+                var itemExists = ActivityList.Any(x => x.parent_id == item.id);
+                if (!itemExists)
+                {
+                    Tbl_Block_7c_Q10 obj = new();
+                    obj.id = Guid.NewGuid();
+                    obj.parent_id = item.id;
+                    obj.serial_number = ActivityList.Count + 1;
+                    await dQ.Save_SCH_HIS_Block7_Q10_List(obj);
+                }
+            }
+        }
+
+        await LoadData();
+
+        StateHasChanged();
+    }
+
+    async Task LoadData()
+    {
+        // Block_4_5_ErrorMessage = string.Empty;
+        ActivityList = await dQ.Fetch_SCH_HIS_Block7_Q10_List();
+        StateHasChanged();
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    {
+        var identifier = FieldIdentifier.Create(field);
+
+        // Try parse
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
+        {
+            value = v;
+        }
+
+        // 1️⃣ Update the actual model field
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(fields, value);
+        fields.item_10_11 = (fields.item_10_1 ?? 0) + (fields.item_10_2 ?? 0) + (fields.item_10_3 ?? 0) + (fields.item_10_4 ?? 0) + (fields.item_10_5 ?? 0) + (fields.item_10_6 ?? 0) + (fields.item_10_7 ?? 0) + (fields.item_10_8 ?? 0) + (fields.item_10_9 ?? 0) + (fields.item_10_10 ?? 0);
+
+        // 2️⃣ Clear previous errors
+        messageStore?.Clear(identifier);
+
+        // 3️⃣ Notify Blazor validation system
+        editContext?.NotifyFieldChanged(identifier);
+    }
+
+    async Task HandleDelete(Guid id)
+    {
+        int item_index = NICFields.FindIndex(l => l.id == id);
+        if (item_index != -1)
+        {
+            NICFields[item_index].is_deleted = true;
+            await dQ.DeleteBlock4_NICList(id);
+            toastService.ShowSuccess("Row deleted successfully!");
+            await LoadData();
+        }
+        else
+        {
+            toastService.ShowError("Not Able to delete row, Please try again!");
+        }
+    }
+
+
+
+    async Task HandleModal(string action = "", Tbl_Block_7c_Q10? data = null)
+    {
+        try
+        {
+            if (action == "UPDATE")
+            {
+                fields = ObjectCloneHelper.CloneTbl7Q10List(data);
+                editContext = new EditContext(fields);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += EditContext_OnFieldChanged;
+                await AddModal.ShowAsync();
+            }
+            else if (action == "CLOSE")
+            {
+                await AddModal.HideAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
+
+    private async Task Save()
+    {
+        try
+        {
+            messageStore.Clear();
+            var validation = Validator.Validate(fields);
+
+            foreach (var error in validation.Errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(fields, error.PropertyName);
+                messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            }
+            editContext.NotifyValidationStateChanged();
+            if (validation.IsValid)
+            {
+                int saved = await dQ.Save_SCH_HIS_Block7_Q10_List(fields) ?? 0;
+                if (saved > 0)
+                {
+                    toastService.ShowSuccess("Saved successfully");
+                    await AddModal.HideAsync();
+                    await LoadData();
+                }
+                else
+                {
+                    toastService.ShowError("Unable to save the data");
+                }
+            }
+            else
+            {
+                toastService.ShowError("Please resolve the errors");
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private void Next()
+    {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
+            return;
+        }
+        if (Q9Needed && NICFields.Count == 0)
+        {
+            toastService.ShowError("Need to add atleast one entry before proceeding");
+            return;
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
+        }
+    }
+}
+
