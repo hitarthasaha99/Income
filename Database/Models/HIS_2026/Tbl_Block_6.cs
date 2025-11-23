@@ -14,6 +14,9 @@ namespace Income.Database.Models.HIS_2026
         [PrimaryKey]
         public Guid id { get; set; }
         public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
+        public int? serial_member { get; set; }
+        public int? serial_number {  get; set; }
+        public Guid fk_block_3 { get; set; }
         //s.no.
         public int? serial_no { get; set; }
         //Q6.1
@@ -24,5 +27,6 @@ namespace Income.Database.Models.HIS_2026
         public int? item_3 { get; set; }
         //Q6.4
         public int? item_4 { get; set; }
+        public bool isUpdated { get; set; } = false;
     }
 }

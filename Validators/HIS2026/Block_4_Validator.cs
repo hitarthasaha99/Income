@@ -106,9 +106,9 @@ namespace Income.Validators.HIS2026
 
                 When(x => x.item_15 == 1, () =>
                 {
-                    RuleFor(x => x.item_16)
-                    .NotNull()
-                    .WithMessage("H028(i): Please check the entry");
+                    //RuleFor(x => x.item_16)
+                    //.NotNull()
+                    //.WithMessage("H028(i): Please check the entry");
 
                     RuleFor(x => x.item_17)
                     .NotNull()

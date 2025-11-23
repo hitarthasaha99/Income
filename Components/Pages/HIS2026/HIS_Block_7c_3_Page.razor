@@ -1,0 +1,260 @@
+﻿@page "/dashboard/his/block_7c_3"
+@using Blazored.FluentValidation
+@using FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@using System.Linq.Expressions
+@using System.Reflection
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+@inject IValidator<Tbl_Block_7c> Validator
+
+<div class="pb-5">
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+
+    @if (editContext != null)
+    {
+        <EditForm EditContext="editContext">
+            <FluentValidationValidator />
+            
+            <div class="card card-style2 rounded-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-center mb-0">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="badge bg-primary me-1">Q7.11</div>
+                                    </td>
+                                    <td>
+                                        Imputed value of goods consumed (out of total production through the activity as mentioned in Q 7.9) by the household during last month
+                                        or
+                                        Imputed value of goods / services (out of total production through the activity as mentioned in Q 7.9) bartered to other households during last month (in whole no. of Rs.)
+                                    </td>
+                                    <td>
+                                        <input disabled="@(SessionStorage.FSU_Submitted)" class="form-control form-control-sm no-spinner" value="@fields.item_7_11" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                               @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => fields.item_7_11, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => fields.item_7_11)" />
+                                      </td>
+                                  </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <div class="badge bg-primary me-1">Q7c.9</div>
+                                    </td>
+                                    <td>Gross Profit / Loss before tax realized by the establishment during last month (in whole no. of Rs.)</td>
+                                    <td>
+                                        <input disabled class="form-control form-control-sm no-spinner" value="@fields.item_7_12" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                               @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => fields.item_7_12, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => fields.item_7_12)" />
+                                        @if (!string.IsNullOrEmpty(item_9_warning))
+                                        {
+                                            <div class="text-success mt-1 fw-bold">
+                                                @item_9_warning
+                                            </div>
+                                        }
+                                    </td>
+                                  </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+
+    }
+
+
+    @* Remarks Card *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header">
+            <h5 class="card-title m-0">
+                Remarks
+            </h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control w-100" rows="4" @bind="@remarks"></textarea>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-primary me-2" @onclick="@(() => Save(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    Tbl_Block_7c fields = new();
+    List<Tbl_Block_7c_NIC> NICBlock7 = [];
+    int NICSUM = 0;
+    int ActivitySum = 0;
+    List<Tbl_Block_7c_Q10> Q10 = [];
+    EditContext editContext;
+    ValidationMessageStore messageStore;
+    DBQueries dB = new();
+    bool isAdd;
+    DateTime survey_date = DateTime.Now;
+    string remarks = string.Empty;
+    string item_9_warning = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        NICBlock7 = await dB.Fetch_SCH_HIS_Block7_NICList();
+        Q10 = await dB.Fetch_SCH_HIS_Block7_Q10_List();
+        NICSUM = NICBlock7.Sum(x => x.GrossValue).GetValueOrDefault();
+        ActivitySum = Q10.Sum(x => x.item_10_11).GetValueOrDefault();
+        editContext = new EditContext(fields);
+        messageStore = new ValidationMessageStore(editContext);
+        editContext.OnFieldChanged += EditContext_OnFieldChanged;
+
+        StateHasChanged();
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private async Task LoadData()
+    {
+        fields = await dB.Fetch_SCH_HIS_Block7C(SessionStorage.selected_hhd_id);
+        if (fields == null)
+        {
+            fields = new Tbl_Block_7c()
+            {
+                id = Guid.NewGuid()
+            };
+        }
+    }
+
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    {
+        var identifier = FieldIdentifier.Create(field);
+
+        // Try parse
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
+        {
+            value = v;
+        }
+
+        // 1️⃣ Update the actual model field
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(fields, value);
+
+        fields.item_7_12 = (NICSUM + fields.item_7_11.GetValueOrDefault()) - ActivitySum;
+        CheckItem9Warning();
+        // 2️⃣ Clear previous errors
+        messageStore?.Clear(identifier);
+
+        // 3️⃣ Notify Blazor validation system
+        editContext?.NotifyFieldChanged(identifier);
+    }
+
+    void CheckItem9Warning()
+    {
+        try
+        {
+            item_9_warning = string.Empty;
+            if(fields.item_7_12.GetValueOrDefault() < 0)
+            {
+                item_9_warning = $"W052: Cost of input is more than gross value of receipts, please check the entries and provide suitable clarifications";
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
+
+    private async Task Save(bool is_go_next = false)
+    {
+        try
+        {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_7d");
+                return;
+            }
+            // if (!codeListEntryNeeded)
+            // {
+            //     NavigationManager.NavigateTo("/dashboard/his/block_7b");
+            //     return;
+            // }
+
+            messageStore.Clear();
+            var validation = Validator.Validate(fields);
+
+            foreach (var error in validation.Errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(fields, error.PropertyName);
+                messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            }
+            editContext.NotifyValidationStateChanged();
+
+            if (!validation.IsValid)
+            {
+                toastService.ShowError("Please resolve all the errors");
+                return;
+            }
+            else
+            {
+                int saved = await dB.Save_SCH_HIS_Block7C(fields);
+                if (saved > 0)
+                {
+                    toastService.ShowSuccess("Saved successfully");
+                }
+                else
+                {
+                    toastService.ShowSuccess("Data could not be saved");
+                }
+            }
+
+            if (!is_go_next)
+            {
+                return;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_7d");
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+}

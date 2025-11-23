@@ -1483,28 +1483,40 @@ background-color: @warningLightColor;
 	}
 }
 .card {
-  &.warningWrap {
-    border: 1px solid @warningDarkColor !important;
+    &.warningWrap {
+        border: 1px solid @warningDarkColor !important;
 
-    .card-header {
-      background-color: @warningLightColor;
+        .card-header {
+            background-color: @warningLightColor;
 
-      .card-title {
-        color: @warningDarkColor;
-      }
+            .card-title {
+                color: @warningDarkColor;
+            }
+        }
     }
-  }
 
-  &.dangerWrap {
-    border: 1px solid @danger_2 !important;
+    &.dangerWrap {
+        border: 1px solid @danger_2 !important;
 
-    .card-header {
-      background-color: @lightDanger;
+        .card-header {
+            background-color: @lightDanger;
 
-      .card-title {
-        color: @danger;
-      }
+            .card-title {
+                color: @danger;
+            }
+        }
     }
-  }
+
+    &.acceptedWrap {
+        border: 1px solid @successColor_1 !important;
+
+        .card-header {
+            background-color: @warningColor_4;
+
+            .card-title {
+                color: @success;
+            }
+        }
+    }
 }
 

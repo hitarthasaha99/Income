@@ -125,7 +125,11 @@ namespace Income.Common
         sch_0_0_block_9,
         sch_0_0_block_11,
         ssu_list_page,
-        his_block_3
+        his_block_1,
+        his_block_3,
+        his_block_4,
+        his_block_5,
+        his_block_6
     }
 
     public class CommonList

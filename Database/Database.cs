@@ -2,6 +2,7 @@
 using Income.Database.Models.Common;
 using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
+using Income.Services;
 using SQLite;
 using SQLitePCL;
 using System;
@@ -18,6 +19,7 @@ namespace Income.Database
         public CommonFunction CommonFunction = new CommonFunction();
         public const SQLiteOpenFlags Flags = SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache;
         private const string dbKey = "YourStrongProductionKey!"; // Use a strong key!
+        protected readonly ILoggingService _logger;
 
         public Database()
         {
@@ -26,7 +28,7 @@ namespace Income.Database
                 Batteries_V2.Init(); // SQLCipher initialization
                 var databasePath = Path.Combine(FileSystem.AppDataDirectory, CommonConstants.DatabaseFilename);
                 _database = new SQLiteAsyncConnection(databasePath, Flags, true);
-
+                //_logger = loggingService;
                 // Encryption and PRAGMA
                 //_database.ExecuteAsync($"PRAGMA key = '{dbKey}';").ConfigureAwait(false).GetAwaiter().GetResult();
                 //_database.ExecuteAsync("PRAGMA cipher_compatibility = 4;").ConfigureAwait(false).GetAwaiter().GetResult();
@@ -63,6 +65,14 @@ namespace Income.Database
                 await _database.CreateTableAsync<Tbl_Block_3>().ConfigureAwait(false);
                 await _database.CreateTableAsync<Tbl_Block_4>().ConfigureAwait(false);
                 await _database.CreateTableAsync<Tbl_Block_4_Q5>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_5>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_6>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_7a>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_7a_1>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_7b>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_7c>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_7c_NIC>().ConfigureAwait(false);
+                await _database.CreateTableAsync<Tbl_Block_7c_Q10>().ConfigureAwait(false);
                 await _database.CreateTableAsync<Tbl_Warning>().ConfigureAwait(false);
                 // Run indexes
                 await CreateIndexesAsync();

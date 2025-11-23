@@ -3,21 +3,20 @@ using Income.Database.Models.Common;
 using SQLite;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_4_Q5 : Tbl_Base
+    public class Tbl_Block_7c_NIC : Tbl_Base
     {
         [PrimaryKey]
         public Guid id { get; set; }
         public int hhd_id { get; set; } = SessionStorage.selected_hhd_id;
 
-        // Foreign key to Tbl_Block_4
-        public Guid Block4Id { get; set; }
+        // Foreign key to Tbl_Block_7c
+        public Guid Block7CId { get; set; }
         public int? SerialNumber { get; set; }
 
         // Activity type / description (dropdown or free text)
@@ -26,10 +25,8 @@ namespace Income.Database.Models.HIS_2026
         // NIC Code (linked from NICCodeConstants)
         public int? NicCode { get; set; }
 
-        // Business seasonal (1 = Yes, 2 = No)
-        public int? BusinessSeasonal { get; set; }
+        // Gross value of receipts
+        public int? GrossValue { get; set; }
 
-        // No of months
-        public int? NumberOfMonths { get; set; }
     }
 }
