@@ -258,4 +258,37 @@
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
+    private void handleCalculate()
+    {
+        decimal sum_1_2 =(model.Q10_1 ?? 0) + (model.Q10_2 ?? 0);
+
+    decimal sum_3_12 =
+        (model.Q10_3 ?? 0) +
+        (model.Q10_4 ?? 0) +
+        (model.Q10_5 ?? 0) +
+        (model.Q10_6 ?? 0) +
+        (model.Q10_7 ?? 0) +
+        (model.Q10_8 ?? 0) +
+        (model.Q10_9 ?? 0) +
+        (model.Q10_10 ?? 0) +
+        (model.Q10_11 ?? 0) +
+        (model.Q10_12 ?? 0);
+
+    decimal sum_13_22 =
+        (model.Q10_13 ?? 0) +
+        (model.Q10_14 ?? 0) +
+        (model.Q10_15 ?? 0) +
+        (model.Q10_16 ?? 0) +
+        (model.Q10_17 ?? 0) +
+        (model.Q10_18 ?? 0) +
+        (model.Q10_19 ?? 0) +
+        (model.Q10_20 ?? 0) +
+        (model.Q10_21 ?? 0) +
+        (model.Q10_22 ?? 0);
+
+    model.TotalExpenditure =
+        (sum_1_2 / 7m * 30m) +
+        (sum_3_12) +
+        (sum_13_22 / 365m * 30m);
+    }
 }
