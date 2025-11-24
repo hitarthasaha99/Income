@@ -348,9 +348,23 @@
 
     protected override async Task OnInitializedAsync()
     {
+        //NavigationManager.LocationChanged += Nav_LocationChanged;
         block_0_1_VM.NotifyUiUpdate += StateHasChanged;
         await block_0_1_VM.Init();
         editContext = new EditContext(block_0_1_VM.block_0_1);
+    }
+
+    private async void Nav_LocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        if (e.IsNavigationIntercepted == false)
+        {
+            await block_0_1_VM.Init(); // replace with your initialization logic
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= Nav_LocationChanged;
     }
 
     async Task HandleSubmit(bool goNext)

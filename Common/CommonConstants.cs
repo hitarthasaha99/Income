@@ -206,21 +206,21 @@ namespace Income.Common
 
         public List<Tbl_Lookup> LOOKUP_CONST_SURVEY_CODE = new List<Tbl_Lookup>
         {
-            new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "inhabited - 01"},
-            new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "uninhabited - 02"},
-            new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = " zero case - 03"},
-            new Tbl_Lookup { id = 4, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "inhabited - 04"},
-            new Tbl_Lookup { id = 5, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "uninhabited - 05"},
-            new Tbl_Lookup { id = 6, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "zero case - 06"},
-            new Tbl_Lookup { id = 7, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "selected FSU casualty – 07"},
+            new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "01- selected FSU surveyed: inhabited"},
+            new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "02- selected FSU surveyed: uninhabited"},
+            new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "03- selected FSU surveyed: zero case"},
+            new Tbl_Lookup { id = 4, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "04- originally selected FSU not surveyed but substitute FSU surveyed: inhabited"},
+            new Tbl_Lookup { id = 5, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "05- originally selected FSU not surveyed but substitute FSU surveyed: uninhabited"},
+            new Tbl_Lookup { id = 6, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "06- originally selected FSU not surveyed but substitute FSU surveyed: Zero case"},
+            new Tbl_Lookup { id = 7, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE, title = "07- selected FSU casualty and no substitute surveyed"},
         };
 
         public List<Tbl_Lookup> LOOKUP_CONST_SUBSTITUTION_REASON = new List<Tbl_Lookup>
         {
-            new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "not identifiable/traceable – 01"},
-            new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "not accessible – 02"},
-            new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "restricted area (not permitted to survey) – 03"},
-            new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "others (specify) – 09"},
+            new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "01 - sample FSU: not identifiable/traceable"},
+            new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "02 - sample FSU: not accessible"},
+            new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "03 - sample FSU: restricted area (not permitted to survey)"},
+            new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON, title = "09 - sample FSU: others (specify)"},
         };
 
         
