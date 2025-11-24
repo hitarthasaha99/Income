@@ -5,6 +5,8 @@
 @using FluentValidation
 @using Income.Database.Models.HIS_2026
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@using System.Reflection
 @inject IJSRuntime JSRuntime
 
 <div class="my-2">
@@ -26,52 +28,70 @@
                             <th class="fw-bold fs-6">Reference Period </th>
                             <th class="fw-bold fs-6">Expenditure (in whole no. of Rs.)</th>
                         </tr>
-                        
+
                     </thead>
                     <tbody>
                         <tr>
                             <td colspan="8" class="fw-bold">Food items</td>
                         </tr>
-                       <tr>
+                        <tr>
                             <td>Q10.1 </td>
                             <td>vegetables including ginger, garlic & fruits (fresh)</td>
                             <td>Last 7 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_1" @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_1, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }" />
                             </td>
-                       </tr>
-                       <tr>
+                          
+
+                        </tr>
+
+                        <tr>
                             <td>Q10.2 </td>
                             <td>egg, fish & meat </td>
                             <td>Last 7 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_2  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_2, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
-                       </tr>
-                       <tr>
+                        </tr>
+                        <tr>
                             <td>Q10.3 </td>
                             <td>cereals & cereal products, pulses & pulse products, salt & sugar, edible oil, spices, dry fruits & nuts</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_3  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_3, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
-                       </tr>
-                       <tr>
+                        </tr>
+                        <tr>
                             <td>Q10.4</td>
                             <td>milk & milk products</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_4  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_4, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
-                       </tr>
-                       <tr>
+                        </tr>
+                        <tr>
                             <td>Q10.5</td>
                             <td>beverages, processed food, pan, tobacco & intoxicants</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_5  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_5, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
-                       </tr>
+                        </tr>
                         <tr>
                             <td colspan="8" class="fw-bold">Non -Food Items – Consumable Services</td>
                         </tr>
@@ -80,7 +100,10 @@
                             <td>fuel & light (including petrol/diesel/CNG/other fuel for vehicles)</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_6  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_6, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -88,7 +111,10 @@
                             <td>toilet articles & other household consumables</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_7  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_7, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -96,7 +122,10 @@
                             <td>conveyance</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_8  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_8, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -104,7 +133,10 @@
                             <td>entertainment expenses, consumer services excluding conveyance</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_9  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_9, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -112,7 +144,10 @@
                             <td>rent & garage rent, consumer taxes and cesses</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_10  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_10, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -120,7 +155,10 @@
                             <td>house rent, garage rent (imputed) </td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_11  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_11, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -128,7 +166,10 @@
                             <td>medical expenses: non - hospitalization (includes medicine, doctor’s fee, medical test fees etc.)</td>
                             <td>Last 30 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_12  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_12, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -136,7 +177,10 @@
                             <td>medical expenses: hospitalization</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_13  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_13, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -144,7 +188,10 @@
                             <td>educational expenses</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_14  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_14, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -155,7 +202,10 @@
                             <td>clothing, bedding and footwear</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_15  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_15, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -163,7 +213,10 @@
                             <td>personal and sports goods, medical and therapeutic appliances</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_16  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_16, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -171,7 +224,10 @@
                             <td>personal transport equipment</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_17  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_17, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -179,7 +235,10 @@
                             <td>furniture and fixtures & goods for recreation,</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_18  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_18 , e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -187,7 +246,10 @@
                             <td>cooking and household appliances</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_19  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_19, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -195,7 +257,10 @@
                             <td>repair and maintenance of residential buildings, land</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_20  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_20, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -203,7 +268,10 @@
                             <td>repair & maintenance of vehicles, household appliances and other durable goods</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_21  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_21, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -211,7 +279,10 @@
                             <td>jewellery & ornaments</td>
                             <td>Last 365 days</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_22  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_22, e);
+                                                                                                                                                                         handleCalculate();
+                                                                                                                                                                     }"  />
                             </td>
                         </tr>
                         <tr>
@@ -219,10 +290,10 @@
                             <td>Total expenditure = sum (Q10.1: 10.2) /7×30 + sum (Q10.3: Q10.12) + sum (Q10.13: Q10.22)/365×30</td>
                             <td class="text-center">-</td>
                             <td>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly/>
                             </td>
                         </tr>
-                       
+
                     </tbody>
                 </table>
 
@@ -258,37 +329,63 @@
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
-    private void handleCalculate()
+    //Object
+    private Tbl_Block_10 model = new();
+    // private void item1OnInput(ChangeEventArgs e)
+    // {
+    //     var text = e.Value?.ToString();
+
+    //     if (string.IsNullOrWhiteSpace(text))
+    //         model.item_1 = null;
+    //     else if (int.TryParse(text, out int v))
+    //         model.item_1 = v;
+    //     else
+    //         model.item_1 = null;
+
+    //     handleCalculate();
+    // }
+
+    //On Input comon Method
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
     {
-        decimal sum_1_2 =(model.Q10_1 ?? 0) + (model.Q10_2 ?? 0);
+        var identifier = FieldIdentifier.Create(field);
 
-    decimal sum_3_12 =
-        (model.Q10_3 ?? 0) +
-        (model.Q10_4 ?? 0) +
-        (model.Q10_5 ?? 0) +
-        (model.Q10_6 ?? 0) +
-        (model.Q10_7 ?? 0) +
-        (model.Q10_8 ?? 0) +
-        (model.Q10_9 ?? 0) +
-        (model.Q10_10 ?? 0) +
-        (model.Q10_11 ?? 0) +
-        (model.Q10_12 ?? 0);
-
-    decimal sum_13_22 =
-        (model.Q10_13 ?? 0) +
-        (model.Q10_14 ?? 0) +
-        (model.Q10_15 ?? 0) +
-        (model.Q10_16 ?? 0) +
-        (model.Q10_17 ?? 0) +
-        (model.Q10_18 ?? 0) +
-        (model.Q10_19 ?? 0) +
-        (model.Q10_20 ?? 0) +
-        (model.Q10_21 ?? 0) +
-        (model.Q10_22 ?? 0);
-
-    model.TotalExpenditure =
-        (sum_1_2 / 7m * 30m) +
-        (sum_3_12) +
-        (sum_13_22 / 365m * 30m);
+        // Try parse
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
+        {
+            value = v;
+        }
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(model, value);
     }
+
+   private void handleCalculate()
+{
+    // Weekly items (convert to monthly)
+    decimal weeklySum = (model.item_1 ?? 0) + (model.item_2 ?? 0);
+    decimal weeklyToMonthly = weeklySum / 7m * 30m;
+    
+    // Monthly items (use as-is)
+    decimal monthlySum = (model.item_3 ?? 0) + (model.item_4 ?? 0) + 
+                        (model.item_5 ?? 0) + (model.item_6 ?? 0) + 
+                        (model.item_7 ?? 0) + (model.item_8 ?? 0) +
+                        (model.item_9 ?? 0) + (model.item_10 ?? 0) +
+                        (model.item_11 ?? 0) + (model.item_12 ?? 0);
+    
+    // Annual items (convert to monthly)
+    decimal annualSum = (model.item_13 ?? 0) + (model.item_14 ?? 0) + 
+                       (model.item_15 ?? 0) + (model.item_16 ?? 0) +
+                       (model.item_17 ?? 0) + (model.item_18 ?? 0) +
+                       (model.item_19 ?? 0) + (model.item_20 ?? 0) +
+                       (model.item_21 ?? 0) + (model.item_22 ?? 0);
+    decimal annualToMonthly = annualSum / 365m * 30m;
+    
+    // Total expenditure
+    model.item_23 = Math.Round((double)(weeklyToMonthly + monthlySum + annualToMonthly), 2);
+    StateHasChanged(); // Ensure UI updates
+}
+
 }
