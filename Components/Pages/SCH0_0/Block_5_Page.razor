@@ -48,7 +48,7 @@
                                         </div>
                                     </td>
                                     <td>@item.serial_number</td>
-                                    <td><input type="number" disabled="@(is_selection_done)" class="form-control form-control-sm" value="@item.Percentage.ToString()" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)" @oninput="(e) => HandleChange(e, item.id)" /></td>
+                                    <td><input type="number" step="0.1" min="0" max="100" disabled="@(is_selection_done)" class="form-control form-control-sm" value="@item.Percentage" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)" @oninput="(e) => HandleChange(e, item.id)" /></td>
                                 </tr>
                             }
                         }
@@ -149,6 +149,8 @@
         }
         return;
     }
+    const double EPSILON = 0.000001;
+
     async Task HandleSubmit(string action)
     {
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
@@ -159,6 +161,13 @@
         if (total_population_percentage != 100)
         {
             toastService.ShowError("Total population percentage should be 100%");
+            return;
+        }
+        if (block_5.Any(row =>
+                            row.Percentage == null ||
+                            Math.Abs(row.Percentage.Value) < EPSILON))
+        {
+            toastService.ShowError("Percentage cannot be zero");
             return;
         }
         if (action == "SELECTION")
@@ -220,15 +229,28 @@
             var item_index = block_5.FindIndex(k => k.id == id);
             if (item_index != -1)
             {
-                var val = args.Value.ToString();
-                if (!string.IsNullOrEmpty(val) || !string.IsNullOrWhiteSpace(val))
+                var val = args.Value?.ToString() ?? "";
+                if (System.Text.RegularExpressions.Regex.IsMatch(val, @"^\d{0,3}(\.\d{0,1})?$"))
                 {
-                    block_5[item_index].Percentage = Convert.ToInt32(val);
+                    if (double.TryParse(val, out double value))
+                        block_5[item_index].Percentage = value;
+                    else
+                        block_5[item_index].Percentage = null;
                 }
                 else
                 {
-                    block_5[item_index].Percentage = block_5[item_index].Percentage;
+                    // Reset to previous valid value if invalid input
+                    block_5[item_index].Percentage = Math.Round(block_5[item_index].Percentage.Value, 1);
+                    StateHasChanged();
                 }
+                // if (!string.IsNullOrEmpty(val) || !string.IsNullOrWhiteSpace(val))
+                // {
+                //     block_5[item_index].Percentage = Convert.ToInt32(val);
+                // }
+                // else
+                // {
+                //     block_5[item_index].Percentage = block_5[item_index].Percentage;
+                // }
             }
             total_population_percentage = CalculateTotalPopulationPercentage(block_5);
             StateHasChanged();

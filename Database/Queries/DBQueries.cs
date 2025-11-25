@@ -1607,7 +1607,7 @@ namespace Income.Database.Queries
                 var response = await _database.Table<Tbl_Block_7a_1>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null && response.Count > 0)
                 {
-                    return response;
+                    return response.OrderBy(x => x.serial_number).ToList();
                 }
                 else
                 {
@@ -1967,6 +1967,50 @@ namespace Income.Database.Queries
             catch (Exception ex)
             {
 
+            }
+        }
+
+        public async Task<List<Tbl_Block_7d>> Fetch_SCH_HIS_Block7D()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7d>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7d>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error while fetching Block 7D list: {ex.Message}");
+                return new List<Tbl_Block_7d>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block7D_List(Tbl_Block_7d obj)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_7d>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(obj);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(obj);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 7D: {ex.Message}");
+                return null;
             }
         }
 

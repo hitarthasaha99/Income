@@ -5,6 +5,8 @@
 @using Income.Database.Models.HIS_2026
 @using Income.Validators.HIS2026
 @using Income.Viewmodels
+@using System.Linq.Expressions
+@using System.Reflection
 @inject IJSRuntime JSRuntime
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
@@ -147,5 +149,196 @@
     </div>
 </div>
 @code {
+    readonly DateTime survey_date = DateTime.Now;
+    readonly Modal AddModal = default!;
+    Tbl_Block_7c_Q10 fields = new();
+    List<Tbl_Block_7a_1> CropCodeList = [];
+    Tbl_Block_4? block_4;
+    List<Tbl_Block_7c_NIC> NICFields = [];
+    List<Tbl_Block_7d> Block7DList = [];
+    EditContext editContext;
+    string remarks = string.Empty;
+    DBQueries dQ = new();
+    ValidationMessageStore messageStore;
 
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        {
+            await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+        }
+
+        CropCodeList = await dQ.Fetch_SCH_HIS_Block7A_CodeList();
+
+        NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
+        block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
+        Block7DList = await dQ.Fetch_SCH_HIS_Block7D();
+
+        if (Block7DList.Count == 0)
+        {
+            var tempList = new List<Tbl_Block_7d>();
+            int serial_no = 1;
+            foreach (var crop in CropCodeList)
+            {
+                Tbl_Block_7d obj = new();
+                obj.id = Guid.NewGuid();
+                obj.serial_number = serial_no++;
+                obj.item_1 = crop.serial_number;
+                obj.item_2 = crop.code.ToString();
+                tempList.Add(obj);
+            }
+        }
+
+        
+
+        await LoadData();
+
+        StateHasChanged();
+    }
+
+    async Task LoadData()
+    {
+        // Block_4_5_ErrorMessage = string.Empty;
+        
+        StateHasChanged();
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    {
+        var identifier = FieldIdentifier.Create(field);
+
+        // Try parse
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
+        {
+            value = v;
+        }
+
+        // 1️⃣ Update the actual model field
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(fields, value);
+        fields.item_10_11 = (fields.item_10_1 ?? 0) + (fields.item_10_2 ?? 0) + (fields.item_10_3 ?? 0) + (fields.item_10_4 ?? 0) + (fields.item_10_5 ?? 0) + (fields.item_10_6 ?? 0) + (fields.item_10_7 ?? 0) + (fields.item_10_8 ?? 0) + (fields.item_10_9 ?? 0) + (fields.item_10_10 ?? 0);
+
+        // 2️⃣ Clear previous errors
+        messageStore?.Clear(identifier);
+
+        // 3️⃣ Notify Blazor validation system
+        editContext?.NotifyFieldChanged(identifier);
+    }
+
+    async Task HandleDelete(Guid id)
+    {
+        int item_index = NICFields.FindIndex(l => l.id == id);
+        if (item_index != -1)
+        {
+            NICFields[item_index].is_deleted = true;
+            await dQ.DeleteBlock4_NICList(id);
+            toastService.ShowSuccess("Row deleted successfully!");
+            await LoadData();
+        }
+        else
+        {
+            toastService.ShowError("Not Able to delete row, Please try again!");
+        }
+    }
+
+
+
+    async Task HandleModal(string action = "", Tbl_Block_7c_Q10? data = null)
+    {
+        try
+        {
+            if (action == "UPDATE")
+            {
+                fields = ObjectCloneHelper.CloneTbl7Q10List(data);
+                editContext = new EditContext(fields);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += EditContext_OnFieldChanged;
+                await AddModal.ShowAsync();
+            }
+            else if (action == "CLOSE")
+            {
+                await AddModal.HideAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
+
+    private async Task Save()
+    {
+        try
+        {
+            // messageStore.Clear();
+            // var validation = Validator.Validate(fields);
+
+            // foreach (var error in validation.Errors)
+            // {
+            //     var fieldIdentifier = new FieldIdentifier(fields, error.PropertyName);
+            //     messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            // }
+            // editContext.NotifyValidationStateChanged();
+            // if (validation.IsValid)
+            // {
+            //     int saved = await dQ.Save_SCH_HIS_Block7_Q10_List(fields) ?? 0;
+            //     if (saved > 0)
+            //     {
+            //         toastService.ShowSuccess("Saved successfully");
+            //         await AddModal.HideAsync();
+            //         await LoadData();
+            //     }
+            //     else
+            //     {
+            //         toastService.ShowError("Unable to save the data");
+            //     }
+            // }
+            // else
+            // {
+            //     toastService.ShowError("Please resolve the errors");
+            //     return;
+            // }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private void Next()
+    {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
+            return;
+        }
+        if (NICFields.Count == 0)
+        {
+            toastService.ShowError("Need to add atleast one entry before proceeding");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
+        }
+    }
 }

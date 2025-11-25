@@ -125,6 +125,8 @@
                     block_0_1.approximate_population_su = (int)calc;
                     int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
                     block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
+                    block_0_1.number_of_sub_division_of_su_to_be_formed = block_4.number_of_sub_division_of_su_to_be_formed;
+                    block_0_1.sample_su_number = selected_su?.serial_number;
                 }
                 else
                 {
@@ -200,7 +202,7 @@
         var update_block_4 = await Queries.SaveBlock4(block_4);
         if (update.GetValueOrDefault() != 0)
         {
-            if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)
+            if (block_4.number_of_sub_division_of_su_to_be_formed > 1)
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
             else
             {
