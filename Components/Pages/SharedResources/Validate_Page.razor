@@ -15,7 +15,7 @@
     />
     <div class="d-flex align-items-center alert-info-popup mb-3">
         <div class="outerCircle outerWarning">
-            <div class="innerCircle innerWarning"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="innerCircle innerWarning"><i class="fi fi-rr-triangle-warning"></i></div>
         </div>
         <div class="ms-2 text-start">
             <h5 class="text-dark fw-bold fs-16 mb-1">@((ParentWarning?.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).Count() ?? 0)) Warnings Found</h5>
@@ -44,235 +44,256 @@
             3 => "dangerWrap",
             _ => ""
         };
+        var buttonClass = top.warning_status switch
+        {
+            1 => "warningButton",
+            2 => "acceptedButton",
+            3 => "dangerButton",
+            _ => "defaultButton"
+        };
+
         <div class="card discussion-item custom-badge @wrapClass mb-4">
             <div class="py-2 card-header">
                 <div class="mb-0 card-title h5">Warning</div>
             </div>
-            <div class="card-header bg-transparent p-3 pb-0">
-                <div class="d-flex">
-                    <div class="user-panel d-flex align-items-center"> 
-                        <div class="image avatar-latter color1 ms-0">
-                            @(new string(top?.user_name?.Trim().Where(char.IsLetter).Take(2).ToArray()))
-                        </div>
-                        <div class="info">
-                            <strong class="d-block" style="line-height: 12px;">@(top.user_name)</strong>
-                            <small>@(common.GetUserRoleName(top.role_code))</small> 
-                        </div> 
-                    </div>
-                    <div class="ms-auto">
-                        <ul class="stats other-info">
-                             <li>
-                                @* <a onclick="@(() =>NavigateWarning(top) )"><i class="fi fi-rr-eye"></i></a> *@
-                                @*<h4 class="mb-0">@(top?.serial_number)</h4>*@                          
-                            </li> 
-                            <li class="d-flex align-items-center">
-                                <i class="fi fi-rr-calendar"></i>
-                                <h4 class="mb-0">@(top?.created_on?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <h2>
-                    <span class="sl-no-label">
-                        <label>@(top?.serial_number)</label>
-                        <small>SL No.</small>
-                    </span>
-                    <span class="title-dis ps-3">@(top?.warning_message)</span>
-                </h2>
-                <hr />
-                <div class="row stats other-info">
-                    @* <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">SSS</h3>
-                            <p class="text-danger mb-0">
-                               
-                            </p>
-                        </div>
-                    </div> *@
-                    <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">HHD No.</h3>
-                            <p class="text-success mb-0">
-                                @(top?.hhd_id == 0 ? "-" : top?.hhd_id)
-                            </p>
-                        </div>
-                    </div>
-                    @* <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">Member Srl. No.</h3>
-                            <p class="text-info mb-0">
-                                3
-                            </p>
-                        </div>
-                    </div> *@
-                    <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">Block</h3>
-                            <p class="text-warning mb-0">
-                                @(top?.block)
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">Item</h3>
-                            <p class="text-danger mb-0">
-                                @(top?.item_no)
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">Schedule</h3>
-                            <p class="text-success mb-0">
-                                @(top?.schedule)
-                            </p>
-                        </div>
-                    </div>
-                    @* <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">Case Srl. no</h3>
-                            <p class="text-info mb-0">
-                                3
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="list d-flex align-items-center mb-3">
-                            <h3 class="mb-0 me-2">Schedule</h3>
-                            <p class="text-warning mb-0">
-                                21.1
-                            </p>
-                        </div>
-                    </div> *@
-                </div>
-                @* @if (ChildWarning != null && ChildWarning.Count > 0)
-                {
-                    @foreach (var Child in ChildWarning.OrderBy(x=> x?.created_on))
-                    {
-                        @if (Child?.parent_comment_id == top?.id)
-                        {
-                            <div class="card-header border-top ps-5 pe-0 bg-transparent">
-                                <div class="d-flex">
-                                    <div class="user-panel d-flex align-items-center custom-badge">
-                                        <div class="image avatar-latter color2 me-0">
-                                            @(new string(Child?.user_name?.Trim().Where(char.IsLetter).Take(2).ToArray()))
-                                        </div>
-                                        <div class="info" style="padding-left:14px;"> 
-                                            <div class="d-flex align-items-center"> 
-                                                <strong class="d-block me-4" style="line-height: 12px;">@(Child?.user_name)</strong>
-                                                <div class="badge badge-outline badge-primary fw-bold">@((Child?.role_code == SessionStorage.user_role) ? "ME" : "")</div>
-                                                @if (Child.warning_status == 4 || Child.warning_status == 2 || Child.warning_status == 5)
-                                                {
-                                                    <div class="badge badge-outline badge-success fw-bold ms-1">ACCEPTED</div>
-                                                }
-                                                else if (Child.warning_status == 3)
-                                                {
-                                                    <div class="badge badge-outline badge-dange fw-bold ms-1">REJECTED</div>
-                                                }
-                                            </div>
-                                            <small>@(common.GetUserRoleName(Child.role_code))</small>
-                                        </div> 
+            <div class="accordion custom-accordian" id="commentAccordian">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <div class="card-header bg-transparent p-3 pb-0">
+                            <div class="d-flex">
+                                <div class="user-panel d-flex align-items-center"> 
+                                    <div class="image avatar-latter color1 ms-0">
+                                        @(new string(top?.user_name?.Trim().Where(char.IsLetter).Take(2).ToArray()))
                                     </div>
-                                    <div class="ms-auto">
-                                        <ul class="stats other-info">
-                                            <li class="d-flex align-items-center">
-                                                <i class="fi fi-rr-calendar"></i>
-                                                <h4 class="mb-0">@(Child?.created_on?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
-                                            </li>
-                                            @* <li class="d-flex">
-                                                <i class="bi bi-pencil"></i>
-                                                <h4 class="mb-0">Edit</h4>
-                                            </li>
-                                        </ul>
+                                    <div class="info">
+                                        <strong class="d-block" style="line-height: 12px;">@(top.user_name)</strong>
+                                        <small>@(common.GetUserRoleName(top.role_code))</small> 
+                                    </div> 
+                                </div>
+                                <div class="ms-auto">
+                                    <ul class="stats other-info">
+                                         <li>
+                                            @* <a onclick="@(() =>NavigateWarning(top) )"><i class="fi fi-rr-eye"></i></a> *@
+                                            @*<h4 class="mb-0">@(top?.serial_number)</h4>*@                          
+                                        </li> 
+                                        <li class="d-flex align-items-center">
+                                            <i class="fi fi-rr-calendar"></i>
+                                            <h4 class="mb-0">@(top?.created_on?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
+                                        </li>
+                                        <li>
+                                            <button class="accordion-button collapsed @buttonClass" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <h2>
+                                <span class="sl-no-label">
+                                    <label>@(top?.serial_number)</label>
+                                    <small>SL No.</small>
+                                </span>
+                                <span class="title-dis ps-3">@(top?.warning_message)</span>
+                            </h2>
+                            <hr />
+                            <div class="row stats other-info">
+                                @* <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">SSS</h3>
+                                        <p class="text-danger mb-0">
+                               
+                                        </p>
+                                    </div>
+                                </div> *@
+                                <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">HHD No.</h3>
+                                        <p class="text-success mb-0">
+                                            @(top?.hhd_id == 0 ? "-" : top?.hhd_id)
+                                        </p>
                                     </div>
                                 </div>
-                                <input type="radio" id="@(Child.id)" Label="Accept"  checked ="@((Child.warning_status == 4 || Child.warning_status ==2 )? true : false)" disabled />
-                                <label class="form-check-label" for="acceptRadio">Accept</label>
-
-                                <input type="radio" id="@(Child.id)" Label="Reject" checked="@((Child.warning_status == 3 )? true : false)" disabled />
-                                <label class="form-check-label" for="rejectRadio">Reject</label>
-
-                                <h2>
-                                    <span class="sl-no-label">
-                                        <label>1</label>
-                                        <small>SL No.</small>
-                                    </span>
-                                    <span class="title-dis ps-3">@(Child?.remarks)</span>
-                                </h2>
+                                @* <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">Member Srl. No.</h3>
+                                        <p class="text-info mb-0">
+                                            3
+                                        </p>
+                                    </div>
+                                </div> *@
+                                <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">Block</h3>
+                                        <p class="text-warning mb-0">
+                                            @(top?.block)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">Item</h3>
+                                        <p class="text-danger mb-0">
+                                            @(top?.item_no)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">Schedule</h3>
+                                        <p class="text-success mb-0">
+                                            @(top?.schedule)
+                                        </p>
+                                    </div>
+                                </div>
+                                @* <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">Case Srl. no</h3>
+                                        <p class="text-info mb-0">
+                                            3
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">Schedule</h3>
+                                        <p class="text-warning mb-0">
+                                            21.1
+                                        </p>
+                                    </div>
+                                </div> *@
                             </div>
-                        }
-                    }
-                }
-             *@
-            </div>
-            <div class="card-header bg-transparent py-4">
-                <form class="d-flex align-items-center">
-                    @if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
-                    {
-                        //<RadioInput Name="EnableNotifications" Label="Accept" @bind-Value="Warning_VM.Is_Accepted" />
-                        // <RadioInput Name="EnableNotifications" Label="Reject" @bind-Value="Warning_VM.IsRejected" />
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id=@($"acceptRadio_{top.id}")
-                                   name="EnableNotifications" @onchange="(() => OnAccept())" />
-                            <label class="form-check-label" for="acceptRadio">Accept</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id=@($"rejectRadio_{top.id}")
-                                   name="EnableNotifications" @onchange="(() => OnReject())" />
-                            <label class="form-check-label" for="rejectRadio">Reject</label>
-                        </div>
-                    }
-                    <div class="form-group me-3 w-100">
-                        <input type="text" class="form-control" placeholder="Enter Remarks" @bind="Warning_VM.warningcoment.remarks" disabled="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO) && top?.warning_status == 4)">
-                    </div>
-                    <NavLink type="submit" class="btn btn-primary" @onclick="(() => Validate(top))">Submit</NavLink>
-                </form>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th>Sl no.</th>
-                                <th>Date</th>
-                                <th>User ID</th>
-                                <th>Accepted/Rejected</th>
-                                <th>Comment</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach(var item in ChildWarning.Where(x => x.parent_comment_id == top.id))
+                            @* @if (ChildWarning != null && ChildWarning.Count > 0)
                             {
-                                <tr>
-                                    <td>@item.serial_number</td>
-                                    <td>@item.created_on</td>
-                                    <td>@item.user_name</td>
-                                    <td>@(item.warning_status == 2 ? "Accepted" : "Rejected")</td>
-                                    <td>@item.remarks</td>
-                                </tr>
+                                @foreach (var Child in ChildWarning.OrderBy(x=> x?.created_on))
+                                {
+                                    @if (Child?.parent_comment_id == top?.id)
+                                    {
+                                        <div class="card-header border-top ps-5 pe-0 bg-transparent">
+                                            <div class="d-flex">
+                                                <div class="user-panel d-flex align-items-center custom-badge">
+                                                    <div class="image avatar-latter color2 me-0">
+                                                        @(new string(Child?.user_name?.Trim().Where(char.IsLetter).Take(2).ToArray()))
+                                                    </div>
+                                                    <div class="info" style="padding-left:14px;"> 
+                                                        <div class="d-flex align-items-center"> 
+                                                            <strong class="d-block me-4" style="line-height: 12px;">@(Child?.user_name)</strong>
+                                                            <div class="badge badge-outline badge-primary fw-bold">@((Child?.role_code == SessionStorage.user_role) ? "ME" : "")</div>
+                                                            @if (Child.warning_status == 4 || Child.warning_status == 2 || Child.warning_status == 5)
+                                                            {
+                                                                <div class="badge badge-outline badge-success fw-bold ms-1">ACCEPTED</div>
+                                                            }
+                                                            else if (Child.warning_status == 3)
+                                                            {
+                                                                <div class="badge badge-outline badge-dange fw-bold ms-1">REJECTED</div>
+                                                            }
+                                                        </div>
+                                                        <small>@(common.GetUserRoleName(Child.role_code))</small>
+                                                    </div> 
+                                                </div>
+                                                <div class="ms-auto">
+                                                    <ul class="stats other-info">
+                                                        <li class="d-flex align-items-center">
+                                                            <i class="fi fi-rr-calendar"></i>
+                                                            <h4 class="mb-0">@(Child?.created_on?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
+                                                        </li>
+                                                        @* <li class="d-flex">
+                                                            <i class="bi bi-pencil"></i>
+                                                            <h4 class="mb-0">Edit</h4>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <input type="radio" id="@(Child.id)" Label="Accept"  checked ="@((Child.warning_status == 4 || Child.warning_status ==2 )? true : false)" disabled />
+                                            <label class="form-check-label" for="acceptRadio">Accept</label>
+
+                                            <input type="radio" id="@(Child.id)" Label="Reject" checked="@((Child.warning_status == 3 )? true : false)" disabled />
+                                            <label class="form-check-label" for="rejectRadio">Reject</label>
+
+                                            <h2>
+                                                <span class="sl-no-label">
+                                                    <label>1</label>
+                                                    <small>SL No.</small>
+                                                </span>
+                                                <span class="title-dis ps-3">@(Child?.remarks)</span>
+                                            </h2>
+                                        </div>
+                                    }
+                                }
                             }
-                            @* <tr>
-                                <td>1</td>
-                                <td>19 Nov. 2025/11:24:20</td>
-                                <td>ENM.SML.24</td>
-                                <td>
-                                    <div class="badge badge-outline badge-success fw-bold ms-1">ACCEPTED</div>
-                                </td>
-                                <td>okASDASDsa</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>19 Nov. 2025/11:24:20</td>
-                                <td>ENM.SML.24</td>
-                                <td>
-                                    <div class="badge badge-outline badge-danger fw-bold ms-1">REJECTED</div>
-                                </td>
-                                <td>okASDASDsa</td>
-                            </tr> *@
-                        </tbody>
-                    </table>
+                         *@
+                        </div>
+                    </div>
+                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#commentAccordian">
+                        <div class="accordion-body p-0">
+                            <div class="card-header bg-transparent py-4">
+                                <form class="d-flex align-items-center">
+                                    @if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+                                    {
+                                        //<RadioInput Name="EnableNotifications" Label="Accept" @bind-Value="Warning_VM.Is_Accepted" />
+                                        // <RadioInput Name="EnableNotifications" Label="Reject" @bind-Value="Warning_VM.IsRejected" />
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id=@($"acceptRadio_{top.id}")
+                                                   name="EnableNotifications" @onchange="(() => OnAccept())" />
+                                            <label class="form-check-label" for="acceptRadio">Accept</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id=@($"rejectRadio_{top.id}")
+                                                   name="EnableNotifications" @onchange="(() => OnReject())" />
+                                            <label class="form-check-label" for="rejectRadio">Reject</label>
+                                        </div>
+                                    }
+                                    <div class="form-group me-3 w-100">
+                                        <input type="text" class="form-control" placeholder="Enter Remarks" @bind="Warning_VM.warningcoment.remarks" disabled="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO) && top?.warning_status == 4)">
+                                    </div>
+                                    <NavLink type="submit" class="btn btn-primary" @onclick="(() => Validate(top))">Submit</NavLink>
+                                </form>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th style="min-width: 50px;">Sl no.</th>
+                                                <th style="min-width: 70px;">Date</th>
+                                                <th style="min-width: 100px;">User ID</th>
+                                                <th style="min-width: 90px;">Status</th>
+                                                <th>Comment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach(var item in ChildWarning.Where(x => x.parent_comment_id == top.id))
+                                            {
+                                                <tr>
+                                                    <td>@item.serial_number</td>
+                                                    <td>@item.created_on</td>
+                                                    <td>@item.user_name</td>
+                                                    <td>@(item.warning_status == 2 ? "Accepted" : "Rejected")</td>
+                                                    <td>@item.remarks</td>
+                                                </tr>
+                                            }
+                                            @* <tr>
+                                                <td>1</td>
+                                                <td>19 Nov. 2025/11:24:20</td>
+                                                <td>ENM.SML.24</td>
+                                                <td>
+                                                    <div class="badge badge-outline badge-success fw-bold ms-1">ACCEPTED</div>
+                                                </td>
+                                                <td>okASDASDsa</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>19 Nov. 2025/11:24:20</td>
+                                                <td>ENM.SML.24</td>
+                                                <td>
+                                                    <div class="badge badge-outline badge-danger fw-bold ms-1">REJECTED</div>
+                                                </td>
+                                                <td>okASDASDsa</td>
+                                            </tr> *@
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
