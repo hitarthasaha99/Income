@@ -191,6 +191,7 @@ namespace Income.Viewmodels.SCH0_0
                         }
                         tbl_Sch_0_0_Block_2_2 = list;
                         AllowSelection = false;
+                        SessionStorage.hamlet_selection_done = true;
                         OnPropertyChanged(nameof(tbl_Sch_0_0_Block_2_2));
                         NotifyUiUpdate?.Invoke();
                     }

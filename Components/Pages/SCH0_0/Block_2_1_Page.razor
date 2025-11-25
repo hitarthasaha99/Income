@@ -152,6 +152,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        //NavigationManager.LocationChanged += Nav_LocationChanged;
         is_sel = SessionStorage.hamlet_selection_done;
         block_2_1_VM.NotifyUiUpdate += StateHasChanged;
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
@@ -165,6 +166,19 @@
         block_0_1 = await sch_0_0_Queries.FetchBlock1();
         remarks = block_0_1?.remarks_block_2_1;
         StateHasChanged();
+    }
+
+    private async void Nav_LocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        if (e.IsNavigationIntercepted == false)
+        {
+            await OnInitializedAsync(); // replace with your initialization logic
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= Nav_LocationChanged;
     }
 
     private void ResetSerialNumbers()

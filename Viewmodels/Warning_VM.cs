@@ -13,12 +13,12 @@ namespace Income.Viewmodels
         public List<Tbl_Warning> WarningList = [];
 
         public List<Tbl_Warning> _tempWarnings = [];
-        public void AddWarning(string warningMsg, string schedule, string blockNumber, string item)
+        public void AddWarning(string warningMsg, string schedule, string blockNumber, string item, int hhdNo = 0)
         {
             Tbl_Warning tbl_Warning = new();
             tbl_Warning.block = blockNumber;
             tbl_Warning.fsu_id = SessionStorage.SelectedFSUId;
-            tbl_Warning.hhd_id = SessionStorage.selected_hhd_id;
+            tbl_Warning.hhd_id = hhdNo == 0 ? SessionStorage.selected_hhd_id : hhdNo;
             tbl_Warning.item_no = item;
             tbl_Warning.warning_status = 1;
             tbl_Warning.role_code = SessionStorage.user_role;
