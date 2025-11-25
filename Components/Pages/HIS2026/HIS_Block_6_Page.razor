@@ -496,7 +496,7 @@
     {
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            NavigationManager.NavigateTo("dashboard/his/block_7");
+            NavigationManager.NavigateTo("dashboard/his/block_7a");
             return;
         }
         else
@@ -506,7 +506,7 @@
                 toastService.ShowError("Please save/update details for all entries before proceeding");
                 return;
             }
-            NavigationManager.NavigateTo("/dashboard/his/block_7");
+            NavigationManager.NavigateTo("/dashboard/his/block_7a");
         }
     }
 }

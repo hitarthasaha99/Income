@@ -50,72 +50,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>To be populated from the responses of Q7.1 (column 2)</td>
-                            <td>
-                                <select class="form-select form-select-sm">
-                                    <option>individually operated -1</option>
-                                    <option>jointly operated with other household(s) -2</option>
-                                </select>
-                            </td>
-                            <td><input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" /></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Animal husbandry</td>
-                            <td>
-                                <select class="form-select form-select-sm">
-                                    <option>individually operated -1</option>
-                                    <option>jointly operated with other household(s) -2</option>
-                                </select>
-                            </td>
-                            <td><input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" /></td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Fisheries</td>
-                            <td>
-                                <select class="form-select form-select-sm">
-                                    <option>individually operated -1</option>
-                                    <option>jointly operated with other household(s) -2</option>
-                                </select>
-                            </td>
-                            <td><input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" /></td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Agroforestry activity</td>
-                            <td>
-                                <select class="form-select form-select-sm">
-                                    <option>individually operated -1</option>
-                                    <option>jointly operated with other household(s) -2</option>
-                                </select>
-                            </td>
-                            <td><input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" /></td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>Others (bee keeping, sericulture, lac culture, ancillary etc.)</td>
-                            <td>
-                                <select class="form-select form-select-sm">
-                                    <option>individually operated -1</option>
-                                    <option>jointly operated with other household(s) -2</option>
-                                </select>
-                            </td>
-                            <td><input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" /></td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>To be populated from the responses of Q7.9 (column 2) </td>
-                            <td>
-                                <select class="form-select form-select-sm">
-                                    <option>individually operated -1</option>
-                                    <option>jointly operated with other household(s) -2</option>
-                                </select>
-                            </td>
-                            <td><input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(this.value + event.key)" /></td>
-                        </tr>
+                        @if (Block7DList != null)
+                        {
+                            foreach(var item in Block7DList)
+                            {
+                                <tr></tr>
+                            }
+                        }
                     </tbody>
                 </table>
             </div>
@@ -332,13 +273,13 @@
             NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
             return;
         }
-        if (NICFields.Count == 0)
+        if (Block7DList.Any(x => !x.isUpdated.GetValueOrDefault()))
         {
-            toastService.ShowError("Need to add atleast one entry before proceeding");
+            toastService.ShowError("Need to  atleast one entry before proceeding");
         }
         else
         {
-            NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
+            NavigationManager.NavigateTo("/dashboard/his/block_8a");
         }
     }
 }

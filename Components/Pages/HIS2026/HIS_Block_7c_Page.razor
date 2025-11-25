@@ -106,7 +106,7 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-outline-primary">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-outline-primary" @onclick=@(() => Next())>Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
             </div>
         </div>
 
@@ -204,7 +204,6 @@
     async void GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
-        return;
     }
 
     protected override async Task OnInitializedAsync()
@@ -396,7 +395,6 @@
         if (Q9Needed && NICFields.Count == 0)
         {
             toastService.ShowError("Need to add atleast one entry before proceeding");
-            return;
         }
         else
         {

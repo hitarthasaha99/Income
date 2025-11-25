@@ -23,5 +23,6 @@ namespace Income.Database.Models.HIS_2026
         public string? item_3 { get; set; }
         //% shareholding
         public decimal? item_4 { get; set; }
+        public bool? isUpdated { get; set; }
     }
 }

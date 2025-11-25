@@ -618,7 +618,7 @@
             var existingListingData = await SCH_0_0_Queries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
             var sss_selection_done = existingListingData.Any(x => x.SSS != 0);
 
-            if (sss_selection_done == false)
+            if (!sss_selection_done)
             {
                 toastService.ShowError("Please calculate SSS before doing selection, Please try again!");
                 return;
