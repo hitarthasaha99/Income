@@ -93,8 +93,11 @@
                                 <td>@member.item_9</td>
                                 <td>@member.item_10</td>
                                 <td>@member.item_11</td>
-                                <td>@(member.item_12 == 1 ? "Yes" : "No")</td>
-                                <td class="d-flex align-items-center">
+                                <td>
+                                    @(member.item_12 == 1 ? "yes" :
+                                                                    member.item_12 == 2 ? "no" : "")
+                            </td>
+                            <td class="d-flex align-items-center">
                                     <button class="btn btn-link me-3 fs-6"
                                             hidden="@SessionStorage.FSU_Submitted"
                                             @onclick="@(() => HandleModal("UPDATE", member))">
@@ -248,13 +251,13 @@
                                         <label class="form-label fw-bold d-flex align-items-start">
                                             <span class="me-2">6.</span> Marital status (code)
                                         </label>
-                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_6" @onchange="clearItem_6">
+                                        <select class="form-select form-select-sm" value="@newMember.gender" @onchange="clearItem_6">
                                             <option value="">-Select-</option>
                                             <option value="1">never married – 1</option>
                                             <option value="2">currently married (including living together) – 2</option>
                                             <option value="3">widowed – 3</option>
                                             <option value="4">divorced/separated – 4</option>
-                                        </InputSelect>
+                                        </select>
                                         <ValidationMessage For="@(() => newMember.item_6)" />
                                         @if (!string.IsNullOrEmpty(maritalStatusWarning))
                                         {
@@ -267,7 +270,7 @@
                                         <label class="form-label fw-bold d-flex align-items-start">
                                             <span class="me-2">7.</span> Highest level of complete education (code)
                                         </label>
-                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_7" @onchange="ClearItem7">
+                                        <select class="form-select form-select-sm" value="@newMember.item_7" @onchange="ClearItem7">
                                             <option value="">-Select-</option>
                                             <option value="1">not literate (i.e. not able to read or write a simple message with understanding in any language) -01 </option>
                                             <option value="2">literate without formal schooling (like NFEC, AEC, TLC, literate without any schooling, etc.)-02 </option>
@@ -279,7 +282,7 @@
                                             <option value="8">diploma /certificate course - 08 </option>
                                             <option value="10">graduate -10 </option>
                                             <option value="11">postgraduate and above - 11 </option>
-                                        </InputSelect>
+                                        </select>
                                         <ValidationMessage For="@(() => newMember.item_7)" />
                                         @if (!string.IsNullOrEmpty(item_7Warning))
                                         {
@@ -295,7 +298,7 @@
                                             <label class="form-label fw-bold d-flex align-items-start">
                                                 <span class="me-2">8.</span> Primary
                                             </label>
-                                            <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_8" @onchange="ClearItem8">
+                                            <select class="form-select form-select-sm" value="@newMember.item_8" @onchange="ClearItem8">
                                                 <option value="">-Select-</option>
                                                 <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                                 <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
@@ -312,12 +315,12 @@
                                                 <option value="13">earning from interest - 13 </option>
                                                 <option value="14">unfit for work due to disability or illness – 14 </option>
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                            </InputSelect>
+                                            </select>
                                             <ValidationMessage For="@(() => newMember.item_8)" />
                                           
                                             @if (!string.IsNullOrEmpty(item_8Warning))
                                             {
-                                                <div class="text-success">@item_8Warning</div>
+                                                <div class="text-success" role="alert">@item_8Warning</div>
                                             }
                                         </div>
                                         @* Item9 *@
@@ -325,7 +328,7 @@
                                             <label class="form-label fw-bold d-flex align-items-start">
                                                 <span class="me-2">9.</span> Secondary
                                             </label>
-                                            <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_9" @onchange="ClearItem9">
+                                            <select class="form-select form-select-sm" value="@newMember.item_9" @onchange="ClearItem9">
                                                 <option value="">-Select-</option>
                                                 <!-- Same options as above -->
                                                 <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
@@ -343,12 +346,12 @@
                                                 <option value="13">earning from interest - 13 </option>
                                                 <option value="14">unfit for work due to disability or illness – 14 </option>
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                            </InputSelect>
+                                            </select>
                                             <ValidationMessage For="@(() => newMember.item_9)" />
 
                                             @if (!string.IsNullOrEmpty(item_9Warning))
                                             {
-                                                <div class="text-success">@item_9Warning</div>
+                                                <div class="text-success" role="alert">@item_9Warning</div>
                                             }
                                         </div>
                                     </div>
@@ -360,7 +363,7 @@
                                             <label class="form-label fw-bold d-flex align-items-start">
                                                 <span class="me-2">10.</span> Primary
                                             </label>
-                                            <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_10" @onchange="ClearItem10">
+                                            <select class="form-select form-select-sm" value="@newMember.item_10" @onchange="ClearItem10">
                                                 <option value="">-Select-</option>
                                                 <!-- Same options as above for primary -->
                                                 <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
@@ -378,12 +381,12 @@
                                                 <option value="13">earning from interest - 13 </option>
                                                 <option value="14">unfit for work due to disability or illness – 14 </option>
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                            </InputSelect>
+                                            </select>
                                             <ValidationMessage For="@(() => newMember.item_10)" />
                                    
                                             @if (!string.IsNullOrEmpty(item_10Warning))
                                             {
-                                                <div class="text-success">@item_10Warning</div>
+                                                <div class="text-success" role="alert">@item_10Warning</div>
                                             }
                                         </div>
                                         @* Iter11 *@
@@ -391,7 +394,7 @@
                                             <label class="form-label fw-bold d-flex align-items-start">
                                                 <span class="me-2">11.</span> Secondary
                                             </label>
-                                            <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_11" @onchange="ClearItem11">
+                                            <select class="form-select form-select-sm" value="@newMember.item_11" @onchange="ClearItem11">
                                                 <option value="">-Select-</option>
                                                 <!-- Same options as above for secondary -->
                                                 <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
@@ -409,7 +412,7 @@
                                                 <option value="13">earning from interest - 13 </option>
                                                 <option value="14">unfit for work due to disability or illness – 14 </option>
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                            </InputSelect>
+                                            </select>
                                             <ValidationMessage For="@(() => newMember.item_11)" />
                                      
                                             @if (!string.IsNullOrEmpty(item_11Warning))
@@ -418,7 +421,7 @@
                                             }
                                             @if (!string.IsNullOrEmpty(singleUserWarning))
                                             {
-                                                <div class="text-success">@item_11Warning</div>
+                                                <div class="text-success" role="alert">@item_11Warning</div>
                                             }
                                         </div>
                                     </div>
@@ -428,7 +431,7 @@
                                         <label class="form-label fw-bold d-flex align-items-start">
                                             <span class="me-2">12.</span> whether a beneficiary of any Central/ State Government social assistance scheme as on date of survey (yes-1/ no-2)
                                         </label>
-                                        <InputSelect class="form-select form-select-sm" @bind-Value="newMember.item_12" @oninput="ClearItem12Error" disabled="@isItem12Disabled">
+                                        <InputSelect class="form-select form-select-sm" @bind-value="newMember.item_12" @onchange="ClearItem12" disabled="@isItem12Disabled">
                                             <option value="">-Select-</option>
                                             <option value="1">yes-1</option>
                                             <option value="2">no-2</option>
@@ -547,8 +550,13 @@
 
         if (string.IsNullOrEmpty(value))
             newMember.item_3 = null;
+
         else
             newMember.item_3 = int.Parse(value);
+        //check again if change Relation to head change
+        CheckGenderWarning();
+        checkAgeReletionWarning();
+
     }
 
     private void ageClear(ChangeEventArgs e)
@@ -567,6 +575,12 @@
         checkSingleUser();
         //Call method
         handleCol_12();
+        checkItem_6Warning();
+        CheckItem7Warning();
+        CheckItem8Warning();
+        CheckItem9Warning();
+        CheckItem10Warning();
+        CheckItem11Warning();
     }
 
 
@@ -589,6 +603,7 @@
 
     private void ClearItem7(ChangeEventArgs e)
     {
+        clearItem7Error();
         item_7Error = null;
 
         if (int.TryParse(e.Value?.ToString(), out int v))
@@ -600,36 +615,79 @@
     }
 
 
-    private void ClearItem8()
+    private void ClearItem8(ChangeEventArgs e)
     {
         ClearItem8Error();
-        // CheckItem8Warning();
+        item_8Error = null;
+
+        if (int.TryParse(e.Value?.ToString(), out int v))
+            newMember.item_8 = v;
+        else
+            newMember.item_8 = null;
+
+        CheckItem8Warning();
         StateHasChanged();
     }
-    private void ClearItem9()
+    private void ClearItem9(ChangeEventArgs e)
     {
         ClearItem9Error();
-        // CheckItem9Warning();
+        item_9Error = null;
+
+        if (int.TryParse(e.Value?.ToString(), out int v))
+            newMember.item_9 = v;
+        else
+            newMember.item_9 = null;
+        CheckItem9Warning();
         StateHasChanged();
     }
-    private void ClearItem10()
+    private void ClearItem10( ChangeEventArgs e)
     {
         ClearItem10Error();
-        // CheckItem10Warning();
+        item_10Error = null;
+
+        if (int.TryParse(e.Value?.ToString(), out int v))
+            newMember.item_10 = v;
+        else
+            newMember.item_10 = null;
+        CheckItem10Warning();
         StateHasChanged();
     }
-    private void ClearItem11()
+    private void ClearItem11(ChangeEventArgs e)
     {
         ClearItem11Error();
-        // CheckItem11Warning();
+        item_11Error = null;
+
+        if (int.TryParse(e.Value?.ToString(), out int v))
+            newMember.item_11 = v;
+        else
+            newMember.item_11 = null;
+        CheckItem11Warning();
         StateHasChanged();
     }
+    private void ClearItem12(ChangeEventArgs e)
+    {
+        // Clear validation error
+        ClearItem12Error();
+        item_12Error = null;
+
+        // Parse user input
+        if (int.TryParse(e.Value?.ToString(), out int v))
+            newMember.item_12 = v;
+        else
+            newMember.item_12 = null;
+
+        // Run your logic (enable/disable + clear when age < 15)
+        handleCol_12();
+
+        // Refresh UI
+        StateHasChanged();
+    }
+
 
 
     //if age > 15 then Enable col_12
     private void handleCol_12()
     {
-        // Enable when age >= 15, otherwise disable
         if (newMember.age.HasValue && newMember.age.Value >= 15)
         {
             isItem12Disabled = false;
@@ -637,11 +695,10 @@
         else
         {
             isItem12Disabled = true;
-            newMember.item_12 = null; // optionally clear selection
+            newMember.item_12 = null;
         }
     }
 
-    //Validator Method
 
 
     //Gender Warning..............................................
@@ -655,7 +712,7 @@
         {
             if (spouse != null && spouse.item_3 == 2 && spouse.gender.HasValue && spouse.gender == head.gender)
             {
-                genderWarning = "W: Gender of head and spouse should not be the same. Please verify.";
+                genderWarning = "W005(ii): Please check the entries recorded against col. 4 and col. 3 corresponding to members recorded at Serial nos (col. 1) 1 & 2 ";
                 StateHasChanged();
                 return;
             }
@@ -712,9 +769,9 @@
         // -------------------------------------------------------------
         if (newMember.item_3 is 3 or 4 or 5 or 6)
         {
-            if (memberAge >= headAge.Value)
+            if (memberAge > headAge.Value)
             {
-                ageRelationWarning = "W006(ii): Age must be less than Head of Household.";
+                ageRelationWarning = "W006(ii): Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
@@ -727,7 +784,7 @@
         {
             if (memberAge <= headAge.Value)
             {
-                ageRelationWarning = "W006(iii): Age must be more than Head of Household.";
+                ageRelationWarning = "W006(iii): Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
@@ -740,14 +797,14 @@
         {
             if (Math.Abs(memberAge - headAge.Value) < 15)
             {
-                ageRelationWarning = "W006(iv): Age difference with Head must be ≥ 15 years.";
+                ageRelationWarning = "W006(iv): Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
 
             if (spouseAge != null && Math.Abs(memberAge - spouseAge.Value) < 15)
             {
-                ageRelationWarning = "W006(iv): Age difference with Spouse must be ≥ 15 years.";
+                ageRelationWarning = "W006(iv): Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
@@ -760,14 +817,14 @@
         {
             if (Math.Abs(memberAge - headAge.Value) < 32)
             {
-                ageRelationWarning = "W006(v): Age difference with Head must be ≥ 32 years.";
+                ageRelationWarning = "W006(v): Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
 
             if (spouseAge != null && Math.Abs(memberAge - spouseAge.Value) < 32)
             {
-                ageRelationWarning = "W006(v): Age difference with Spouse must be ≥ 32 years.";
+                ageRelationWarning = "W006(v): Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
@@ -780,14 +837,14 @@
         {
             if (Math.Abs(memberAge - headAge.Value) < 15)
             {
-                ageRelationWarning = "W006(vi): Age difference with Head must be ≥ 15 years.";
+                ageRelationWarning = "W006(vi): Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
 
             if (spouseAge != null && Math.Abs(memberAge - spouseAge.Value) < 15)
             {
-                ageRelationWarning = "W006(vi): Age difference with Spouse must be ≥ 15 years.";
+                ageRelationWarning = "W006(vi):Please check the age (col. 5) & corresponding entry recorded against col. 3";
                 StateHasChanged();
                 return;
             }
@@ -807,7 +864,7 @@
             // Rule: If household size is 1, age must be ≥ 6
             if (newMember.age.Value < 6)
             {
-                singleUserWarning = "W006(ii): For a single-member household, age must be ≥ 6 years.";
+                singleUserWarning = "W006(vii): Please check the entry";
             }
         }
 
@@ -835,7 +892,7 @@
         StateHasChanged();
     }
 
-    //Education warning
+    //Education warning............................................................
 
     private void CheckItem7Warning()
     {
@@ -903,6 +960,84 @@
         }
     }
 
+    //Item 8 Warning...................................
+    private void CheckItem8Warning()
+    {
+        item_8Warning = null; // Replace with your warning variable for column 8
+
+        if (newMember.item_8 == null || newMember.age == null)
+            return;
+
+        int col8 = newMember.item_8.Value; // Column 8 code
+        int age = newMember.age.Value;
+
+        // Rule: codes 01, 02, 04, 05 in col. 8 must have age >= 10
+        if ((col8 == 1 || col8 == 2 || col8 == 4 || col8 == 5) && age < 10)
+        {
+            item_8Warning = "W008(ii): Please recheck entries recorded against cols. 5 & 8";
+        }
+
+        StateHasChanged();
+    }
+
+    //Item9 Warning...............................
+    private void CheckItem9Warning()
+    {
+        item_9Warning = null; // Replace with your warning variable name for column 9
+
+        if (newMember.item_9 == null || newMember.age == null)
+            return;
+
+        int col9 = newMember.item_9.Value; // Column 9 code
+        int age = newMember.age.Value;
+
+        // Rule: codes 01, 02, 04, 05 in col. 9 must have age >= 10
+        if ((col9 == 1 || col9 == 2 || col9 == 4 || col9 == 5) && age < 10)
+        {
+            item_9Warning = "W009(ii): Please recheck entries recorded against cols. 5 & 9.";
+        }
+
+        StateHasChanged();
+    }
+    //Item 10 Warning.....................
+    private void CheckItem10Warning()
+    {
+        item_10Warning = null; // Your variable for column 10 warning
+
+        if (newMember.item_10 == null || newMember.age == null)
+            return;
+
+        int col10 = newMember.item_10.Value;
+        int age = newMember.age.Value;
+
+        // Codes 01, 02, 04, 05 in col.10 require age >= 10
+        if ((col10 == 1 || col10 == 2 || col10 == 4 || col10 == 5) && age < 10)
+        {
+            item_10Warning = "W008(ii): Please check the entries recorded against Cols. 10 & 5";
+        }
+
+        StateHasChanged();
+    }
+
+    //Item 11 Warning
+    private void CheckItem11Warning()
+    {
+        item_11Warning = null; // Your variable for column 11 warning
+
+        if (newMember.item_11 == null || newMember.age == null)
+            return;
+
+        int col11 = newMember.item_11.Value;
+        int age = newMember.age.Value;
+
+        // Codes 01, 02, 04, 05 in col.11 require age >= 10
+        if ((col11 == 1 || col11 == 2 || col11 == 4 || col11 == 5) && age < 10)
+        {
+            item_11Warning = "W008(ii): Please check the entries recorded against Cols. 11 & 5";
+        }
+
+        StateHasChanged();
+    }
 
 
 
@@ -963,7 +1098,7 @@
            FieldIdentifier.Create(() => newMember.item_12));
     }
 
-    private void ClearErrors()
+    private void clearErrors()
     {
         // Clear all previous errors before validation
         nameError = null;
@@ -979,6 +1114,8 @@
         item_12Error = null;
         genderWarning = null;
         ageWarning = null;
+        ageRelationWarning = null;
+        singleUserWarning = null;
         maritalStatusWarning = null;
         item_7Warning = null;
         item_8Warning = null;
@@ -1031,6 +1168,7 @@
         {
             Console.WriteLine(ex.Message);
         }
+        clearErrors();
 
     }
 
@@ -1091,7 +1229,7 @@
     private async Task HandleAddMember()
     {
 
-        //Validate();
+        clearErrors();
         messageStore.Clear();
         var errors = Validator.Validate(newMember);
         foreach (var error in errors.Errors)
