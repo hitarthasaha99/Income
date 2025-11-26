@@ -9,14 +9,14 @@
 @inject IJSRuntime JS
 
 
-<div class="my-2">
+<div class="main-content">
 	<CommonContentHeader SelectedFsuId="@SelectedFsuId"
 						 survey_time="@survey_time"
 						 page_name="/dashboard/fsulist"
 						 ShowVisitedBlock="ShowVisitedBlock" />
-	<div class="card card-style2">
-		<div class="card-header d-flex align-items-center">
-			<h3 class="card-title m-0 d-flex align-items-center">
+	<div class="card custom-card">
+		<div class="card-header">
+			<h3 class="card-title">
 				Selected Sampling Units list
 			</h3>
 			@* <button class="btn btn-sm btn-primary ms-auto" @onclick="HandlePrint">
@@ -25,7 +25,7 @@
 		</div>
 		<div class="card-body p-0">
 			<div class="table-responsive">
-				<table class="table table-striped table-bordered custom-badge mb-0">
+				<table class="table table-bordered table-striped mb-0 custom-badge align-middle">
 					<thead>
 						<tr>
 							<th>Action</th>
@@ -50,14 +50,14 @@
 								{
 									<tr>
 										<td>
-											<div class="d-flex">
+											<div class="d-flex align-items-center">
 												@if (item.status != "SUBSTITUTED")
 												{
 													@if (item.isSelected == true)
 													{
-														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="me-3 text-muted"><i class="bi bi-arrow-right"></i></NavLink>
+														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="me-3"><i class="fi fi-rr-arrow-right"></i></NavLink>
 													}
-													<NavLink @onclick="@(() => HandleComments(item))" class="me-3 text-muted"><i class="bi bi-chat-left-text"></i></NavLink>
+													<NavLink @onclick="@(() => HandleComments(item))"><i class="fi fi-rr-comment-alt"></i></NavLink>
 												}
 
 											</div>
@@ -66,7 +66,13 @@
 										{
 											@if (item.status != "SUBSTITUTED" && item.hhdStatus != 32)
 											{
-												<td><input class="form-check-input" type="checkbox" @onchange="@((ChangeEventArgs args) => HandleCheckedChange(args, item))"></td>
+												<td>
+													<div class="siteCustomCheckbox">
+														<label>
+															<input type="checkbox" @onchange="@((ChangeEventArgs args) => HandleCheckedChange(args, item))">
+														</label>
+													</div>
+												</td>
 											}
 											else
 											{
@@ -81,39 +87,45 @@
 										<td>@item.Block_7_2</td>
 										<td>@item.Block_7_4</td>
 										<td>@item.Block_7_5</td>
-										<td class="custom-badge">
+										<td>
 											<span class="@($"badge badge-outline badge-{commonFunction.ReturnStatusColor(item.status == "SUBSTITUTED" ? commonList?.LOOKUP_CONST_STATUS_LIST?.FirstOrDefault(o => o.id == 100)?.title : commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus) != null ? commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus).title ?? "" : "")}")">
 												@((item.status == "SUBSTITUTED") ? commonList?.LOOKUP_CONST_STATUS_LIST?.FirstOrDefault(o => o.id == 100)?.title : ((commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus) != null ? commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus).title ?? "" : "")))
 											</span>
 										</td>
-										<td class="custom-badge">
+										<td>
 											<div class="badge badge-warning">@(SetStatus(item.status))</div>
 										</td>
 										<td>@(item.OriginalHouseholdID)</td>
 										<td>
-											<NavLink class="btn btn-outline-primary me-2" hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO && item.hhdStatus == 12) ? false : true)">Download<i class="bi bi-download ms-1"></i></NavLink>
+											<NavLink class="btn btn-outline-primary" hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO && item.hhdStatus == 12) ? false : true)">Download <i class="fi fi-rr-download"></i></NavLink>
 										</td>
 									</tr>
 								}
 							}
 						}
+					
 					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
-	<div class="d-flex justify-content-between mb-3">
-		<div class="d-flex">
-			<NavLink class="btn btn-outline-primary me-2" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</NavLink>
-			@* <NavLink class="btn btn-primary me-2" @onclick="HandleValidate">Validate<i class="bi bi-check-circle-fill ms-1"></i></NavLink> *@
-			@* <NavLink class="btn btn-outline-primary fw-500 disabled">Download<i class="bi bi-download ms-1"></i></NavLink> *@
-		</div>
-		<div class="d-flex">
-			<NavLink class="@((SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO ? "btn btn-outline-primary disabled d-none" : "btn btn-outline-primary"))">Submit to SSO<i class="bi bi-chevron-right ms-1"></i></NavLink>
-		</div>
-	</div>
 </div>
-
+<div class="footer">
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="d-flex">
+				<NavLink class="btn btn-outline-secondary me-2" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</NavLink>
+				@* <NavLink class="btn btn-success me-2" @onclick="HandleValidate">Validate<i class="fi fi-rr-memo-circle-check ms-1"></i></NavLink> *@
+				@* <NavLink class="btn btn-outline-primary disabled">Download<i class="fi fi-rr-download ms-1"></i></NavLink> *@
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="d-flex justify-content-end">
+				<NavLink class="@((SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO ? "btn btn-primary disabled d-none" : "btn btn-primary"))">Submit to SSO<i class="fi fi-rr-arrow-right ms-1"></i></NavLink>
+			</div>
+		</div>
+	</div>	
+</div>
 <script src="js/download.js"></script>
 
 

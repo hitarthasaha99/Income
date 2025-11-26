@@ -116,14 +116,18 @@
             </div>
         </div>
     </div>
-    <!-- Remarks textarea -->
-    <div class="mb-3 px-2">
-        <label for="remarksTextarea" class="form-label">Remarks</label>
-        <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
-    </div>
 </div>
 <!-- 🔹 Footer Navigation (Always visible) -->
 <div class="footer">
+    <!-- Remarks textarea -->
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+        </div> 
+    </div>
     <div class="row">
         <div class="col-sm-6">
             <div class="d-flex">
@@ -143,7 +147,7 @@
 </div>
 
 
-<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Fullscreen="ModalFullscreen.MediumDown">
+<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false"  Fullscreen="ModalFullscreen.MediumDown">
     <HeaderTemplate>
         <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
     </HeaderTemplate>

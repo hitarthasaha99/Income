@@ -13,154 +13,203 @@
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
 
-
-<div class="pb-5">
-
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
-                         survey_time="@survey_time" />
-
-    <div class="card-style2 p-2">
-        <div class="w-100 card-header d-flex justify-content-between">
-            <p class="fs-5 m-0"><span class="text-primary me-2">[4]</span>Household Characteristics</p>
-            <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-outline-primary"><i class="bi bi-chat-left-text me-2"></i>Comment</NavLink>
-        </div>
-        <div class="card-container mt-2">
-            @if (block_4 != null)
-            {
-                <EditForm Model="block_4">
-                    <div class="row card-body">
-
+@if (block_4 != null)
+{
+    <EditForm Model="block_4">
+        <div class="main-content">
+            <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
+                                 survey_time="@survey_time" />
+            <div class="card custom-card">
+                <div class="card-header">
+                    <h3 class="card-title"><span class="text-primary me-2">[4]</span>Household Characteristics</h3>
+                    <div class="card-tools">
+                        <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
+                    </div>
+            
+                </div>
+                <div class="card-header">
+                    <div class="row w-100">
                         <!--4.1-->
-                        <div class="mb-4 col-md-4">
-                            <label class="form-label fw-bold">
-                                <span class="badge bg-primary me-2">1</span>Household Size
-                            </label>
-                            <input type="text" class="form-control" placeholder="" value="@block_4?.item_1" disabled>
-                            @if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
-                            {
-                                <div class="text-success mt-1 fw-bold">
-                                    @Block_4_1_ErrorMessage
-                                </div>
-                            }
-                        </div>
-                        <!--4.2-->
-                        <div class="mb-4 col-md-4">
-                            <label class="form-label fw-bold">
-                                <span class="badge bg-primary me-2">2</span>Social Group
-                            </label>
-                            <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_2" @onchange="item_2_changed">
-                                <option value="">Select</option>
-                                @if (commonList.LOOKUP_CONST_CASTE != null && commonList.LOOKUP_CONST_CASTE.Count > 0)
+                        <div class="col-md-4">
+                            <div>
+                                <label class="form-label">
+                                    <span class="form-badge">1</span>Household Size
+                                </label>
+                                <input type="text" class="form-control" value="@block_4?.item_1" disabled>
+                                @if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
                                 {
-                                    @foreach (var item in commonList.LOOKUP_CONST_CASTE)
-                                    {
-                                        <option value="@item.id">@item.title</option>
-                                    }
-                                }
-                            </select>
-                            @if (!string.IsNullOrEmpty(Block_4_2_ErrorMessage))
-                            {
-                                <small class="text-danger">@Block_4_2_ErrorMessage</small>
-                            }
-                        </div>
-                        <!--4.3-->
-                        <div class="mb-4 col-md-4">
-                            <label class="form-label fw-bold">
-                                <span class="badge bg-primary me-2">3</span>Religion
-                            </label>
-                            <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_3" @onchange="item_3_changed">
-                                <option value="">Select</option>
-                                @if (commonList.LOOKUP_CONST_RELIGION != null && commonList.LOOKUP_CONST_RELIGION.Count > 0)
-                                {
-                                    @foreach (var item in commonList.LOOKUP_CONST_RELIGION)
-                                    {
-                                        <option value="@item.id">@item.title</option>
-                                    }
-                                }
-                            </select>
-                            @if (!string.IsNullOrEmpty(Block_4_3_ErrorMessage))
-                            {
-                                <small class="text-danger">@Block_4_3_ErrorMessage</small>
-                            }
-                        </div>
-
-                        <!-- Divider -->
-                        <div class="col-12">
-                            <hr class="border border-primary border-2 opacity-50 my-3" />
-                        </div>
-
-                        <!--4.4-->
-                        <div class="mb-4 col-12">
-                            <label class="form-label fw-bold"> <span class="badge bg-primary me-2">4</span>Agricultural activities carried out by one or more household members in last 365 days </label>
-                            <div class="table-responsive">
-                                <table class="table table-bordered align-middle text-center">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 50px;">S. No.</th>
-                                            <th class="text-start">Description of Activity</th>
-                                            <th style="width: 80px;">Select</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td class="text-start">Cultivation of crops / fruits / vegetables / spices</td>
-                                            <td> <input type="checkbox" @bind="block_4.item_4_1" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td class="text-start">Cultivation of flowers</td>
-                                            <td> <input type="checkbox" @bind="block_4.item_4_2" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td class="text-start">Animal husbandry</td>
-                                            <td> <input type="checkbox" @bind="block_4.item_4_3" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td class="text-start">Fisheries</td>
-                                            <td> <input type="checkbox" @bind="block_4.item_4_4" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
-                                        </tr>
-                                        <tr>
-                                            <td>5</td>
-                                            <td class="text-start">Agroforestry activity</td>
-                                            <td> <input type="checkbox" @bind="@block_4.item_4_5" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
-                                        </tr>
-                                        <tr>
-                                            <td>6</td>
-                                            <td class="text-start">Others (bee keeping, sericulture, lac culture, ancillary etc.)</td>
-                                            <td> <input type="checkbox" @bind="block_4.item_4_6" class="form-check-input is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" /> </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                @if (!string.IsNullOrEmpty(Block_4_4_ErrorMessage))
-                                {
-                                    <small class="text-danger">@Block_4_4_ErrorMessage</small>
+                                    <div class="form-text text-danger">
+                                        @Block_4_1_ErrorMessage
+                                    </div>
                                 }
                             </div>
                         </div>
-
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
-                        <div class="d-flex">
-                            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
-                            {
-                                <button type="button" class="btn btn-primary me-2 is_sso action" @onclick="@(() => Save())">
-                                    <i class="bi bi-floppy-fill me-1"></i>Save
-                                </button>
-                            }
-                            <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                        <!--4.2-->
+                        <div class="col-md-4">
+                            <div>
+                                <label class="form-label">
+                                    <span class="form-badge">2</span>Social Group
+                                </label>
+                                <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_2" @onchange="item_2_changed">
+                                    <option value="">Select</option>
+                                    @if (commonList.LOOKUP_CONST_CASTE != null && commonList.LOOKUP_CONST_CASTE.Count > 0)
+                                    {
+                                        @foreach (var item in commonList.LOOKUP_CONST_CASTE)
+                                        {
+                                            <option value="@item.id">@item.title</option>
+                                        }
+                                    }
+                                </select>
+                                @if (!string.IsNullOrEmpty(Block_4_2_ErrorMessage))
+                                {
+                                    <div class="form-text text-danger">@Block_4_2_ErrorMessage</div>
+                                }
+                            </div>
+                        </div>
+                        <!--4.3-->
+                        <div class="col-md-4">
+                            <div>
+                                <label class="form-label">
+                                    <span class="form-badge">3</span>Religion
+                                </label>
+                                <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_3" @onchange="item_3_changed">
+                                    <option value="">Select</option>
+                                    @if (commonList.LOOKUP_CONST_RELIGION != null && commonList.LOOKUP_CONST_RELIGION.Count > 0)
+                                    {
+                                        @foreach (var item in commonList.LOOKUP_CONST_RELIGION)
+                                        {
+                                            <option value="@item.id">@item.title</option>
+                                        }
+                                    }
+                                </select>
+                                @if (!string.IsNullOrEmpty(Block_4_3_ErrorMessage))
+                                {
+                                    <div class="form-text text-danger">@Block_4_3_ErrorMessage</div>
+                                }
+                            </div>
                         </div>
                     </div>
-                </EditForm>
-            }
-            
-            
+                </div>
+                <div class="card-body p-0">
+                    <!--4.4-->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th colspan="3" class="text-center">
+                                        <label class="form-label mb-0"> <span class="form-badge">4</span>Agricultural activities carried out by one or more household members in last 365 days </label>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="width:50px;">S. No.</th>
+                                    <th>Description of Activity</th>
+                                    <th style="width: 80px;">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Cultivation of crops / fruits / vegetables / spices</td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" @bind="block_4.item_4_1" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Cultivation of flowers</td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" @bind="block_4.item_4_2" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Animal husbandry</td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" @bind="block_4.item_4_3" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Fisheries</td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" @bind="block_4.item_4_4" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Agroforestry activity</td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" @bind="@block_4.item_4_5" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>Others (bee keeping, sericulture, lac culture, ancillary etc.)</td>
+                                    <td>
+                                        <div class="siteCustomCheckbox">
+                                            <label>
+                                                <input type="checkbox" @bind="block_4.item_4_6" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            @if (!string.IsNullOrEmpty(Block_4_4_ErrorMessage))
+                            {
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            <div class="form-text text-danger">@Block_4_4_ErrorMessage</div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            }
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+        <div class="footer">
+            <div class="row">
+                <div class="col-sm-6">
+                    <button class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-end">
+                        @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                        {
+                            <button type="button" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => Save())">
+                                <i class="fi fi-rr-disk me-1"></i>Save
+                            </button>
+                        }
+                        <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
 
 @code {
     private CommonConfig commonConfig = new CommonConfig();
