@@ -3,6 +3,7 @@ using Income.Database.Models.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
@@ -12,6 +13,11 @@ namespace Income.Services
 {
     public class NetworkService
     {
+        private readonly ILoggingService _loggingService;
+        public NetworkService(ILoggingService loggingService)
+        {
+            _loggingService = loggingService;
+        }
         public async Task<string?> GetAsync(string baseurl, string endpoint)
         {
             try
@@ -24,69 +30,186 @@ namespace Income.Services
             }
             catch (Exception ex)
             {
+                await _loggingService.LogError($"GET request failed: {ex.Message}");
                 return null;
             }
         }
 
-        //public async Task<HttpResponseMessage> PostAsync(string controller, string action, object parameter)
-        //{
-        //    try
-        //    {
-        //        using (var client = new HttpClient())
-        //        {
-        //            client.BaseAddress = new Uri(Constants.PostAddress);
-        //            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", SessionDetail.Token);
-        //            client.DefaultRequestHeaders.Accept.Clear();
-        //            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //            client.Timeout = TimeSpan.FromSeconds(300);
+        public static string ZipString(string inputStr)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(inputStr);
+            string text = "";
+            long num = inputStr.Length;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (GZipStream gZipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+                {
+                    gZipStream.Write(bytes, 0, bytes.Length);
+                }
 
-        //            string apiURL = $"api/SURVEY/v1/{controller}/{action}";
+                byte[] inArray = memoryStream.ToArray();
+                text = Convert.ToBase64String(inArray);
+                num = text.Length;
+            }
 
-        //            // Serialize and zip
-        //            string json = JsonConvert.SerializeObject(parameter);
-        //            var zippedJson = ZipString(json); // assuming this returns byte[]
-        //            var zippedJsonBytes = UnzipBytes(zippedJson);
+            return text;
+        }
 
-        //            await WriteJsonToFileAsync(json); // still store uncompressed json locally
+        public async Task<HttpResponseMessage> PostAsync(string controller, string action, object parameter)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(CommonConfig.PostAddress);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", SessionStorage.auth_token);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.Timeout = TimeSpan.FromSeconds(300);
 
-        //            // Create gzipped content
-        //            using (var content = new ByteArrayContent(zippedJsonBytes))
-        //            {
-        //                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        //                content.Headers.ContentEncoding.Add("gzip");
+                    string apiURL = $"api/SURVEY/v1/{controller}/{action}";
 
-        //                var response = await client.PostAsync(apiURL, content);
+                    // Serialize and zip
+                    string json = JsonConvert.SerializeObject(parameter);
+                    var zippedJson = ZipString(json); // assuming this returns byte[]
+                    var zippedJsonBytes = await UnzipBytes(zippedJson);
 
-        //                if (!response.IsSuccessStatusCode)
-        //                {
-        //                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-        //                    {
-        //                        await AppShell.Current.DisplayAlert("Alert", "Session expired, please login again.", "OK");
-        //                    }
+                    await WriteJsonToFileAsync(json); // still store uncompressed json locally
+                    return null;
 
-        //                    var responseContent = await response.Content.ReadAsStringAsync();
-        //                    CommonService.LogInfo($"Error {action}: {responseContent}");
-        //                }
+                    // Create gzipped content
+                    using (var content = new ByteArrayContent(zippedJsonBytes))
+                    {
+                        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                        content.Headers.ContentEncoding.Add("gzip");
 
-        //                return response;
-        //            }
-        //        }
-        //    }
-        //    catch (HttpRequestException hex)
-        //    {
-        //        CommonService.LogInfo($"Error {hex.Message}");
-        //        if (hex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-        //        {
-        //            await AppShell.Current.DisplayAlert("Alert", "Session expired, please login again.", "OK");
-        //        }
-        //        return null;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        CommonService.LogInfo($"Error {ex.Message}");
-        //        return null;
-        //    }
-        //}
+                        var response = await client.PostAsync(apiURL, content);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                            {
+                                //await AppShell.Current.DisplayAlert("Alert", "Session expired, please login again.", "OK");
+                            }
+
+                            var responseContent = await response.Content.ReadAsStringAsync();
+                            await _loggingService.LogError($"Error {action}: {responseContent}");
+                        }
+
+                        return response;
+                    }
+                }
+            }
+            catch (HttpRequestException hex)
+            {
+                await _loggingService.LogError($"POST request failed: {hex.Message}");
+                //if (hex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                //{
+                //    await AppShell.Current.DisplayAlert("Alert", "Session expired, please login again.", "OK");
+                //}
+                return null;
+            }
+            catch (Exception ex)
+            {
+                await _loggingService.LogError($"POST request failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<byte[]> UnzipBytes(string inputStr)
+        {
+            try
+            {
+                byte[] buffer = Convert.FromBase64String(inputStr);
+                byte[] result;
+                using (MemoryStream memoryStream = new MemoryStream(buffer))
+                {
+                    using (new GZipStream(memoryStream, CompressionMode.Decompress))
+                    {
+                        result = memoryStream.ToArray();
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _loggingService.LogError($"Error during UnzipBytes operation - {ex}");
+            }
+
+            return new List<byte>().ToArray();
+        }
+
+        private async Task RequestPermissionsAsync()
+        {
+            try
+            {
+                var readStatus = await Permissions.RequestAsync<Permissions.StorageRead>();
+                var writeStatus = await Permissions.RequestAsync<Permissions.StorageWrite>();
+
+                if (readStatus != PermissionStatus.Granted || writeStatus != PermissionStatus.Granted)
+                {
+                    //await Shell.Current.DisplayAlert("Error", "Cannot export without permission", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
+
+        private async Task WriteJsonToFileAsync(string json, string baseFileName = $"POST")
+        {
+            try
+            {
+                baseFileName = $"{SessionStorage.SelectedFSUId}";
+                string documentsPath = string.Empty;
+#if ANDROID
+                await RequestPermissionsAsync();
+#endif
+#if ANDROID
+                documentsPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)?.AbsolutePath ?? string.Empty;
+#endif
+#if WINDOWS
+                documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+#endif
+
+                if (string.IsNullOrEmpty(documentsPath))
+                {
+                    documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                }
+
+                string ExportPath = Path.Combine(documentsPath, "Income_EXPORT");
+
+                // Create the folder if it doesn't exist
+                if (!Directory.Exists(ExportPath))
+                {
+                    Directory.CreateDirectory(ExportPath);
+                }
+                // Get the app's local folder
+                string appDirectory = ExportPath;
+                string timestamp = DateTime.Now.ToString("yyyy-MMM-dd_HH-mm-ss-fff");
+                string filePath = Path.Combine(appDirectory, "SubmissionJSON", $"{baseFileName}_{timestamp}.json");
+
+                // Extract directory path
+                string directoryPath = Path.GetDirectoryName(filePath);
+
+                // Check if the directory exists, and create it if it doesn't
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                using (var writer = new StreamWriter(filePath, false))
+                {
+                    await writer.WriteAsync(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _loggingService.LogInfo($"Error writing JSON to file: {ex.Message}");
+            }
+        }
 
         public async Task<Login_Response_Model>? LoginService(Tbl_User_Details _User_Details)
         {
@@ -110,6 +233,7 @@ namespace Income.Services
             catch (Exception ex)
             {
                 // Handle exceptions as needed
+                await _loggingService.LogError($"Login POST request failed: {ex.Message}");
                 return null;
             }
         }
@@ -130,6 +254,7 @@ namespace Income.Services
             }
             catch (Exception ex)
             {
+                await _loggingService.LogError($"Logout POST request failed: {ex.Message}");
                 return null;
             }
         }

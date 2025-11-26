@@ -16,7 +16,7 @@ namespace Income.Database.Models.Common
         public Tbl_Sch_0_0_Block_4? IncomeSch00block_4 { get; set; }
         public List<Tbl_Sch_0_0_Block_5>? IncomeSch00block_5 { get; set; }
         public List<Tbl_Sch_0_0_Block_7>? IncomeSch00block_7 { get; set; }
-        public Tbl_Sch_0_0_FieldOperation? IncomeSch00block_11 { get; set; }
+        public Tbl_Sch_0_0_FieldOperation? IncomeSch00FieldOp { get; set; }
         public List<Tbl_Warning>? IncomeSch00WarningList { get; set; }
         public List<SCH_HIS_Model>? IncomeSchHISDto {  get; set; }
     }
