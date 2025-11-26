@@ -2014,6 +2014,50 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<Tbl_Block_8?> Fetch_SCH_HIS_Block8(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_8>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 8: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block8(Tbl_Block_8 tbl_block_8)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_8>().Where(x => x.id == tbl_block_8.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_8);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_8);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 8: {ex.Message}");
+                return 0;
+            }
+        }
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {

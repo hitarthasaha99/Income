@@ -1,0 +1,254 @@
+﻿@page "/dashboard/his/block_8a"
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@using FluentValidation
+@using Income.Database.Models.HIS_2026
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@using System.Reflection
+@inject IJSRuntime JSRuntime
+@inject IValidator<Tbl_Block_8> Validator
+@inject ILoggingService loggingService
+
+<div class="my-2">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+    <div class="card card-style2">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">Block 8: Income from Transfer receipts </span>
+            </h3>
+        </div>
+
+        @if (editContext != null)
+        {
+            <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th class="fw-bold fs-6">Q.no.</th>
+                            <th class="fw-bold fs-6">Question description</th>
+                            <th class="fw-bold fs-6">Reference Period </th>
+                            <th class="fw-bold fs-6">Amount received (in whole no. of Rs.)</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Q8.1 </td>
+                            <td>pension (payments received from companies/government after retirement)</td>
+                            <td>Last month</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
+                                value="@model.item_1" @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_1, e);
+                                                                                                                                                                                                                                                                                                                                             }" />
+                            <ValidationMessage For="() => model.item_1" />
+                            </td>
+                          
+
+                        </tr>
+
+                        <tr>
+                            <td>Q8.2 </td>
+                            <td>transfers receipts from other households in the form of family support payments (such as alimony, child and parental support), regular receipts from inheritances and trust funds, regular monetary gifts received</td>
+                            <td>Last month</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_2  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_2, e);
+                                                                                                                                                                         
+                                                                                                                                                                     }"  />
+                                <ValidationMessage For="() => model.item_2" />                                                                                                                                     }"  />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Q8.3 </td>
+                            <td>remittances received from abroad and financial support received from other households</td>
+                            <td>Last 365 days</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_3  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_3, e);
+                                                                                                                                                                         
+                                                                                                                                                                     }"  />
+                                <ValidationMessage For="() => model.item_3" />   
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Q8.4</td>
+                            <td>stipend, scholarship (includes Government stipend)</td>
+                            <td>Last 365 days</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_4  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_4, e);
+                                                                                                                                                                         
+                                                                                                                                                                     }"  />
+                                <ValidationMessage For="() => model.item_4" />   
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Q8.5</td>
+                            <td>retirement benefits including gratuity, social security benefits, CGEGIS etc. (excluding maturity value of PF, lump sum leave encashment received at the time of retirement)</td>
+                            <td>Last 365 days</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value=@model.item_5  @oninput="e =>                                                                                                                                                                                                            {
+                                                                                                                                                                         UpdateFieldAndValidate(() => model.item_5, e);
+                                                                                                                                                                         
+                                                                                                                                                                     }"  />
+                                <ValidationMessage For="() => model.item_5" />   
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <div class="mb-3 px-2">
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <textarea class="form-control" @bind="remarks" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                </div>
+            </div>
+        </div>
+        }
+
+        
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <NavLink class="btn btn-outline-primary" href="/back">
+            <i class="bi bi-chevron-left me-1"></i>
+            Back
+        </NavLink>
+        <div class="d-flex">
+            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                <button @onclick="() => ValidateAndSave(false)" class="btn btn-primary me-2 is_sso action">
+                    <i class="bi bi-floppy-fill me-1"></i>
+                    Save
+                </button>
+            }
+            <button @onclick="(() => ValidateAndSave(true))" class="btn btn-outline-primary">
+                Next
+                <i class="bi bi-chevron-right ms-1"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    private CommonConfig commonConfig = new CommonConfig();
+    private DBQueries dB = new();
+    DateTime survey_time = DateTime.Now;
+    private Tbl_Block_8? model;
+    EditContext editContext;
+    ValidationMessageStore messageStore;
+    private string? remarks = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            model = await dB.Fetch_SCH_HIS_Block8(SessionStorage.selected_hhd_id) ?? null;
+            if(model == null)
+            {
+                model = new Tbl_Block_8
+                {
+                    hhd_id = SessionStorage.selected_hhd_id,
+                    fsu_id = SelectedFsuId,
+                    id = Guid.NewGuid()
+                };
+            }
+            editContext = new EditContext(model);
+            messageStore = new ValidationMessageStore(editContext);
+            editContext.OnFieldChanged += EditContext_OnFieldChanged;
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await loggingService.LogError("HIS Block 8 OnInitializedAsync", ex);
+        }
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    {
+        var identifier = FieldIdentifier.Create(field);
+
+        // Try parse
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
+        {
+            value = v;
+        }
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(model, value);
+
+        messageStore.Clear(identifier);
+        editContext.NotifyFieldChanged(identifier);
+
+    }
+
+    private async Task ValidateAndSave(bool is_go_next = false)
+    {
+        try
+        {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_8b");
+                return;
+            }
+
+            messageStore.Clear();
+            var validation = Validator.Validate(model);
+
+            foreach (var error in validation.Errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(model, error.PropertyName);
+                messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            }
+            editContext.NotifyValidationStateChanged();
+
+            if (!validation.IsValid)
+            {
+                toastService.ShowError("Please resolve all the errors");
+                return;
+            }
+            else
+            {
+                int saved = await dB.Save_SCH_HIS_Block8(model);
+                if (saved > 0)
+                {
+                    toastService.ShowSuccess("Saved successfully");
+                }
+                else
+                {
+                    toastService.ShowSuccess("Data could not be saved");
+                }
+            }
+
+            if (!is_go_next)
+            {
+                return;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_8b");
+            }
+        }
+        catch (Exception ex)
+        {
+            //await loggingService.LogError("HIS Block 8 ValidateAndSave", ex);
+        }
+    }
+}
