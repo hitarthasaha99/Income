@@ -5,9 +5,9 @@
 @inject IToastService toastService
 @inject IJSRuntime jsRuntime
 @inject ILoggingService loggingService
-<section class="h-100 login-bg">
-	<div class="container h-100">
-		<div class="row justify-content-sm-center h-100">
+<section class="login-bg py-3 py-md-5">
+	<div class="container">
+		<div class="row justify-content-sm-center">
 			<div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-10">
                 <div class="card shadow-lg">
                     <div class="card-body p-5">
@@ -17,16 +17,21 @@
                                 <div class="badge badge-outline badge-warning text-uppercase semibold">@version_code</div>
                             </div>
                         </div>
-                        <p class="text-primary text-uppercase semibold">National Household Income Survey</p>
-                        <h1 class="fs-4 card-title fw-bold mb-1">Welcome Back !</h1>
-                        <p class="mb-3 fs-4">Login</p>
+                        <h4 class="fw-bolder text-primary">National Statistics Office</h4>
+                        <p class="text-dark fw-bold text-uppercase mb-1">NATIONAL HOUSEHOLD INCOME SURVEY: 2026</p>
+                        <p class="text-muted">February 2026 - January 2025</p>
+                        <div class="my-3">
+							<span class="central-highlight">Central Sample</span>
+						</div>
+                        @* <h1 class="fs-4 card-title fw-bold mb-1">Welcome Back !</h1>
+                        <p class="mb-3 fs-4">Login</p> *@
                         <div class="mb-3">
-                            <label class="form-label">User ID *</label>
+                            <label class="form-label">User ID <span class="text-danger ms-1">*</span></label>
                             <input type="text" class="form-control" placeholder="Enter User ID" @bind="UserDetails.username">
                             <ValidationComponent @ref="user_id" field_name="User ID" field_value="@UserDetails.username" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Password *</label>
+                            <label class="form-label">Password <span class="text-danger ms-1">*</span></label>
                             <PasswordInput @bind-Value="@UserDetails.password" class="m-0" placeholder="Enter Password" Style="margin: 0 !important" />
                             <ValidationComponent @ref="pass" field_name="Password" field_value="@UserDetails.password" field_type=@CommonConstants.VALIDATION_TYPE_DEFAULT is_error="@is_error" />
                         </div>

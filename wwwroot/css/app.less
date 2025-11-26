@@ -92,6 +92,14 @@ a,
   background-size: cover;
   .card{
     border-radius: 1rem;
+    .central-highlight{
+      background-color: #FFEEE3;
+      color: #D55800;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 5px;
+    }
   }
   .input-group{
     .form-control{
@@ -200,7 +208,7 @@ input[type="radio"] {
   color: @danger_2 !important;
 }
 .text-success{
-  color:#0E9A2E !important;
+  color:@successDarkColor !important;
 }
 .bg-primary{
   background-color: #267DFF !important;
@@ -218,7 +226,7 @@ input[type="radio"] {
   background-color: #F66265 !important;
 }
 .bg-success{
-  background-color: #D7FFE0 !important;
+  background-color:@successLightColor !important;
 }
 
 
@@ -629,11 +637,11 @@ input[type="radio"] {
       }
       &:last-child {
         td:first-child {
-          border-bottom-left-radius: 10px;
+          border-bottom-left-radius: 8px;
         }
 
         td:last-child {
-          border-bottom-right-radius: 10px;
+          border-bottom-right-radius: 8px;
         }
       }
     }
@@ -1476,11 +1484,9 @@ background-color: @warningLightColor;
       }
 	}
 	
-	&:not(.active) {
-		&:hover {
-			background-color: #f9f7ff8a;
-		}
-	}
+  &:hover {
+    background-color: #f8f8fd;
+  }
 }
 .card {
     &.warningWrap {
@@ -1511,12 +1517,67 @@ background-color: @warningLightColor;
         border: 1px solid @successColor_1 !important;
 
         .card-header {
-            background-color: @warningColor_4;
+            background-color: @successLightColor;
 
             .card-title {
-                color: @success;
+                color: @successDarkColor;
             }
         }
     }
 }
+.custom-accordian {
+  .accordion-item {
+    .accordion-header {
+      .accordion-button {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: none;
+        padding: 0;
+        font-weight: 600;
+        background-color: transparent;
+        color: @siteBlack;
+
+        // Default state: collapsed
+        &.collapsed::after {
+          content: "\ec37";  // minus icon
+          font-family: uicons-regular-rounded !important;
+          background-image: none;
+          margin-left: 0;
+          height: auto;
+          width: auto;
+        }
+
+        // Expanded state
+        &:not(.collapsed)::after {
+          content: "\ea63";  // plus icon
+          font-family: uicons-regular-rounded !important;
+          background-image: none;
+          margin-left: 0;
+          height: auto;
+          width: auto;
+        }
+
+        &.warningButton {
+          background-color: @warningLightColor;
+          color: @warningDarkColor;
+        }
+
+        &.acceptedButton {
+          background-color: @successLightColor;
+          color: @successDarkColor;
+        }
+
+        &.dangerButton {
+          background-color: @lightDanger;
+          color: @danger;
+        }
+      }
+    }
+  }
+}
+
 

@@ -59,6 +59,6 @@ namespace Income.Database.Models.HIS_2026
         //Q10.22 
         public int? item_22 { get; set; }
         //Q10.23 
-        public int? item_23 { get; set; }
+        public double? item_23 { get; set; }
     }
 }
