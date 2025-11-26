@@ -39,5 +39,24 @@ namespace Income.Database.Models.HIS_2026
         public int? survey_code { get; set; }
         public int? substitution_reason { get; set; }
         public string? block_1_remark { get; set; } = string.Empty;
+        public string? block_3_remark { get; set; } = string.Empty;
+        public string? block_4_remark { get; set; } = string.Empty;
+        public string? block_5_remark { get; set; } = string.Empty;
+        public string? block_6_remark { get; set; } = string.Empty;
+        public string? block_7a_remark { get; set; } = string.Empty;
+        public string? block_7b_remark { get; set; } = string.Empty;
+        public string? block_7c_remark { get; set; } = string.Empty;
+        public string? block_7d_remark { get; set; } = string.Empty;
+
+        public string? block_8a_remark { get; set; } = string.Empty;
+        public string? block_8b_remark { get; set; } = string.Empty;
+
+        public string? block_9a_remark { get; set; } = string.Empty;
+        public string? block_9b_remark { get; set; } = string.Empty;
+        public string? block_10_remark { get; set; } = string.Empty;
+        public string? block_11a_remark { get; set; } = string.Empty;
+        public string? block_11b_remark { get; set; } = string.Empty;
+        public string? block_12_remark { get; set; } = string.Empty;
+        public string? block_13_remark { get; set; } = string.Empty;
     }
 }
