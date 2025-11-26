@@ -241,18 +241,14 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="d-flex align-items-center justify-content-end">
-                        <button class="btn btn-outline-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</button>
+                        <button class="btn btn-outline-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</button>
                         <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
                     </div>
                 </div>
             </div>
         </div>
     </EditForm>
-}
-
-
-         
-
+}       
 @code {
     bool is_go_next = false;
     EditContext editContext;
