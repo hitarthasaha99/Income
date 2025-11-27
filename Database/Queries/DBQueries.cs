@@ -1,7 +1,9 @@
 ﻿using Blazored.Toast.Services;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.EMMA;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Income.Common;
+using Income.Common.HIS2026;
 using Income.Database.Models.Common;
 using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
@@ -1379,13 +1381,14 @@ namespace Income.Database.Queries
                 if (items != null && items.Count > 0)
                 {
                     int s = 1;
-                    foreach(var item in items)
+                    foreach (var item in items)
                     {
                         item.SerialNumber = s;
                         s++;
                         await _database.UpdateAsync(item);
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -1707,11 +1710,23 @@ namespace Income.Database.Queries
         {
             try
             {
-                int status = new();
+                int status;
                 var check_existence = await _database.Table<Tbl_Block_7a_1>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(obj);
+                    //Sync with Block 7D
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if (block_7d != null && block_7d.Count > 0)
+                    {
+                        var matching_7d = block_7d.FirstOrDefault(x => x.block_7a_id == obj.id);
+                        if (matching_7d != null)
+                        {
+                            matching_7d.code = obj.code;
+                            matching_7d.item_2 = Block_7_1_Constants.CropCodes.FirstOrDefault(x => x.id == obj.code)?.title ?? "";
+                            await Save_SCH_HIS_Block7D_List(matching_7d);
+                        }
+                    }
                 }
                 else
                 {
@@ -1889,11 +1904,23 @@ namespace Income.Database.Queries
         {
             try
             {
-                int status = new();
+                int status;
                 var check_existence = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(obj);
+                    //Sync with Block 7D
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if (block_7d != null && block_7d.Count > 0)
+                    {
+                        var matching_7d = block_7d.FirstOrDefault(x => x.block_7a_id == obj.id);
+                        if (matching_7d != null)
+                        {
+                            matching_7d.code = obj.NicCode;
+                            matching_7d.item_2 = Block_4_Constants.NIC_CODES.FirstOrDefault(x => x.id == obj.NicCode)?.title ?? "";
+                            await Save_SCH_HIS_Block7D_List(matching_7d);
+                        }
+                    }
                 }
                 else
                 {
@@ -1923,6 +1950,15 @@ namespace Income.Database.Queries
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
+                    }
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if(block_7d != null)
+                    {
+                        var item = block_7d.FirstOrDefault(x => x.block_7c_id == id);
+                        if (item != null)
+                        {
+                            _ = await Delete_SCH_HIS_Block7D_List(item);
+                        }
                     }
                     await ReserializeBlock7NICList();
                     return 1;

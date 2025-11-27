@@ -227,7 +227,6 @@
 
     async Task LoadData()
     {
-        // Block_4_5_ErrorMessage = string.Empty;
         NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
         StateHasChanged();
     }
@@ -247,7 +246,7 @@
         if (item_index != -1)
         {
             NICFields[item_index].is_deleted = true;
-            await dQ.DeleteBlock4_NICList(id);
+            await dQ.DeleteBlock7_NICList(id);
             toastService.ShowSuccess("Row deleted successfully!");
             await LoadData();
         }

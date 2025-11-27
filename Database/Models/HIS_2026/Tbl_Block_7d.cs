@@ -14,6 +14,8 @@ namespace Income.Database.Models.HIS_2026
         [PrimaryKey]
         public Guid id { get; set; }
         public int hhd_id { get; set; } = SessionStorage.selected_hhd_id;
+        public Guid block_7a_id { get; set; }
+        public Guid block_7c_id { get; set; }
         public int? code { get; set; }
         public int? serial_number { get; set; }
         //sl no of activity
