@@ -10,142 +10,193 @@
 @inject LocalizationService Loc
 
 
-<div class="pb-5">
-
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                          survey_time="@survey_time" />
-
-    <div class="card-style2 p-2">
-        <div class="w-100 card-header d-flex justify-content-between">
-            <p class="fs-5 m-0"><span class="text-primary me-2">[1]</span>Identification of sample household</p>
-            <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-outline-primary" @onclick="@(() => Comment())"><i class="bi bi-chat-left-text me-2"></i>Comment</NavLink>
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary me-2">[1]</span>Identification of sample household
+            </h3>
+            <div cllass="card-tools">
+                <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+            </div>
         </div>
-        <div class="card-container mt-2">
-            <div class="row card-body">
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">1</span>@Loc["sector"]
-                    </label>
-                    <input type="text" class="form-control" placeholder="" value="@block_1.sector_name" disabled>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">1</span>@Loc["sector"]
+                        </label>
+                        <input type="text" class="form-control" value="@block_1.sector_name" disabled>
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">2</span>@Loc["state_ut_name"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" value="@block_1.state_name" disabled>
+               <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">2</span>@Loc["state_ut_name"]
+                        </label>
+                        <input type="text" class="form-control is_sso" value="@block_1.state_name" disabled>
+                    </div>
+               </div>
+               <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">3</span>@Loc["district_name"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.district_name">
+                    </div>
+               </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">4</span>@Loc["sub_dist"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.town_name">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">3</span>@Loc["district_name"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.district_name">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">5</span>@Loc["vill_name"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.village_name">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">4</span>@Loc["sub_dist"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.town_name">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">6</span>@Loc["invst_unit_no"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.investigator_unit_no">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">5</span>@Loc["vill_name"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.village_name">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">7</span>@Loc["sample_su_no"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.sample_su_number">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">6</span>@Loc["invst_unit_no"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.investigator_unit_no">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">8</span>@Loc["round_number"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.round_number">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">7</span>@Loc["sample_su_no"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.sample_su_number">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">9</span>@Loc["sch_no"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.schedule_number">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">8</span>@Loc["round_number"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.round_number">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">10</span>@Loc["serial_no_sample_fsu"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.serial_number_sample_fsu">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">9</span>@Loc["sch_no"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.schedule_number">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">11</span>@Loc["sample_sub_div_no"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.sample_sub_division_number">
+                    </div>
                 </div>
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">10</span>@Loc["serial_no_sample_fsu"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.serial_number_sample_fsu">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">12</span>@Loc["sample_hh_number"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.sample_hhd_number">
+                    </div>
                 </div>
-
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">11</span>@Loc["sample_sub_div_no"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.sample_sub_division_number">
-                </div>
-
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">12</span>@Loc["sample_hh_number"]
-                    </label>
-                    <input type="text" class="form-control is_sso" placeholder="" disabled value="@block_1.sample_hhd_number">
-                </div>
-
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">13</span>@Loc["survey_code"]
-                    </label>
-                    <select class="form-select w-100 is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
-                        <option value="">Select</option>
-                        @if (commonList.LOOKUP_CONST_HHD_SURVEY_CODE != null && commonList.LOOKUP_CONST_HHD_SURVEY_CODE.Count > 0)
-                        {
-                            @foreach (var item in commonList.LOOKUP_CONST_HHD_SURVEY_CODE)
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">13</span>@Loc["survey_code"]
+                        </label>
+                        <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
+                            <option value="">Select</option>
+                            @if (commonList.LOOKUP_CONST_HHD_SURVEY_CODE != null && commonList.LOOKUP_CONST_HHD_SURVEY_CODE.Count > 0)
                             {
-                                <option value="@item.id">@item.title</option>
+                                @foreach (var item in commonList.LOOKUP_CONST_HHD_SURVEY_CODE)
+                                {
+                                    <option value="@item.id">@item.title</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
+               <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">14</span>@Loc["reason_for_substitution"]
+                        </label>
 
-                <div class="mb-4 col-md-4">
-                    <label class="form-label fw-bold">
-                        <span class="badge bg-primary me-2">14</span>@Loc["reason_for_substitution"]
-                    </label>
-
-                    <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
-                        <option value="">Select</option>
-                        @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
-                        {
-                            @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                        <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
+                            <option value="">Select</option>
+                            @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
                             {
-                                <option value="@item.id">@item.title</option>
+                                @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                                {
+                                    <option value="@item.id">@item.title</option>
+                                }
                             }
-                        }
-                    </select>
-                </div>
-                @* <div class="mb-3 col-12" hidden="@((!is_remarks_visible))">
-                    <label class="form-label fw-bold"><span class="badge bg-primary me-2">15</span>Remarks</label>
-                    <textarea type="text" class="form-control is_sso" placeholder="" cols="4" @bind="block_1.block_1_remarks"></textarea>
-                </div> *@
+                        </select>
+                    </div>
+               </div>
+               @* <div class="col-sm-12">
+                    <div class="mb-3 col-12" hidden="@((!is_remarks_visible))">
+                        <label class="form-label"><span class="form-badge">15</span>Remarks</label>
+                        <textarea type="text" class="form-control is_sso" cols="4" @bind="block_1.block_1_remarks"></textarea>
+                    </div>
+               </div> *@
             </div>
         </div>
     </div>
+</div>
 
-    <Modal @ref="comment_vm.AddModal" Title="Comment" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.Large">
-        <BodyTemplate>
-            <div class="mb-3">
-                <div class="row mb-2">
-                    @* <div class="col-6"> *@
-                    @*     <label class="form-label fw-bold"> *@
-                    @*         <span class="badge bg-primary me-2">1</span>Select row *@
+<div class="footer">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <button class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                {
+                    <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                }
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+<Modal @ref="comment_vm.AddModal" Title="Comment" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
+    <BodyTemplate>
+        <div class="mb-3">
+            <div class="row mb-2">
+                @* <div class="col-md-12"> *@
+                    @* <div class="mb-3"> *@
+                    @*     <label class="form-label"> *@
+                    @*         <span class="form-badge">1</span>Select row *@
                     @*     </label> *@
-                    @*     <select class="form-select w-100" @bind="comment_vm.Serialnumber"> *@
+                    @*     <select class="form-select" @bind="comment_vm.Serialnumber"> *@
                     @*         <option value="">Select</option> *@
                     @*         @if (RowList != null) *@
                     @*         { *@
@@ -155,10 +206,12 @@
                     @*             } *@
                     @*         } *@
                     @*     </select> *@
-                    @* </div> *@
-                    <div class="col-6">
-                        <label class="form-label fw-bold">
-                            <span class="badge bg-primary me-2">2</span>Question Number
+                     @* </div> *@
+                @* </div> *@
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">2</span>Question Number
                         </label>
                         <select class="form-select w-100" @bind="comment_vm.item_no">
                             <option value="">Select</option>
@@ -172,66 +225,54 @@
                         </select>
                     </div>
                 </div>
-                <label for="commentBox" class="form-label">Enter your comment</label>
-                <textarea class="form-control" id="commentBox" rows="4" @bind="comment_vm.comment"></textarea>
-                @if (comment_vm.ShowError)
-                {
-                    <div class="text-danger mt-2">Comment cannot be empty.</div>
-                }
-            </div>
-
-            @if (CommentList != null)
-            {
-                <div style="overflow: auto;">
-                    <table class="table table-bordered table-striped align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="min-width: 200px;">Comment</th>
-                                <th style="min-width: 100px;">Item Number</th>
-                                <th style="min-width: 50px;">Member Srl.</th>
-                                <th style="min-width: 20px;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in CommentList)
-                            {
-                                <tr>
-                                    <td>@item.comment</td>
-                                    <td class="text-center">@item.item_no</td>
-                                    <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-success btn-sm me-2" @onclick="@(() => Update(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="bi bi-check-circle me-1"></i>Edit</button>
-                                        <button class="btn btn-danger btn-sm" @onclick="@(() => Delete(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="bi bi-x-circle me-1"></i>Delete</button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="commentBox" class="form-label">Enter your comment</label>
+                        <textarea class="form-control" id="commentBox" rows="2" @bind="comment_vm.comment"></textarea>
+                        @if (comment_vm.ShowError)
+                        {
+                            <div class="text-danger mt-2">Comment cannot be empty.</div>
+                        }
+                    </div>
                 </div>
-            }
-
-        </BodyTemplate>
-        <FooterTemplate>
-            <Button class="btn btn-primary me-2" @onclick="@(() => Submit())"><i class="bi bi-check-circle me-1"></i>Submit</Button>
-            <Button class="btn btn-outline-primary" @onclick="@(() => Close())"><i class="bi bi-x-circle me-1"></i>Close</Button>
-        </FooterTemplate>
-    </Modal>
-
-
-    <div class="d-flex justify-content-between mb-3">
-        <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
-        <div class="d-flex">
-            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
-            {
-                <NavLink class="btn btn-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
-            }
-            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
         </div>
-    </div>
 
-
-</div>
-
+        @if (CommentList != null)
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 200px;">Comment</th>
+                            <th style="min-width: 100px;">Item Number</th>
+                            <th style="min-width: 50px;">Member Srl.</th>
+                            <th style="min-width: 20px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in CommentList)
+                        {
+                            <tr>
+                                <td>@item.comment</td>
+                                <td class="text-center">@item.item_no</td>
+                                <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
+                                <td class="text-center">
+                                    <button class="btn btn-link me-2" @onclick="@(() => Update(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-pencil"></i></button>
+                                    <button class="btn btn-link text-danger" @onclick="@(() => Delete(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-trash"></i></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button class="btn btn-outline-secondary me-auto" @onclick="@(() => Close())">Close</Button>
+        <Button class="btn btn-primary" @onclick="@(() => Submit())">Submit</Button>
+    </FooterTemplate>
+</Modal>
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
