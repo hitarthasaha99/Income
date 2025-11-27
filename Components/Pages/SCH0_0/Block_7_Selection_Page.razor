@@ -12,41 +12,48 @@
 @inject IToastService toastService
 @inject PreloadService preloadService
 @inject ILoggingService Logger
+@inject NetworkService networkService
 
 
 <GlobalErrorBoundary>
     <div class="main-content">
         <CommonContentHeader SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time" />
+        <ConfirmDialog @ref="dialog" />
+
         <div class="card custom-card">
             <!-- 🔹 Sticky Top Action Header -->
             <div class="card-header">
                 <h3 class="card-title">
                     <span class="text-primary me-2">[Block 7]</span>List of households and selection of households for Schedule on HIS
                 </h3>
-                <div class="card-tools">
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => OpenGenerateModal())">
-                            <i class="fi fi-rr-calculator me-1"></i>Generate
-                        </button>
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <div class="card-tools">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => OpenGenerateModal())">
+                                <i class="fi fi-rr-calculator me-1"></i>Generate
+                            </button>
 
-                        <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => CalculateSSS())">
-                            <i class="fi fi-rr-calculator me-1"></i>Calc SSS
-                        </button>
+                            <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => CalculateSSS())">
+                                <i class="fi fi-rr-calculator me-1"></i>Calc SSS
+                            </button>
 
-                        <button class="btn btn-primary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
-                            <i class="fi fi-rr-checkbox me-1"></i>Selection
-                        </button>
+                            <button class="btn btn-primary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
+                                <i class="fi fi-rr-checkbox me-1"></i>Selection
+                            </button>
 
-                        <button class="btn btn-outline-primary btn-sm" @onclick="@(() => ResetSelection())">
-                            <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection
-                        </button>
+                            <button class="btn btn-outline-primary btn-sm" @onclick="@(() => ResetSelection())">
+                                <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection
+                            </button>
 
-                        <button class="btn btn-outline-primary btn-sm" @onclick="@(() => DeleteAllHHDS())">
-                            <i class="fi fi-rr-rotate-left me-1"></i>Delete All Households
-                        </button>
+                            <button class="btn btn-outline-primary btn-sm" @onclick="@(() => DeleteAllHHDS())">
+                                <i class="fi fi-rr-rotate-left me-1"></i>Delete All Households
+                            </button>
+                        </div>
                     </div>
-                </div>
+                }
+                
             </div>
 
             <!-- 🔹 Scrollable table -->
@@ -57,14 +64,14 @@
                             <tr>
                                 <th style="min-width:10px;">Srl.No.</th>
                                 <th style="min-width:50px;">House Number</th>
-                                <th style="min-width:200px;">Is the house used only for non-residential purposes? (yes-1, no-2)</th>
+                                <th style="min-width:100px;">Is the house used only for non-residential purposes?</th>
                                 <th style="min-width:50px;">Household Serial Number</th>
                                 <th style="min-width:100px;">Name of the head of the household</th>
                                 <th style="min-width:50px;">Household Size</th>
-                                <th style="min-width:400px;">Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</th>
+                                <th style="min-width:100px;">Highest education level attained among the household members</th>
                                 <th style="min-width:50px;">Household Type</th>
-                                <th style="min-width:400px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</th>
-                                <th style="min-width:200px;">Usual monthly consumption expenditure of the household (Rs.)</th>
+                                <th style="min-width:100px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
+                                <th style="min-width:100px;">Usual monthly consumption expenditure of the household (Rs.)</th>
                                 <th style="min-width:100px;">SSS number for Schedule HIS 2026</th>
                                 <th style="min-width:40px;">Selected</th>
                             </tr>
@@ -137,6 +144,10 @@
                     <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
                         <i class="fi fi-rr-angle-left me-1"></i>Back
                     </NavLink>
+                    @if (AllowUpdateListing)
+                    {
+                        <button class="btn btn-primary ms-2" @onclick="@(() => OpenUpdateListingModal())">Update Listing</button>
+                    }
                 </div>
             </div>
             <div class="col-sm-6">
@@ -176,13 +187,55 @@
         <Button @onclick="Cancel">Cancel</Button>
     </FooterTemplate>
 </Modal>
+
+    <Modal @ref="UpdateListingModal" Size="ModalSize.Large">
+        <HeaderTemplate>
+            <h5 class="modal-title">Update Listing</h5>
+        </HeaderTemplate>
+
+        <BodyTemplate>
+            <div class="list-group">
+                <InputRadioGroup @bind-Value="SelectedReason">
+                    <div class="list-group">
+
+                        <label class="list-group-item">
+                            <InputRadio Value="1" class="form-check-input me-2" />
+                            FSU identification was wrong
+                        </label>
+
+                        <label class="list-group-item">
+                            <InputRadio Value="2" class="form-check-input me-2" />
+                            Sub-Unit formation was wrong
+                        </label>
+
+                        <label class="list-group-item">
+                            <InputRadio Value="3" class="form-check-input me-2" />
+                            Sub-division formation was wrong
+                        </label>
+
+                        <label class="list-group-item">
+                            <InputRadio Value="4" class="form-check-input me-2" />
+                            Household wrongly added/missed
+                        </label>
+
+                    </div>
+                </InputRadioGroup>
+            </div>
+        </BodyTemplate>
+
+        <FooterTemplate>
+            <Button @onclick="@(() => DoUpdateListing())">Confirm</Button>
+            <Button @onclick="Cancel">Cancel</Button>
+        </FooterTemplate>
+
+    </Modal>
 </GlobalErrorBoundary>
 
 
 
 @code {
     private Modal ModalRef;
-
+    private Modal UpdateListingModal;
     public Dictionary<int, int> InputCounts { get; set; } = new();
     public List<int> ValidSss { get; set; } = new();
     EditContext editContext;
@@ -193,6 +246,7 @@
     CommonConfig commonConfig = new();
     Modal AddModal = default;
     public int sector { get; set; } = 0;
+    private Tbl_Fsu_List tbl_Fsu_List;
     Tbl_Sch_0_0_Block_7 fields = new();
     List<Tbl_Sch_0_0_Block_7> ListItems = new();
     ValidationComponent house_number_ref = new();
@@ -202,6 +256,10 @@
     CommonList commonList = new();
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     private ValidationMessageStore messageStore;
+    private bool AllowUpdateListing;
+    private ConfirmDialog dialog = default!;
+    private int SelectedReason { get; set; }
+
     private readonly Dictionary<int, int[]> SssMap = new()
 {
     { 1, new[] { 11,12,21,22,31,32,40,90 } },
@@ -229,6 +287,8 @@
 
         await commonQueries.InsertVisitedBlock(vb);
         var block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+        tbl_Fsu_List = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+
         if (block_0_1 != null)
         {
             this.block_0_1 = block_0_1;
@@ -243,6 +303,8 @@
                 InputCounts[sss] = 0;
         }
         await LoadData();
+        
+        StateHasChanged();
         await Logger.LogInfo($"Block 7 Loaded for {SessionStorage.SelectedFSUId}");
     }
 
@@ -298,6 +360,10 @@
         else
         {
             ListItems?.Clear();
+        }
+        if (tbl_Fsu_List != null)
+        {
+            AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected);
         }
         StateHasChanged();
 
@@ -677,7 +743,68 @@
 
     }
 
-    
+    private async void OpenUpdateListingModal()
+    {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Alert",
+            message1: "Do you want to proceed? This will lead to data being deleted.",
+            confirmDialogOptions: options);
+
+        if (confirmation)
+        {
+            await UpdateListingModal.ShowAsync();
+        }
+    }
+
+    private async Task DoUpdateListing()
+    {
+        try
+        {
+            await Logger.LogInfo($"Selected Reason for Update Listing: {SelectedReason}");
+            if (SelectedReason > 0 && Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
+            {
+                var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.UpdateListingAction, new { fsu_reference_Id = SessionStorage.SelectedFSUId, survey_Id = SessionStorage.surveyId, is_updateListingCount = true });
+                if (response != null && response.IsSuccessStatusCode)
+                {
+                    toastService.ShowSuccess("Update Listing request submitted successfully");
+                    var res = await SCH_0_0_Queries.DoUpdateListing(SessionStorage.SelectedFSUId, SelectedReason);
+                    if (res > 0 && (SelectedReason == 1 || SelectedReason == 2 || SelectedReason == 3))
+                    {
+                        await UpdateListingModal.HideAsync();
+                        NavigationManager.NavigateTo("/dashboard/fsulist/");
+                    }
+                    else if(res > 0 && SelectedReason == 4)
+                    {
+                        await SCH_0_0_Queries.ResetSelection();
+                        await UpdateListingModal.HideAsync();
+                        NavigationManager.NavigateTo("/dashboard/sch0.0/block_7");
+                    }
+
+                }
+                else
+                {
+                    toastService.ShowError("Failed to submit Update Listing request. Please try again.");
+                    return;
+                }
+            }
+            else
+            {
+                toastService.ShowError("Need internet connectivity to proceed");
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+        finally
+        {
+            preloadService.Hide();
+            await UpdateListingModal.HideAsync();
+        }
+    }
+
 
     async Task HandleSubmit(string action = "")
     {

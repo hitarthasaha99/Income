@@ -48,16 +48,16 @@
                         <tr>
                             <th style="min-width:10px;">Srl.No.</th>
                             <th style="min-width:50px;">House Number</th>
-                            <th style="min-width:200px;">Is the house used only for non-residential purposes? (yes-1, no-2)</th>
+                            <th style="min-width:100px;">Is the house used only for non-residential purposes? (yes-1, no-2)</th>
                             <th style="min-width:50px;">Household Serial Number</th>
                             <th style="min-width:100px;">Name of the head of the household</th>
                             <th style="min-width:50px;">Household Size</th>
-                            <th style="min-width:400px;">Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</th>
+                            <th style="min-width:100px;">Highest education level attained among the household members</th>
                             <th style="min-width:50px;">Household Type</th>
-                            <th style="min-width:400px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</th>
-                            <th style="min-width:200px;">Usual monthly consumption expenditure of the household (Rs.)</th>
-                            <th style="min-width:100px;">SSS number for Schedule HIS 2026</th>
-                            <th style="min-width:40px;">Selected</th>
+                            <th style="min-width:100px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
+                            <th style="min-width:100px;">Usual monthly consumption expenditure of the household (Rs.)</th>
+                            @* <th style="min-width:100px;">SSS number for Schedule HIS 2026</th>
+                            <th style="min-width:40px;">Selected</th> *@
                             <th style="min-width:40px;">Action</th>
                         </tr>
                     </thead>
@@ -74,8 +74,6 @@
                             <th>(8)</th>
                             <th>(9)</th>
                             <th>(10)</th>
-                            <th>(11)</th>
-                            <th></th>
                         </tr>
                         @if (ListItems != null && ListItems.Count > 0)
                         {
@@ -94,14 +92,14 @@
                                         <td>@item.Block_7_7</td>
                                         <td>@item.Block_7_8</td>
                                         <td>@item.Block_7_9</td>
-                                        <td>@item.SSS</td>
+                                        @* <td>@item.SSS</td>
                                         <td>
                                             <div class="siteCustomCheckbox">
                                                 <label>
                                                     <input type="checkbox" @bind="item.isSelected" disabled />
                                                 </label>    
                                             </div>
-                                        </td>
+                                        </td> *@
 
                                         @if (!SessionStorage.selection_done)
                                             {
@@ -186,7 +184,7 @@
                         <!-- Is Household -->
                         <div class="col-sm-12">
                             <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">2</span>Is the house for non-residential purposes?</label>
+                                <label class="form-label"><span class="form-badge">2</span>Is the house used only for non-residential purposes? (yes-1, no-2)</label>
                                 <InputSelect class="form-select" @bind-Value="fields.is_household" oninput="@(((ChangeEventArgs e) => OnIsHouseholdChanged(e)))">
                                     <option value="">- Select -</option>
                                     @if (commonList?.LOOKUP_CONST_YES_NO != null)
@@ -241,7 +239,7 @@
                         <!-- Highest Education Level -->
                         <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                             <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">6</span>Highest Education Level (Urban only)</label>
+                                <label class="form-label"><span class="form-badge">6</span>Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</label>
                                 <InputSelect class="form-select"
                                                 @bind-Value="fields.Block_7_6" Disabled="@(sector == 1)">
                                     <option value="">- Select -</option>
@@ -260,7 +258,7 @@
                         <!-- Household Type -->
                         <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                             <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">7</span>Household Type</label>
+                                <label class="form-label"><span class="form-badge">7</span>Household Type (entry in code)</label>
                                 <InputSelect class="form-select" @bind-Value="fields.Block_7_7">
                                     <option value="">- Select -</option>
                                     @if (sector == 1 && Block_7_Constants.HHDTypeRural != null)
@@ -285,7 +283,7 @@
                         <!-- Total Land Owned -->
                         <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                             <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">8</span>Total Land Owned (Rural only)</label>
+                                <label class="form-label"><span class="form-badge">8</span>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</label>
                                 <InputNumber class="form-control no-spinner"
                                                 @bind-Value="fields.Block_7_8"
                                                 step="any"
@@ -298,7 +296,7 @@
                         <!-- Monthly Expenditure -->
                         <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                             <div>
-                                <label class="form-label"><span class="form-badge">9</span>Usual Monthly Consumption Expenditure</label>
+                                <label class="form-label"><span class="form-badge">9</span>usual monthly consumption expenditure of the household (in Rs.)	SSS number for Schedule HIS 2026</label>
                                 <input class="form-control no-spinner"
                                                 type="number"
                                                 step="1"

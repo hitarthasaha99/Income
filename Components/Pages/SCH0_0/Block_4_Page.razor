@@ -20,7 +20,8 @@
             </h3>
         </div>
         <div class="card-body">
-            <div class="row">
+            <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+                <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label for="" class="form-label">
@@ -35,7 +36,6 @@
                             <span class="form-badge">2</span> Approximate population of the SU
                         </label>
                         <input disabled="@(!AllowEdit)" type="number" class="form-control form-control-sm no-spinner" id="" value="@block_4.approximate_population_su" @oninput="HandleChange">
-                        <ValidationComponent @ref="population_ref" is_error="@is_error" field_name="Approximate population of the SU" />
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -47,6 +47,7 @@
                     </div>
                 </div>
             </div>
+            </fieldset>
         </div>
     </div>
 </div>
@@ -57,7 +58,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" rows="2"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="" rows="2"></textarea>
         </div>
     </div>
     <div class="row">
@@ -195,6 +196,11 @@
             {
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_7");
             }
+            return;
+        }
+        if (block_4?.approximate_population_su > block_0_1.Block_1_14)
+        {
+            toastService.ShowError("Approximate population of the SU cannot be greater than the total population of the selected FSU.");
             return;
         }
         block_0_1.remarks_block_4 = remarks;

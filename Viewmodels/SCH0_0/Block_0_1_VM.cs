@@ -175,7 +175,6 @@ namespace Income.Viewmodels.SCH0_0
                 if (_isAdd)
                 {
                     block_0_1.id = Guid.NewGuid();
-                    block_0_1.survey_timestamp = DateTime.Now;
                     await SCH_0_0_Queries.SaveBlock1(block_0_1);
                 }
                 else

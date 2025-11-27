@@ -21,7 +21,8 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-striped table-bordered mb-0">
+                <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+                    <table class="table table-striped table-bordered mb-0">
                     <thead>
                         <tr>
                             <th>Selected</th>
@@ -60,6 +61,7 @@
                         </tr>
                     </tfoot>
                 </table>
+                </fieldset>
             </div>
         </div>
     </div>
@@ -72,7 +74,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="@remarks" placeholder="" rows="2"></textarea>
+            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="" rows="2"></textarea>
         </div>
     </div>
     <div class="row">
@@ -83,7 +85,10 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <button hidden="@((is_selection_done))" class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit("SELECTION"))"><i class="fi fi-rr-checkbox me-2"></i>Do Selection</button>
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <button hidden="@((is_selection_done))" class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit("SELECTION"))"><i class="fi fi-rr-checkbox me-2"></i>Do Selection</button>
+                }
                 @* <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit("SAVE"))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink> *@
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
@@ -117,9 +122,10 @@
         };
         await commonQueries.InsertVisitedBlock(vb);
         var response = await SCH_0_0_Queries.FetchSCH0Block5Data();
+        block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+
         if (response == null || response.Count == 0)
         {
-            var block_0_1 = await SCH_0_0_Queries.FetchBlock1();
             if (block_0_1 != null)
             {
                 block_5 = new();
@@ -190,6 +196,8 @@
         }
         else
         {
+            block_0_1.remarks_block_5 = remarks;
+            await SCH_0_0_Queries.SaveBlock1(block_0_1);
             if (action == "SAVE")
             {
                 var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
@@ -198,8 +206,7 @@
                     toastService.ShowError($"Error while storing data into database, Please try again!");
                     return;
                 }
-                block_0_1.remarks_block_5 = remarks;
-                await SCH_0_0_Queries.SaveBlock1(block_0_1);
+                
                 return;
             }
             else if (action == "NEXT")

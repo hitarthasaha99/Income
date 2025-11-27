@@ -21,7 +21,7 @@
             <h3 class="card-title">
                 <span class="text-primary me-2">[Block 11]</span>Particulars of sampling of households
             </h3>
-            <Button class="btn btn-primary is_sso action" @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
+            <Button class="btn btn-primary is_sso action" hidden="@SessionStorage.FSU_Submitted" @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
             <Button Disabled="@SessionStorage.FSU_Submitted" class="btn btn-primary is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-memo-circle-check me-1"></i>Validate</Button>
 
         </div>
@@ -419,6 +419,24 @@
     {
         try
         {
+            int lookup_submit_status = 0;
+            int lookup_sub_submit_status = 0;
+            var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+            if (fsu != null)
+            {
+                lookup_submit_status = fsu.lookupFsuSubmitStatus.GetValueOrDefault();
+            }
+            if (new int [] {21,12,22,31,32, 80 }.Contains(lookup_submit_status))
+            {
+                toastService.ShowInfo("FSU has already been submitted");
+                return;
+            }
+            var warnings = await DBQueries.GetWarningList(schedule: "0");
+            if (warnings.Any(x => x.warning_status == 1))
+            {
+                toastService.ShowError("Warnings need to be resolved before submission");
+                return;
+            }
             Submission_Model data = new();
             data.IncomeSchHISDto = null;
 
@@ -438,7 +456,7 @@
                 block_6.file_image_source = ExtractBase64(block_6.file_image_source);
             }
             data.IncomeSch00block3 = new() { block_3, block_6 };
-            data.IncomeSch00block_4 = new();
+            data.IncomeSch00block_4 = await DBQueries.GetBlock4();
             data.IncomeSch00block_5 = await DBQueries.FetchSCH0Block5Data();
             data.IncomeSch00block_7 = await DBQueries.GetBlock7DataWithDeleted();
             data.IncomeSch00FieldOp = await DBQueries.FetchBlock2();
@@ -466,8 +484,18 @@
             }
 
             string final_payload = JsonConvert.SerializeObject(payload);
-            await loggingService.LogInfo(final_payload);
-            await networkService.PostAsync("IncomeSurvey", "UpSertIncomeResponseAsync", final_payload);
+            var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                toastService.ShowSuccess("Data submitted successfully");
+                SessionStorage.FSU_Submitted = true;
+
+                StateHasChanged();
+            }
+            else
+            {
+                toastService.ShowError("Data could not be submitted");
+            }
         }
         catch (Exception ex)
         {

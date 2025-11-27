@@ -74,9 +74,6 @@ namespace Income.Services
                     var zippedJson = ZipString(json); // assuming this returns byte[]
                     var zippedJsonBytes = await UnzipBytes(zippedJson);
 
-                    await WriteJsonToFileAsync(json); // still store uncompressed json locally
-                    return null;
-
                     // Create gzipped content
                     using (var content = new ByteArrayContent(zippedJsonBytes))
                     {
@@ -84,6 +81,11 @@ namespace Income.Services
                         content.Headers.ContentEncoding.Add("gzip");
 
                         var response = await client.PostAsync(apiURL, content);
+                        if (response != null)
+                        {
+                            await WriteJsonToFileAsync(json, endpoint: action, code:response.StatusCode.ToString()); // still store uncompressed json locally
+
+                        }
 
                         if (!response.IsSuccessStatusCode)
                         {
@@ -95,6 +97,7 @@ namespace Income.Services
                             var responseContent = await response.Content.ReadAsStringAsync();
                             await _loggingService.LogError($"Error {action}: {responseContent}");
                         }
+                        
 
                         return response;
                     }
@@ -158,11 +161,11 @@ namespace Income.Services
             }
         }
 
-        private async Task WriteJsonToFileAsync(string json, string baseFileName = $"POST")
+        private async Task WriteJsonToFileAsync(string json, string baseFileName = $"POST", string endpoint = "", string code ="")
         {
             try
             {
-                baseFileName = $"{SessionStorage.SelectedFSUId}";
+                baseFileName = $"{SessionStorage.SelectedFSUId}_{endpoint}_{code}";
                 string documentsPath = string.Empty;
 #if ANDROID
                 await RequestPermissionsAsync();
