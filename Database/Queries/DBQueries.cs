@@ -2215,6 +2215,102 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<List<Tbl_Block_8_Q6>> Fetch_SCH_HIS_Block8_6(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_8_Q6>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_8_Q6>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 8_Q6: {ex.Message}");
+                return new List<Tbl_Block_8_Q6>();
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block8_Q6(Tbl_Block_8_Q6 tbl_block_8)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_8_Q6>().Where(x => x.id == tbl_block_8.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_8);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_8);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 8: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<int> Delete_SCH_HIS_Block8_Q6(Tbl_Block_8_Q6 obj)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_8_Q6>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        obj.is_deleted = true;
+                        status = await _database.UpdateAsync(obj);
+                    }
+                    else
+                    {
+                        status = await _database.DeleteAsync(obj);
+                    }
+
+                    await ReserializeBlock8List();
+                    return status;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While deleting SCH HIS Block 7D: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task ReserializeBlock8List()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block8_6(SessionStorage.selected_hhd_id);
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {

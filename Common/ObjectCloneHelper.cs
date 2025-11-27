@@ -85,5 +85,23 @@ namespace Income.Common
                 isUpdated = src.isUpdated,
             };
         }
+
+        public static T ShallowCopy<T>(this T source) where T : new()
+        {
+            if (source == null) return default;
+
+            T copy = new T();
+            var properties = typeof(T).GetProperties()
+                .Where(p => p.CanRead && p.CanWrite);
+
+            foreach (var prop in properties)
+            {
+                var value = prop.GetValue(source, null);
+                prop.SetValue(copy, value, null);
+            }
+
+            return copy;
+        }
+
     }
 }
