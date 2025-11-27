@@ -303,7 +303,7 @@
                 InputCounts[sss] = 0;
         }
         await LoadData();
-        
+
         StateHasChanged();
         await Logger.LogInfo($"Block 7 Loaded for {SessionStorage.SelectedFSUId}");
     }
@@ -694,7 +694,6 @@
                 int sectorType = sector; // 1 = Rural, 2 = Urban
 
                 var result = service.SelectHouseholds(households, sectorType);
-
                 if (result.Success)
                 {
                     foreach (var item in result.SelectedHouseholds)
