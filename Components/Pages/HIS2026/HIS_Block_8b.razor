@@ -86,6 +86,18 @@
         </div>
     </div>
 
+    @* Remarks Card *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header">
+            <h5 class="card-title m-0">
+                Remarks
+            </h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control w-100" rows="4" @bind="@remarks"></textarea>
+        </div>
+    </div>
+
 
     <div class="row">
         <div class="col-sm-6">
@@ -198,6 +210,7 @@
     bool benefitsEntryNeeded = false;
     readonly DBQueries dB = new();
     bool isAdd;
+    private string remarks = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {

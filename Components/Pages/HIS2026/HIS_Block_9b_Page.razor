@@ -1,0 +1,378 @@
+﻿@page "/dashboard/his/block_9b"
+@using Blazored.FluentValidation
+@using FluentValidation
+@using Income.Common.HIS2026
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Validators.HIS2026
+@using Income.Viewmodels
+@using System.Linq.Expressions
+@using System.Reflection
+@inject IJSRuntime JSRuntime
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject Comment_vm comment_vm
+@inject LocalizationService Loc
+
+<div class="pb-5">
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+
+    @if (editContext != null)
+    {
+        <EditForm EditContext="editContext">
+            <div class="card card-style2 rounded-4">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h3 class="card-title m-0 d-flex align-items-center">
+                        <span class="text-primary me-2">Block 9: Income from Asset</span>
+                    </h3>
+                </div>
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h3 class="card-title m-0 d-flex align-items-center">
+                        <span class="text-primary">B. Income from non-financial assets</span>
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered align-middle text-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th colspan="3" class="bg-transparent text-start">
+                                        <label class="form-label fs-6 fw-bold m-0">
+                                            <span class="badge bg-primary me-1">Q9.5</span>
+
+                                        </label>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="width: 50px;">S. No.</th>
+                                    <th>Item description</th>
+                                    <th>Number of months rented during last 365 days</th>
+                                    <th>Average monthly rent received (in Rs.)</th>
+                                    <th>Expenses incurred on repair and maintenance, insurance cost etc. (in Rs.) during 'last 365 days'</th>
+                                </tr>
+                                <tr>
+                                    <th>(1)</th>
+                                    <th>(2)</th>
+                                    <th>(3)</th>
+                                    <th>(4)</th>
+                                    <th>(5)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>1</td>
+                                    <td>dwelling</td>
+                                    <td>
+                                        <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                               @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_1_3, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_1_3)" />
+                                      </td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_1_4, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_1_4)" />
+                                      </td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_1_5, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_1_5)" />
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>2</td>
+                                      <td>building and other structure (excluding dwelling)</td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_2_3, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_2_3)" />
+                                      </td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_2_4, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_2_4)" />
+                                      </td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_2_5, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_2_5)" />
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>3</td>
+                                      <td>hired-out machinery and equipment</td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_3_3, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_3_3)" />
+                                      </td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_3_4, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_3_4)" />
+                                      </td>
+                                      <td>
+                                          <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                 @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_5_3_5, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_5_3_5)" />
+                                      </td>
+                                  </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            @* 7.3, 7.4 .... *@
+            <div class="card card-style2 rounded-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-center mb-0">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="badge bg-primary me-1">Q9.6</div>
+                                    </td>
+                                    <td>Income earned from leasing out land (including agricultural land, gazing land, lawn etc.) and other natural resources like ponds, orchards, plantations etc.</td>
+                                    <td rowspan="2">Last 365 days</td>
+                                    <td>
+                                        <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                               @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_6, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_6)" />
+                                      </td>
+                                  </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <div class="badge bg-primary me-1">Q9.7</div>
+                                    </td>
+                                    <td>Income earned from licensing the use of intellectual property (includes the return for services of patented or copyright material, e.g. receipts from writings, right to make use of inventions, etc.)</td>
+                                    
+                                    <td>
+                                        <input class="form-control form-control-sm no-spinner" value="@block_9b?.item_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                               @oninput="e =>
+                                               {
+                                                   UpdateFieldAndValidate(() => block_9b.item_7, e);
+                                               }" />
+                                          <ValidationMessage For="@(() => block_9b.item_7)" />
+                                      </td>
+                                  </tr>
+                              </tbody>
+                              @if (!string.IsNullOrEmpty(item_9_6_warning))
+                              {
+                                  <tfoot>
+                                      <tr>
+                                        <td colspan="4">
+                                            <div class="alert alert-success fw-bold text-success mb-0" role="alert">
+                                                @item_9_6_warning
+                                            </div>
+                                        </td>
+                                      </tr>
+                                  </tfoot>
+                            }
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </EditForm>
+
+    }
+
+
+    @* Remarks Card *@
+    <div class="card card-style2 rounded-4">
+        <div class="card-header">
+            <h5 class="card-title m-0">
+                Remarks
+            </h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control w-100" rows="4" @bind="@remarks"></textarea>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-primary me-2" @onclick="@(() => Save(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    private Modal modal = default!;
+    private Tbl_Block_9b? block_9b = new();
+    private List<Tbl_Block_3> MemberList = [];
+    EditContext editContext;
+    ValidationMessageStore messageStore;
+    DBQueries dB = new();
+    bool isAdd;
+    DateTime survey_date = DateTime.Now;
+    string remarks = string.Empty;
+    string item_9_6_warning = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        MemberList = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        block_9b = await dB.Fetch_SCH_HIS_Block9B(SessionStorage.selected_hhd_id);
+        if (block_9b == null)
+        {
+            block_9b = new();
+            block_9b.id = Guid.NewGuid();
+        }
+        editContext = new EditContext(block_9b);
+        messageStore = new ValidationMessageStore(editContext);
+        editContext.OnFieldChanged += EditContext_OnFieldChanged;
+
+        StateHasChanged();
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
+    }
+
+
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    {
+        try
+        {
+            var identifier = FieldIdentifier.Create(field);
+
+            // Try parse
+            int? value = null;
+            if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+                int.TryParse(e.Value?.ToString(), out var v))
+            {
+                value = v;
+            }
+
+            // 1️⃣ Update the actual model field
+            var memberExpr = (MemberExpression)field.Body;
+            var prop = (PropertyInfo)memberExpr.Member;
+            prop.SetValue(block_9b, value);
+
+            CheckWarning();
+
+            // 2️⃣ Clear previous errors
+            messageStore?.Clear(identifier);
+
+            // 3️⃣ Notify Blazor validation system
+            editContext?.NotifyFieldChanged(identifier);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
+    void CheckWarning()
+    {
+        item_9_6_warning = string.Empty;
+        if (MemberList.Any(x => x.item_8 == 10 || x.item_9 == 10 || x.item_10 == 10 || x.item_11 == 10) && (block_9b?.item_6.GetValueOrDefault() <= 0 && block_9b?.item_7.GetValueOrDefault() <= 0))
+        {
+            item_9_6_warning = "W067: Please check the entry recorded against cols. 8-11";
+        }
+    }
+
+    private async Task Save(bool is_go_next = false)
+    {
+        try
+        {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_10");
+                return;
+            }
+            messageStore.Clear();
+
+            var validator = new Block_9b_Validator(MemberList);
+            var validation = validator.Validate(block_9b);
+
+            foreach (var error in validation.Errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(block_9b, error.PropertyName);
+                messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            }
+            editContext.NotifyValidationStateChanged();
+
+            if (!validation.IsValid)
+            {
+                toastService.ShowError("Please resolve all the errors");
+                return;
+            }
+            else
+            {
+                int saved = await dB.Save_SCH_HIS_Block9B(block_9b);
+                if (saved > 0)
+                {
+                    toastService.ShowSuccess("Saved successfully");
+                }
+                else
+                {
+                    toastService.ShowSuccess("Data could not be saved");
+                }
+            }
+
+            if (!is_go_next)
+            {
+                return;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_10");
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+}

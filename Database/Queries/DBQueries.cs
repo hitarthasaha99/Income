@@ -2311,6 +2311,94 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<Tbl_Block_9a?> Fetch_SCH_HIS_Block9a(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_9a>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 9a: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block9a(Tbl_Block_9a tbl_block_9a)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_9a>().Where(x => x.id == tbl_block_9a.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_9a);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_9a);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 9a: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<Tbl_Block_9b?> Fetch_SCH_HIS_Block9B(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_9b>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 9B: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block9B(Tbl_Block_9b tbl_block_9b)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_9b>().Where(x => x.id == tbl_block_9b.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_9b);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_9b);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 9B: {ex.Message}");
+                return 0;
+            }
+        }
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {
@@ -2345,6 +2433,8 @@ namespace Income.Database.Queries
 
             return result;
         }
+
+        
 
         public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "HIS")
         {
