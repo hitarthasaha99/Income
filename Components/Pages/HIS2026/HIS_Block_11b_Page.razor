@@ -3,9 +3,13 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @using FluentValidation
+@using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@using System.Reflection
 @inject IJSRuntime JSRuntime
+@inject IValidator<Tbl_Block_11b> Validator
 
 
 <div class="my2">
@@ -15,7 +19,6 @@
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">Block 11b: Particulars of direct tax (income tax, professional tax, etc.) paid</span>
             </h3>
-            @* <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal"><i class="bi bi-plus"></i>Add</button> *@
             <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                 <i class="fi fi-rr-plus me-1"></i>Add
             </button>
@@ -59,91 +62,88 @@
 
 
     @* Model Popup When Click Add Button *@
-    <Modal @ref="AddModal" id = "addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Fullscreen="ModalFullscreen.MediumDown">
-    @* <div class="modal fade" id="addModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"> *@
+    <Modal @ref="AddModal" id="addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Fullscreen="ModalFullscreen.MediumDown">
         <HeaderTemplate>
             <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
-</HeaderTemplate>
+        </HeaderTemplate>
 
         <BodyTemplate>
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <EditForm Model="@table11B" OnInvalidSubmit="handleSave">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    @if (editContext != null)
+                    {
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add Item</h5>
-                    </div>
+                        <EditForm EditContext="editContext">
 
-                    <div class="modal-body">
-                        <div class="row">
 
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label fw-bold">
-                                    1. S.no.of the member
-                                </label>
-                                <input type="number" readonly class="form-control form-control-sm" value="@table11B.item_1" disabled />
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Item</h5>
                             </div>
 
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label fw-bold">
-                                    2. Name of Member
-                                </label>
-                                <InputText @bind-Value="table11B.item_2" @oninput="clearItem2Error"
-                                           class="form-control form-control-sm"
-                                           id="memberName"
-                                           autocomplete="off"
-                                           autocapitalize="off"
-                                           autocorrect="off"
-                                           spellcheck="false"
-                                           onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)" />
+                            <div class="modal-body">
+                                <div class="row">
 
-                                @if (!string.IsNullOrEmpty(item_2Error))
-                                {
-                                    <small class="text-danger">@item_2Error</small>
-                                }
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            1. S.no.of the member
+                                        </label>
+                                        <input type="number" readonly class="form-control form-control-sm" value="@table11B.item_1" disabled />
+                                    </div>
+
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            2. Name of Member
+                                        </label>
+                                        <InputText @bind-Value="table11B.item_2" @oninput="clearItem2Error"
+                                                   class="form-control form-control-sm"
+                                                   id="memberName"
+                                                   autocomplete="off"
+                                                   autocapitalize="off"
+                                                   autocorrect="off"
+                                                   spellcheck="false"
+                                                   onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)" />
+
+                                        @if (!string.IsNullOrEmpty(item_2Error))
+                                        {
+                                            <small class="text-danger">@item_2Error</small>
+                                        }
+                                    </div>
+
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            3. Whether paid any direct tax during last financial year? (yes-1, no-2)
+                                        </label>
+                                        <select value="@table11B.item_3"
+                                                @onchange="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => table11B.item_3, e);
+                                                    item_3Condition(e);
+                                                }"
+                                                  class="form-select form-select-sm">
+                                              <option value="">-Select-</option>
+                                              <option value="1">1-yes</option>
+                                              <option value="2">2-no</option>
+
+                                        </select>
+                                        <ValidationMessage For="@(() => table11B.item_3)" />
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            4. Amount of direct tax paid (net of refunds) in last financial year (in Rs.)
+                                        </label>
+                                        <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@table11B.item_4" disabled="@(!is11B_4Enable)"
+                                               @oninput="e => UpdateFieldAndValidate(() => table11B.item_4, e)" />
+                                        <ValidationMessage For="@(() => table11B.item_4)" />
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label fw-bold">
-                                    3. Whether paid any direct tax during last financial year? (yes-1, no-2)
-                                </label>
-                                <InputSelect @bind-Value="table11B.item_3" @oninput="clearItem_3"
-                                             class="form-select form-select-sm">
-                                    <option value="">-Select-</option>
-                                    <option value="1">1-yes</option>
-                                    <option value="2">2-no</option>
 
-                                </InputSelect>
-                                @if (!string.IsNullOrEmpty(item_3Error))
-                                {
-                                    <small class="text-danger">@item_3Error</small>
-                                }
-                            </div>
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label fw-bold">
-                                    4. Amount of direct tax paid (net of refunds) in last financial year (in Rs.)
-                                </label>
-                                <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" @bind-value="table11B.item_4" disabled="@(!is11B_4Enable)" />
-                            </div>
-                        </div>
-                    </div>
-
-                   
-                </EditForm>
+                        </EditForm>
+                    }
+                </div>
             </div>
-        </div>
         </BodyTemplate>
-        @* <FooterTemplate>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary btn-sm" @onclick="handleSave">
-                    <i class="bi bi-floppy-fill me-1"></i>
-                    Save
-                </button>
-                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </FooterTemplate> *@
         <FooterTemplate>
             <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
             <button type="submit" @onclick="@(() => handleSave())" class="btn btn-primary" form="YourEditFormId"><i class="fi fi-rr-disk me-1"></i>@((isAdd ? "Save" : "Update"))</button>
@@ -165,40 +165,50 @@
     private String? item_2Error = null;
     private string? item_3Error = null;
     private bool is11B_4Enable = false;
+    CommonQueries commonQueries = new();
+
+
+    EditContext editContext;
+    ValidationMessageStore messageStore;
 
 
 
 
-    //onInput method in 11B.3
-    private void clearItem_3(ChangeEventArgs e)
+    protected override async Task OnInitializedAsync()
     {
-        item_3Condition(e);
-        clearItem3Error();
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_11b",
+            block_title = "HIS Block 11b",
+            block_code = CommonEnum.sch_0_0_block_11b.ToString(),
+        };
+
+        // Insert the visited block record asynchronously
+        await commonQueries.InsertVisitedBlock(vb);
+        StateHasChanged();
     }
 
-    //Validate And Hard Check All Field
-    private void handleValidation()
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
     {
-        error = false;
-        if (string.IsNullOrWhiteSpace(table11B.item_2))
+        var identifier = FieldIdentifier.Create(field);
+
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
         {
-            item_2Error = "Name must be filled";
-            error = true;
+            value = v;
         }
-        else
-        {
-            item_2Error = null;
-        }
-        if (table11B.item_3 == null || table11B.item_3 == 0)
-        {
-            item_3Error = "H76(ii): Invalid Entry, Please check the entry";
-            error = true;
-        }
-        else
-        {
-            item_3Error = null;
-        }
+
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(table11B, value);
+
+        messageStore.Clear(identifier);
+
+        editContext?.NotifyFieldChanged(identifier);
     }
+
+   
 
 
     //Check the 11b_3 yes then enable 11b_4 input field
@@ -215,43 +225,54 @@
         {
             // If NO or blank → disable + clear
             is11B_4Enable = false;
-            table11B.item_4 = null; // Clear value
+            table11B.item_4 = null;
+            var fieldIdentifier = new FieldIdentifier(table11B, nameof(table11B.item_4));
+            messageStore.Clear(fieldIdentifier);
+            editContext.NotifyValidationStateChanged();
         }
 
-        // Clear the Q3 error if user selects anything
         item_3Error = null;
     }
 
     //Save Data And show List
-    private async void handleSave()
+    private async Task handleSave()
     {
-        handleValidation();
-        if (error)
+        // Clear previous errors
+        messageStore.Clear();
+        error = false;
+
+        // Validate model using FluentValidation
+        var validationResult = Validator.Validate(table11B);
+
+        // Add errors to message store for display in EditForm
+        foreach (var error in validationResult.Errors)
         {
+            var fieldIdentifier = new FieldIdentifier(table11B, error.PropertyName);
+            messageStore.Add(fieldIdentifier, error.ErrorMessage);
+        }
+        editContext.NotifyValidationStateChanged();
+
+        if (!validationResult.IsValid)
+        {
+            error = true;
             return;
         }
-
         table11B.item_1 = showDataTable11B.Count + 1;
         showDataTable11B.Add(table11B);
 
-        // Reset form model
         table11B = new Tbl_Block_11b();
-
-        // Reset UI state
         is11B_4Enable = false;
-        item_3Error = null;
         item_2Error = null;
+        item_3Error = null;
+
         await JSRuntime.InvokeVoidAsync("closeModal", "addModal");
         toastService.ShowSuccess("Member added successfully!");
     }
 
-
-
-
     //Clear all error when input any thing
     private void clearItem2Error() => item_2Error = null;
     private void clearItem3Error() => item_3Error = null;
-    bool isAdd = true;
+    bool isAdd = false;
 
     async Task HandleModal(string action = "", Tbl_Block_11b? data = null)
     {
@@ -259,23 +280,36 @@
         {
             if (action == "ADD")
             {
-                // Create empty object
-                table11B = new Tbl_Block_11b();
+                isAdd = true;
 
-                // Generate serial number
+                // Create empty object with serial number
+                table11B = new Tbl_Block_11b();
                 table11B.item_1 = showDataTable11B.Count + 1;
 
-                // OPEN modal
+                // Initialize EditContext and validation messages
+                editContext = new EditContext(table11B);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += EditContext_OnFieldChanged;
+
+                // Reset enable state for amount input
+                is11B_4Enable = false;
+
                 await AddModal.ShowAsync();
             }
             else if (action == "UPDATE")
             {
+                isAdd = false;
+
                 if (data != null)
                 {
-                    // Load existing row into edit form
+                    // Load existing data
                     table11B = data;
 
-                    // Enable item_4 if item_3 == yes
+                    editContext = new EditContext(table11B);
+                    messageStore = new ValidationMessageStore(editContext);
+                    editContext.OnFieldChanged += EditContext_OnFieldChanged;
+
+                    // Enable amount input if tax paid
                     is11B_4Enable = table11B.item_3 == 1;
 
                     await AddModal.ShowAsync();
@@ -290,6 +324,11 @@
         {
             Console.WriteLine(ex.Message);
         }
+    }
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        messageStore.Clear(e.FieldIdentifier);
+        editContext.NotifyValidationStateChanged();
     }
 
 }
