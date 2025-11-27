@@ -94,10 +94,9 @@
                                 <td>@member.item_10</td>
                                 <td>@member.item_11</td>
                                 <td>
-                                    @(member.item_12 == 1 ? "yes" :
-                                                                    member.item_12 == 2 ? "no" : "")
-                            </td>
-                            <td class="d-flex align-items-center">
+                                    @(member.item_12 == 1 ? "yes" : member.item_12 == 2 ? "no" : "")
+                                </td>
+                                <td class="d-flex align-items-center">
                                     <button class="btn btn-link me-3 fs-6"
                                             hidden="@SessionStorage.FSU_Submitted"
                                             @onclick="@(() => HandleModal("UPDATE", member))">
@@ -117,37 +116,37 @@
         </div>
     </div>
 </div>
-<!-- 🔹 Footer Navigation (Always visible) -->
-<div class="footer">
-    <!-- Remarks textarea -->
-    <div class="card custom-card">
-        <div class="card-header">
-            <h3 class="card-title">Remarks</h3>
-        </div>
-        <div class="card-body">
-            <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
-        </div> 
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="d-flex">
-                <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
-                    <i class="fi fi-rr-angle-left me-1"></i>Back
-                </NavLink>
+    <!-- 🔹 Footer Navigation (Always visible) -->
+    <div>
+        <!-- Remarks textarea -->
+        <div class="card custom-card">
+            <div class="card-header">
+                <h3 class="card-title">Remarks</h3>
+            </div>
+            <div class="card-body">
+                <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
             </div>
         </div>
-        <div class="col-sm-6">
-            <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
-                    Next<i class="fi fi-rr-angle-right ms-1"></i>
-                </NavLink>
+        <div class="row mb-4">
+            <div class="col-sm-6">
+                <div class="d-flex">
+                    <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
+                        <i class="fi fi-rr-angle-left me-1"></i>Back
+                    </NavLink>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="d-flex align-items-center justify-content-end">
+                    <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
+                        Next<i class="fi fi-rr-angle-right ms-1"></i>
+                    </NavLink>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false"  Fullscreen="ModalFullscreen.MediumDown">
+<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Fullscreen="ModalFullscreen.MediumDown">
     <HeaderTemplate>
         <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
     </HeaderTemplate>
@@ -205,7 +204,7 @@
                                             <option value="9">servants/employees/other non-relatives-9 </option>
                                         </select>
                                         <ValidationMessage For="@(() => newMember.item_3)" />
-                                  
+
                                     </div>
 
                                     <!-- Gender select -->
@@ -321,7 +320,7 @@
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                             </select>
                                             <ValidationMessage For="@(() => newMember.item_8)" />
-                                          
+
                                             @if (!string.IsNullOrEmpty(item_8Warning))
                                             {
                                                 <div class="text-success" role="alert">@item_8Warning</div>
@@ -387,7 +386,7 @@
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                             </select>
                                             <ValidationMessage For="@(() => newMember.item_10)" />
-                                   
+
                                             @if (!string.IsNullOrEmpty(item_10Warning))
                                             {
                                                 <div class="text-success" role="alert">@item_10Warning</div>
@@ -418,7 +417,7 @@
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                             </select>
                                             <ValidationMessage For="@(() => newMember.item_11)" />
-                                     
+
                                             @if (!string.IsNullOrEmpty(item_11Warning))
                                             {
                                                 <div class="text-success">@item_11Warning</div>
@@ -442,7 +441,7 @@
 
                                         </InputSelect>
                                         <ValidationMessage For="@(() => newMember.item_12)" />
-                                      
+
                                     </div>
                                 </div>
                             </div>
@@ -644,7 +643,7 @@
         CheckItem9Warning();
         StateHasChanged();
     }
-    private void ClearItem10( ChangeEventArgs e)
+    private void ClearItem10(ChangeEventArgs e)
     {
         ClearItem10Error();
         item_10Error = null;
