@@ -1757,6 +1757,15 @@ namespace Income.Database.Queries
                     {
                         int deleted = await _database.DeleteAsync(exists);
                     }
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if (block_7d != null)
+                    {
+                        var item = block_7d.FirstOrDefault(x => x.block_7c_id == id);
+                        if (item != null)
+                        {
+                            _ = await Delete_SCH_HIS_Block7D_List(item);
+                        }
+                    }
                     await ReserializeCodeList();
                     return 1;
                 }
@@ -2149,6 +2158,8 @@ namespace Income.Database.Queries
                     {
                         status = await _database.DeleteAsync(obj);
                     }
+
+                    await ReserializeBlock7DList();
                     return status;
                 }
                 return 0;
