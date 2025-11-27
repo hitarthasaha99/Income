@@ -1,0 +1,29 @@
+﻿using FluentValidation;
+using Income.Database.Models.HIS_2026;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Income.Validators.HIS2026
+{
+    public class Block7DValidator : AbstractValidator<Tbl_Block_7d>
+    {
+        public Block7DValidator()
+        {
+            RuleFor(x => x.item_3)
+            .NotEmpty().WithMessage("H054: Invalid entry, please check the entry")
+            .Must(x => x == 1 || x == 2)
+            .WithMessage("H054: Invalid entry, please check the entry");
+
+            RuleFor(x => x.item_4)
+                .NotEmpty().When(x => x.item_3 == 2)
+                .WithMessage("Please enter share (%).");
+
+            RuleFor(x => x.item_4)
+                .GreaterThanOrEqualTo(0).When(x => x.item_3 == 2)
+                .WithMessage("Share cannot be negative.");
+        }
+    }
+}

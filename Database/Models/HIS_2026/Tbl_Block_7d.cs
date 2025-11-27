@@ -14,13 +14,14 @@ namespace Income.Database.Models.HIS_2026
         [PrimaryKey]
         public Guid id { get; set; }
         public int hhd_id { get; set; } = SessionStorage.selected_hhd_id;
+        public int? code { get; set; }
         public int? serial_number { get; set; }
         //sl no of activity
         public int? item_1 { get; set; }
         //description of activity
         public string? item_2 { get; set; }
         //mode of operation (1/2)
-        public string? item_3 { get; set; }
+        public int? item_3 { get; set; }
         //% shareholding
         public decimal? item_4 { get; set; }
         public bool? isUpdated { get; set; }

@@ -1,5 +1,6 @@
 ﻿@page "/dashboard/his/block_7d"
 @using Blazored.FluentValidation
+@using FluentValidation
 @using Income.Common.HIS2026
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
@@ -14,7 +15,6 @@
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
 
-
 <div class="pb-5">
     <CommonContentHeader />
     <div class="card card-style2 rounded-4">
@@ -24,262 +24,509 @@
                 Mode of operation & percentage of shareholding in activities carried out during last 365 days
             </h5>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle text-center mb-0">
-                    <thead>
-                        <tr>
-                            <th colspan="3" class="bg-transparent text-start">
-                                <label class="form-label fs-6 fw-bold m-0">
-                                    <span class="badge bg-primary me-1">Q7.12</span>
-                                    Mode of operation & percentage of shareholding among activity(ies) carried out in last 365 days (To be populated from the responses of Q7.1 - crop cultivation, Q4.4 – allied activity in agriculture & Q7.9 – non-agriculture activity)
-                                </label>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th style="width: 50px;">S. no. of activity</th>
-                            <th>Description of activity</th>
-                            <th>Mode of operation (individually operated -1, jointly operated with other household(s) -2)</th>
-                            <th>% shareholding(in case of code 2 in col. 3)</th>
-                        </tr>
-                        <tr>
-                            <th>(1)</th>
-                            <th>(2)</th>
-                            <th>(3)</th>
-                            <th>(4)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Block7DList != null)
-                        {
-                            foreach(var item in Block7DList)
-                            {
-                                <tr></tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        @if (editContext != null)
+        {
+            <EditForm EditContext="editContext">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
+                            <table class="table table-bordered align-middle text-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th colspan="3" class="bg-transparent text-start">
+                                        <label class="form-label fs-6 fw-bold m-0">
+                                            <span class="badge bg-primary me-1">Q7.12</span>
+                                            Mode of operation & percentage of shareholding among activity(ies) carried out in last 365 days (To be populated from the responses of Q7.1 - crop cultivation, Q4.4 – allied activity in agriculture & Q7.9 – non-agriculture activity)
+                                        </label>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="width: 50px;">S. no. of activity</th>
+                                    <th>Description of activity</th>
+                                    <th>Mode of operation (individually operated -1, jointly operated with other household(s) -2)</th>
+                                    <th>% shareholding(in case of code 2 in col. 3)</th>
+                                </tr>
+                                <tr>
+                                    <th>(1)</th>
+                                    <th>(2)</th>
+                                    <th>(3)</th>
+                                    <th>(4)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Block7DList?.Any() == true)
+                                {
+                                    foreach (var d in Block7DList)
+                                    {
+                                        <tr>
+                                            <td>@d.item_1</td>
+                                            <td>@d.item_2</td>
+                                            <td>
+                                                <select class="form-select" @onchange="(e) => UpdateModeOfOperation(d, e)">
+                                                    <option value="">Select</option>
+                                                    <option value="1" selected="@(d.item_3 == 1)">1 - Individually operated</option>
+                                                    <option value="2" selected="@(d.item_3 == 2)">2 - Jointly operated with other households</option>
+                                                </select>
+                                                <ValidationMessage For="@(() => d.item_3)" />
+
+                                            </td>
+                                            <td>
+                                                <input disabled="@(d.item_3 == 1 || d.item_3 == null)" class="form-control" value="@(d.item_4?.ToString() ?? "")" @oninput="(e) => UpdateShareholding(d, e)" />
+                                                <ValidationMessage For="@(() => d.item_4)" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4">No activities yet.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            
+                        </table>
+                        </fieldset>
+                    </div>
+                </div>
+            </EditForm>
+        }
+        
+        
     </div>
 
-
     @* Remarks Card *@
-    <div class="card card-style2 rounded-4">
+    <div class="card card-style2 rounded-4 mt-3">
         <div class="card-header">
             <h5 class="card-title m-0">
                 Remarks
             </h5>
         </div>
         <div class="card-body">
-            <textarea class="form-control w-100" rows="4"></textarea>
+            <textarea class="form-control w-100" rows="4" @bind="remarks"></textarea>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-3">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+            <button class="btn btn-outline-primary" @onclick="GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-primary me-2"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
-                <NavLink class="btn btn-outline-primary">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <button class="btn btn-primary me-2" @onclick="() => SaveClicked(false)"><i class="bi bi-floppy-fill me-1"></i>Save</button>
+                }
+                <button class="btn btn-outline-primary" @onclick="() => SaveClicked(true)">Next<i class="bi bi-chevron-right ms-1"></i></button>
             </div>
         </div>
-
     </div>
 </div>
+
 @code {
     readonly DateTime survey_date = DateTime.Now;
-    readonly Modal AddModal = default!;
-    Tbl_Block_7c_Q10 fields = new();
-    List<Tbl_Block_7a_1> CropCodeList = [];
+    List<Tbl_Block_7a_1> CropCodeList = new();
     Tbl_Block_4? block_4;
-    List<Tbl_Block_7c_NIC> NICFields = [];
-    List<Tbl_Block_7d> Block7DList = [];
-    EditContext editContext;
+    List<Tbl_Block_7c_NIC> NICFields = new();
+    List<Tbl_Block_7d> Block7DList = new();
+    EditContext? editContext;
     string remarks = string.Empty;
     DBQueries dQ = new();
-    ValidationMessageStore messageStore;
+    ValidationMessageStore? messageStore;
 
-    async void GoBack()
+    // Guards
+    private bool _isBusy = false;
+    private bool _initialized = false;
+
+    async Task GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        if (firstRender && !_initialized)
         {
-            await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+            // Prevent re-entrancy.
+            _initialized = true;
+
+            // Load all data in a single guarded flow.
+            await LoadAllDataSafeAsync();
+            editContext = new EditContext(this); // or new object(), or a wrapper model
+            messageStore = new ValidationMessageStore(editContext);
+            // clear errors every validation request
+            editContext.OnValidationRequested += (_, __) => messageStore.Clear();
+            // After completing load and sync, trigger one render.
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ValidateRow(Tbl_Block_7d row)
+    {
+        // Clear previous errors for this row only
+        messageStore.Clear(new FieldIdentifier(row, nameof(row.item_3)));
+        messageStore.Clear(new FieldIdentifier(row, nameof(row.item_4)));
+
+        // Rule: item_3 must be 1 or 2
+        if (row.item_3 is null or 0)
+        {
+            messageStore.Add(
+                new FieldIdentifier(row, nameof(row.item_3)),
+                "H054: Invalid entry, please check the entry"
+            );
         }
 
-        CropCodeList = await dQ.Fetch_SCH_HIS_Block7A_CodeList();
-
-        NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
-        block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
-        Block7DList = await dQ.Fetch_SCH_HIS_Block7D();
-
-        if (Block7DList.Count == 0)
+        // Rule: If item_3 = 2 → item_4 must be >= 0
+        if (row.item_3 == 2)
         {
-            var tempList = new List<Tbl_Block_7d>();
-            int serial_no = 1;
-            foreach (var crop in CropCodeList)
+            if (row.item_4 == null)
             {
-                Tbl_Block_7d obj = new();
-                obj.id = Guid.NewGuid();
-                obj.serial_number = serial_no++;
-                obj.item_1 = crop.serial_number;
-                obj.item_2 = crop.code.ToString();
-                tempList.Add(obj);
+                messageStore.Add(
+                    new FieldIdentifier(row, nameof(row.item_4)),
+                    "H055: Invalid entry, please check the entry"
+                );
+            }
+            else if (row.item_4 < 0)
+            {
+                messageStore.Add(
+                    new FieldIdentifier(row, nameof(row.item_4)),
+                    "H055: Invalid entry, please check the entry"
+                );
             }
         }
 
-        
-
-        await LoadData();
-
-        StateHasChanged();
-    }
-
-    async Task LoadData()
-    {
-        // Block_4_5_ErrorMessage = string.Empty;
-        
-        StateHasChanged();
-    }
-
-    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
-    {
-        // Clear validation messages for this specific field
-        messageStore.Clear(e.FieldIdentifier);
-
-        // Update validation state
+        // Notify UI to refresh validation messages
         editContext.NotifyValidationStateChanged();
     }
 
-    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+
+    private async Task LoadAllDataSafeAsync()
     {
-        var identifier = FieldIdentifier.Create(field);
-
-        // Try parse
-        int? value = null;
-        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
-            int.TryParse(e.Value?.ToString(), out var v))
+        if (_isBusy) return;
+        _isBusy = true;
+        try
         {
-            value = v;
+            // Load lists in parallel where possible (no UI changes yet).
+            var fetchCropTask = dQ.Fetch_SCH_HIS_Block7A_CodeList();
+            var fetchNICTask = dQ.Fetch_SCH_HIS_Block7_NICList();
+            var fetchBlock4Task = dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
+            var fetchBlock7DTask = dQ.Fetch_SCH_HIS_Block7D();
+
+            await Task.WhenAll(fetchCropTask, fetchNICTask, fetchBlock4Task, fetchBlock7DTask);
+
+            CropCodeList = fetchCropTask.Result ?? new List<Tbl_Block_7a_1>();
+            NICFields = fetchNICTask.Result ?? new List<Tbl_Block_7c_NIC>();
+            block_4 = fetchBlock4Task.Result;
+            Block7DList = fetchBlock7DTask.Result ?? new List<Tbl_Block_7d>();
+
+            // Sync (but do not call StateHasChanged inside loops). These methods will perform DB saves
+            // but we only update the in-memory list and then perform a single InvokeAsync(StateHasChanged).
+            await SyncBlock7A_7DAsync_Batched();
+            await SyncBlock4_7DAsync_Batched();
+            await SyncBlock7C_7DAsync_Batched();
+            await dQ.ReserializeBlock7DList();
+
         }
-
-        // 1️⃣ Update the actual model field
-        var memberExpr = (MemberExpression)field.Body;
-        var prop = (PropertyInfo)memberExpr.Member;
-        prop.SetValue(fields, value);
-        fields.item_10_11 = (fields.item_10_1 ?? 0) + (fields.item_10_2 ?? 0) + (fields.item_10_3 ?? 0) + (fields.item_10_4 ?? 0) + (fields.item_10_5 ?? 0) + (fields.item_10_6 ?? 0) + (fields.item_10_7 ?? 0) + (fields.item_10_8 ?? 0) + (fields.item_10_9 ?? 0) + (fields.item_10_10 ?? 0);
-
-        // 2️⃣ Clear previous errors
-        messageStore?.Clear(identifier);
-
-        // 3️⃣ Notify Blazor validation system
-        editContext?.NotifyFieldChanged(identifier);
+        catch (Exception ex)
+        {
+            Console.WriteLine($"LoadAllDataSafeAsync error: {ex.Message}");
+        }
+        finally
+        {
+            _isBusy = false;
+        }
     }
 
-    async Task HandleDelete(Guid id)
+    int GetCurrentSerialNumber()
     {
-        int item_index = NICFields.FindIndex(l => l.id == id);
-        if (item_index != -1)
+        if (Block7DList != null)
         {
-            NICFields[item_index].is_deleted = true;
-            await dQ.DeleteBlock4_NICList(id);
-            toastService.ShowSuccess("Row deleted successfully!");
-            await LoadData();
+            return Block7DList.Count > 0 ? Block7DList.Count + 1 : 1;
+        }
+        return 1;
+    }
+
+    private async Task SyncBlock4_7DAsync_Batched()
+    {
+        // Add missing codes from CropCodeList into Block7DList in-memory first
+        var toAdd = new List<Tbl_Block_7d>();
+        if (block_4 != null)
+        {
+            bool item_3 = block_4.item_4_3.GetValueOrDefault();
+            bool item_4 = block_4.item_4_4.GetValueOrDefault();
+            bool item_5 = block_4.item_4_5.GetValueOrDefault();
+            bool item_6 = block_4.item_4_6.GetValueOrDefault();
+
+            //Need to define internal codes for the above items as they are not part of NIC CODES
+            //item_3 -> 4003
+            //item_4 -> 4004
+            //item_5 -> 4005
+            //item_6 -> 4006
+            if (item_3)
+            {
+                bool exists = Block7DList.Any(d => d.code == 4003);
+                if (!exists)
+                {
+                    var newEntry = new Tbl_Block_7d
+                    {
+                        id = Guid.NewGuid(),
+                        serial_number = GetCurrentSerialNumber(),
+                        code = 4003,
+                        item_1 = 2,
+                        item_2 = "animal husbandry"
+                    };
+                    toAdd.Add(newEntry);
+                }
+            }
+            if (item_4)
+            {
+                bool exists = Block7DList.Any(d => d.code == 4004);
+                if (!exists)
+                {
+                    var newEntry = new Tbl_Block_7d
+                    {
+                        id = Guid.NewGuid(),
+                        serial_number = GetCurrentSerialNumber(),
+                        code = 4004,
+                        item_1 = 3,
+                        item_2 = "fisheries"
+                    };
+                    toAdd.Add(newEntry);
+                }
+            }
+            if (item_5)
+            {
+                bool exists = Block7DList.Any(d => d.code == 4005);
+                if (!exists)
+                {
+                    var newEntry = new Tbl_Block_7d
+                    {
+                        id = Guid.NewGuid(),
+                        serial_number = GetCurrentSerialNumber(),
+                        code = 4005,
+                        item_1 = 4,
+                        item_2 = "agroforestry activity"
+                    };
+                    toAdd.Add(newEntry);
+                }
+            }
+            if (item_6)
+            {
+                bool exists = Block7DList.Any(d => d.code == 4006);
+                if (!exists)
+                {
+                    var newEntry = new Tbl_Block_7d
+                    {
+                        id = Guid.NewGuid(),
+                        serial_number = GetCurrentSerialNumber(),
+                        code = 4006,
+                        item_1 = 5,
+                        item_2 = "others (bee keeping, sericulture, lac culture, ancillary etc.)"
+                    };
+                    toAdd.Add(newEntry);
+                }
+            }
+        }
+
+        if (toAdd.Any())
+        {
+            // Save to DB but do it sequentially to avoid overwhelming the webview.
+            foreach (var ne in toAdd)
+            {
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(ne);
+                    Block7DList.Add(ne);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving Block7D new entry: {ex.Message}");
+                }
+            }
+            // Single UI update after batch work
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task SyncBlock7A_7DAsync_Batched()
+    {
+        // Add missing codes from CropCodeList into Block7DList in-memory first
+        var toAdd = new List<Tbl_Block_7d>();
+        foreach (var code in CropCodeList)
+        {
+            // assume mapping by code id is different - previously used id comparisons; adjust if needed
+            bool exists = Block7DList.Any(d => d.code == code.code);
+            if (!exists)
+            {
+                var newEntry = new Tbl_Block_7d
+                {
+                    id = Guid.NewGuid(),
+                    serial_number = GetCurrentSerialNumber(),
+                    code = code.code,
+                    item_1 = code.serial_number,
+                    item_2 = Block_7_1_Constants.CropCodes.FirstOrDefault(x => x.id == code.code)?.title ?? ""
+
+                };
+                toAdd.Add(newEntry);
+            }
+        }
+
+        if (toAdd.Any())
+        {
+            // Save to DB but do it sequentially to avoid overwhelming the webview.
+            foreach (var ne in toAdd)
+            {
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(ne);
+                    Block7DList.Add(ne);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving Block7D new entry: {ex.Message}");
+                }
+            }
+            // Single UI update after batch work
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task SyncBlock7C_7DAsync_Batched()
+    {
+        var toAdd = new List<Tbl_Block_7d>();
+        foreach (var code in NICFields)
+        {
+            bool exists = Block7DList.Any(d => d.code == code.NicCode);
+            if (!exists)
+            {
+                var newEntry = new Tbl_Block_7d
+                {
+                    id = Guid.NewGuid(),
+                    serial_number = GetCurrentSerialNumber(),
+                    code = code.NicCode,
+                    item_1 = code.SerialNumber,
+                    item_2 = Block_4_Constants.NIC_CODES.FirstOrDefault(x => x.id == code.NicCode)?.title ?? ""
+
+                };
+                toAdd.Add(newEntry);
+            }
+        }
+
+        if (toAdd.Any())
+        {
+            foreach (var ne in toAdd)
+            {
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(ne);
+                    Block7DList.Add(ne);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving Block7D new NIC entry: {ex.Message}");
+                }
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    // Handler for changing mode of operation (select)
+    private void UpdateModeOfOperation(Tbl_Block_7d entry, ChangeEventArgs e)
+    {
+        if (entry == null) return;
+        if (int.TryParse(e?.Value?.ToString(), out var val))
+        {
+            entry.item_3 = val;
+            if (val == 1)
+            {
+                entry.item_4 = null; // Clear shareholding if individually operated
+            }
         }
         else
         {
-            toastService.ShowError("Not Able to delete row, Please try again!");
+            entry.item_3 = null;
         }
+        ValidateRow(entry);
+    }
+
+    private void UpdateShareholding(Tbl_Block_7d entry, ChangeEventArgs e)
+    {
+        if (entry == null) return;
+        if (decimal.TryParse(e?.Value?.ToString(), out var val))
+        {
+            entry.item_4 = val;
+        }
+        else
+        {
+            entry.item_4 = null;
+        }
+        ValidateRow(entry);
     }
 
 
-
-    async Task HandleModal(string action = "", Tbl_Block_7c_Q10? data = null)
+    async Task SaveClicked(bool is_go_next = false)
     {
+        if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            Next();
+            return;
+        }
+        // Simple guard
+        bool hasErrors = false;
+        foreach (var row in Block7DList)
+        {
+            ValidateRow(row);
+            if (editContext.GetValidationMessages(new FieldIdentifier(row, nameof(row.item_3))).Any() ||
+                editContext.GetValidationMessages(new FieldIdentifier(row, nameof(row.item_4))).Any())
+            {
+                hasErrors = true;
+            }
+        }
+
+        if (hasErrors)
+        {
+            toastService.ShowError("Please resolve pending errors");
+            return;
+        }
+
         try
         {
-            if (action == "UPDATE")
+            foreach (var item in Block7DList)
             {
-                fields = ObjectCloneHelper.CloneTbl7Q10List(data);
-                editContext = new EditContext(fields);
-                messageStore = new ValidationMessageStore(editContext);
-                editContext.OnFieldChanged += EditContext_OnFieldChanged;
-                await AddModal.ShowAsync();
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(item);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Update_Block7D error: {ex.Message}");
+                }
             }
-            else if (action == "CLOSE")
+
+
+            toastService.ShowSuccess("Saved successfully");
+            // Single UI refresh at the end
+            await InvokeAsync(StateHasChanged);
+
+            if(is_go_next)
             {
-                await AddModal.HideAsync();
+                Next();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($"SaveClicked error: {ex.Message}");
+            toastService.ShowError("Unable to save the data");
         }
-
-    }
-
-
-    private async Task Save()
-    {
-        try
+        finally
         {
-            // messageStore.Clear();
-            // var validation = Validator.Validate(fields);
-
-            // foreach (var error in validation.Errors)
-            // {
-            //     var fieldIdentifier = new FieldIdentifier(fields, error.PropertyName);
-            //     messageStore.Add(fieldIdentifier, error.ErrorMessage);
-            // }
-            // editContext.NotifyValidationStateChanged();
-            // if (validation.IsValid)
-            // {
-            //     int saved = await dQ.Save_SCH_HIS_Block7_Q10_List(fields) ?? 0;
-            //     if (saved > 0)
-            //     {
-            //         toastService.ShowSuccess("Saved successfully");
-            //         await AddModal.HideAsync();
-            //         await LoadData();
-            //     }
-            //     else
-            //     {
-            //         toastService.ShowError("Unable to save the data");
-            //     }
-            // }
-            // else
-            // {
-            //     toastService.ShowError("Please resolve the errors");
-            //     return;
-            // }
-        }
-        catch (Exception ex)
-        {
-
+            _isBusy = false;
         }
     }
 
     private void Next()
     {
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-        {
-            NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
-            return;
-        }
-        if (Block7DList.Any(x => !x.isUpdated.GetValueOrDefault()))
-        {
-            toastService.ShowError("Need to  atleast one entry before proceeding");
-        }
-        else
-        {
-            NavigationManager.NavigateTo("/dashboard/his/block_8a");
-        }
+        NavigationManager.NavigateTo("/dashboard/his/block_8a");
     }
 }

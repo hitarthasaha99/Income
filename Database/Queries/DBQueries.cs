@@ -1237,15 +1237,17 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4)
+        public async Task<int> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4, bool has_item_4_changed = false)
         {
             try
             {
-                int status = new();
+                int status;
                 var check_existence = await _database.Table<Tbl_Block_4>().Where(x => x.id == tbl_block_4.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(tbl_block_4);
+                    await SyncBlock7D(check_existence);
+
                 }
                 else
                 {
@@ -1257,6 +1259,64 @@ namespace Income.Database.Queries
             {
                 Console.WriteLine($"Error While saving SCH HIS Block 4: {ex.Message}");
                 return 0;
+            }
+        }
+
+        public async Task SyncBlock7D(Tbl_Block_4 tbl_Block_4)
+        {
+            try
+            {
+                var Block7DList = await Fetch_SCH_HIS_Block7D() ?? new List<Tbl_Block_7d>();
+                var toAdd = new List<Tbl_Block_7d>();
+                int current_sl = Block7DList.Count;
+                // Map Block 4 → Block 7D creation metadata
+                var map = new[]
+                {
+                    new { Flag = tbl_Block_4.item_4_3, Code = 4003, Item1 = 2, Item2 = "animal husbandry" },
+                    new { Flag = tbl_Block_4.item_4_4, Code = 4004, Item1 = 3, Item2 = "fisheries" },
+                    new { Flag = tbl_Block_4.item_4_5, Code = 4005, Item1 = 4, Item2 = "agroforestry activity" },
+                    new { Flag = tbl_Block_4.item_4_6, Code = 4006, Item1 = 5, Item2 = "others (bee keeping, sericulture, lac culture, ancillary etc.)" }
+                };
+
+                foreach (var row in map)
+                {
+                    var exists = Block7DList.FirstOrDefault(d => d.code == row.Code);
+
+                    // ❌ CASE 1: Corresponding Block_4 flag is false → delete existing entry
+                    if (!row.Flag.GetValueOrDefault())
+                    {
+                        if (exists != null)
+                            await Delete_SCH_HIS_Block7D_List(exists);
+
+                        continue; // move to next row
+                    }
+
+                    // ✔️ CASE 2: Flag is true → create entry if missing
+                    if (exists == null)
+                    {
+                        var newEntry = new Tbl_Block_7d
+                        {
+                            id = Guid.NewGuid(),
+                            hhd_id = tbl_Block_4.hhd_id,
+                            serial_number = current_sl++,
+                            code = row.Code,
+                            item_1 = row.Item1,
+                            item_2 = row.Item2,
+                        };
+
+                        toAdd.Add(newEntry);
+                    }
+                }
+
+                // Save new entries
+                foreach (var item in toAdd)
+                {
+                    await Save_SCH_HIS_Block7D_List(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While syncing Block 7D: {ex.Message}");
             }
         }
 
@@ -1322,6 +1382,28 @@ namespace Income.Database.Queries
                     foreach(var item in items)
                     {
                         item.SerialNumber = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public async Task ReserializeBlock7DList()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block7D();
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
                         s++;
                         await _database.UpdateAsync(item);
                     }
@@ -2010,6 +2092,34 @@ namespace Income.Database.Queries
             catch (Exception ex)
             {
                 Console.WriteLine($"Error While saving SCH HIS Block 7D: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int?> Delete_SCH_HIS_Block7D_List(Tbl_Block_7d obj)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_7d>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        obj.is_deleted = true;
+                        status = await _database.UpdateAsync(obj);
+                    }
+                    else
+                    {
+                        status = await _database.DeleteAsync(obj);
+                    }
+                    return status;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While deleting SCH HIS Block 7D: {ex.Message}");
                 return null;
             }
         }
