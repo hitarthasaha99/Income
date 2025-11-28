@@ -94,14 +94,15 @@
                                         </label>
                                     }
                                 }
+                                <ValidationMessage For="@(() => block_4.item_8)" />
+                                @if (!string.IsNullOrEmpty(Item8WarningMessage))
+                                {
+                                    <div class="form-text text-success mb-3">
+                                        @Item8WarningMessage
+                                    </div>
+                                }
                             </div>
-                            <ValidationMessage For="@(() => block_4.item_8)" />
-                            @if (!string.IsNullOrEmpty(Item8WarningMessage))
-                            {
-                                <div class="form-text text-warning">
-                                    @Item8WarningMessage
-                                </div>
-                            }
+                            
                         </div>
                     </div>
 
@@ -146,14 +147,15 @@
                                         <span class="label-text">@item.title</span>
                                     </label>
                                 }
+                                <ValidationMessage For="@(() => block_4.item_10)" />
+                                @if (!string.IsNullOrEmpty(Item10WarningMessage))
+                                {
+                                    <div class="form-text text-success mb-3">
+                                        @Item10WarningMessage
+                                    </div>
+                                }
                             </div>
-                            <ValidationMessage For="@(() => block_4.item_10)" />
-                            @if (!string.IsNullOrEmpty(Item10WarningMessage))
-                            {
-                                <div class="form-text text-warning">
-                                    @Item10WarningMessage
-                                </div>
-                            }
+                           
                         </div>
                     </div>
                     <div class="col-sm-12">
@@ -226,7 +228,7 @@
                         <!--4.15-->
                         <div class="mb-3">
                             <label class="form-label">
-                                <span class="form-badge">15</span>Whether the household has any outstanding loan taken from financial institution* for the purpose of construction of land/house/building/flat or to meet expenditure of economic activity or; one or more of these?
+                                <span class="form-badge">15</span>Whether the household has any outstanding loan taken from financial institution * for the purpose of construction of land/house/building/flat or to meet expenditure of economic activity or; one or more of these?
                             </label>
                             <select class="form-select is_sso"
                                     value="@block_4.item_15"

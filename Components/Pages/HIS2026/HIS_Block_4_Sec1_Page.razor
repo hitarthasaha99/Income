@@ -25,68 +25,65 @@
                     <div class="card-tools">
                         <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
                     </div>
-            
                 </div>
-                <div class="card-header">
-                    <div class="row w-100">
-                        <!--4.1-->
-                        <div class="col-md-4">
-                            <div>
-                                <label class="form-label">
-                                    <span class="form-badge">1</span>Household Size
-                                </label>
-                                <input type="text" class="form-control" value="@block_4?.item_1" disabled>
-                                @if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
-                                {
-                                    <div class="form-text text-danger">
-                                        @Block_4_1_ErrorMessage
-                                    </div>
-                                }
-                            </div>
+                <div class="row px-3 pt-3 pb-1">
+                    <!--4.1-->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">1</span>Household Size
+                            </label>
+                            <input type="text" class="form-control" value="@block_4?.item_1" disabled>
+                            @if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
+                            {
+                                <div class="form-text text-danger">
+                                    @Block_4_1_ErrorMessage
+                                </div>
+                            }
                         </div>
-                        <!--4.2-->
-                        <div class="col-md-4">
-                            <div>
-                                <label class="form-label">
-                                    <span class="form-badge">2</span>Social Group
-                                </label>
-                                <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_2" @onchange="item_2_changed">
-                                    <option value="">Select</option>
-                                    @if (commonList.LOOKUP_CONST_CASTE != null && commonList.LOOKUP_CONST_CASTE.Count > 0)
-                                    {
-                                        @foreach (var item in commonList.LOOKUP_CONST_CASTE)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }
-                                </select>
-                                @if (!string.IsNullOrEmpty(Block_4_2_ErrorMessage))
+                    </div>
+                    <!--4.2-->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">2</span>Social Group
+                            </label>
+                            <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_2" @onchange="item_2_changed">
+                                <option value="">Select</option>
+                                @if (commonList.LOOKUP_CONST_CASTE != null && commonList.LOOKUP_CONST_CASTE.Count > 0)
                                 {
-                                    <div class="form-text text-danger">@Block_4_2_ErrorMessage</div>
+                                    @foreach (var item in commonList.LOOKUP_CONST_CASTE)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
                                 }
-                            </div>
+                            </select>
+                            @if (!string.IsNullOrEmpty(Block_4_2_ErrorMessage))
+                            {
+                                <div class="form-text text-danger">@Block_4_2_ErrorMessage</div>
+                            }
                         </div>
-                        <!--4.3-->
-                        <div class="col-md-4">
-                            <div>
-                                <label class="form-label">
-                                    <span class="form-badge">3</span>Religion
-                                </label>
-                                <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_3" @onchange="item_3_changed">
-                                    <option value="">Select</option>
-                                    @if (commonList.LOOKUP_CONST_RELIGION != null && commonList.LOOKUP_CONST_RELIGION.Count > 0)
-                                    {
-                                        @foreach (var item in commonList.LOOKUP_CONST_RELIGION)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }
-                                </select>
-                                @if (!string.IsNullOrEmpty(Block_4_3_ErrorMessage))
+                    </div>
+                    <!--4.3-->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">3</span>Religion
+                            </label>
+                            <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_3" @onchange="item_3_changed">
+                                <option value="">Select</option>
+                                @if (commonList.LOOKUP_CONST_RELIGION != null && commonList.LOOKUP_CONST_RELIGION.Count > 0)
                                 {
-                                    <div class="form-text text-danger">@Block_4_3_ErrorMessage</div>
+                                    @foreach (var item in commonList.LOOKUP_CONST_RELIGION)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
                                 }
-                            </div>
+                            </select>
+                            @if (!string.IsNullOrEmpty(Block_4_3_ErrorMessage))
+                            {
+                                <div class="form-text text-danger">@Block_4_3_ErrorMessage</div>
+                            }
                         </div>
                     </div>
                 </div>
