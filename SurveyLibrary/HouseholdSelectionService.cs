@@ -1,4 +1,5 @@
 ﻿using Income.Database.Models.SCH0_0;
+using Income.Database.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,11 @@ namespace Income.SurveyLibrary
 {
     public class HouseholdSelectionService
     {
+        DBQueries dQ;
+        public HouseholdSelectionService()
+        {
+            dQ = new DBQueries();
+        }
         // Allocation rules from the document
         private static readonly Dictionary<int, Dictionary<int, int>> RuralAllocation = new()
     {
@@ -370,6 +376,36 @@ namespace Income.SurveyLibrary
                 .Max();
 
             return maxId + 1;
+        }
+
+        public async Task<int> ReassignSSSHouseholdIds(List<Tbl_Sch_0_0_Block_7> allHouseholds, int sss)
+        {
+            Console.WriteLine($"Re-assigning SSS_household_id for SSS {sss}...");
+
+            // Get all selected households from this SSS, ordered by Block_7_3
+            var householdsInSSS = allHouseholds
+                .Where(h => h.SSS == sss && h.isSelected && h.is_household == 2 && h.status != "SUBSTITUTED" && h.status != "CASUALTY")
+                .OrderBy(h => h.Block_7_3)
+                .ToList();
+
+            if (householdsInSSS.Count == 0)
+            {
+                Console.WriteLine($"⚠️ No selected households found in SSS {sss}");
+                return 0;
+            }
+
+            // Re-assign SSS_household_id sequentially
+            int sequentialId = 1;
+            foreach (var household in householdsInSSS)
+            {
+                household.SSS_household_id = sequentialId;
+                Console.WriteLine($"  HH {household.Block_7_3}: SSS_household_id = {sequentialId}");
+                sequentialId++;
+                await dQ.Update_SCH0_0_Block_7(household);
+            }
+
+            Console.WriteLine($"✅ Re-assigned {householdsInSSS.Count} households in SSS {sss}");
+            return householdsInSSS.Count;
         }
 
         private int GetStatusCode(string status)

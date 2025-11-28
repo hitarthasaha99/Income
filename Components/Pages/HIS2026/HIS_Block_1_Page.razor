@@ -499,6 +499,7 @@
                 await dQ.Update_SCH0_0_Block_7(nextHousehold);
                 await dQ.Update_SCH0_0_Block_7(current_hhd);
                 await dQ.Save_SCH_HIS_Block1(block_1);
+                await service.ReassignSSSHouseholdIds(hhd_list, current_hhd.SSS);
                 NavigationManager.NavigateTo("/dashboard/his/ssu_page");
                 return;
             }
@@ -521,6 +522,7 @@
             current_hhd.isCasualty = true;
             current_hhd.SSS_household_id = 0;
             await dQ.Update_SCH0_0_Block_7(current_hhd);
+            await service.ReassignSSSHouseholdIds(hhd_list, current_hhd.SSS);
             toastService.ShowInfo("Household has been marked as casualty");
             await commonQueries.DeleteBlockDataForCasulaty();
         }
