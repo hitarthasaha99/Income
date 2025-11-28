@@ -20,7 +20,8 @@
             </h3>
         </div>
         <div class="card-body">
-            <div class="row">
+            <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+                <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label for="" class="form-label">
@@ -35,7 +36,6 @@
                             <span class="form-badge">2</span> Approximate population of the SU
                         </label>
                         <input disabled="@(!AllowEdit)" type="number" class="form-control form-control-sm no-spinner" id="" value="@block_4.approximate_population_su" @oninput="HandleChange">
-                        <ValidationComponent @ref="population_ref" is_error="@is_error" field_name="Approximate population of the SU" />
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -47,6 +47,7 @@
                     </div>
                 </div>
             </div>
+            </fieldset>
         </div>
     </div>
 </div>
@@ -125,6 +126,8 @@
                     block_0_1.approximate_population_su = (int)calc;
                     int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
                     block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
+                    block_0_1.number_of_sub_division_of_su_to_be_formed = block_4.number_of_sub_division_of_su_to_be_formed;
+                    block_0_1.sample_su_number = selected_su?.serial_number;
                 }
                 else
                 {
@@ -195,12 +198,17 @@
             }
             return;
         }
+        if (block_4?.approximate_population_su > block_0_1.Block_1_14)
+        {
+            toastService.ShowError("Approximate population of the SU cannot be greater than the total population of the selected FSU.");
+            return;
+        }
         block_0_1.remarks_block_4 = remarks;
         var update = await Queries.SaveBlock1(block_0_1);
         var update_block_4 = await Queries.SaveBlock4(block_4);
         if (update.GetValueOrDefault() != 0)
         {
-            if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)
+            if (block_4.number_of_sub_division_of_su_to_be_formed > 1)
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
             else
             {

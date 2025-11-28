@@ -218,7 +218,7 @@
     </BodyTemplate>
     <FooterTemplate>
         <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
-        <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId"><i class="fi fi-rr-disk me-1"></i>@((isAdd ? "Save" : "Update"))</button>
+        <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
     </FooterTemplate>
 </Modal>
 
@@ -496,7 +496,7 @@
     {
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            NavigationManager.NavigateTo("dashboard/his/block_7");
+            NavigationManager.NavigateTo("dashboard/his/block_7a");
             return;
         }
         else
@@ -506,7 +506,7 @@
                 toastService.ShowError("Please save/update details for all entries before proceeding");
                 return;
             }
-            NavigationManager.NavigateTo("/dashboard/his/block_7");
+            NavigationManager.NavigateTo("/dashboard/his/block_7a");
         }
     }
 }

@@ -27,6 +27,8 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                 <table class="table table-striped table-bordered mb-0">
                     <thead>
                         <tr>
@@ -82,6 +84,7 @@
                         </tr>
                     </tfoot>
                 </table>
+                </fieldset>
             </div>
         </div>
     </div>
@@ -103,7 +106,10 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-outline-primary me-2" hidden="@(!block_2_2_VM.AllowSelection)" @onclick="@(() => DoSelection())"><i class="fi fi-rr-checkbox me-1"></i>Do Selection</NavLink>
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <NavLink class="btn btn-outline-primary me-2" hidden="@(!block_2_2_VM.AllowSelection)" @onclick="@(() => DoSelection())"><i class="fi fi-rr-checkbox me-1"></i>Do Selection</NavLink>
+                }
                 @* <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink> *@
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
@@ -153,6 +159,8 @@
         block_0_1 = await SCH_0_0_Queries.FetchBlock1();
         remarks = block_0_1?.remarks_block_2_2;
     }
+
+
 
     async void DoSelection()
     {

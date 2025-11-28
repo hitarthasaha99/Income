@@ -106,7 +106,7 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-outline-primary">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-outline-primary" @onclick=@(() => Next())>Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
             </div>
         </div>
 
@@ -204,7 +204,6 @@
     async void GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
-        return;
     }
 
     protected override async Task OnInitializedAsync()
@@ -228,7 +227,6 @@
 
     async Task LoadData()
     {
-        // Block_4_5_ErrorMessage = string.Empty;
         NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
         StateHasChanged();
     }
@@ -248,7 +246,7 @@
         if (item_index != -1)
         {
             NICFields[item_index].is_deleted = true;
-            await dQ.DeleteBlock4_NICList(id);
+            await dQ.DeleteBlock7_NICList(id);
             toastService.ShowSuccess("Row deleted successfully!");
             await LoadData();
         }
@@ -396,7 +394,6 @@
         if (Q9Needed && NICFields.Count == 0)
         {
             toastService.ShowError("Need to add atleast one entry before proceeding");
-            return;
         }
         else
         {

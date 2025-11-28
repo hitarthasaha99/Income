@@ -21,7 +21,8 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-striped table-bordered mb-0">
+                <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+                    <table class="table table-striped table-bordered mb-0">
                     <thead>
                         <tr>
                             <th>Selected</th>
@@ -48,7 +49,7 @@
                                         </div>
                                     </td>
                                     <td>@item.serial_number</td>
-                                    <td><input type="number" disabled="@(is_selection_done)" class="form-control form-control-sm" value="@item.Percentage.ToString()" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)" @oninput="(e) => HandleChange(e, item.id)" /></td>
+                                    <td><input type="number" step="0.1" min="0" max="100" disabled="@(is_selection_done)" class="form-control form-control-sm" value="@item.Percentage" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)" @oninput="(e) => HandleChange(e, item.id)" /></td>
                                 </tr>
                             }
                         }
@@ -60,6 +61,7 @@
                         </tr>
                     </tfoot>
                 </table>
+                </fieldset>
             </div>
         </div>
     </div>
@@ -83,7 +85,10 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <button hidden="@((is_selection_done))" class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit("SELECTION"))"><i class="fi fi-rr-checkbox me-2"></i>Do Selection</button>
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <button hidden="@((is_selection_done))" class="btn btn-outline-primary me-2" @onclick="@(() => HandleSubmit("SELECTION"))"><i class="fi fi-rr-checkbox me-2"></i>Do Selection</button>
+                }
                 @* <NavLink class="btn btn-primary me-2" @onclick="@(() => HandleSubmit("SAVE"))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink> *@
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
@@ -117,9 +122,10 @@
         };
         await commonQueries.InsertVisitedBlock(vb);
         var response = await SCH_0_0_Queries.FetchSCH0Block5Data();
+        block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+
         if (response == null || response.Count == 0)
         {
-            var block_0_1 = await SCH_0_0_Queries.FetchBlock1();
             if (block_0_1 != null)
             {
                 block_5 = new();
@@ -149,6 +155,8 @@
         }
         return;
     }
+    const double EPSILON = 0.000001;
+
     async Task HandleSubmit(string action)
     {
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
@@ -159,6 +167,13 @@
         if (total_population_percentage != 100)
         {
             toastService.ShowError("Total population percentage should be 100%");
+            return;
+        }
+        if (block_5.Any(row =>
+                            row.Percentage == null ||
+                            Math.Abs(row.Percentage.Value) < EPSILON))
+        {
+            toastService.ShowError("Percentage cannot be zero");
             return;
         }
         if (action == "SELECTION")
@@ -181,6 +196,8 @@
         }
         else
         {
+            block_0_1.remarks_block_5 = remarks;
+            await SCH_0_0_Queries.SaveBlock1(block_0_1);
             if (action == "SAVE")
             {
                 var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
@@ -189,8 +206,7 @@
                     toastService.ShowError($"Error while storing data into database, Please try again!");
                     return;
                 }
-                block_0_1.remarks_block_5 = remarks;
-                await SCH_0_0_Queries.SaveBlock1(block_0_1);
+                
                 return;
             }
             else if (action == "NEXT")
@@ -220,15 +236,28 @@
             var item_index = block_5.FindIndex(k => k.id == id);
             if (item_index != -1)
             {
-                var val = args.Value.ToString();
-                if (!string.IsNullOrEmpty(val) || !string.IsNullOrWhiteSpace(val))
+                var val = args.Value?.ToString() ?? "";
+                if (System.Text.RegularExpressions.Regex.IsMatch(val, @"^\d{0,3}(\.\d{0,1})?$"))
                 {
-                    block_5[item_index].Percentage = Convert.ToInt32(val);
+                    if (double.TryParse(val, out double value))
+                        block_5[item_index].Percentage = value;
+                    else
+                        block_5[item_index].Percentage = null;
                 }
                 else
                 {
-                    block_5[item_index].Percentage = block_5[item_index].Percentage;
+                    // Reset to previous valid value if invalid input
+                    block_5[item_index].Percentage = Math.Round(block_5[item_index].Percentage.Value, 1);
+                    StateHasChanged();
                 }
+                // if (!string.IsNullOrEmpty(val) || !string.IsNullOrWhiteSpace(val))
+                // {
+                //     block_5[item_index].Percentage = Convert.ToInt32(val);
+                // }
+                // else
+                // {
+                //     block_5[item_index].Percentage = block_5[item_index].Percentage;
+                // }
             }
             total_population_percentage = CalculateTotalPopulationPercentage(block_5);
             StateHasChanged();

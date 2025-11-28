@@ -1,4 +1,5 @@
 ﻿using Income.Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,8 @@ namespace Income.Database.Models.Common
         public int? survey_duration_in_seconds { get; set; }
         public DateTime? survey_timestamp { get; set; }
         public Guid? _ref { get; set; }
+        [JsonProperty("Id")]
+        [JsonIgnore]
+        public Guid Ignored_Id_For_Json { get; set; }
     }
 }
