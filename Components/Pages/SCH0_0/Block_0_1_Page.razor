@@ -220,7 +220,7 @@
                                 <span class="form-badge">17.1</span>
                                 Reason
                             </label>
-                            <textarea disabled="@SessionStorage.hamlet_selection_done" type="text" rows="1" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17"></textarea>
+                            <textarea maxlength="50" disabled="@SessionStorage.hamlet_selection_done" type="text" rows="1" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17"></textarea>
                         </div>
                     </div>
                 </div>
@@ -230,7 +230,7 @@
                     <h3 class="card-title"><span class="text-primary fw-bolder me-2">18</span>Remarks</h3>
                 </div>
                 <div class="card-body">
-                    <textarea disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control disabled w-100" placeholder="" rows="2" @bind="block_0_1_VM.block_0_1.remarks"></textarea>
+                    <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control disabled w-100" placeholder="" rows="2" @bind="block_0_1_VM.block_0_1.remarks"></textarea>
                 </div>
             </div>
         </div>
@@ -507,5 +507,4 @@
             block_0_1_VM.block_0_1.Block_1_17 = null;
         }
     }
-
 }
