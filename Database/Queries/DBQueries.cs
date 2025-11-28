@@ -1,7 +1,10 @@
 ﻿using Blazored.Toast.Services;
+using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.EMMA;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Income.Common;
+using Income.Common.HIS2026;
 using Income.Database.Models.Common;
 using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
@@ -18,11 +21,322 @@ namespace Income.Database.Queries
 {
     public class DBQueries : Database
     {
-        //public DBQueries(ILoggingService loggingService) : base (loggingService)
-        //{
-            
-        //}
         ToastService toastService = new();
+
+        public async Task<int> SaveReceivedDataAsync(Submission_Model data)
+        {
+            try
+            {
+                if (data != null)
+                {
+                    var sch00_block_0_1 = data.IncomeSch00block0;
+                    if (sch00_block_0_1 != null)
+                    {
+                        await SaveBlock1(sch00_block_0_1);
+                    }
+
+                    var sch00_block_2_1 = data.IncomeSch00block2_1;
+                    if (sch00_block_2_1 != null && sch00_block_2_1.Count > 0)
+                    {
+                        await SaveSCH0Block2_1(sch00_block_2_1);
+                    }
+
+                    var sch00_block_2_2 = data.IncomeSch00block2_2;
+                    if (sch00_block_2_2 != null && sch00_block_2_2.Count > 0)
+                    {
+                        await SaveSCH0Block2_2(sch00_block_2_2);
+                    }
+
+                    var sch00_block_3 = data.IncomeSch00block3;
+                    if (sch00_block_3 != null && sch00_block_3.Count > 0)
+                    {
+                        await SaveFileData(sch00_block_3);
+                    }
+
+                    var sch00_block_4 = data.IncomeSch00block_4;
+                    if (sch00_block_4 != null)
+                    {
+                        await SaveBlock4(sch00_block_4);
+                    }
+
+                    var sch00_block_5 = data.IncomeSch00block_5;
+                    if (sch00_block_5 != null && sch00_block_5.Count > 0)
+                    {
+                        await SaveSCH0Block5(sch00_block_5);
+                    }
+
+                    var sch00_block_7 = data.IncomeSch00block_7;
+                    if (sch00_block_7 != null && sch00_block_7.Count > 0)
+                    {
+                        foreach (var item in sch00_block_7)
+                        {
+                            await SaveUpdateSCH0Block7(item);
+                        }
+                    }
+
+                    var sch00_field_op = data.IncomeSch00FieldOp;
+                    if (sch00_field_op != null)
+                    {
+                        await SaveBlock2(sch00_field_op);
+                    }
+
+                    var sch00_warnings = data.IncomeSch00WarningList;
+                    if (sch00_warnings != null)
+                    {
+                        foreach (var item in sch00_warnings)
+                        {
+                            var existing_warning = await _database.Table<Tbl_Warning>().Where(x => x.id == item.id).ToListAsync();
+                            if (existing_warning != null && existing_warning.Count > 0)
+                            {
+                                await _database.UpdateAsync(item);
+                            }
+                            else
+                            {
+                                await _database.InsertAsync(item);
+                            }
+                        }
+                    }
+
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> HardDeleteDataForFSUID(int fsuID)
+        {
+            try
+            {
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_0_1 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_2_1 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_3 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_4 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_FieldOperation WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                await _database.ExecuteAsync($"DELETE FROM Tbl_Warning WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> DoUpdateListing(int fsuID, int option)
+        {
+            try
+            {
+                if(SessionStorage.FSU_Submitted)
+                {
+                    //Should we soft-delete or just delete
+                    //1 - nukes all entries in all tables related to the FSU
+                    // Perform delete operations for all relevant tables
+                    if (option == 1)
+                    {
+                        await _database.Table<Tbl_Sch_0_0_Block_0_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                    }
+
+                    if (option == 1 || option == 2)
+                    {
+                        await _database.Table<Tbl_Sch_0_0_Block_2_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_2_2>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID && x.is_sub_unit == true);
+
+                    }
+
+                    if (option == 1 || option == 2 || option == 3)
+                    {
+                        await _database.Table<Tbl_Block_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4_Q5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_NIC>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_Q10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7d>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8_Q6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_A>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_B>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+
+
+                        await _database.Table<Tbl_Sch_0_0_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Warning>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
+                        if (fsuRecord != null)
+                        {
+                            // Update the IsReSelectionEnabled property
+                            fsuRecord.is_selection_done = false;
+                            // Update the record in the database
+                            await _database.UpdateAsync(fsuRecord);
+                        }
+                    }
+                    if (option == 4)
+                    {
+                        await _database.Table<Tbl_Block_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4_Q5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_NIC>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_Q10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7d>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8_Q6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_A>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_B>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
+                        if (fsuRecord != null)
+                        {
+                            // Update the IsReSelectionEnabled property
+                            fsuRecord.is_selection_done = false;
+                            // Update the record in the database
+                            await _database.UpdateAsync(fsuRecord);
+                        }
+                    }
+
+
+                    // If all operations succeed, return 1
+                    return 1;
+                }
+                else
+                {
+                    //1 - nukes all entries in all tables related to the FSU
+                    // Perform delete operations for all relevant tables
+                    if (option == 1)
+                    {
+                        await _database.Table<Tbl_Sch_0_0_Block_0_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                    }
+
+                    if (option == 1 || option == 2)
+                    {
+                        await _database.Table<Tbl_Sch_0_0_Block_2_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_2_2>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID && x.is_sub_unit == true);
+
+                    }
+
+                    if (option == 1 || option == 2 || option == 3)
+                    {
+                        await _database.Table<Tbl_Block_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4_Q5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_NIC>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_Q10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7d>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8_Q6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_A>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_B>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+
+
+                        await _database.Table<Tbl_Sch_0_0_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Warning>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
+                        if (fsuRecord != null)
+                        {
+                            // Update the IsReSelectionEnabled property
+                            fsuRecord.is_selection_done = false;
+                            // Update the record in the database
+                            await _database.UpdateAsync(fsuRecord);
+                        }
+                    }
+                    if (option == 4)
+                    {
+                        await _database.Table<Tbl_Block_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_4_Q5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7a_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_NIC>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7c_Q10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_7d>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_8_Q6>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_9b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_A>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_B>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_10>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
+                        await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
+                        if (fsuRecord != null)
+                        {
+                            // Update the IsReSelectionEnabled property
+                            fsuRecord.is_selection_done = false;
+                            // Update the record in the database
+                            await _database.UpdateAsync(fsuRecord);
+                        }
+                    }
+
+
+                    // If all operations succeed, return 1
+                    return 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
 
         public async Task<int?> SaveSCH0Block2_1(List<Tbl_Sch_0_0_Block_2_1> tbl_Sch_0_0_Block_2_1)
         {
@@ -131,6 +445,7 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_Sch_0_0_Block_4.id = Guid.NewGuid();
                     status = await _database.InsertAsync(tbl_Sch_0_0_Block_4);
                 }
                 return status;
@@ -264,6 +579,7 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_Sch_0_0_Block_0_1.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_Sch_0_0_Block_0_1);
                 }
                 return status;
@@ -662,6 +978,7 @@ namespace Income.Database.Queries
                         item.b = 0;
                     }
                     var update = await _database.UpdateAllAsync(response);
+                    SessionStorage.selection_done = false;
                     return update;
                 }
                 return 0;
@@ -1237,15 +1554,17 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4)
+        public async Task<int> Save_SCH_HIS_Block4(Tbl_Block_4 tbl_block_4, bool has_item_4_changed = false)
         {
             try
             {
-                int status = new();
+                int status;
                 var check_existence = await _database.Table<Tbl_Block_4>().Where(x => x.id == tbl_block_4.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(tbl_block_4);
+                    await SyncBlock7D(check_existence);
+
                 }
                 else
                 {
@@ -1257,6 +1576,64 @@ namespace Income.Database.Queries
             {
                 Console.WriteLine($"Error While saving SCH HIS Block 4: {ex.Message}");
                 return 0;
+            }
+        }
+
+        public async Task SyncBlock7D(Tbl_Block_4 tbl_Block_4)
+        {
+            try
+            {
+                var Block7DList = await Fetch_SCH_HIS_Block7D() ?? new List<Tbl_Block_7d>();
+                var toAdd = new List<Tbl_Block_7d>();
+                int current_sl = Block7DList.Count;
+                // Map Block 4 → Block 7D creation metadata
+                var map = new[]
+                {
+                    new { Flag = tbl_Block_4.item_4_3, Code = 4003, Item1 = 2, Item2 = "animal husbandry" },
+                    new { Flag = tbl_Block_4.item_4_4, Code = 4004, Item1 = 3, Item2 = "fisheries" },
+                    new { Flag = tbl_Block_4.item_4_5, Code = 4005, Item1 = 4, Item2 = "agroforestry activity" },
+                    new { Flag = tbl_Block_4.item_4_6, Code = 4006, Item1 = 5, Item2 = "others (bee keeping, sericulture, lac culture, ancillary etc.)" }
+                };
+
+                foreach (var row in map)
+                {
+                    var exists = Block7DList.FirstOrDefault(d => d.code == row.Code);
+
+                    // ❌ CASE 1: Corresponding Block_4 flag is false → delete existing entry
+                    if (!row.Flag.GetValueOrDefault())
+                    {
+                        if (exists != null)
+                            await Delete_SCH_HIS_Block7D_List(exists);
+
+                        continue; // move to next row
+                    }
+
+                    // ✔️ CASE 2: Flag is true → create entry if missing
+                    if (exists == null)
+                    {
+                        var newEntry = new Tbl_Block_7d
+                        {
+                            id = Guid.NewGuid(),
+                            hhd_id = tbl_Block_4.hhd_id,
+                            serial_number = current_sl++,
+                            code = row.Code,
+                            item_1 = row.Item1,
+                            item_2 = row.Item2,
+                        };
+
+                        toAdd.Add(newEntry);
+                    }
+                }
+
+                // Save new entries
+                foreach (var item in toAdd)
+                {
+                    await Save_SCH_HIS_Block7D_List(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While syncing Block 7D: {ex.Message}");
             }
         }
 
@@ -1319,9 +1696,32 @@ namespace Income.Database.Queries
                 if (items != null && items.Count > 0)
                 {
                     int s = 1;
-                    foreach(var item in items)
+                    foreach (var item in items)
                     {
                         item.SerialNumber = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public async Task ReserializeBlock7DList()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block7D();
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
                         s++;
                         await _database.UpdateAsync(item);
                     }
@@ -1607,7 +2007,7 @@ namespace Income.Database.Queries
                 var response = await _database.Table<Tbl_Block_7a_1>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null && response.Count > 0)
                 {
-                    return response;
+                    return response.OrderBy(x => x.serial_number).ToList();
                 }
                 else
                 {
@@ -1625,11 +2025,23 @@ namespace Income.Database.Queries
         {
             try
             {
-                int status = new();
+                int status;
                 var check_existence = await _database.Table<Tbl_Block_7a_1>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(obj);
+                    //Sync with Block 7D
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if (block_7d != null && block_7d.Count > 0)
+                    {
+                        var matching_7d = block_7d.FirstOrDefault(x => x.block_7a_id == obj.id);
+                        if (matching_7d != null)
+                        {
+                            matching_7d.code = obj.code;
+                            matching_7d.item_2 = Block_7_1_Constants.CropCodes.FirstOrDefault(x => x.id == obj.code)?.title ?? "";
+                            await Save_SCH_HIS_Block7D_List(matching_7d);
+                        }
+                    }
                 }
                 else
                 {
@@ -1659,6 +2071,15 @@ namespace Income.Database.Queries
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
+                    }
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if (block_7d != null)
+                    {
+                        var item = block_7d.FirstOrDefault(x => x.block_7c_id == id);
+                        if (item != null)
+                        {
+                            _ = await Delete_SCH_HIS_Block7D_List(item);
+                        }
                     }
                     await ReserializeCodeList();
                     return 1;
@@ -1807,11 +2228,23 @@ namespace Income.Database.Queries
         {
             try
             {
-                int status = new();
+                int status;
                 var check_existence = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(obj);
+                    //Sync with Block 7D
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if (block_7d != null && block_7d.Count > 0)
+                    {
+                        var matching_7d = block_7d.FirstOrDefault(x => x.block_7a_id == obj.id);
+                        if (matching_7d != null)
+                        {
+                            matching_7d.code = obj.NicCode;
+                            matching_7d.item_2 = Block_4_Constants.NIC_CODES.FirstOrDefault(x => x.id == obj.NicCode)?.title ?? "";
+                            await Save_SCH_HIS_Block7D_List(matching_7d);
+                        }
+                    }
                 }
                 else
                 {
@@ -1841,6 +2274,15 @@ namespace Income.Database.Queries
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
+                    }
+                    var block_7d = await Fetch_SCH_HIS_Block7D();
+                    if(block_7d != null)
+                    {
+                        var item = block_7d.FirstOrDefault(x => x.block_7c_id == id);
+                        if (item != null)
+                        {
+                            _ = await Delete_SCH_HIS_Block7D_List(item);
+                        }
                     }
                     await ReserializeBlock7NICList();
                     return 1;
@@ -1970,6 +2412,308 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<List<Tbl_Block_7d>> Fetch_SCH_HIS_Block7D()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7d>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7d>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error while fetching Block 7D list: {ex.Message}");
+                return new List<Tbl_Block_7d>();
+            }
+        }
+
+        public async Task<int?> Save_SCH_HIS_Block7D_List(Tbl_Block_7d obj)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_7d>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(obj);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(obj);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 7D: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int?> Delete_SCH_HIS_Block7D_List(Tbl_Block_7d obj)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_7d>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        obj.is_deleted = true;
+                        status = await _database.UpdateAsync(obj);
+                    }
+                    else
+                    {
+                        status = await _database.DeleteAsync(obj);
+                    }
+
+                    await ReserializeBlock7DList();
+                    return status;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While deleting SCH HIS Block 7D: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<Tbl_Block_8?> Fetch_SCH_HIS_Block8(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_8>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 8: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block8(Tbl_Block_8 tbl_block_8)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_8>().Where(x => x.id == tbl_block_8.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_8);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_8);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 8: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<List<Tbl_Block_8_Q6>> Fetch_SCH_HIS_Block8_6(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_8_Q6>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_8_Q6>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 8_Q6: {ex.Message}");
+                return new List<Tbl_Block_8_Q6>();
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block8_Q6(Tbl_Block_8_Q6 tbl_block_8)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_8_Q6>().Where(x => x.id == tbl_block_8.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_8);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_8);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 8: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<int> Delete_SCH_HIS_Block8_Q6(Tbl_Block_8_Q6 obj)
+        {
+            try
+            {
+                int status;
+                var check_existence = await _database.Table<Tbl_Block_8_Q6>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        obj.is_deleted = true;
+                        status = await _database.UpdateAsync(obj);
+                    }
+                    else
+                    {
+                        status = await _database.DeleteAsync(obj);
+                    }
+
+                    await ReserializeBlock8List();
+                    return status;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While deleting SCH HIS Block 7D: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task ReserializeBlock8List()
+        {
+            try
+            {
+                var items = await Fetch_SCH_HIS_Block8_6(SessionStorage.selected_hhd_id);
+                if (items != null && items.Count > 0)
+                {
+                    int s = 1;
+                    foreach (var item in items)
+                    {
+                        item.serial_number = s;
+                        s++;
+                        await _database.UpdateAsync(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public async Task<Tbl_Block_9a?> Fetch_SCH_HIS_Block9a(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_9a>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 9a: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block9a(Tbl_Block_9a tbl_block_9a)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_9a>().Where(x => x.id == tbl_block_9a.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_9a);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_9a);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 9a: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<Tbl_Block_9b?> Fetch_SCH_HIS_Block9B(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_9b>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 9B: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block9B(Tbl_Block_9b tbl_block_9b)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_9b>().Where(x => x.id == tbl_block_9b.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_9b);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_9b);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 9B: {ex.Message}");
+                return 0;
+            }
+        }
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {
@@ -2004,6 +2748,8 @@ namespace Income.Database.Queries
 
             return result;
         }
+
+        
 
         public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "HIS")
         {

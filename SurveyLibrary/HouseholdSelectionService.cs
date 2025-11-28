@@ -79,6 +79,41 @@ namespace Income.SurveyLibrary
             public bool Success { get; set; }
         }
 
+        // Track which households have been reserved for selection
+        private class SelectionPool
+        {
+            private HashSet<Guid> reservedIds = new HashSet<Guid>();
+            private List<Tbl_Sch_0_0_Block_7> allHouseholds;
+
+            public SelectionPool(List<Tbl_Sch_0_0_Block_7> households)
+            {
+                allHouseholds = households;
+            }
+
+            public List<Tbl_Sch_0_0_Block_7> GetAvailable(int? stratum = null, int? sss = null)
+            {
+                return allHouseholds.Where(h =>
+                    !reservedIds.Contains(h.id) &&
+                    (stratum == null || h.Stratum == stratum) &&
+                    (sss == null || h.SSS == sss)
+                ).ToList();
+            }
+
+            public bool Reserve(Tbl_Sch_0_0_Block_7 household)
+            {
+                if (reservedIds.Contains(household.id))
+                    return false;
+
+                reservedIds.Add(household.id);
+                return true;
+            }
+
+            public bool IsReserved(Tbl_Sch_0_0_Block_7 household)
+            {
+                return reservedIds.Contains(household.id);
+            }
+        }
+
         public SelectionResult SelectHouseholds(List<Tbl_Sch_0_0_Block_7> households, int sectorType)
         {
             var result = new SelectionResult { Success = true };
@@ -94,49 +129,50 @@ namespace Income.SurveyLibrary
             bool isRural = sectorType == 1;
             var allocation = isRural ? RuralAllocation : UrbanAllocation;
 
-            // Filter only households (is_household == 2 or similar logic)
+            // Filter only households that are eligible
             var eligibleHouseholds = households
                 .Where(h => h.is_household == 2 && !h.isSelected && !h.isCasualty)
                 .ToList();
 
-            // Group by stratum
-            var stratumGroups = eligibleHouseholds.GroupBy(h => h.Stratum).ToDictionary(g => g.Key, g => g.ToList());
+            // Create a selection pool to track reservations
+            var pool = new SelectionPool(eligibleHouseholds);
 
-            // Process each stratum
-            foreach (var stratumKvp in allocation)
+            // Process each stratum in order
+            var stratumOrder = allocation.Keys.OrderBy(k => k).ToList();
+
+            foreach (int stratum in stratumOrder)
             {
-                int stratum = stratumKvp.Key;
-                var sssAllocations = stratumKvp.Value;
+                var sssAllocations = allocation[stratum];
                 int totalRequired = sssAllocations.Values.Sum();
 
-                if (!stratumGroups.ContainsKey(stratum))
-                {
-                    stratumGroups[stratum] = new List<Tbl_Sch_0_0_Block_7>();
-                }
-
-                var stratumHouseholds = stratumGroups[stratum];
-                int totalAvailable = stratumHouseholds.Count;
+                var availableInStratum = pool.GetAvailable(stratum: stratum);
+                int totalAvailable = availableInStratum.Count;
 
                 // Scenario 1: Shortfall in total stratum households
                 if (totalAvailable < totalRequired)
                 {
                     result.Messages[stratum] = $"Stratum {stratum}: Total shortfall. Available: {totalAvailable}, Required: {totalRequired}. No sub-strata formed.";
 
-                    // Assign all available households to the first SSS
+                    // Get the first SSS for this stratum
                     int firstSSS = sssAllocations.Keys.Min();
-                    foreach (var hh in stratumHouseholds)
+
+                    // Select all available households from this stratum
+                    foreach (var hh in availableInStratum)
                     {
-                        hh.isSelected = true;
-                        hh.SelectedPostedSSS = firstSSS;
-                        hh.SelectedFromSSS = hh.SSS;
-                        result.SelectedHouseholds.Add(hh);
+                        if (pool.Reserve(hh))
+                        {
+                            hh.isSelected = true;
+                            hh.SelectedPostedSSS = firstSSS;
+                            hh.SelectedFromSSS = hh.SSS;
+                            result.SelectedHouseholds.Add(hh);
+                        }
                     }
 
                     // Compensate shortfall
                     int shortfall = totalRequired - totalAvailable;
                     var compensationOrder = isRural ? RuralStratumCompensation[stratum] : UrbanStratumCompensation[stratum];
 
-                    CompensateShortfall(eligibleHouseholds, compensationOrder, shortfall, firstSSS, result);
+                    CompensateShortfall(pool, compensationOrder, shortfall, firstSSS, result);
                 }
                 else
                 {
@@ -146,22 +182,22 @@ namespace Income.SurveyLibrary
                         int sss = sssKvp.Key;
                         int required = sssKvp.Value;
 
-                        var sssHouseholds = stratumHouseholds
-                            .Where(h => h.SSS == sss && !h.isSelected)
-                            .ToList();
-
-                        int available = sssHouseholds.Count;
+                        var availableInSSS = pool.GetAvailable(sss: sss);
+                        int available = availableInSSS.Count;
 
                         if (available >= required)
                         {
                             // Sufficient households - select randomly
-                            var selected = SelectRandomly(sssHouseholds, required);
+                            var selected = SelectRandomly(availableInSSS, required);
                             foreach (var hh in selected)
                             {
-                                hh.isSelected = true;
-                                hh.SelectedPostedSSS = sss;
-                                hh.SelectedFromSSS = sss;
-                                result.SelectedHouseholds.Add(hh);
+                                if (pool.Reserve(hh))
+                                {
+                                    hh.isSelected = true;
+                                    hh.SelectedPostedSSS = sss;
+                                    hh.SelectedFromSSS = sss;
+                                    result.SelectedHouseholds.Add(hh);
+                                }
                             }
                         }
                         else
@@ -170,19 +206,22 @@ namespace Income.SurveyLibrary
                             result.Messages[sss] = $"SSS {sss}: Shortfall. Available: {available}, Required: {required}";
 
                             // Select all available
-                            foreach (var hh in sssHouseholds)
+                            foreach (var hh in availableInSSS)
                             {
-                                hh.isSelected = true;
-                                hh.SelectedPostedSSS = sss;
-                                hh.SelectedFromSSS = sss;
-                                result.SelectedHouseholds.Add(hh);
+                                if (pool.Reserve(hh))
+                                {
+                                    hh.isSelected = true;
+                                    hh.SelectedPostedSSS = sss;
+                                    hh.SelectedFromSSS = sss;
+                                    result.SelectedHouseholds.Add(hh);
+                                }
                             }
 
                             // Compensate shortfall
                             int shortfall = required - available;
                             var compensationOrder = isRural ? RuralSSSCompensation[sss] : UrbanSSSCompensation[sss];
 
-                            CompensateShortfall(eligibleHouseholds, compensationOrder, shortfall, sss, result);
+                            CompensateShortfall(pool, compensationOrder, shortfall, sss, result);
                         }
                     }
                 }
@@ -192,7 +231,7 @@ namespace Income.SurveyLibrary
         }
 
         private void CompensateShortfall(
-            List<Tbl_Sch_0_0_Block_7> allHouseholds,
+            SelectionPool pool,
             List<int> compensationOrder,
             int shortfall,
             int postedSSS,
@@ -204,11 +243,14 @@ namespace Income.SurveyLibrary
             {
                 if (compensated >= shortfall) break;
 
-                // Find available households from this SSS
-                var availableHouseholds = allHouseholds
-                    .Where(h => (h.SSS == compensationSSS || h.Stratum == compensationSSS)
-                        && !h.isSelected && !h.isCasualty)
-                    .ToList();
+                // Find available households from this SSS or Stratum
+                var availableHouseholds = pool.GetAvailable(sss: compensationSSS);
+
+                // If no households found for SSS, try as stratum
+                if (availableHouseholds.Count == 0)
+                {
+                    availableHouseholds = pool.GetAvailable(stratum: compensationSSS);
+                }
 
                 int needed = shortfall - compensated;
                 int toSelect = Math.Min(needed, availableHouseholds.Count);
@@ -217,11 +259,14 @@ namespace Income.SurveyLibrary
 
                 foreach (var hh in selected)
                 {
-                    hh.isSelected = true;
-                    hh.SelectedPostedSSS = postedSSS;
-                    hh.SelectedFromSSS = hh.SSS;
-                    result.SelectedHouseholds.Add(hh);
-                    compensated++;
+                    if (pool.Reserve(hh))
+                    {
+                        hh.isSelected = true;
+                        hh.SelectedPostedSSS = postedSSS;
+                        hh.SelectedFromSSS = hh.SSS;
+                        result.SelectedHouseholds.Add(hh);
+                        compensated++;
+                    }
                 }
             }
 
@@ -250,7 +295,7 @@ namespace Income.SurveyLibrary
                 .Where(h => h.SSS == casualtyHousehold.SSS
                     && !h.isSelected
                     && !h.isCasualty
-                    && h.is_household == 1)
+                    && h.is_household == 2)
                 .ToList();
 
             if (availableSubstitutes.Count == 0)

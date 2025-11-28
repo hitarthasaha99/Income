@@ -2,13 +2,13 @@
 @using Income.Database.Queries
 @inject NavigationManager NavigationManager
 @inject PreloadService preloadService
+@inject NetworkService commonService
 
 <div class="login-bg"></div>
 
 @code {
     private CommonQueries CommonQueries = new CommonQueries();
     private CommonFunction function = new();
-    private NetworkService commonService = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,13 +32,8 @@
             SessionStorage.user_name = user_details.username;
             SessionStorage.role_name = function.GetUserRoleName(SessionStorage.user_role);
             preloadService.Hide();
-            // SessionStorage.SelectedFSUId = 15148;
-            // SessionStorage.selected_hhd_id = 1;
-            // NavigationManager.NavigateTo($"/dashboard/validate_page?schedule={0}");
 
-            // NavigationManager.NavigateTo("dashboard/fsulist/");
-            NavigationManager.NavigateTo("/dashboard/his/block_3");
-
+            NavigationManager.NavigateTo("/dashboard/fsulist/");
         }
     }
 }

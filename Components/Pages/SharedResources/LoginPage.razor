@@ -5,6 +5,7 @@
 @inject IToastService toastService
 @inject IJSRuntime jsRuntime
 @inject ILoggingService loggingService
+@inject NetworkService commonService
 <section class="login-bg py-3 py-md-5">
 	<div class="container">
 		<div class="row justify-content-sm-center">
@@ -51,7 +52,6 @@
     public CommonConfig commonConfig { get; private set; } = new CommonConfig();
     private Network_Service_Model network_Service_Model = new();
     private CommonQueries CommonQueries = new CommonQueries();
-    private NetworkService commonService = new();
     private CommonFunction commonFunction = new();
     private CommonFunction funcs = new();
     private bool is_busy = false;

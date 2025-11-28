@@ -32,7 +32,7 @@ namespace Income.Common
         }
         public List<Validation_Model> SCH_0_0_BLOCK_1_REQ_FIELDS { get; set; } = new();
 
-        public static readonly string APP_VERSION = "1.0.4";
+        public static readonly string APP_VERSION = "1.0.5";
 
         //Test
         public static readonly string PostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/";
@@ -55,10 +55,12 @@ namespace Income.Common
         /// </summary>
         public const string LOGIN_API = "v1/UtilityMaster/AuthenticateSurveyUserAsync";
         public const string FETCH_FSU_LIST_BY_USER_ID = "IncomeSurvey/GetFsuListByUserId?v_userid=";
-        public const string FETCH_SAVED_RESPONSES_BY_FSU_ID = "GetIncomeResponseDetailsByFsuIdAndStatus/";
+        public const string FETCH_SAVED_RESPONSES_BY_FSU_ID = "IncomeSurvey/GetIncomeResponseDetailsByFsuIdAndStatus/";
         public const string SAVE_SUBMITTED_RESPONSE = "UpSertIncomeResponseAsync";
         public static string CHECK_CAPI_VERSION = $"v1/UtilityMaster/GetCapiApkVersionByUsername?survey_id={SessionStorage.surveyId}";
         public static string LOGOUT_API = "v1/UtilityMaster/LogoutUser?v_userName=";
+        public static string BaseController = "IncomeSurvey";
+        public static string UpdateListingAction = "RemoveIncomeCapiDetails";
 
     }
 }

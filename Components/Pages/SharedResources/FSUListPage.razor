@@ -6,6 +6,7 @@
 @inject PreloadService preloadService
 @inject NetworkService commonService;
 @inject IToastService toastService
+@inject ILoggingService loggingService
 
 <div class="main-content">
     <div class="d-flex align-items-center justify-content-between mb-3">
@@ -28,7 +29,7 @@
                         <tr>
                             @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
                             {
-                                <th><input class="form-check-input" type="checkbox" style="width: 20px; height: 20px" checked="@(tbl_Fsu_List.Count == selected_guid.Count)" onchange="@((ChangeEventArgs args) => _handleCheckbox(args, null))"/></th>
+                                <th><input class="form-check-input" type="checkbox" style="width: 20px; height: 20px" checked="@(tbl_Fsu_List.Count == selected_guid.Count)"/></th>
                             }
                             <th>subround</th>
                             <th>fsu id</th>
@@ -46,7 +47,7 @@
                                 <tr>
                                     @if(SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
                                     {
-                                        <td><input class="form-check-input" type="checkbox" onchange="@((ChangeEventArgs args) => _handleCheckbox(args, item))" checked="@((selected_guid.Contains(item.fsu_id) ? true : false))" /></td>
+                                        <td><input class="form-check-input" type="checkbox" checked="@((selected_guid.Contains(item.fsu_id) ? true : false))" /></td>
                                     }
                                     <td>@item.subrnd</td>
                                     <td>@item.fsu_id</td>
@@ -70,8 +71,8 @@
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
-@*                                             <NavLink @onclick="@(() => HandleRefresh(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
- *@                                        </div>
+                                            <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -116,203 +117,105 @@
             };
         await commonQueries.InsertVisitedBlock(vb);
         preloadService.Show(SpinnerColor.Light, "Checking for updates, Please hang on....");
-        // var app_version = await commonService.GetAsync(CommonConfig.CHECK_CAPI_VERSION);
-        // if (!string.IsNullOrEmpty(app_version))
-        // {
-        //     try
-        //     {
-        //         apk_version_model version_Model = JsonConvert.DeserializeObject<apk_version_model>(app_version);
-        //         #if !DEBUG
-        //         if (version_Model != null)
-        //         {
-        //             var update = funcs.IsUpdateAvailable(version_Model);
-        //             if (update == true)
-        //             {
-        //                 preloadService.Hide();
-        //                 var modalOption = new ModalOption
-        //                     {
-        //                         Title = "Update Available!",
-        //                         Message = $"In order to use this app you must download the latest {version_Model.apk_major_version}.{version_Model.apk_minor_version} version.",
-        //                         Type = ModalType.Info,
-        //                         IsVerticallyCentered = true
-        //                     };
-        //                 await ModalService.ShowAsync(modalOption, Quit);
-        //                 return;
-        //             }
-        //         }
-        //         #endif
-        //     }
-        //     catch(Exception ex)
-        //     {
-        //         toastService.ShowError($"{app_version}. {ex}");
-        //     }
-        // }
-        Fsu_Load();
-        return;
+        //CheckAPKVersion();
+        await Fsu_Load();
     }
 
-    void _handleCheckbox(ChangeEventArgs args, Tbl_Fsu_List? fsu_obj)
-    {
-        var action = args.Value.ToString() == "True" ? true : false;
-        if (fsu_obj == null)
-        {
-            selected_guid = [];
-            if (action == true)
-            {
-                foreach(var item in temp_fsu_list)
-                {
-                    selected_guid.Add(item.fsu_id);
-                }
-            }
-        }
-        else
-        {
-            if (action == true)
-            {
-                var is_exist = selected_guid.Contains(fsu_obj.fsu_id);
-                if (!is_exist)
-                {
-                    selected_guid.Add(fsu_obj.fsu_id);
-                }
-            }
-            else
-            {
-                selected_guid.Remove(fsu_obj.fsu_id);
-            }
-        }
-        StateHasChanged();
-        return;
-    }
 
     void Quit()
     {
         funcs.CloseApp();
-        return;
     }
 
-    // async Task HandleRefresh(Tbl_Fsu_List fsu)
-    // {
-    //     try
-    //     {
-    //         if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
-    //         {
-    //             bool confirmation = await dialog.ShowAsync(
-    //                                 title: "Confirmation Required",
-    //                                 message1: "Downloading Fsu data may overwrite existing records and impact Local information.",
-    //                                 message2: "Are you sure you want to continue with the download?"
-    //                                 );
+    async Task DownloadFSUData(Tbl_Fsu_List fsu, int statusCode = 0)
+    {
+        try
+        {
+            if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                bool confirmation = await dialog.ShowAsync(
+                                    title: "Confirmation Required",
+                                    message1: "Downloading Fsu data may overwrite existing records and impact Local information.",
+                                    message2: "Are you sure you want to continue with the download?"
+                                    );
+                if (confirmation)
+                {
+                    canProceed = true;
+                }
 
-    //             if (confirmation)
-    //             {
-    //                 canProceed = true;
-    //             }
-    //             else
-    //             {
-    //                 return;
-    //             }
-    //         }
-    //         else if (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
-    //         {
-    //             canProceed = true;
-    //         }
-    //         if (!canProceed)
-    //         {
-    //             toastService.ShowWarning("You are not authorized to download this data.");
-    //             return;
-    //         }
-    //         if (!funcs.checkHasInternet())
-    //         {
-    //             toastService.ShowWarning("No Internet Connection. Please try again when you're back online!");
-    //             return;
-    //         }
+            }
+            else if (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+            {
+                canProceed = true;
+            }
 
-    //         preloadService.Show(SpinnerColor.Light, "Fetching data from central database for offline access. Please wait...");
+            if (!canProceed)
+            {
+                return;
+            }
+            if (!funcs.checkHasInternet())
+            {
+                toastService.ShowWarning("No Internet Connection. Please try again when you're back online!");
+                return;
+            }
 
-    //         var saved_response = await commonService.GetAsync($"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{fsu.fsu_id}/{fsu.lookupFsuSubmitStatus}");
+            preloadService.Show(SpinnerColor.Light, "Fetching data from central database for offline access. Please wait...");
 
-    //         if (string.IsNullOrEmpty(saved_response))
-    //         {
-    //             toastService.ShowError($"No data found on server for  this FSU. Synchronization failed.");
-    //             return;
-    //         }
+            var response = await commonService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{fsu.fsu_id}/{fsu.lookupFsuSubmitStatus}");
 
-    //         try
-    //         {
-    //             var decoded = JsonConvert.DeserializeObject<saved_response_top_layer>(saved_response);
-    //             if (decoded == null || decoded.result == null || string.IsNullOrEmpty(decoded?.result?.submitted_json_data))
-    //             {
-    //                 toastService.ShowError($"No submission data found in server response for FSU: {fsu.fsu}.");
-    //                 return;
-    //             }
 
-    //             var savedData = JsonConvert.DeserializeObject<bind_layer>(decoded.result.submitted_json_data);
-    //             if (savedData == null)
-    //             {
-    //                 toastService.ShowError($"Failed to parse server data for FSU: {fsu.fsu}.");
-    //                 return;
-    //             }
+            if (string.IsNullOrEmpty(response))
+            {
+                toastService.ShowError($"No data found on server for this FSU. Synchronization failed.");
+                return;
+            }
+            else
+            {
+                var deserialized = JsonConvert.DeserializeObject<Upsert_Model>(response);
+                if (deserialized != null)
+                {
+                    var received_data = JsonConvert.DeserializeObject<Submission_Model>(deserialized.submitted_json_data);
+                    if (received_data != null && received_data.IncomeSch00block0 != null)
+                    {
+                        if (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                        {
+                            await dB.HardDeleteDataForFSUID(fsu.fsu_id);
+                        }
+                        var success = await dB.SaveReceivedDataAsync(received_data);
+                        if (success > 0)
+                        {
+                            toastService.ShowSuccess($"FSU data download completed successfully");
+                        }
+                        else
+                        {
+                            toastService.ShowError($"FSU data download failed");
+                        }
+                    }
+                    else
+                    {
+                        await loggingService.LogError($"Data received for {fsu.fsu_id} was null");
+                        toastService.ShowError($"No data received from server");
+                    }
+                }
+                else
+                {
+                    await loggingService.LogError($"Data received for {fsu.fsu_id} was null");
+                    toastService.ShowError($"No data received from server");
+                }
+            }
 
-    //             // SCH00 blocks
-    //             await dB.SaveBlock1(savedData.TravelSch00block0);
-    //             await dB.SaveFileData(savedData.TravelSch00block3List);
-    //             await dB.SaveSCH0Block4_1(savedData.TravelSch00Block4aList);
-    //             await dB.SaveSCH0Block4_2(savedData.TravelSch00Block4bList);
-    //             await dB.SaveSCH0Block4_3(savedData.TravelSch00Block4cList);
-    //             await dB.SaveSCH0Block5(savedData.TravelSch00Block5aList);
-    //             await commonQueries.UpdateFsuDownloadStatus(fsu.fsu_id);
-    //             // SCH25 blocks
-    //             if (savedData.TravelSch25datumDto?.Count > 0)
-    //             {
-    //                 // foreach (var sch25 in savedData.TravelSch25datumDto)
-    //                 // {
-    //                 //     await sCH_25_Quaries.SaveHhdStatus(sch25.hhd_id ?? 0, sch25.hhd_status ?? 0, decoded.result.fsu_id);
-    //                 //     await dB.Update_SCH0_0_Block_5AHHD_Status(sch25.hhd_status ?? 0, sch25.hhd_id ?? 0, decoded.result.fsu_id);
-    //                 //     await sCH_25_Quaries.SaveBlock2(sch25.block_2);
-    //                 //     await sCH_25_Quaries.SaveBlock1(sch25.block_1);
-    //                 //     await sCH_25_Quaries.SaveBlock3(sch25.block_3);
-    //                 //     await sCH_25_Quaries.SaveBlock4(sch25.block_4);
-    //                 //     await sCH_25_Quaries.SaveBlock4_1(sch25.block_4_1);
-    //                 //     await sCH_25_Quaries.SaveBlock4_1_item(sch25.block_4_1_Item_3);
-    //                 //     await sCH_25_Quaries.saving_5_1_data(sch25.block_5_1);
-    //                 //     await sCH_25_Quaries.saving_5_2_data(sch25.block_5_2);
-    //                 //     await sCH_25_Quaries.SaveBlock6_1(sch25.block_6_1);
-    //                 //     await sCH_25_Quaries.SaveBlock6_2(sch25.block_6_2);
-    //                 //     await sCH_25_Quaries.SaveBlock7(sch25.block_7);
-    //                 //     await sCH_25_Quaries.SaveBlock8(sch25.block_8);
-    //                 //     await sCH_25_Quaries.SaveBlock8_1(sch25.block_8_1);
-    //                 //     await sCH_25_Quaries.SaveBlock9_1(sch25.block_9_1);
-    //                 //     await sCH_25_Quaries.UpsertWarningAsync(sch25.warning);
-    //                 //     await sCH_25_Quaries.UpsertComments(sch25.comments);
 
-    //                 //     if (sch25.block_9?.Count > 0)
-    //                 //     {
-    //                 //         foreach (var block9 in sch25.block_9)
-    //                 //         {
-    //                 //             await sCH_25_Quaries.SaveBlock9(block9);
-    //                 //         }
-    //                 //     }
-    //                 // }
-    //             }
-
-    //             toastService.ShowSuccess($"FSU data synchronization completed successfully");
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             Console.WriteLine($"Error processing response for the FSU : {ex}");
-    //             toastService.ShowError($"Error syncing FSU . Please check logs.");
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         toastService.ShowError($"Unexpected error: {ex.Message}");
-    //     }
-    //     finally
-    //     {
-    //         preloadService.Hide();
-    //         StateHasChanged();
-    //     }
-    // }
-
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Error while downloading FSU data: {ex.Message}");
+        }
+        finally
+        {
+            preloadService.Hide();
+            StateHasChanged();
+        }
+    }
 
 
     async Task HandleSelection(string block_name, int fsu_id)
@@ -330,11 +233,22 @@
             if (block_name == "sch0.0")
             {
                 var data = await dB.FetchBlock1();
-                // if (data == null || data.Block_1_18 == 0)
-                // {
-                //     toastService.ShowError("Please download the required data before proceeding.");
-                //     return;
-                // }
+                if (SessionStorage.user_role == CommonConstants.USER_CODE_JSO || SessionStorage.user_role == CommonConstants.USER_CODE_JSO2)
+                {
+                    // if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
+                    // {
+                    //     toastService.ShowError("Please ensure the selection is done and the data is downloaded Sucessfully.");
+                    //     return;
+                    // }
+                }
+                else
+                {
+                    if (data == null)
+                    {
+                        toastService.ShowError("Data for FSU was not found. Please download first.");
+                        return;
+                    }
+                }
             }
             else if (block_name == "his")
             {
@@ -346,14 +260,29 @@
                 }
 
             }
-            SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
-            SessionStorage.selection_done = await FSU_Selection_Done(fsu_id);
-            SessionStorage.hamlet_selection_done = SessionStorage.selection_done ? true : await CheckHamletSelection(fsu_id);
-            SessionStorage.FSU_Submitted = SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
-            SessionStorage.selected_hhd_seq = 0;
-            SessionStorage.selected_hhd_id = 0;
-            string page_name = block_name == "sch0.0" ? "block0_1" : "ssu_page";
-            NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
+            if (SessionStorage.user_role == CommonConstants.USER_CODE_JSO || SessionStorage.user_role == CommonConstants.USER_CODE_JSO2)
+            {
+                SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
+                SessionStorage.selection_done = await FSU_Selection_Done(fsu_id);
+                SessionStorage.hamlet_selection_done = SessionStorage.selection_done ? true : await CheckHamletSelection(fsu_id);
+                SessionStorage.FSU_Submitted = SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
+                SessionStorage.selected_hhd_seq = 0;
+                SessionStorage.selected_hhd_id = 0;
+                string page_name = block_name == "sch0.0" ? "block0_1" : "ssu_page";
+                NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
+            }
+            else
+            {
+                SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
+                SessionStorage.selection_done = true;
+                SessionStorage.hamlet_selection_done = true;
+                SessionStorage.FSU_Submitted = true;
+                SessionStorage.selected_hhd_seq = 0;
+                SessionStorage.selected_hhd_id = 0;
+                string page_name = block_name == "sch0.0" ? "block0_1" : "ssu_page";
+                NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
+            }
+
         }
         catch(Exception ex)
         {
@@ -511,7 +440,7 @@
                     var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(response);
                     //CheckFSUSubstitution(fsu_list);
                     preloadService.Hide();
-                    CheckFSUUpdateListingDone(fsu_list);
+                    //CheckFSUUpdateListingDone(fsu_list);
                     preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
 
                     if (fsu_list != null && fsu_list.Count > 0)
