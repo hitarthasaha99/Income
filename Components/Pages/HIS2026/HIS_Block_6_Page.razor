@@ -218,7 +218,7 @@
     </BodyTemplate>
     <FooterTemplate>
         <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
-        <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId"><i class="fi fi-rr-disk me-1"></i>@((isAdd ? "Save" : "Update"))</button>
+        <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
     </FooterTemplate>
 </Modal>
 
