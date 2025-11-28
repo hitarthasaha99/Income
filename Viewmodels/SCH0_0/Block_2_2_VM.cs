@@ -246,7 +246,9 @@ namespace Income.Viewmodels.SCH0_0
                 if (total != 100)
                     result.Errors.Add("Total percentage must be equal to 100.");
 
-                if (tbl_Sch_0_0_Block_2_2.Any(row => row.Percentage == 0))
+                if (tbl_Sch_0_0_Block_2_2.Any(row =>
+                            row.Percentage == null ||
+                            Math.Abs(row.Percentage.Value) < EPSILON))
                     result.Errors.Add("Hamlet percentage cannot be zero.");
 
                 if(tbl_Sch_0_0_Block_2_2.Any(row => row.serial_no_of_hamlets_in_su?.Split(',').Length == 0))
@@ -310,6 +312,8 @@ namespace Income.Viewmodels.SCH0_0
             return result;
         }
 
+        const double EPSILON = 0.000001;
+
         public ValidationResult ValidateUrban()
         {
             var result = new ValidationResult();
@@ -319,7 +323,10 @@ namespace Income.Viewmodels.SCH0_0
                 if (total != 100)
                     result.Errors.Add("Total percentage must be equal to 100.");
 
-                if (tbl_Sch_0_0_Block_2_2.Any(row => row.Percentage == 0))
+                if (tbl_Sch_0_0_Block_2_2.Any(row =>
+                            row.Percentage == null ||
+                            Math.Abs(row.Percentage.Value) < EPSILON)) //row =>
+                    
                     result.Errors.Add("Hamlet percentage cannot be zero.");
 
                 if (Tbl_Fsu_List.totalsu == 0)

@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService ToastService
 @inject PreloadService preloadService
-
+@inject NetworkService common
 <div class="page p-0 w-100">
     <main class="px-0 py-0 w-100">
         <div class="navbar m-0 p-0 w-100 custom-badge">
@@ -69,7 +69,6 @@
     string version_code = "V " + CommonConfig.APP_VERSION;
     string full_name = SessionStorage.full_name;
     string short_code = "";
-    NetworkService common = new NetworkService();
     CommonFunction commonfuncs = new();
 
     protected override void OnInitialized()

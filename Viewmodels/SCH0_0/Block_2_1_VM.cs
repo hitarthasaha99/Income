@@ -160,6 +160,9 @@ namespace Income.Viewmodels.SCH0_0
             OnPropertyChanged(nameof(tbl_Sch_0_0_block_2_1));
         }
 
+        const double EPSILON = 0.000001;
+
+
         public ValidationResult Validate()
         {
             var result = new ValidationResult();
@@ -169,10 +172,14 @@ namespace Income.Viewmodels.SCH0_0
                 var non_deleted = tbl_Sch_0_0_block_2_1.Where(x => x.is_deleted != true).ToList();
                 double total = non_deleted.Sum(row => row.percentage.GetValueOrDefault());
                 if (total != 100)
-                    result.Errors.Add("Total percentage must be equal to 100.");
+                    result.Errors.Add("Total percentage must be equal to 100");
 
-                if (non_deleted.Any(row => row.percentage == 0))
+                if (non_deleted.Any(row =>
+                            row.percentage == null ||
+                            Math.Abs(row.percentage.Value) < EPSILON))
+                {
                     result.Errors.Add("Hamlet percentage cannot be zero.");
+                }
 
                 if (non_deleted.Any(row => string.IsNullOrWhiteSpace(row.hamlet_name)))
                     result.Errors.Add("Hamlet name cannot be empty.");
