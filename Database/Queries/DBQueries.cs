@@ -1308,6 +1308,12 @@ namespace Income.Database.Queries
                 else
                 {
                     status = await _database.InsertAsync(tbl_block_1);
+                    var hhd = await GetCurrentHHD(SessionStorage.SelectedFSUId, tbl_block_1.hhd_id.GetValueOrDefault());
+                    if (hhd != null)
+                    {
+                        hhd.hhdStatus = 11;
+                        await Update_SCH0_0_Block_7(hhd);
+                    }
                 }
                 return status;
             }

@@ -234,8 +234,8 @@ namespace Income.Common
             {
                 return new List<Tbl_Lookup>
                 {
-                    !IsSubstitutionAllowed ? new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Original - 01"} : null,
-                    IsSubstitutionAllowed ? new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Substitute - 02"} : null,
+                    new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Original - 01"},
+                    //new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Substitute - 02"},
                     new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Casualty - 03"},
                     new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "get a substitution - 09"},
                 }.Where(x => x != null).ToList();

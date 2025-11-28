@@ -1,6 +1,7 @@
 @page "/dashboard/his/block0_1"
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
+@using Income.SurveyLibrary
 @using Income.Viewmodels
 @inject IJSRuntime JSRuntime
 @layout Income.Components.Layout.DashboardLayout
@@ -154,13 +155,23 @@
                             }
                         </select>
                     </div>
-               </div>
-               @* <div class="col-sm-12">
-                    <div class="mb-3 col-12" hidden="@((!is_remarks_visible))">
-                        <label class="form-label"><span class="form-badge">15</span>Remarks</label>
-                        <textarea type="text" class="form-control is_sso" cols="4" @bind="block_1.block_1_remarks"></textarea>
+                    @* When user will select code 9 - others in q.17 the 17.1 will be enabled *@
+                    <div class="col-sm-12" hidden="@(!is_remarks_visible)">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">17.1</span>
+                                Reason
+                            </label>
+                            <textarea maxlength="50" disabled="@SessionStorage.FSU_Submitted" type="text" rows="1" class="form-control" @bind="block_1.substitution_reason_remark"></textarea>
+                        </div>
                     </div>
-               </div> *@
+               </div>
+               <div class="col-sm-12">
+                    <div class="mb-3 col-12">
+                        <label class="form-label"><span class="form-badge">15</span>Remarks</label>
+                        <textarea type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control is_sso" cols="4" @bind="block_1.block_1_remark"></textarea>
+                    </div>
+               </div>
             </div>
         </div>
     </div>
@@ -290,6 +301,7 @@
     bool is_remarks_visible = false;
     int hhdStatus = 0;
     CommonFunction function = new();
+    private bool show_substitution_reason => (block_1.survey_code == 3 || block_1.survey_code == 9);
     public async Task SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
         block_1.survey_code = string.IsNullOrEmpty(args.Value.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
@@ -456,6 +468,68 @@
             return;
         }
 
+        if (is_remarks_visible && string.IsNullOrEmpty(block_1.substitution_reason_remark))
+        {
+            toastService.ShowError("Please provide a reason before proceeding");
+            return;
+        }
+
+        if (block_1.survey_code == 9)
+        {
+            var service = new HouseholdSelectionService();
+            var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+            var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+            var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
+            if (nextHousehold == null)
+            {
+                toastService.ShowError("No substitute household available. Please mark this household as casualty");
+                return;
+            }
+            else
+            {
+                nextHousehold.SSS_household_id = current_hhd.SSS_household_id;
+                nextHousehold.status = "SUBSTITUTE";
+                nextHousehold.isSelected = true;
+                nextHousehold.isSubstitute = true;
+
+                current_hhd.SSS_household_id = 0;
+                current_hhd.status = "SUBSTITUTED";
+                current_hhd.isSelected = true;
+                current_hhd.SubstitutionCount += 1;
+                await dQ.Update_SCH0_0_Block_7(nextHousehold);
+                await dQ.Update_SCH0_0_Block_7(current_hhd);
+                await dQ.Save_SCH_HIS_Block1(block_1);
+                NavigationManager.NavigateTo("/dashboard/his/ssu_page");
+                return;
+            }
+        }
+
+        if (block_1.survey_code == 3)
+        {
+            var service = new HouseholdSelectionService();
+
+            var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+            var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+            var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
+            if (nextHousehold != null)
+            {
+                toastService.ShowError("Substitute household is available. Please select substitute household instead of marking as casualty");
+                return;
+            }
+            current_hhd.status = "CASUALTY";
+            current_hhd.isSelected = true;
+            current_hhd.isCasualty = true;
+            current_hhd.SSS_household_id = 0;
+            await dQ.Update_SCH0_0_Block_7(current_hhd);
+            toastService.ShowInfo("Household has been marked as casualty");
+            await commonQueries.DeleteBlockDataForCasulaty();
+        }
+
+        if(block_1.survey_code == 1)
+        {
+            block_1.substitution_reason = null;
+        }
+
         var response = await dQ.Save_SCH_HIS_Block1(block_1);
         if (response != 1)
         {
@@ -469,7 +543,6 @@
             {
                 if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
                 {
-                    await commonQueries.DeleteBlockDataForCasulaty();
                     NavigationManager.NavigateTo("/dashboard/his/block_10");
                     return;
                 }

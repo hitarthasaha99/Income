@@ -13,7 +13,7 @@
 	<CommonContentHeader SelectedFsuId="@SelectedFsuId"
 						 survey_time="@survey_time"
 						 page_name="/dashboard/fsulist"
-						 ShowVisitedBlock="ShowVisitedBlock" />
+						 ShowVisitedBlock="false" />
 	<div class="card custom-card">
 		<div class="card-header">
 			<h3 class="card-title">
@@ -28,17 +28,17 @@
 				<table class="table table-bordered table-striped mb-0 custom-badge align-middle">
 					<thead>
 						<tr>
-							<th>Action</th>
 							<th></th>
+							<th>Action</th>
 							<th>HHD Serial</th>
+							<th>SSS</th>
+							<th>Selected HHD No.</th>
 							<th>HHD Number</th>
 							<th>HHD Head</th>
 							<th>HHD Size</th>
-							<th>Survey Status</th>
 							<th>HHD Status</th>
+							<th>Survey Status</th>
 							<th>Substituted for ID</th>
-							<th></th>
-
 						</tr>
 					</thead>
 					<tbody>
@@ -49,19 +49,7 @@
 								@if (item.is_deleted != true)
 								{
 									<tr>
-										<td>
-											<div class="d-flex align-items-center">
-												@if (item.status != "SUBSTITUTED")
-												{
-													@if (item.isSelected == true)
-													{
-														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="me-3"><i class="fi fi-rr-arrow-right"></i></NavLink>
-													}
-													<NavLink @onclick="@(() => HandleComments(item))"><i class="fi fi-rr-comment-alt"></i></NavLink>
-												}
-
-											</div>
-										</td>
+										
 										@if (((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2) && item.hhdStatus != 21) || (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS && item.hhdStatus == 31))
 										{
 											@if (item.status != "SUBSTITUTED" && item.hhdStatus != 32)
@@ -83,17 +71,63 @@
 										{
 											<td></td>
 										}
+
+										<td>
+											<div class="d-flex align-items-center">
+												@if (item.status != "SUBSTITUTED")
+												{
+													@if (item.isSelected == true)
+													{
+														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="me-3"><i class="fi fi-rr-arrow-right"></i></NavLink>
+													}
+													<NavLink @onclick="@(() => HandleComments(item))"><i class="fi fi-rr-comment-alt"></i></NavLink>
+												}
+
+											</div>
+										</td>
 										<td>@item.Block_7_3</td>
+										<td>@item.SSS</td>
+										<td>@(item.SSS_household_id.HasValue ? item.SSS_household_id.Value : "")</td>
 										<td>@item.Block_7_2</td>
 										<td>@item.Block_7_4</td>
 										<td>@item.Block_7_5</td>
+										@{
+											int statusId;
+
+											if(item.status == "SUBSTITUTED")
+											{
+												statusId = 100;
+											}
+											else if(item.status == "SUBSTITUTE")
+											{
+												statusId = 60;
+											}
+											else if(item.status == "CASUALTY")
+											{
+												statusId = 70;
+											}
+											else
+											{
+                                                statusId = item.hhdStatus.GetValueOrDefault();
+                                            }
+
+											// Lookup the status object once
+											var statusObj = commonList?.LOOKUP_CONST_STATUS_LIST
+											?.FirstOrDefault(o => o.id == statusId);
+
+											// Title with null safety
+											var statusTitle = statusObj?.title ?? "";
+
+											// Badge color based on title
+											var badgeColor = commonFunction.ReturnStatusColor(statusTitle);
+										}
 										<td>
-											<span class="@($"badge badge-outline badge-{commonFunction.ReturnStatusColor(item.status == "SUBSTITUTED" ? commonList?.LOOKUP_CONST_STATUS_LIST?.FirstOrDefault(o => o.id == 100)?.title : commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus) != null ? commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus).title ?? "" : "")}")">
-												@((item.status == "SUBSTITUTED") ? commonList?.LOOKUP_CONST_STATUS_LIST?.FirstOrDefault(o => o.id == 100)?.title : ((commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus) != null ? commonList.LOOKUP_CONST_STATUS_LIST.FirstOrDefault(o => o.id == item.hhdStatus).title ?? "" : "")))
+											<span class="badge badge-outline badge-@badgeColor">
+												@statusTitle
 											</span>
 										</td>
 										<td>
-											<div class="badge badge-warning">@(SetStatus(item.status))</div>
+											<div class="badge badge-warning">@(SetSurveyStatus(item.hhdStatus.GetValueOrDefault()))</div>
 										</td>
 										<td>@(item.OriginalHouseholdID)</td>
 										<td>
@@ -475,6 +509,28 @@
 			return;
 		}
 
+	}
+
+	private string SetSurveyStatus(int status)
+	{
+		try
+		{
+			return status switch
+			{
+				0 => "Not Surveyed Yet",
+				11 => "Ongoing",
+				12 => "Referred back by Supervisor",
+				21 => "Submitted by Enumerator",
+				22 => "Referred back by DS",
+				31 => "Submitted by Supervisor",
+				32 => "Accepted by DS",
+				_ => ""
+			};
+		}
+		catch (Exception ex)
+		{
+			return "";
+		}
 	}
 
 	private string SetStatus(string status)

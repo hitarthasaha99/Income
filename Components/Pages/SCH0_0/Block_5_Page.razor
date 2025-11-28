@@ -103,6 +103,7 @@
     DateTime survey_time = DateTime.Now;
     CommonQueries commonQueries = new();
     DBQueries SCH_0_0_Queries = new();
+    Tbl_Sch_0_0_Block_4? block_4 = new();
     List<Tbl_Sch_0_0_Block_5> block_5 = new();
     double? total_population_percentage = new();
     bool is_selection_done = false;
@@ -126,20 +127,24 @@
         await commonQueries.InsertVisitedBlock(vb);
         var response = await SCH_0_0_Queries.FetchSCH0Block5Data();
         block_0_1 = await SCH_0_0_Queries.FetchBlock1();
-
+        block_4 = await SCH_0_0_Queries.GetBlock4();
         if (response == null || response.Count == 0)
         {
             if (block_0_1 != null)
             {
                 block_5 = new();
-                for (var i = 0; i < block_0_1.number_of_sub_division_of_su_to_be_formed; i++)
+                if (block_4 != null)
                 {
-                    block_5.Add(new Tbl_Sch_0_0_Block_5
+                    for (var i = 0; i < block_4.number_of_sub_division_of_su_to_be_formed; i++)
                     {
-                        id = Guid.NewGuid(),
-                        serial_number = i+1,
-                    });
+                        block_5.Add(new Tbl_Sch_0_0_Block_5
+                        {
+                            id = Guid.NewGuid(),
+                            serial_number = i + 1,
+                        });
+                    }
                 }
+                
                 StateHasChanged();
             }
             else

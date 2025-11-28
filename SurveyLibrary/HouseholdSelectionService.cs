@@ -285,69 +285,103 @@ namespace Income.SurveyLibrary
             return households.OrderBy(x => random.Next()).Take(count).ToList();
         }
 
-        // Method to find substitutes when a household becomes a casualty
-        public Tbl_Sch_0_0_Block_7 FindSubstitute(
+        // Method to find substitute for a selected household
+        // Returns: 
+        //   - The substitute household if found
+        //   - null if no substitute available (method returns 0 in your context)
+        public Tbl_Sch_0_0_Block_7? FindSubstitute(
             List<Tbl_Sch_0_0_Block_7> allHouseholds,
-            Tbl_Sch_0_0_Block_7 casualtyHousehold)
+            Tbl_Sch_0_0_Block_7 originalHousehold)
         {
-            // Find unselected households from the same SSS
+            // Validation
+            if (originalHousehold == null || !originalHousehold.isSelected)
+            {
+                Console.WriteLine("❌ Cannot substitute: Household is not selected");
+                return null;
+            }
+
+            // Get the SSS from which the household was originally selected
+            // This is important because we need to find substitute from the ORIGINAL SSS, not the posted SSS
+            int sourceSSS = originalHousehold.SSS;
+
+            Console.WriteLine($"Finding substitute for HH {originalHousehold.Block_7_3} from SSS {sourceSSS}...");
+
+            // Find available households from the same SSS that:
+            // 1. Are from the same SSS
+            // 2. Have not been selected
+            // 3. Are not casualties
+            // 4. Are valid households
+            // 5. Have not been used as substitutes before
             var availableSubstitutes = allHouseholds
-                .Where(h => h.SSS == casualtyHousehold.SSS
+                .Where(h => h.SSS == sourceSSS
                     && !h.isSelected
                     && !h.isCasualty
-                    && h.is_household == 2)
+                    && h.is_household == 2
+                    && !h.isSubstitute
+                    && (h.hhdStatus == 0 || h.hhdStatus == 11)
+                    && h.Block_7_3 != originalHousehold.Block_7_3)
                 .ToList();
 
             if (availableSubstitutes.Count == 0)
-                return null;
+            {
+                Console.WriteLine($"⚠️ No substitute available in SSS {sourceSSS}");
+                return null; // Return null, which you can interpret as 0
+            }
 
-            // Random selection
+            // Random selection from available substitutes
             var random = new Random();
             var substitute = availableSubstitutes[random.Next(availableSubstitutes.Count)];
 
+            // Update original household status
+            //originalHousehold.hhdStatus = GetStatusCode("SUBSTITUTED"); // You may need to define status codes
+            originalHousehold.status = "SUBSTITUTED";
+            // Note: Keep isSelected = true for the original household for tracking
+
+            // Update substitute household
             substitute.isSelected = true;
             substitute.isSubstitute = true;
-            substitute.SubstitutedForID = casualtyHousehold.Block_7_3;
-            substitute.OriginalHouseholdID = casualtyHousehold.OriginalHouseholdID ?? casualtyHousehold.Block_7_3;
-            substitute.SubstitutionCount = casualtyHousehold.SubstitutionCount + 1;
-            substitute.SelectedPostedSSS = casualtyHousehold.SelectedPostedSSS;
-            substitute.SelectedFromSSS = substitute.SSS;
+            //substitute.hhdStatus = GetStatusCode("SUBSTITUTE");
+            substitute.status = "SUBSTITUTE";
+            substitute.SubstitutedForID = originalHousehold.Block_7_3;
+            substitute.OriginalHouseholdID = originalHousehold.OriginalHouseholdID ?? originalHousehold.Block_7_3;
+            substitute.SubstitutionCount = originalHousehold.SubstitutionCount + 1;
+
+            // Inherit the posted SSS from the original household
+            substitute.SelectedPostedSSS = originalHousehold.SelectedPostedSSS;
+            substitute.SelectedFromSSS = sourceSSS;
+
+            // Assign SSS_household_id
+            substitute.SSS_household_id = GetNextSSSHouseholdId(allHouseholds, sourceSSS);
+
+            Console.WriteLine($"✅ Substitute found: HH {substitute.Block_7_3} (SSS_household_id: {substitute.SSS_household_id})");
 
             return substitute;
         }
-    }
 
-    // Usage example:
-    /*
-    var service = new HouseholdSelectionService();
-    var households = GetHouseholdsFromDatabase(); // Your list of Tbl_Sch_0_0_Block_7
-    int sectorType = 1; // 1 = Rural, 2 = Urban
-
-    var result = service.SelectHouseholds(households, sectorType);
-
-    if (result.Success)
-    {
-        Console.WriteLine($"Total households selected: {result.SelectedHouseholds.Count}");
-
-        foreach (var msg in result.Messages)
+        // Helper method to get the next SSS_household_id for a given SSS
+        // This is a running serial number within each SSS
+        private int GetNextSSSHouseholdId(List<Tbl_Sch_0_0_Block_7> allHouseholds, int sss)
         {
-            Console.WriteLine(msg.Value);
+            // Find the maximum SSS_household_id currently assigned in this SSS
+            var maxId = allHouseholds
+                .Where(h => h.SSS == sss && h.SSS_household_id.HasValue)
+                .Select(h => h.SSS_household_id.Value)
+                .DefaultIfEmpty(0)
+                .Max();
+
+            return maxId + 1;
         }
 
-        // Process selected households
-        foreach (var hh in result.SelectedHouseholds)
+        private int GetStatusCode(string status)
         {
-            Console.WriteLine($"HH {hh.Block_7_3}: SSS {hh.SSS} -> Posted as SSS {hh.SelectedPostedSSS}");
+            return status switch
+            {
+                "SELECTED" => 1,
+                "SUBSTITUTED" => 9,
+                "SUBSTITUTE" => 2,
+                "CASUALTY" => 3,
+                _ => 0
+            };
         }
     }
-
-    // Handle casualty and find substitute
-    var casualty = result.SelectedHouseholds.First();
-    casualty.isCasualty = true;
-    var substitute = service.FindSubstitute(households, casualty);
-    if (substitute != null)
-    {
-        Console.WriteLine($"Substitute found: HH {substitute.Block_7_3} for HH {casualty.Block_7_3}");
-    }
-    */
 }

@@ -38,6 +38,7 @@ namespace Income.Database.Models.HIS_2026
         public int? sample_hhd_number { get; set; }
         public int? survey_code { get; set; }
         public int? substitution_reason { get; set; }
+        public string? substitution_reason_remark { get; set; }
         public string? block_1_remark { get; set; } = string.Empty;
         public string? block_3_remark { get; set; } = string.Empty;
         public string? block_4_remark { get; set; } = string.Empty;

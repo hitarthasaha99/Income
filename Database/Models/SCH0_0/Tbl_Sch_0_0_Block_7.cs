@@ -55,7 +55,7 @@ namespace Income.Database.Models.SCH0_0
         // Track how many times the original household has been substituted
         public int SubstitutionCount { get; set; }
         // Status 
-        public int? hhdStatus { get; set; }
+        public int? hhdStatus { get; set; } = 0;
         // use for to maintain status to check survey of the household are send to sso
         public string status { get; set; } = string.Empty;
         [JsonIgnore]
