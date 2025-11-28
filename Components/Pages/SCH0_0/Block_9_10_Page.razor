@@ -44,14 +44,31 @@
             <textarea class="form-control disabled w-100" rows="2"></textarea>
         </div>
     </div> *@
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="d-flex justify-content-end">
-                <NavLink class="btn btn-outline-primary me-2" hidden="@(SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
-                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
-            </div>
+    <div class="d-flex justify-content-between align-items-center">
+
+        <!-- Left: Back button -->
+        <div>
+            <NavLink class="btn btn-outline-primary me-2" @onclick="GoBack">
+                <i class="fi fi-rr-angle-left me-1"></i>Back
+            </NavLink>
         </div>
+
+        <!-- Right: Save + Next buttons -->
+        <div class="d-flex">
+            <NavLink class="btn btn-outline-primary me-2"
+                     hidden="@(SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)"
+                     @onclick="@(() => HandleSubmit(false))">
+                <i class="fi fi-rr-disk me-1"></i>Save
+            </NavLink>
+
+            <NavLink class="btn btn-primary"
+                     @onclick="@(() => HandleSubmit(true))">
+                Next<i class="fi fi-rr-angle-right ms-1"></i>
+            </NavLink>
+        </div>
+
     </div>
+
 </div>
 
 @code {
@@ -83,7 +100,11 @@
         return;
     }
 
-
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
 
     async Task HandleSubmit(bool go_next)
     {

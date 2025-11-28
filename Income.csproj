@@ -42,28 +42,28 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
       <AndroidPackageFormat>apk</AndroidPackageFormat>
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.6</ApplicationDisplayVersion>
+      <ApplicationVersion>6</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.6</ApplicationDisplayVersion>
+      <ApplicationVersion>6</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.6</ApplicationDisplayVersion>
+      <ApplicationVersion>6</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.6</ApplicationDisplayVersion>
+      <ApplicationVersion>6</ApplicationVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg"  Color="#ffffff" />
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#ffffff" />
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />

@@ -13,6 +13,8 @@
         SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time"  
     />
+    <ConfirmDialog @ref="dialog" />
+
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
@@ -106,6 +108,7 @@
     bool is_selection_done = false;
     string? remarks = string.Empty;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
+    private ConfirmDialog dialog = default!;
 
     async void GoBack()
     {
@@ -178,6 +181,19 @@
         }
         if (action == "SELECTION")
         {
+            if(PopulationVariationExists())
+            {
+                var options_0 = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                var confirmation_0 = await dialog.ShowAsync(
+                    title: "Alert",
+                    message1: "All the sub-divisions need to have more or less equal population. Do you want to continue?",
+                    confirmDialogOptions: options_0);
+
+                if (!confirmation_0)
+                {
+                    return;
+                }
+            }
             Random num = new Random();
             int? from_val = block_5[0].serial_number;
             int? to_val = block_5[block_5.Count - 1].serial_number;
@@ -229,6 +245,23 @@
             }
         }
     }
+    public bool PopulationVariationExists()
+    {
+        try
+        {
+            var percentages = block_5
+                      .Select(row => row.Percentage.GetValueOrDefault()) // Extract Percentage values.
+                      .ToList();
+            double minValue = percentages.Min();
+            double maxValue = percentages.Max();
+            return Math.Abs(maxValue - minValue) > 5;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
     void HandleChange(ChangeEventArgs args, Guid id)
     {
         try
