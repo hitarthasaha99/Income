@@ -494,6 +494,7 @@
 
                 current_hhd.SSS_household_id = 0;
                 current_hhd.status = "SUBSTITUTED";
+                current_hhd.hhdStatus = null;
                 current_hhd.isSelected = true;
                 current_hhd.SubstitutionCount += 1;
                 await dQ.Update_SCH0_0_Block_7(nextHousehold);

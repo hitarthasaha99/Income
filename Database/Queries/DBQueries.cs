@@ -2808,6 +2808,133 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<List<Tbl_Block_11b>> Fetch_SCH_HIS_Block11b(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_11b>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 11b: {ex.Message}");
+                return new();
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block11b(Tbl_Block_11b tbl_block_11b)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_11b>().Where(x => x.id == tbl_block_11b.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    tbl_block_11b.is_updated = true;
+                    status = await _database.UpdateAsync(tbl_block_11b);
+                }
+                else
+                {
+                    tbl_block_11b.is_updated = false;
+                    status = await _database.InsertAsync(tbl_block_11b);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 11b: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<T?> FetchSingleForFsuAndHhdAsync<T>()
+    where T : Tbl_Base, IHISModel, new()
+        {
+            return await _database.Table<T>()
+                .Where(x => x.is_deleted == null || x.is_deleted == false)
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId)
+                .Where(x => x.hhd_id == SessionStorage.selected_hhd_id)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<T>> FetchListAsync<T>()
+    where T : Tbl_Base, IHISModel, new()
+        {
+            try
+            {
+                return await _database.Table<T>()
+                    .Where(x =>
+                        x.fsu_id == SessionStorage.SelectedFSUId &&
+                        x.hhd_id == SessionStorage.selected_hhd_id &&
+                        (x.is_deleted == null || x.is_deleted == false)
+                    )
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                //await _loggingService.LogExceptionAsync(ex);
+                return new List<T>();
+            }
+        }
+
+
+
+        public async Task<int> SaveAsync<T>(T entity) where T : Tbl_Base, new()
+        {
+            if (entity == null)
+                return 0;
+
+            // Check if exists in database
+            var existing = await _database.Table<T>()
+                .FirstOrDefaultAsync(x => x.id == entity.id);
+
+            entity.survey_timestamp = DateTime.Now;
+
+            if (existing == null)
+            {
+                // INSERT
+                entity.id = Guid.NewGuid();
+                entity.survey_coordinates = SessionStorage.location;
+                await _database.InsertAsync(entity);
+                return 1;
+            }
+            else
+            {
+                // UPDATE
+                await _database.UpdateAsync(entity);
+                return 1;
+            }
+        }
+
+        public async Task DeleteEntryAsync<T>(Guid id) where T : Tbl_Base, new()
+        {
+            // Fetch entry by ID
+            var entry = await _database.Table<T>().FirstOrDefaultAsync(x => x.id == id);
+
+            if (entry == null)
+                return;
+
+            // If FSU is submitted → soft delete
+            if (SessionStorage.FSU_Submitted)
+            {
+                entry.is_deleted = true;
+                await _database.UpdateAsync(entry);
+            }
+            else
+            {
+                // Hard delete
+                await _database.DeleteAsync(entry);
+            }
+        }
+
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {

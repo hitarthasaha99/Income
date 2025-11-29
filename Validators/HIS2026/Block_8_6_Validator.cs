@@ -25,7 +25,7 @@ namespace Income.Validators.HIS2026
             RuleFor(x => x.item_3)
                 .NotNull()
                 .WithMessage("H060: Invalid entry, please check recorded in col 12, block 3")
-                .NotEqual(0)
+                .GreaterThan(0)
                 .WithMessage("H060: Invalid entry, please check recorded in col 12, block 3")
                 .LessThanOrEqualTo(_ => _totalMembers)
                 .WithMessage("H060: Invalid entry, please check recorded in col 12, block 3");

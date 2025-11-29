@@ -1,5 +1,6 @@
 ﻿using Income.Common;
 using Newtonsoft.Json;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Income.Database.Models.Common
 {
     public class Tbl_Base
     {
+        [PrimaryKey]
+        public Guid id { get; set; }
         public Guid? user_id { get; set; } = SessionStorage.__user_id;
         public int? tenant_id { get; set; } = SessionStorage.tenant_id;
         public int? sub_round { get; set; }
@@ -17,7 +20,7 @@ namespace Income.Database.Models.Common
         public int fsu_id { get; set; } = SessionStorage.SelectedFSUId;
         public Guid? fsu_ref_id { get; set; }
         public Guid? survey_id { get; set; } = SessionStorage.surveyId;
-        public bool? is_deleted { get; set; }
+        public bool? is_deleted { get; set; } = false;
         public int? survey_duration_in_seconds { get; set; }
         public DateTime? survey_timestamp { get; set; }
         public Guid? _ref { get; set; }

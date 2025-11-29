@@ -6,8 +6,6 @@ namespace Income.Database.Models.SCH0_0
 {
     public class Tbl_Sch_0_0_Block_7 : Tbl_Base
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
         public int SSS { get; set; }
         public int Stratum { get; set; }
         public int? SelectedPostedSSS { get; set; } = null; // SSS code to "post" (if merged)
@@ -55,7 +53,7 @@ namespace Income.Database.Models.SCH0_0
         // Track how many times the original household has been substituted
         public int SubstitutionCount { get; set; }
         // Status 
-        public int? hhdStatus { get; set; } = 0;
+        public int? hhdStatus { get; set; } = null;
         // use for to maintain status to check survey of the household are send to sso
         public string status { get; set; } = string.Empty;
         [JsonIgnore]

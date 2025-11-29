@@ -1,0 +1,145 @@
+﻿@page "/dashboard/his/block_12"
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Database.Models.SCH0_0
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject ILoggingService Logger
+
+
+<div class="main-content pb-5">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                         survey_time="@survey_time" />
+    @* Enumerator Comments *@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[Block 12]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
+            </h3>
+        </div>
+        <div class="card-body">
+            <textarea disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
+        </div>
+    </div>
+    @* Supervisor Comments *@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary fw-bolder me-2">[Block 13]</span> Remarks by Field Supervisor (FS)/Senior Statistical Officer (SSO)
+            </h3>
+        </div>
+        <div class="card-body">
+            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks"></textarea>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    
+    <div class="d-flex justify-content-between align-items-center">
+
+        <!-- Left: Back button -->
+        <div>
+            <NavLink class="btn btn-outline-primary me-2" @onclick="GoBack">
+                <i class="fi fi-rr-angle-left me-1"></i>Back
+            </NavLink>
+        </div>
+
+        <!-- Right: Save + Next buttons -->
+        <div class="d-flex">
+            <NavLink class="btn btn-outline-primary me-2"
+                     hidden="@(SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)"
+                     @onclick="@(() => HandleSubmit(false))">
+                <i class="fi fi-rr-disk me-1"></i>Save
+            </NavLink>
+
+            <NavLink class="btn btn-primary"
+                     @onclick="@(() => HandleSubmit(true))">
+                Next<i class="fi fi-rr-angle-right ms-1"></i>
+            </NavLink>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    CommonQueries commonQueries = new();
+    DBQueries dB = new();
+    bool is_error = false;
+    Tbl_Block_1? block_1;
+    string EnumeratorRemarks = string.Empty;
+    string SupervisorRemarks = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_12",
+            block_title = "HIS Block 12/13",
+            block_code = CommonEnum.his_block_12.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
+        if (block_1 != null)
+        {
+            EnumeratorRemarks = block_1.block_12_remark ?? string.Empty;
+            SupervisorRemarks = block_1.block_13_remark ?? string.Empty;
+        }
+        StateHasChanged();
+    }
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    async Task HandleSubmit(bool go_next)
+    {
+        try
+        {
+            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                block_1!.block_12_remark = EnumeratorRemarks;
+            }
+            else if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+            {
+                block_1!.block_13_remark = SupervisorRemarks;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_2");
+                return;
+            }
+            int update = await dB.SaveAsync<Tbl_Block_1>(block_1);
+            if (update > 0)
+            {
+                if (go_next)
+                {
+                    NavigationManager.NavigateTo("/dashboard/his/block_2");
+                }
+                else
+                {
+                    toastService.ShowSuccess("Data saved successfully.");
+                }
+            }
+
+            else
+            {
+                toastService.ShowError("Failed to save data. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("An error occurred while saving the data. Please try again.");
+        }
+        finally
+        {
+
+        }
+    }
+}

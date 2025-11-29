@@ -11,8 +11,6 @@ namespace Income.Database.Models.HIS_2026
 {
     public class Tbl_Block_7a : Tbl_Base
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
         public int hhd_id { get; set; } = SessionStorage.selected_hhd_id;
         public int? item_2_1 { get; set; }
         public int? item_2_2 { get; set; }
@@ -30,6 +28,7 @@ namespace Income.Database.Models.HIS_2026
         public int? item_3 { get; set; }
         public int? item_4 { get; set; }
         public int? item_5 { get; set; }
+        //7a.9
         public int? item_6 { get; set; }
 
     }

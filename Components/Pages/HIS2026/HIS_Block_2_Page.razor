@@ -1,0 +1,340 @@
+﻿@page "/dashboard/his/block_2"
+@using FluentValidation
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Income.Viewmodels
+@using System.Linq.Expressions
+@using System.Reflection
+@layout Income.Components.Layout.DashboardLayout
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject LocalizationService Loc
+@inject IToastService toastService
+@inject Warning_VM warningVM
+@inject ILoggingService loggingService
+@inject IValidator<Tbl_Block_FieldOperation> Validator
+
+<div class="my-2">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                         survey_time="@survey_time" />
+
+    <div class="card card-style2">
+        <div class="card-header d-flex align-items-center">
+            <h3 class="card-title m-0 d-flex align-items-center">
+                <span class="text-primary me-2">@Loc["2_heading"]</span>
+            </h3>
+        </div>
+
+        @if (editContext != null)
+        {
+            <div class="row gx-5 p-2 ">
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">1a</span>@Loc["enuname"]
+                    </label>
+                    <input type="text" class="form-control is_sso" value="@block_2?.enumerator_name" disabled>
+                </div>
+                @if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+                {
+                    <div class="mb-4 col-md-4">
+                        <label class="form-label fw-bold">
+                            <span class="badge bg-primary me-2">1b</span>@Loc["SupervisorName"]
+                        </label>
+                        <input type="text" class="form-control" value="@block_2?.supervisor_name" disabled>
+                    </div>
+                }
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">2</span>@Loc["surveyinspection"]
+                    </label>
+                    <input type="text" class="form-control is_sso" value="@block_2?.date_of_survey" disabled>
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">3</span>@Loc["inminutes"]
+                    </label>
+                    <input type="text" class="form-control is_sso" value="@block_2?.total_time">
+                    <ValidationMessage For="@(() => block_2.total_time)" />
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">4</span>@Loc["number"]
+                    </label>
+                    <input type="text" class="form-control is_sso" value="@block_2?.number_of_enumerators">
+                    <ValidationMessage For="@(() => block_2.number_of_enumerators)" />
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">5 (i)</span>@Loc["whether23"]
+                    </label>
+                    <div class="form-check">
+                        <input disabled class="form-check-input is_sso" value="1" type="radio" id="remarkYes" name="remarksEntered" checked="@(block_2?.item_5_1_remarks)">
+                        <label class="form-check-label" for="remarkYes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input disabled class="form-check-input is_sso" value="2" type="radio" id="remarkNo" name="remarksEntered" checked="@(!block_2?.item_5_1_remarks)">
+                        <label class="form-check-label" for="remarkNo">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">5 (ii)</span>@Loc["Whether24"]
+                    </label>
+                    <div class="form-check">
+                        <input disabled class="form-check-input is_sso" value="1" type="radio" id="remarkEYes" name="remarksEEntered" checked="@(block_2?.item_5_2_remarks)">
+                        <label class="form-check-label" for="remarkEYes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input disabled class="form-check-input is_sso" value="2" type="radio" id="remarkENo" name="remarksEEntered" checked="@(!block_2?.item_5_2_remarks)">
+                        <label class="form-check-label" for="remarkENo">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">6</span>@Loc["name6"]
+                    </label>
+                    <select class="form-select w-100 is_sso" value="@block_2?.fk_block_3">
+                        <option value="">Select</option>
+                        @if (block_3 != null)
+                        {
+                            @foreach (var item in block_3)
+                            {
+                                @if (item.age > 15)
+                                {
+                                    <option value="@item.id">@item.serial_no - @item.item_2</option>
+                                }
+                            }
+                        }
+                        <option value="99">99 - others</option>
+                    </select>
+                    <ValidationMessage For="@(() => block_2.informant_serial)" />
+                </div>
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">7</span>@Loc["Mobile6"]
+                    </label>
+                    <input type="text" class="form-control is_sso" value="@block_2?.informant_mobile">
+                    <ValidationMessage For="@(() => block_2.informant_mobile)" />
+                </div>
+
+
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">
+                        <span class="badge bg-primary me-2">9</span>@Loc["Response"]
+                    </label>
+                    <select class="form-select w-100 is_sso" value="@block_2?.informant_response_code">
+                        <option value="">Select</option>
+                        <option value="1">informant co-operative and capable - 1</option>
+                        <option value="2">informant co-operative but not capable - 2</option>
+                        <option value="3">informant busy - 3</option>
+                        <option value="4">informant reluctant - 4</option>
+                        <option value="9">others - 9</option>
+                    </select>
+                    <ValidationMessage For="@(() => block_2.informant_response_code)" />
+                </div>
+            </div>
+        }
+
+        
+    </div>
+
+    <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+        <div class="d-flex">
+            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            {
+                <NavLink class="btn btn-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+            }
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => HandleSubmit(true))">Exit<i class="bi bi-chevron-right ms-1"></i></NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    Tbl_Block_1? block_1;
+    Tbl_Block_FieldOperation? block_2;
+    List<Tbl_Block_3> block_3 = [];
+    CommonQueries commonQueries = new CommonQueries();
+    CommonConfig commonConfig = new CommonConfig();
+    DBQueries dB = new();
+    bool is_error = false;
+    EditContext? editContext;
+    ValidationMessageStore? messageStore;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+            {
+                await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+            {
+                block_uri = "/dashboard/his/block_2",
+                block_title = "HIS Block 2",
+                block_code = CommonEnum.his_block_2.ToString(),
+            };
+            await commonQueries.InsertVisitedBlock(vb);
+            await LoadData();
+            editContext = new EditContext(block_2);
+            messageStore = new ValidationMessageStore(editContext);
+            editContext.OnFieldChanged += EditContext_OnFieldChanged;
+            await LoadData();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return;
+        }
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    {
+        var identifier = FieldIdentifier.Create(field);
+
+        // Try parse
+        int? value = null;
+        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
+            int.TryParse(e.Value?.ToString(), out var v))
+        {
+            value = v;
+        }
+
+        // 1️. Update the actual model field
+        var memberExpr = (MemberExpression)field.Body;
+        var prop = (PropertyInfo)memberExpr.Member;
+        prop.SetValue(block_2, value);
+
+        
+        // 2️. Clear previous errors
+        messageStore?.Clear(identifier);
+
+        // 3️. Notify Blazor validation system
+        editContext?.NotifyFieldChanged(identifier);
+    }
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+
+    private async Task LoadData()
+    {
+        try
+        {
+            block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
+            block_2 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>();
+            if (block_2 == null)
+            {
+                block_2 = new Tbl_Block_FieldOperation
+                {
+                    id = Guid.NewGuid(),
+                    fsu_id = SessionStorage.SelectedFSUId,
+                    hhd_id = SessionStorage.selected_hhd_id,
+                    enumerator_name = SessionStorage.full_name,
+                    enumerator_code = SessionStorage.role_name,
+                    date_of_survey = DateTime.Now,
+                    item_5_1_remarks = block_1 != null ? !string.IsNullOrWhiteSpace(block_1.block_12_remark) : false,
+                    item_5_2_remarks = block_1 != null ? (!string.IsNullOrWhiteSpace(block_1.block_1_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_3_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_4_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_5_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_6_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_7a_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_7b_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_7c_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_7d_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_8a_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_8b_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_9a_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_9b_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_10_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_11a_remark) ||
+                                        !string.IsNullOrWhiteSpace(block_1.block_11b_remark)) : false
+
+                };
+            }
+            block_3 = await dB.FetchListAsync<Tbl_Block_3>();
+        }
+        catch (Exception ex)
+        {
+            await loggingService.LogError("HIS_Block_2_Page_LoadData", ex);
+        }
+    }
+
+    private async Task HandleSubmit(bool is_go_next = false)
+    {
+        try
+        {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/ssu_page");
+                return;
+            }
+            var validationResult = await Validator.ValidateAsync(block_2);
+            if (!validationResult.IsValid)
+            {
+                // Clear existing messages
+                messageStore.Clear();
+                // Add new validation messages
+                foreach (var error in validationResult.Errors)
+                {
+                    var fieldIdentifier = new FieldIdentifier(block_2, error.PropertyName);
+                    messageStore.Add(fieldIdentifier, error.ErrorMessage);
+                }
+                // Notify the EditContext that the validation state has changed
+                editContext.NotifyValidationStateChanged();
+                is_error = true;
+                return;
+            }
+            int saved = await dB.SaveAsync<Tbl_Block_FieldOperation>(block_2);
+            if (saved > 0)
+            {
+                toastService.ShowSuccess("Data saved successfully");
+                if (is_go_next)
+                {
+                    NavigationManager.NavigateTo("/dashboard/his/ssu_page");
+                }
+            }
+            else
+            {
+                toastService.ShowError("Error saving data. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await loggingService.LogError("HIS_Block_2_Page_HandleSubmit", ex);
+        }
+        
+    }
+
+
+}

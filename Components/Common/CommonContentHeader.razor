@@ -124,7 +124,7 @@
             // preloadService.Show(SpinnerColor.Light, "Fetching Location Details..."); // REMOVED
 
             location = await funcs.fetchGeoLocation(); // Start fetching location
-
+            SessionStorage.location = location;
             // 4. Update the location and set loading state back to false
             isLocationLoading = false;
         }

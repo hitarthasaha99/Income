@@ -5,8 +5,6 @@ namespace Income.Database.Models.SCH0_0
 {
     public class Tbl_Sch_0_0_FieldOperation : Tbl_Base
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
         public string? enumerator_name { get; set; }
         public string? supervisor_name { get; set; }
         public DateTime? field_work_start_date { get; set; }

@@ -130,7 +130,21 @@ namespace Income.Common
         his_block_3,
         his_block_4,
         his_block_5,
-        his_block_6
+        his_block_6,
+        his_block_7a,
+        his_block_7b,
+        his_block_7c,
+        his_block_7d,
+        his_block_8,
+        his_block_9a,
+        his_block_9b,
+        his_block_10,
+        his_block_11a,
+        his_block_11b,
+        his_block_A,
+        his_block_B,
+        his_block_12,
+        his_block_2
     }
 
     public class CommonList

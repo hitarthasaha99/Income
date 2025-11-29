@@ -127,7 +127,7 @@
 											</span>
 										</td>
 										<td>
-											<div class="badge badge-warning">@(SetSurveyStatus(item.hhdStatus.GetValueOrDefault()))</div>
+											<div class="badge badge-warning">@(SetSurveyStatus(item))</div>
 										</td>
 										<td>@(item.OriginalHouseholdID)</td>
 										<td>
@@ -511,11 +511,11 @@
 
 	}
 
-	private string SetSurveyStatus(int status)
+	private string SetSurveyStatus(Tbl_Sch_0_0_Block_7 item)
 	{
 		try
 		{
-			return status switch
+			return item.hhdStatus switch
 			{
 				0 => "Not Surveyed Yet",
 				11 => "Ongoing",
@@ -524,6 +524,7 @@
 				22 => "Referred back by DS",
 				31 => "Submitted by Supervisor",
 				32 => "Accepted by DS",
+				null => "",
 				_ => ""
 			};
 		}
