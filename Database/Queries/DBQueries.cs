@@ -3000,6 +3000,11 @@ namespace Income.Database.Queries
             return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.block == block && x.serial_number == serial && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
         }
 
+        public async Task<List<Tbl_Warning>> GetWarningTableDataForBlock(int fsuId, int hddId, string schedule, string block)
+        {
+            return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && x.schedule == schedule && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.block == block && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+        }
+
         public Task<int> DeleteWarningTableDataForSerial(int fsuId, int hddId, string block, int serial, Guid id)
         {
             var data = _database.QueryAsync<Tbl_Warning>($"SELECT * FROM Tbl_Warning WHERE fsu_id == {fsuId} AND hhd_id == {hddId}  AND warning_status == 1");

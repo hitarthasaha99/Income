@@ -91,6 +91,73 @@ namespace Income.Viewmodels
             await dQ.UpsertWarningAsync(warningList);
         }
 
+        public async Task SaveWarningAsync1(
+    string schedule,
+    string block,
+    int serial = 0)
+        {
+            try
+            {
+                // Fetch all saved warnings for this block + schedule + hhd
+                var savedWarnings = await dQ.GetWarningTableDataForBlock(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, schedule ,block);
+
+                // Convert lists to comparison keys
+                // Key = (item_no + serial_number)
+                var currentKeys = _tempWarnings
+                    .Select(w => $"{w.item_no}::{w.serial_number}")
+                    .ToHashSet();
+
+                var savedKeys = savedWarnings
+                    .Select(w => $"{w.item_no}::{w.serial_number}")
+                    .ToHashSet();
+
+                // -----------------------------------------
+                // INSERT NEW WARNINGS
+                // -----------------------------------------
+                var warningsToInsert = _tempWarnings
+                    .Where(w => !savedKeys.Contains($"{w.item_no}::{w.serial_number}"))
+                    .ToList();
+
+                foreach (var warn in warningsToInsert)
+                {
+                    warn.id = Guid.NewGuid();
+                    warn.created_on = DateTime.Now;
+                    warn.updated_at = null;
+                    warn.is_deleted = false;
+
+                    await dQ.SaveAsync<Tbl_Warning>(warn);
+                }
+
+                // -----------------------------------------
+                // DELETE REMOVED WARNINGS
+                // -----------------------------------------
+                var warningsToDelete = savedWarnings
+                    .Where(w => !currentKeys.Contains($"{w.item_no}::{w.serial_number}"))
+                    .ToList();
+
+                foreach (var warn in warningsToDelete)
+                {
+                    if (SessionStorage.FSU_Submitted == true)
+                    {
+                        // SOFT DELETE
+                        warn.is_deleted = true;
+                        warn.updated_at = DateTime.Now;
+                        await dQ.SaveAsync<Tbl_Warning>(warn);
+                    }
+                    else
+                    {
+                        // HARD DELETE
+                        await dQ.DeleteEntryAsync<Tbl_Warning>(warn.id);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error in SaveWarningAsync: " + ex.Message);
+            }
+        }
+
+
         public async Task DeleteWarning(string schedule, string block, int serialNo)
         {
             try
