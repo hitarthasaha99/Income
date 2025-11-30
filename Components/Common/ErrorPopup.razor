@@ -1,0 +1,56 @@
+﻿<Modal @ref="errorModal" Size="ModalSize.Large">
+    <HeaderTemplate>
+        <h5 class="modal-title">Validation Errors</h5>
+    </HeaderTemplate>
+
+    <BodyTemplate>
+        @if (ErrorDict != null && ErrorDict.Any(x => x.Value.Count > 0))
+        {
+            <Accordion @ref="accordion" AlwaysOpen="true">
+                @foreach (var kvp in ErrorDict.Where(x => x.Value.Count > 0))
+                {
+                    var key = kvp.Key;
+
+                    <AccordionItem Title=@($"HHD Serial: {key}")>
+                        <Content>
+                            <ul class="list-group">
+                                @foreach (var error in kvp.Value)
+                                {
+                                    <li class="list-group-item text-danger">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> @error
+                                    </li>
+                                }
+                            </ul>
+                        </Content>
+                    </AccordionItem>
+                }
+            </Accordion>
+        }
+        else
+        {
+            <p>No errors detected.</p>
+        }
+    </BodyTemplate>
+
+    <FooterTemplate>
+        <button @onclick="HidePopup">Close</button>
+    </FooterTemplate>
+</Modal>
+
+
+@code {
+    private Modal errorModal;
+    private Accordion accordion = default!;
+    [Parameter] public Dictionary<int, List<string>> ErrorDict { get; set; }
+
+    public async Task ShowPopup()
+    {
+        await errorModal.ShowAsync();
+        await accordion.ShowAllAccordionItemsAsync();
+    }
+
+    private async Task HidePopup()
+    {
+        await errorModal.HideAsync();
+    }
+}

@@ -34,75 +34,20 @@ namespace Income.Viewmodels
         public bool IsRejected { get; set; }
         public Tbl_Warning warningcoment { get; set; } = new();
 
-        public async Task SaveWarningAsync(bool isAdd, string schedule, string Block, int serialNo)
-        {
-            var warnings = _tempWarnings;
-            List<Tbl_Warning> warningList = [];
 
-            if (!isAdd)
-            {
-                if (warnings.Count() == 0)
-                {
-                    //delete all existing
-                    foreach (var warning in warnings.Where(x => x.serial_number == serialNo))
-                    {
-                        warning.is_deleted = true;
-                    }
-                }
-                else
-                {
-                    foreach (var warning in warnings)
-                    {
-                        var exist = warnings.Where(x => x.item_no == warning.item_no && (x.is_deleted == false || x.is_deleted == null)).FirstOrDefault();
-                        if (exist != null)
-                        {
-                            warning.id = exist.id;
-                            warning.warning_status = exist.warning_status;
-                            exist.warning_message = warning.warning_message;
-                        }
-                    }
-
-                    // Get warnings in Data for the same serial number that are not in _tempWarnings
-                    var remainingWarnings = warnings
-                        .Where(exist => exist.serial_number == serialNo &&
-                                        !warnings.Any(temp => temp.id == exist.id))
-                        .ToList();
-
-
-                    // Delete remaining warnings
-                    foreach (var warning in remainingWarnings)
-                    {
-                        warning.is_deleted = true;
-                    }
-                }
-            }
-
-
-            foreach (var warning in warnings)
-            {
-                if (warning.id == Guid.Empty)
-                {
-                    warning.id = Guid.NewGuid();
-                    warning.serial_number = serialNo;
-                    warningList.Add(warning);
-                }
-            }
-
-            await dQ.UpsertWarningAsync(warningList);
-        }
-
-        public async Task SaveWarningAsync1(
-    string schedule,
-    string block,
-    int serial = 0)
+        public async Task SaveWarningAsync(string schedule, string block, int serial = 0)
         {
             try
             {
                 // Fetch all saved warnings for this block + schedule + hhd
-                var savedWarnings = await dQ.GetWarningTableDataForBlock(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, schedule ,block);
+                var savedWarnings = await dQ.GetWarningTableDataForBlock(
+                    SessionStorage.SelectedFSUId,
+                    SessionStorage.selected_hhd_id,
+                    schedule,
+                    block
+                );
 
                 // Convert lists to comparison keys
-                // Key = (item_no + serial_number)
                 var currentKeys = _tempWarnings
                     .Select(w => $"{w.item_no}::{w.serial_number}")
                     .ToHashSet();
@@ -129,7 +74,7 @@ namespace Income.Viewmodels
                 }
 
                 // -----------------------------------------
-                // DELETE REMOVED WARNINGS
+                // DELETE REMOVED WARNINGS (AND THEIR CHILD COMMENTS)
                 // -----------------------------------------
                 var warningsToDelete = savedWarnings
                     .Where(w => !currentKeys.Contains($"{w.item_no}::{w.serial_number}"))
@@ -137,29 +82,51 @@ namespace Income.Viewmodels
 
                 foreach (var warn in warningsToDelete)
                 {
+                    // -----------------------------------------
+                    // 1. DELETE CHILD COMMENTS FIRST
+                    // -----------------------------------------
+                    var childComments = await dQ.GetChildCommentsAsync(warn.id);
+
+                    foreach (var child in childComments)
+                    {
+                        if (SessionStorage.FSU_Submitted == true)
+                        {
+                            child.is_deleted = true;
+                            child.updated_at = DateTime.Now;
+                            await dQ.SaveAsync<Tbl_Warning>(child);
+                        }
+                        else
+                        {
+                            await dQ.DeleteEntryAsync<Tbl_Warning>(child.id);
+                        }
+                    }
+
+                    // -----------------------------------------
+                    // 2. DELETE THE PARENT WARNING
+                    // -----------------------------------------
                     if (SessionStorage.FSU_Submitted == true)
                     {
-                        // SOFT DELETE
                         warn.is_deleted = true;
                         warn.updated_at = DateTime.Now;
                         await dQ.SaveAsync<Tbl_Warning>(warn);
                     }
                     else
                     {
-                        // HARD DELETE
                         await dQ.DeleteEntryAsync<Tbl_Warning>(warn.id);
                     }
                 }
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("Error in SaveWarningAsync: " + ex.Message);
+                // log if needed
             }
             finally
             {
                 _tempWarnings.Clear();
+                WarningList.Clear();
             }
         }
+
 
 
         public async Task DeleteWarning(string schedule, string block, int serialNo)

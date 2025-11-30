@@ -499,7 +499,7 @@
                 payload.lookup_fsu_sub_submit_status = 12; // status = 12 when referring back to ENM
             }
 
-            string final_payload = JsonConvert.SerializeObject(payload);
+            //string final_payload = JsonConvert.SerializeObject(payload);
             var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
             if (response != null && response.IsSuccessStatusCode)
             {

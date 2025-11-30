@@ -830,7 +830,7 @@ namespace Income.Database.Queries
                     {
                         int deleted = await _database.DeleteAsync(exists);
                     }
-                    await ReserializeHHD(exists);
+                    await ReserializeHHD();
                     return 1;
                 }
                 return 0;
@@ -842,7 +842,7 @@ namespace Income.Database.Queries
             }
         }
 
-        private async Task ReserializeHHD(Tbl_Sch_0_0_Block_7 deleted)
+        public async Task ReserializeHHD()
         {
             try
             {
@@ -853,32 +853,13 @@ namespace Income.Database.Queries
                     // Order by current serial
                     var allOrdered = households.OrderBy(h => h.Block_7_1).ToList();
 
-                    // Identify deleted serial position
-                    int deletedSerial1 = deleted.Block_7_1 ?? 0;
-
-                    // Start from the next serial
-                    int nextSerial = deletedSerial1;
-
-                    foreach (var h in allOrdered.Where(h => h.Block_7_1 > deletedSerial1))
+                    int nextSerial = 1;
+                    foreach (var h in allOrdered)
                     {
                         h.Block_7_1 = nextSerial++;
                     }
 
-                    //2. Re-serialize Block_7_3 for is_household = 2 after deleted entry
-                    // Consider only households with is_household = 2
-
                     int hhdSrl = 1;
-                    //var onlyHhd = allOrdered
-                    //    .Where(h => h.is_household == 2)
-                    //    .OrderBy(h => h.Block_7_3)
-                    //    .ToList();
-
-                    //// Find deleted household's Block_7_3 position (only if it was household=2)
-                    //int deletedSerial3 = deleted.is_household == 2 ? deleted.Block_7_3 ?? 0 : 0;
-
-                    //int nextHhdSerial = deletedSerial3;
-
-
 
                     foreach(var hhd in allOrdered)
                     {
@@ -1311,7 +1292,7 @@ namespace Income.Database.Queries
                     var hhd = await GetCurrentHHD(SessionStorage.SelectedFSUId, tbl_block_1.hhd_id.GetValueOrDefault());
                     if (hhd != null)
                     {
-                        hhd.hhdStatus = 11;
+                        hhd.hhdStatus = hhd.status == "SUBSTITUTED" ? null : 11;
                         await Update_SCH0_0_Block_7(hhd);
                     }
                 }
@@ -2854,35 +2835,62 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<T?> FetchSingleForFsuAndHhdAsync<T>()
-    where T : Tbl_Base, IHISModel, new()
+        public enum DeleteFilter
         {
-            return await _database.Table<T>()
-                .Where(x => x.is_deleted == null || x.is_deleted == false)
-                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId)
-                .Where(x => x.hhd_id == SessionStorage.selected_hhd_id)
-                .FirstOrDefaultAsync();
+            ExcludeDeleted,   // default: SAME behaviour as now
+            IncludeAll,       // return everything
+            OnlyDeleted       // return only deleted rows
         }
 
-        public async Task<List<T>> FetchListAsync<T>()
+
+        public async Task<T?> FetchSingleForFsuAndHhdAsync<T>(
+    DeleteFilter filter = DeleteFilter.ExcludeDeleted)
+    where T : Tbl_Base, IHISModel, new()
+        {
+            var query = _database.Table<T>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId)
+                .Where(x => x.hhd_id == SessionStorage.selected_hhd_id);
+
+            // apply delete filter
+            query = filter switch
+            {
+                DeleteFilter.ExcludeDeleted => query.Where(x => x.is_deleted == null || x.is_deleted == false),
+                DeleteFilter.OnlyDeleted => query.Where(x => x.is_deleted == true),
+                DeleteFilter.IncludeAll => query, // no filter
+                _ => query
+            };
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+
+        public async Task<List<T>> FetchListAsync<T>(
+    DeleteFilter filter = DeleteFilter.ExcludeDeleted)
     where T : Tbl_Base, IHISModel, new()
         {
             try
             {
-                return await _database.Table<T>()
-                    .Where(x =>
-                        x.fsu_id == SessionStorage.SelectedFSUId &&
-                        x.hhd_id == SessionStorage.selected_hhd_id &&
-                        (x.is_deleted == null || x.is_deleted == false)
-                    )
-                    .ToListAsync();
+                var query = _database.Table<T>()
+                    .Where(x => x.fsu_id == SessionStorage.SelectedFSUId)
+                    .Where(x => x.hhd_id == SessionStorage.selected_hhd_id);
+
+                // apply delete filter
+                query = filter switch
+                {
+                    DeleteFilter.ExcludeDeleted => query.Where(x => x.is_deleted == null || x.is_deleted == false),
+                    DeleteFilter.OnlyDeleted => query.Where(x => x.is_deleted == true),
+                    DeleteFilter.IncludeAll => query,
+                    _ => query
+                };
+
+                return await query.ToListAsync();
             }
-            catch (Exception ex)
+            catch
             {
-                //await _loggingService.LogExceptionAsync(ex);
                 return new List<T>();
             }
         }
+
 
 
 
@@ -3004,6 +3012,14 @@ namespace Income.Database.Queries
         {
             return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && x.schedule == schedule && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.block == block && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
         }
+
+        public async Task<List<Tbl_Warning>> GetChildCommentsAsync(Guid parentId)
+        {
+            return await _database.Table<Tbl_Warning>()
+                .Where(x => x.parent_comment_id == parentId && (x.is_deleted == null || x.is_deleted == false))
+                .ToListAsync();
+        }
+
 
         public Task<int> DeleteWarningTableDataForSerial(int fsuId, int hddId, string block, int serial, Guid id)
         {

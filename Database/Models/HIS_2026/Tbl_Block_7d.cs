@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_7d : Tbl_Base
+    public class Tbl_Block_7d : Tbl_Base, IHISModel
     {
-        public int hhd_id { get; set; } = SessionStorage.selected_hhd_id;
+        public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
         public Guid block_7a_id { get; set; }
         public Guid block_7c_id { get; set; }
         public int? code { get; set; }

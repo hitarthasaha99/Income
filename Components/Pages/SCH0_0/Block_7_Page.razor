@@ -104,6 +104,13 @@
                                         @if (!SessionStorage.selection_done)
                                             {
                                                 <td class="d-flex align-items-center">
+                                                    @if (!HideInsertBtn)
+                                                    {
+                                                        <button class="btn btn-link me-3 fs-6"
+                                                                @onclick="@(() => HandleModal("INSERT", item))">
+                                                            <i class="fi fi-rr-insert"></i>
+                                                        </button>
+                                                    }                                                 
                                                     <button class="btn btn-link me-3 fs-6"
                                                             @onclick="@(() => HandleModal("UPDATE", item))">
                                                         <i class="fi fi-rr-pencil"></i>
@@ -349,8 +356,10 @@
     private bool ShowPopulationWarning = false;
     private string PopulationWarningMessage = "Please re-check the value";
     string? remarks = string.Empty;
-
+    int originalSrl = 0;
     bool isAdd = false;
+
+    bool HideInsertBtn = false;
 
     CommonFunction commonFunctions = new();
     bool is_error = false;
@@ -382,6 +391,7 @@
         {
             ListItems = new();
             ListItems = response.OrderBy(x => x.Block_7_1).ToList();
+            HideInsertBtn = ListItems.Any(x => x.SSS != 0);
             StateHasChanged();
         }
     }
@@ -440,7 +450,10 @@
         }
         else if (selectedValue == "2")
         {
-            fields.Block_7_3 = ReturnHHDSamplingSerialNumber();
+            if (isAdd)
+                fields.Block_7_3 = ReturnHHDSamplingSerialNumber();
+            else
+                fields.Block_7_3 = originalSrl;
         }
 
     }
@@ -582,7 +595,7 @@
                 {
                     warningVM.AddWarning(secondWarning.Trim(), "0", "7", "0");
                 }
-                await warningVM.SaveWarningAsync1("0", "7", 0);
+                await warningVM.SaveWarningAsync("0", "7", 0);
 
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             }
@@ -653,6 +666,7 @@
                 if (data != null)
                 {
                     fields = data.ShallowCopy();
+                    originalSrl = data.Block_7_3.GetValueOrDefault();
                     // Recreate EditContext for the new model
                     if (fields.Block_7_5 > 30)
                     {
@@ -661,6 +675,23 @@
                     editContext = new EditContext(fields);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += ClearFieldErrorsOnChange;
+                    await AddModal.ShowAsync();
+                }
+            }
+            else if(action == "INSERT")
+            {
+                isAdd = false;
+                fields = new();
+                if (data != null)
+                {
+                    fields.id = Guid.NewGuid();
+                    originalSrl = data.Block_7_3.GetValueOrDefault();
+                    fields.Block_7_1 = data.Block_7_1;
+                    fields.Block_7_3 = data.Block_7_3;
+                    editContext = new EditContext(fields);
+                    messageStore = new ValidationMessageStore(editContext);
+                    editContext.OnFieldChanged += ClearFieldErrorsOnChange;
+
                     await AddModal.ShowAsync();
                 }
             }
@@ -757,10 +788,11 @@
                 block_5_obj.UMPCE = null;
             }
             await SCH_0_0_Queries.SaveUpdateSCH0Block7(block_5_obj);
+            await SCH_0_0_Queries.ReserializeHHD();
             if (block_5_obj.Block_7_5 > 30)
             {
                 warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", block_5_obj.Block_7_3.GetValueOrDefault());
-                await warningVM.SaveWarningAsync(false, "0", "7", 1);
+                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_1.GetValueOrDefault());
             }
         }
         await AddModal.HideAsync();

@@ -1,4 +1,5 @@
-﻿using Income.Database.Models.SCH0_0;
+﻿using Income.Common;
+using Income.Database.Models.SCH0_0;
 using Income.Database.Queries;
 using System;
 using System.Collections.Generic;
@@ -378,10 +379,11 @@ namespace Income.SurveyLibrary
             return maxId + 1;
         }
 
-        public async Task<int> ReassignSSSHouseholdIds(List<Tbl_Sch_0_0_Block_7> allHouseholds, int sss)
+        public async Task<int> ReassignSSSHouseholdIds(int sss)
         {
             Console.WriteLine($"Re-assigning SSS_household_id for SSS {sss}...");
 
+            var allHouseholds = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
             // Get all selected households from this SSS, ordered by Block_7_3
             var householdsInSSS = allHouseholds
                 .Where(h => h.SSS == sss && h.isSelected && h.is_household == 2 && h.status != "SUBSTITUTED" && h.status != "CASUALTY")

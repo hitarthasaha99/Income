@@ -1,4 +1,5 @@
 ﻿using Income.Common;
+using Income.Database.Models.HIS_2026;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.Common
 {
-    public class Tbl_Warning : Tbl_Base
+    public class Tbl_Warning : Tbl_Base, IHISModel
     {
         public string? warning_message { get; set; }
         public int? warning_type { get; set; }

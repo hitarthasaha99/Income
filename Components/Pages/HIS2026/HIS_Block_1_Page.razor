@@ -14,6 +14,8 @@
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                          survey_time="@survey_time" />
+    <ConfirmDialog @ref="dialog" />
+
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
@@ -132,7 +134,20 @@
                             {
                                 @foreach (var item in commonList.LOOKUP_CONST_HHD_SURVEY_CODE)
                                 {
-                                    <option value="@item.id">@item.title</option>
+                                    @if(is_substitute)
+                                    {
+                                        if (item.id != 1)
+                                        {
+                                            <option value="@item.id">@item.title</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (item.id != 2)
+                                        {
+                                            <option value="@item.id">@item.title</option>
+                                        }
+                                    }                                 
                                 }
                             }
                         </select>
@@ -301,8 +316,11 @@
     bool is_remarks_visible = false;
     int hhdStatus = 0;
     CommonFunction function = new();
+    ConfirmDialog dialog = default!;
     private bool show_substitution_reason => (block_1.survey_code == 3 || block_1.survey_code == 9);
-    public async Task SurveyCodeSelectionChanged(ChangeEventArgs args)
+    private bool is_substitute = false;
+
+    public void SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
         block_1.survey_code = string.IsNullOrEmpty(args.Value.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
         if (CommonConstants.LOOKUP_SURVEY_CODE_HDD_2 == args.Value.ToString() || CommonConstants.LOOKUP_SURVEY_CODE_HDD_3 == args.Value.ToString() || CommonConstants.LOOKUP_SURVEY_CODE_HDD_9 == args.Value.ToString())
@@ -381,6 +399,14 @@
     protected override async Task OnInitializedAsync()
     {
         hhdStatus = await dQ.GetCurrentHHDStatus(SessionStorage.SelectedFSUId,SessionStorage.selected_hhd_id);
+        var hhd = await dQ.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+        if (hhd != null)
+        {
+            if(hhd.status == "SUBSTITUTE")
+            {
+                is_substitute = true;
+            }
+        }
         for (var i = 13; i <= 14; i++)
         {
             Question.Add(i.ToString());
@@ -444,6 +470,10 @@
             SessionStorage.location = block_1.survey_coordinates;
             block_1.survey_timestamp = DateTime.Now;
             SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
+            if (is_substitute)
+            {
+                block_1.survey_code = 2;
+            }
         }
         StateHasChanged();
     }
@@ -476,6 +506,21 @@
 
         if (block_1.survey_code == 9)
         {
+            if(block_1.substitution_reason == null)
+            {
+                toastService.ShowError("Please select a reason before proceeding");
+                return;
+            }
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmation = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "This will delete any existing block data for this household.",
+                message2: "Do you want to proceed?",
+                confirmDialogOptions: options);
+            if (!confirmation)
+            {
+                return;
+            }
             var service = new HouseholdSelectionService();
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
             var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
@@ -497,10 +542,12 @@
                 current_hhd.hhdStatus = null;
                 current_hhd.isSelected = true;
                 current_hhd.SubstitutionCount += 1;
-                await dQ.Update_SCH0_0_Block_7(nextHousehold);
+
                 await dQ.Update_SCH0_0_Block_7(current_hhd);
+                await dQ.Update_SCH0_0_Block_7(nextHousehold);
                 await dQ.Save_SCH_HIS_Block1(block_1);
-                await service.ReassignSSSHouseholdIds(hhd_list, current_hhd.SSS);
+                await commonQueries.DeleteBlockDataForCasulaty();
+                await service.ReassignSSSHouseholdIds(current_hhd.SSS);
                 NavigationManager.NavigateTo("/dashboard/his/ssu_page");
                 return;
             }
@@ -508,6 +555,21 @@
 
         if (block_1.survey_code == 3)
         {
+            if (block_1.substitution_reason == null)
+            {
+                toastService.ShowError("Please select a reason before proceeding");
+                return;
+            }
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmation = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "This will delete any existing block data for this household.",
+                message2: "Do you want to proceed?",
+                confirmDialogOptions: options);
+            if (!confirmation)
+            {
+                return;
+            }
             var service = new HouseholdSelectionService();
 
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
@@ -523,7 +585,7 @@
             current_hhd.isCasualty = true;
             current_hhd.SSS_household_id = 0;
             await dQ.Update_SCH0_0_Block_7(current_hhd);
-            await service.ReassignSSSHouseholdIds(hhd_list, current_hhd.SSS);
+            await service.ReassignSSSHouseholdIds(current_hhd.SSS);
             toastService.ShowInfo("Household has been marked as casualty");
             await commonQueries.DeleteBlockDataForCasulaty();
         }

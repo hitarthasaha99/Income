@@ -475,8 +475,16 @@
             int saved = await dB.SaveAsync<Tbl_Block_FieldOperation>(block_2);
             if (saved > 0)
             {
+                if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    var hhd = await dB.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+                    if (hhd != null)
+                    {
+                        hhd.hhdStatus = 15;
+                        await dB.SaveUpdateSCH0Block7(hhd);
+                    }
+                }
                 toastService.ShowSuccess("Data saved successfully");
-                warningVM.WarningList.Clear();
                 if (!string.IsNullOrEmpty(item_3_warning))
                 {
                     warningVM.AddWarning(item_3_warning, "HIS", "2", "3", SessionStorage.selected_hhd_id);
@@ -489,7 +497,7 @@
                 {
                     warningVM.AddWarning(item_7_warning, "HIS", "2", "7", SessionStorage.selected_hhd_id);
                 }
-                await warningVM.SaveWarningAsync1("HIS", "2");
+                await warningVM.SaveWarningAsync("HIS", "2");
                 warningVM._tempWarnings.Clear();
                 if (is_go_next)
                 {

@@ -1,19 +1,25 @@
 ﻿@page "/dashboard/his/ssu_page"
 @using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
 @using Income.Database.Models.SCH0_0
+@using Income.Viewmodels
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
 @inject PreloadService preloadService
 @inject IToastService toastService
 @inject IJSRuntime JSRuntime
-@inject IJSRuntime JS
-
+@inject NetworkService networkService
+@inject Warning_VM warningVM
 
 <div class="main-content">
 	<CommonContentHeader SelectedFsuId="@SelectedFsuId"
 						 survey_time="@survey_time"
 						 page_name="/dashboard/fsulist"
 						 ShowVisitedBlock="false" />
+
+	<ConfirmDialog @ref="dialog" />
+	<ErrorPopup @ref="errorPopup" ErrorDict="errorDict"></ErrorPopup>
+
 	<div class="card custom-card">
 		<div class="card-header">
 			<h3 class="card-title">
@@ -108,15 +114,15 @@
 											}
 											else
 											{
-                                                statusId = item.hhdStatus.GetValueOrDefault();
-                                            }
+												statusId = item.hhdStatus.GetValueOrDefault();
+											}
 
 											// Lookup the status object once
 											var statusObj = commonList?.LOOKUP_CONST_STATUS_LIST
 											?.FirstOrDefault(o => o.id == statusId);
 
 											// Title with null safety
-											var statusTitle = statusObj?.title ?? "";
+											var statusTitle = string.IsNullOrEmpty(item.status) ? "ORIGINAL" : item.status;
 
 											// Badge color based on title
 											var badgeColor = commonFunction.ReturnStatusColor(statusTitle);
@@ -149,20 +155,31 @@
 		<div class="col-sm-6">
 			<div class="d-flex">
 				<NavLink class="btn btn-outline-secondary me-2" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</NavLink>
-				@* <NavLink class="btn btn-success me-2" @onclick="HandleValidate">Validate<i class="fi fi-rr-memo-circle-check ms-1"></i></NavLink> *@
+				<NavLink class="btn btn-success me-2" onclick="@Validate">Validate<i class="fi fi-rr-memo-circle-check ms-1"></i></NavLink>
 				@* <NavLink class="btn btn-outline-primary disabled">Download<i class="fi fi-rr-download ms-1"></i></NavLink> *@
 			</div>
 		</div>
 		<div class="col-sm-6">
 			<div class="d-flex justify-content-end">
-				<NavLink class="@((SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO ? "btn btn-primary disabled d-none" : "btn btn-primary"))">Submit to SSO<i class="fi fi-rr-arrow-right ms-1"></i></NavLink>
+				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+				{
+					<button class="btn btn-primary" @onclick="@(() => Submit(SubmissionMode.jso_to_sso))">Submit to SSO<i class="fi fi-rr-arrow-right ms-1"></i></button>
+				}
+				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+				{
+					<button class="btn btn-primary">Refer back to ENM<i class="fi fi-rr-arrow-right ms-1"></i></button>
+					<button class="btn btn-primary">Submit to DS<i class="fi fi-rr-arrow-right ms-1"></i></button>
+				}
+				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)
+				{
+					<button class="btn btn-primary">Refer back to SSO<i class="fi fi-rr-arrow-right ms-1"></i></button>
+				}
+
 			</div>
 		</div>
 	</div>	
 </div>
 <script src="js/download.js"></script>
-
-
 
 
 @code {
@@ -175,13 +192,39 @@
 	CommonConfig commonConfig = new();
 	CommonFunction commonFunction = new();
 	CommonList commonList = new();
-	List<Tbl_Sch_0_0_Block_7>? selected_for_submission = new();
+	List<Tbl_Sch_0_0_Block_7> selected_for_submission = new();
 	CommonFunction funcs = new();
+	ConfirmDialog dialog = default!;
+	Dictionary<int, List<string>> errorDict = new();
+
+	private ErrorPopup? errorPopup;
+
+	enum SubmissionMode
+	{
+		jso_to_sso,
+		sso_to_jso,
+		sso_to_ds,
+		ds_to_sso
+	}
 
 	async void GoBack()
 	{
 		await JSRuntime.InvokeVoidAsync("__handleGoBack");
 		return;
+	}
+
+	void Validate()
+	{
+		try
+		{
+			warningVM.selected_HHdList = [];
+			warningVM.selected_HHdList.AddRange(selected_for_submission);
+			NavigationManager.NavigateTo($"/dashboard/validate_page?schedule={"HIS"}");
+		}
+		catch (Exception ex)
+		{
+
+		}
 	}
 
 	void HandleCheckedChange(ChangeEventArgs args, Tbl_Sch_0_0_Block_7 item)
@@ -223,165 +266,497 @@
 			int i = 1;
 			foreach (var item in selected)
 			{
-				// var status_response = await dQ.FetchStatusManager(item.Block_7_3);
-				// // Task.Delay(500);
-				// if (status_response != null)
-				// {
-				// 	item.hhdStatus = status_response.hhd_status;
-				// }
-				// else
-				// {
-				// 	item.hhdStatus = 11;
-				// }
-				// //item.seq_no = i;
 				hhd_list.Add(item);
-				i++;
 			}
 		}
 		StateHasChanged();
 	}
 
-	// async Task HandleSsoSubmission()
-	// {
-	// 	if (selected_for_submission != null && selected_for_submission.Count > 0)
-	// 	{
-	// 		List<string> pending_hhd_id = new();
-	// 		List<int> pendingnumber = new();
-	// 		List<string> pending_validate = new();
-	// 		bool canSubmitReferback = true;
-	// 		foreach (var item in selected_for_submission)
-	// 		{
-	// 			var block_3_data = await dQ.FetchBlock3(item.Block_7_3);
-	// 			var block_2_data = await dQ.FetchBlock2(item.Block_7_3);
-	// 			var data = await dQ.GetWarningList(item.Block_7_3);
-	// 			var CheckAnyPendingComment = await dQ.CheckAnyRejectedCommentAsync(item.Block_7_3);
-	// 			if (CheckAnyPendingComment > 0)
-	// 			{
-	// 				pendingnumber.Add(CheckAnyPendingComment);
-	// 			}
-	// 			var pendingWarning = data.Where(k => (k.parent_comment_id == null || k.parent_comment_id == Guid.Empty) && (k.warning_status == 1 || k.warning_status == 3)).ToList();
+	private async Task Submit(SubmissionMode? mode = null)
+	{
+		try
+		{
+			List<Tbl_Sch_0_0_Block_7> hhd_list = [];
+			hhd_list.AddRange(selected_for_submission);
+			var currentRole = SessionStorage.GetUserRole();
+			/*First - need to do basic validation ->
+			* i. Internet check
+			* ii. Current HHD status - if Not Surveyed Yet or Ongoing (hhdStatus = 0 or 11), then don't allow submission
+			*/
+			if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+			{
+				toastService.ShowError("Please check internet connectivity before submission");
+				return;
+			}
+			if (hhd_list.Count == 0)
+			{
+				toastService.ShowError("Please select a household for submission");
+				return;
+			}
+			if (hhd_list.Any(x => x.hhdStatus.GetValueOrDefault() is 0 or 11))
+			{
+				toastService.ShowError("One of the households has not been surveyed yet");
+				return;
+			}
 
-	// 			string status = await commonQueries.ReturnBlockLevelValidationStatus(item.fsu_id, item.Block_7_3, item.status);
-	// 			if (status != CommonConstants.SUCCESS_TEXT)
-	// 			{
-	// 				pending_hhd_id.Add(item.Block_7_3.ToString());
-	// 			}
-	// 			if (status != CommonConstants.FAILURE_TEXT && status != CommonConstants.SUCCESS_TEXT)
-	// 			{
-	// 				toastService.ShowError(status);
-	// 			}
+			var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+			var confirmation = await dialog.ShowAsync(
+				title: "Alert",
+				message1: "Do you want to proceed?",
+				confirmDialogOptions: options);
+			if (!confirmation)
+			{
+				return;
+			}
 
-	// 			if (pendingWarning != null && pendingWarning.Count > 0)
-	// 			{
-	// 				pending_validate.Add(item.Block_7_3.ToString());
-	// 			}
-	// 			if (item.hhdStatus == 12 && item?.needDownload != null && item.needDownload != 12)
-	// 			{
-	// 				canSubmitReferback = false;
-	// 			}
-	// 		}
-	// 		if (pending_hhd_id != null && pending_hhd_id.Count > 0)
-	// 		{
-	// 			toastService.ShowError($"Data submission pending for HHD-ID - {string.Join(",", pending_hhd_id)}");
-	// 			return;
-	// 		}
-	// 		else if (pending_validate != null && pending_validate.Count > 0)
-	// 		{
-	// 			toastService.ShowError($"Warnning Validation pending for HHD-ID - {string.Join(",", pending_validate)}");
-	// 			return;
+			//Need to branch off submission logic for ENM, SSO and DS here
+			if (currentRole == SessionStorage.UserRole.JSO)
+			{
+				var result = await ValidateSubmissionJSO(hhd_list);
+				if (result != null)
+				{
+					bool allEmpty = result.All(kvp => kvp.Value.Count == 0);
+					if (!allEmpty)
+					{
+						toastService.ShowError("Error while validating");
+						errorDict = result;
+						errorPopup?.ShowPopup();
+						return;
+					}
+					else
+					{
+						Submission_Model data = new();
+						data.IncomeSchHISDto = [];
+						data.IncomeSch00block0 = await dQ.FetchBlock1();
+						data.IncomeSch00block2_1 = await dQ.FetchSCH0Block2_1Data();
+						data.IncomeSch00block2_2 = await dQ.FetchSCH0Block2_2Data();
+						var block_3 = await dQ.GetFileData(0);
+						var block_6 = await dQ.GetFileData(1);
 
-	// 		}
-	// 		else if (pendingnumber.Count > 0)
-	// 		{
-	// 			toastService.ShowError("Comments needs to Validate, Submission Not Possible");
-	// 			return;
-	// 		}
-	// 		if (commonFunction.checkHasInternet() == false)
-	// 		{
-	// 			toastService.ShowError("No Internet Connection, Please try again once when you came back online!");
-	// 			return;
-	// 		}
-	// 		if (canSubmitReferback == false)
-	// 		{
-	// 			toastService.ShowError("Referback Household need to download before submit");
-	// 			return;
-	// 		}
-	// 		preloadService.Show(SpinnerColor.Light, "We are gathering Data from Local Database to send into central Database! Please hang on.");
-	// 		var submission_data = await commonQueries.FetchSSO_SubmissionData(selected_for_submission);
-	// 		if (submission_data != null)
-	// 		{
-	// 			toastService.ShowSuccess("Data retrive successfuly from local database!");
-	// 			preloadService.Show(SpinnerColor.Light, "We are saving data into server! Please hang on.");
-	// 			var response = await travelService.PostAsync(CommonConfig.SAVE_SUBMITTED_RESPONSE, submission_data);
-	// 			if (response != null)
-	// 			{
-	// 				foreach (var item in selected_for_submission)
-	// 				{
-	// 					await dQ.SaveHhdStatus(item.Block_7_3, 21, SessionStorage.SelectedFSUId);
-	// 				}
-	// 				toastService.ShowSuccess("Data submitted successfully!");
-	// 				preloadService.Show(SpinnerColor.Light, "DB Cleaning in-progress! Please hang on.");
-	// 				var stat = await commonQueries.ClearUnusedData();
-	// 				if (stat != CommonConstants.SUCCESS_TEXT)
-	// 				{
-	// 					toastService.ShowError(stat);
-	// 				}
-	// 				preloadService.Hide();
-	// 			}
-	// 			else
-	// 			{
-	// 				toastService.ShowError("Getting Error while submitting data to server, Please connect with adminstrator!");
-	// 				preloadService.Hide();
-	// 				return;
-	// 			}
-	// 			var data = await SCH_0_0_Queries.FetchSCH0Block5Data();
-	// 			if (data != null && data.Count > 0)
-	// 			{
-	// 				hhd_list = new();
-	// 				List<Tbl_Sch_0_0_Block_5> selected = data.Where(k => k.is_selected_travel == true).OrderBy(k => k.Block_7_3).ToList();
-	// 				int i = 1;
-	// 				foreach (var item in selected)
-	// 				{
-	// 					var status_response = await dQ.FetchStatusManager(item.Block_7_3);
-	// 					if (status_response != null)
-	// 					{
-	// 						item.hhdStatus = status_response.hhd_status;
-	// 						item.needDownload = status_response.hhd_status;
-	// 					}
-	// 					else
-	// 					{
-	// 						item.hhdStatus = 11;
-	// 					}
-	// 					item.seq_no = i;
-	// 					hhd_list.Add(item);
-	// 					i++;
-	// 				}
-	// 				await SCH_0_0_Queries.SaveSCH0Block5(hhd_list);
-	// 			}
-	// 			StateHasChanged();
-	// 			preloadService.Hide();
-	// 			return;
-	// 		}
-	// 		else
-	// 		{
-	// 			toastService.ShowError("Getting Error while retrieving data from Local Database, Please try Later!");
-	// 			preloadService.Hide();
-	// 			return;
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		toastService.ShowError("Please Select an HouseHold For Submission");
-	// 		return;
-	// 	}
-	// }
+						if (block_3 != null)
+						{
+							block_3.file_image_source = ExtractBase64(block_3.file_image_source);
+						}
+						if (block_6 != null)
+						{
+							block_6.file_image_source = ExtractBase64(block_6.file_image_source);
+						}
+						data.IncomeSch00block3 = new() { block_3, block_6 };
+						data.IncomeSch00block_4 = await dQ.GetBlock4();
+						data.IncomeSch00block_5 = await dQ.FetchSCH0Block5Data();
+						data.IncomeSch00block_7 = await dQ.GetBlock7DataWithDeleted();
+						data.IncomeSch00FieldOp = await dQ.FetchBlock2();
+						data.IncomeSch00WarningList = await dQ.GetWarningList(schedule: "0");
+
+						foreach(var hhd in hhd_list)
+						{
+							var hhd_data = await GetHHDData(hhd);
+							if (hhd_data != null)
+							{
+								data.IncomeSchHISDto.Add(hhd_data);
+							}
+						}
+
+						string json = JsonConvert.SerializeObject(data);
+						Upsert_Model payload = new()
+						{
+							lookup_fsu_submit_status = 21,
+							fsu_id = SessionStorage.SelectedFSUId.ToString(),
+							submitted_json_data = json,
+							survey_id = SessionStorage.surveyId,
+							created_on = DateTime.Now
+						};
+
+						var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
+						if (response != null && response.IsSuccessStatusCode)
+						{
+							toastService.ShowSuccess("Data submitted successfully");
+							SessionStorage.FSU_Submitted = true;
+							StateHasChanged();
+						}
+						else
+						{
+							toastService.ShowError("Data could not be submitted");
+						}
+					}
+				}
+			}
+			else if(currentRole == SessionStorage.UserRole.SSO)
+			{
+				await ValidateAndSetSubmissionStatusSSO(hhd_list);
+			}
+			else if(currentRole == SessionStorage.UserRole.DS)
+			{
+				await ValidateAndSetSubmissionStatusDS(hhd_list);
+			}
+
+		}
+		catch
+		{
+
+		}
+		finally
+		{
+
+		}
+	}
+
+	public static string? ExtractBase64(string dataUri)
+	{
+		if (string.IsNullOrWhiteSpace(dataUri))
+			return null;
+
+		// Find where the comma appears in the data URI
+		var commaIndex = dataUri.IndexOf(',');
+
+		if (commaIndex < 0 || commaIndex == dataUri.Length - 1)
+			return null; // Not a valid data URI
+
+		// Return everything after the comma → pure base64 string
+		return dataUri.Substring(commaIndex + 1);
+	}
+
+	private async Task<Dictionary<int, List<string>>?> ValidateSubmissionJSO(List<Tbl_Sch_0_0_Block_7> hhd_list)
+	{
+		try
+		{
+			preloadService.Show(SpinnerColor.Primary, "Validating. Please wait while we process the data.");
+			Dictionary<int, List<string>> errorDict = new();
+
+			//Block wise checks
+			foreach (var hhd in hhd_list)
+			{
+				List<string> errors = [];
+				int status = 0;
+				status = ReturnSubmissionStatus(SessionStorage.UserRole.JSO, hhd);
+
+				SessionStorage.SelectedFSUId = hhd.fsu_id;
+				SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+
+				var block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
+				var block_2 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>();
+				var block_3 = await dQ.FetchListAsync<Tbl_Block_3>() ?? new();
+				var block_4 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_4>();
+				var block_4_nic = await dQ.FetchListAsync<Tbl_Block_4_Q5>() ?? new();
+				var block_5 = await dQ.FetchListAsync<Tbl_Block_5>() ?? new();
+				var block_6 = await dQ.FetchListAsync<Tbl_Block_6>();
+				var block_7a = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_7a>();
+				var block_7a_1 = await dQ.FetchListAsync<Tbl_Block_7a_1>() ?? new();
+				var block_7b = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_7b>();
+				var block_7c_1 = await dQ.FetchListAsync<Tbl_Block_7c_NIC>() ?? new();
+				var block_7c_Q10 = await dQ.FetchListAsync<Tbl_Block_7c_Q10>() ?? new();
+				var block_7c = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_7c>() ?? null;
+				var block_7d = await dQ.FetchListAsync<Tbl_Block_7d>();
+				var block_8 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_8>();
+				var block_8_Q6 = await dQ.FetchListAsync<Tbl_Block_8_Q6>() ?? new();
+				var block_9a = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_9a>() ?? null;
+				var block_9b = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_9b>() ?? null;
+				var block_10 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_10>();
+				var block_11a = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_11a>();
+				var block_11b = await dQ.FetchListAsync<Tbl_Block_11b>() ?? new();
+				var block_A = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
+				var block_B = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
+				var warnings = await dQ.FetchListAsync<Tbl_Warning>() ?? new();
+
+				if(block_1 == null)
+				{
+					errors.Add($"Block 1 data not found for HHD Serial {hhd.Block_7_3}");
+				}
+
+				if (block_2 == null)
+				{
+					errors.Add($"Block 2 data not found for HHD Serial {hhd.Block_7_3}");
+				}
+
+				if (block_1 != null && block_1.survey_code is 1 or 2)
+				{
+					if(block_3.Count == 0)
+					{
+						errors.Add($"No Block 3 entries found for HHD Serial {hhd.Block_7_3}");
+					}
+				}
+
+				if (block_4 == null)
+				{
+					errors.Add($"Block 4 data not found for HHD Serial {hhd.Block_7_3}");
+				}
+				else
+				{
+					var block_3_condition = block_3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1);
+					if (block_3_condition)
+					{
+						var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
+						if (!items.Any(x => x == true))
+						{
+							errors.Add($"H016: Please check the entry recorded against col.s 8-10 , block 3 for HHD Serial {hhd.Block_7_3}");
+						}
+					}
+				}
+
+				if (block_3.Count > 0)
+				{
+					var block_3_condition = block_3.Any(x => x.item_8 == 2 || x.item_9 == 2 || x.item_10 == 2);
+					if (block_3_condition && block_4_nic.Count == 0)
+					{
+						errors.Add($"H017(i): Please check the entry recorded against col.s 8-10 , block 3");
+					}
+
+					var block_3_condition_for_block_5 = block_3.Any(x => x.item_8 == 4 || x.item_9 == 4 || x.item_10 == 4 || x.item_11 == 4);
+					if (block_3_condition_for_block_5 && block_5.Count == 0)
+					{
+						errors.Add($"H030: Please check the entry recorded against col.s 8-11 , block 3");
+					}
+
+					var block_3_condition_for_block_6 = block_3.Any(x => x.item_8 == 5 || x.item_9 == 5);
+					if (block_3_condition_for_block_5 && block_5.Count == 0)
+					{
+						errors.Add($"H033: Please check the entry recorded against col.s 8-9 , block 3");
+					}
+
+					var block_3_condition_for_block_7c = block_3.Any(x => x.item_8 == 2 || x.item_9 == 2);
+					if (!block_3_condition_for_block_7c && (block_7c != null || block_7c_1.Count > 0 || block_7c_Q10.Count > 0))
+					{
+						errors.Add($"H048: Block 7C is applicable only when col 8 and/or col 9 = 2 for atleast one member");
+					}
+					else if(block_3_condition_for_block_7c && (block_7c == null || block_7c_1.Count == 0 || block_7c_Q10.Count == 0))
+					{
+						errors.Add($"H048: No Block 7C entry found even though col 8 and/or col 9 = 2 for atleast one member");
+					}
+
+					var block_3_block_8_Q6_condition = block_3.Any(x => x.item_12 == 1);
+					if (block_3_block_8_Q6_condition && block_8_Q6.Count == 0)
+					{
+						errors.Add($"H059: Block 8.6 must have atleast one entry if col 12 = 1 for any member");
+					}
+					else if(!block_3_block_8_Q6_condition && block_8_Q6.Count != 0)
+					{
+						errors.Add($"H059: Block 8.6 is applicable only when col 12 = 1 for any member");
+					}
+
+					var block_3_block_9a_condition =
+						block_3.Any(x =>
+							x.item_8 == 13 ||
+							x.item_9 == 13 ||
+							x.item_10 == 13 ||
+							x.item_11 == 13
+						);
+
+					// Now check Block 9a:
+					// If block_3_block_9a_condition == true, then at least one of item_1_1 ... item_1_6 must be > 0
+					var block_9a_valid =
+						!block_3_block_9a_condition ||   // No trigger → automatically valid
+						(block_9a != null && (
+							(block_9a.item_1_1 ?? 0) > 0 ||
+							(block_9a.item_1_2 ?? 0) > 0 ||
+							(block_9a.item_1_3 ?? 0) > 0 ||
+							(block_9a.item_1_4 ?? 0) > 0 ||
+							(block_9a.item_1_5 ?? 0) > 0 ||
+							(block_9a.item_1_6 ?? 0) > 0
+						));
+
+					if (!block_9a_valid)
+					{
+						errors.Add($"H063: Invalid Entry, Please check the entry recorded in Q9.1");
+					}
+
+					var block_3_block_9b_condition =
+						block_3.Any(x =>
+							x.item_8 == 10 ||
+							x.item_9 == 10 ||
+							x.item_10 == 10 ||
+							x.item_11 == 10
+						);
+
+					if (block_3_block_9b_condition && block_9b == null)
+					{
+						errors.Add($"H065: Please check the entry recorded against cols. 8-11");
+					}
+
+
+					//Block 11b
+					if (block_3.Count != block_11b.Count)
+					{
+						errors.Add($"Number of block 3 entries does not match the number of block 11b entries");
+					}
+				}
+
+				if (block_4 != null)
+				{
+					if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
+					{
+						errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
+					}
+
+					if (!block_4.item_4_3.GetValueOrDefault() && !block_4.item_4_4.GetValueOrDefault() && !block_4.item_4_5.GetValueOrDefault() && !block_4.item_4_6.GetValueOrDefault() && (block_7b != null))
+					{
+						errors.Add($"H045: Block 7b is applicable only when atleast one of Block 4.4 Sl. no. 3 - 6 are checked");
+					}
+				}
+
+				if (warnings.Count > 0 && warnings.Any(x => x.warning_status == 1))
+				{
+					errors.Add("All warnings have not been resolved");
+				}
+
+				errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+			}
+			return errorDict;
+
+		}
+		catch (Exception ex)
+		{
+			return null;
+		}
+		finally
+		{
+			preloadService.Hide();
+		}
+	}
+
+	private async Task<SCH_HIS_Model?> GetHHDData(Tbl_Sch_0_0_Block_7 hhd)
+	{
+		try
+		{
+			int status = ReturnSubmissionStatus(SessionStorage.UserRole.JSO, hhd);
+
+			SessionStorage.SelectedFSUId = hhd.fsu_id;
+			SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+			var block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
+			var block_2 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>();
+			var block_3 = await dQ.FetchListAsync<Tbl_Block_3>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_4 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_4>();
+			var block_4_nic = await dQ.FetchListAsync<Tbl_Block_4_Q5>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_5 = await dQ.FetchListAsync<Tbl_Block_5>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_6 = await dQ.FetchListAsync<Tbl_Block_6>(DBQueries.DeleteFilter.IncludeAll);
+			var block_7a = await dQ.FetchListAsync<Tbl_Block_7a>(DBQueries.DeleteFilter.IncludeAll);
+			var block_7a_1 = await dQ.FetchListAsync<Tbl_Block_7a_1>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_7b = await dQ.FetchListAsync<Tbl_Block_7b>(DBQueries.DeleteFilter.IncludeAll);
+			var block_7c_1 = await dQ.FetchListAsync<Tbl_Block_7c_NIC>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_7c_Q10 = await dQ.FetchListAsync<Tbl_Block_7c_Q10>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_7c = await dQ.FetchListAsync<Tbl_Block_7c>(DBQueries.DeleteFilter.IncludeAll) ?? null;
+			var block_7d = await dQ.FetchListAsync<Tbl_Block_7d>(DBQueries.DeleteFilter.IncludeAll);
+			var block_8 = await dQ.FetchListAsync<Tbl_Block_8>(DBQueries.DeleteFilter.IncludeAll);
+			var block_8_Q6 = await dQ.FetchListAsync<Tbl_Block_8_Q6>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_9a = await dQ.FetchListAsync<Tbl_Block_9a>(DBQueries.DeleteFilter.IncludeAll) ?? null;
+			var block_9b = await dQ.FetchListAsync<Tbl_Block_9b>(DBQueries.DeleteFilter.IncludeAll) ?? null;
+			var block_10 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_10>(DBQueries.DeleteFilter.IncludeAll);
+			var block_11a = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_11a>(DBQueries.DeleteFilter.IncludeAll);
+			var block_11b = await dQ.FetchListAsync<Tbl_Block_11b>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+			var block_A = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
+			var block_B = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
+			var warnings = await dQ.FetchListAsync<Tbl_Warning>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+
+			SCH_HIS_Model model = new()
+			{
+				Id = Guid.NewGuid(),
+				hhd_id = hhd.Block_7_3.GetValueOrDefault(),
+				hhd_status = status,
+				IncomeBlock1 = block_1,
+				IncomeBlockFieldOp = block_2,
+				IncomeBlock3 = block_3,
+				IncomeBlock4 = block_4,
+				IncomeBlock4Q5 = block_4_nic,
+				IncomeBlock5 = block_5,
+				IncomeBlock6 = block_6,
+				IncomeBlock7A = block_7a,
+				IncomeBlock7AQ1 = block_7a_1,
+				IncomeBlock7B = block_7b,
+				IncomeBlock7CQ1 = block_7c_1,
+				IncomeBlock7CQ10 = block_7c_Q10,
+				IncomeBlock7C = block_7c,
+				IncomeBlock7D = block_7d,
+				IncomeBlock8 = block_8,
+				IncomeBlock8Q6 = block_8_Q6,
+				IncomeBlock9A = block_9a,
+				IncomeBlock9B = block_9b,
+				IncomeBlock10 = block_10,
+				IncomeBlock11A = block_11a,
+				IncomeBlock11B = block_11b,
+				IncomeBlockA = block_A,
+				IncomeBlockB = block_B,
+				IncomeWarningList = warnings
+			};
+
+			return model;
+		}
+		catch (Exception ex)
+		{
+			return null;
+		}
+	}
+
+	private async Task ValidateAndSetSubmissionStatusSSO(List<Tbl_Sch_0_0_Block_7> hhd_list)
+	{
+		try
+		{
+
+		}
+		catch (Exception ex)
+		{
+
+		}
+	}
+
+	private async Task ValidateAndSetSubmissionStatusDS(List<Tbl_Sch_0_0_Block_7> hhd_list)
+	{
+		try
+		{
+
+		}
+		catch (Exception ex)
+		{
+
+		}
+	}
+
+	private int ReturnSubmissionStatus(SessionStorage.UserRole role, Tbl_Sch_0_0_Block_7 hhd, SubmissionMode? mode = null)
+	{
+		int status = 0;
+		if (hhd != null)
+		{
+			if (role == SessionStorage.UserRole.JSO)
+			{
+				if (hhd.status.Equals("substituted", StringComparison.InvariantCultureIgnoreCase))
+				{
+					status = 60;
+				}
+				else
+				{
+					status = 21;
+				}
+			}
+
+			else if (role == SessionStorage.UserRole.SSO)
+			{
+				if (mode == SubmissionMode.sso_to_ds)
+				{
+					status = 31;
+				}
+				else if (mode == SubmissionMode.sso_to_jso)
+				{
+					status = 12;
+				}
+			}
+
+			else if (role == SessionStorage.UserRole.DS)
+			{
+				status = 22;
+			}
+
+			return status;
+		}
+
+		return status;
+	}
+
+	
 
 	async Task HandleStartSurvey(Tbl_Sch_0_0_Block_7 data)
 	{
 		var name = commonFunction.GetUserRoleName(SessionStorage.user_role);
 		if (name == CommonConstants.ROLE_NAME_JSO)
 		{
-			if (data.hhdStatus == 0 || data.hhdStatus == 11)
+			if (data.hhdStatus == 0 || data.hhdStatus == 11 || data.hhdStatus == 15)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
 				SessionStorage.selected_hhd_seq = data.SSS_household_id.GetValueOrDefault();
@@ -519,6 +894,7 @@
 			{
 				0 => "Not Surveyed Yet",
 				11 => "Ongoing",
+				15 => "Surveyed",
 				12 => "Referred back by Supervisor",
 				21 => "Submitted by Enumerator",
 				22 => "Referred back by DS",
@@ -693,5 +1069,6 @@
 	// 		StateHasChanged();
 	// 	}
 	// }
+
 }
 
