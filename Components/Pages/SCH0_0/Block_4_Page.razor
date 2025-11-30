@@ -203,6 +203,11 @@
             toastService.ShowError("Approximate population of the SU cannot be greater than the total population of the selected FSU.");
             return;
         }
+        else if (block_4?.approximate_population_su <= 0)
+        {
+            toastService.ShowError("Approximate population of the SU cannot be zero or negative.");
+            return;
+        }
         block_0_1.remarks_block_4 = remarks;
         var update = await Queries.SaveBlock1(block_0_1);
         var update_block_4 = await Queries.SaveBlock4(block_4);

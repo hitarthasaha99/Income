@@ -44,13 +44,13 @@ namespace Income.Validators.HIS2026
                 RuleFor(x => x.item_7)
                     .NotNull()
                     .GreaterThan(0)
-                    .When(x => x.item_6 == 1)
+                    .When(x => x.item_6.HasValue && x.item_6.Value == 1)
                     .WithMessage("H019: Invalid Entry, Please check the entry")
                     .DependentRules(() =>
                     {
                         RuleFor(x => x.item_7)
                             .Must(HaveMaxThreeDecimals)
-                            .WithMessage("Item 7 must have at most 3 decimal places.");
+                            .WithMessage("H019: Invalid Entry, Please check the entry");
                     });
 
                 RuleFor(x => x.item_8)
@@ -112,6 +112,7 @@ namespace Income.Validators.HIS2026
 
                     RuleFor(x => x.item_17)
                     .NotNull()
+                    .WithMessage("H029: Invalid Entry, Please check the entry")
                     .GreaterThanOrEqualTo(500)
                     .WithMessage("H029: Invalid Entry, Please check the entry");
 

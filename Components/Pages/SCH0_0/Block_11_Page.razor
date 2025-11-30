@@ -21,8 +21,15 @@
             <h3 class="card-title">
                 <span class="text-primary me-2">[Block 11]</span>Particulars of sampling of households
             </h3>
-            <Button class="btn btn-primary is_sso action" hidden="@SessionStorage.FSU_Submitted" @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
-            <Button Disabled="@SessionStorage.FSU_Submitted" class="btn btn-primary is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-memo-circle-check me-1"></i>Validate</Button>
+
+            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                 <Button class="btn btn-primary is_sso action" hidden @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
+            }
+            @if (ShowValidateButton)
+            {
+                <Button class="btn btn-primary is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-memo-circle-check me-1"></i>Validate</Button>
+            }
 
         </div>
         <div class="card-body">
@@ -57,7 +64,7 @@
                <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
-                            <span class="form-badge">2.1</span>Date of end of field work
+                            <span class="form-badge">2.2</span>Date of end of field work
                         </label>
                         <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_end_date" disabled>
                     </div>
@@ -202,18 +209,19 @@
     string StatusClass = "";
     string? remarks = "";
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
-            {
-                await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
-            }
-        }
-    }
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+    //         {
+    //             await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
+    //         }
+    //     }
+    // }
 
     private string? timeTakenError;
+    private bool ShowValidateButton;
 
     protected override async Task OnInitializedAsync()
     {
@@ -228,6 +236,14 @@
             };
             await commonQueries.InsertVisitedBlock(vb);
             var block_1 = await DBQueries.FetchBlock1();
+            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                ShowValidateButton = !SessionStorage.FSU_Submitted;
+            }
+            else
+            {
+                ShowValidateButton = true;
+            }
             if (block_1 != null)
             {
                 block_0_1 = block_1;
@@ -483,7 +499,7 @@
                 payload.lookup_fsu_sub_submit_status = 12; // status = 12 when referring back to ENM
             }
 
-            string final_payload = JsonConvert.SerializeObject(payload);
+            //string final_payload = JsonConvert.SerializeObject(payload);
             var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
             if (response != null && response.IsSuccessStatusCode)
             {

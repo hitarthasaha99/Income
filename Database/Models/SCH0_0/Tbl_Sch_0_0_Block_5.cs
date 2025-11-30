@@ -5,8 +5,6 @@ namespace Income.Database.Models.SCH0_0
 {
     public class Tbl_Sch_0_0_Block_5 : Tbl_Base
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
         public int? serial_number { get; set; }
         public bool? is_selected { get; set; }
         public bool? IsChecked { get; set; }

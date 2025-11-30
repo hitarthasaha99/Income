@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_7a_1 : Tbl_Base
+    public class Tbl_Block_7a_1 : Tbl_Base, IHISModel
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
         public Guid Block_7a_Id { get; set; }
-        public int hhd_id { get; set; } = SessionStorage.selected_hhd_id;
+        public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
         //serial number
         public int serial_number { get; set; }
         //crop code

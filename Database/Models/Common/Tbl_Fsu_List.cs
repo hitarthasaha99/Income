@@ -10,8 +10,6 @@ namespace Income.Database.Models.Common
 {
     public class Tbl_Fsu_List : Tbl_Base
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
         public int? village_id { get; set; }
         public string? village_name { get; set; }
         public int? town_id { get; set; }

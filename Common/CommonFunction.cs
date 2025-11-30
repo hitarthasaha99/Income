@@ -203,6 +203,7 @@ namespace Income.Common
                 {
                     double latitude = location.Latitude;
                     double longitude = location.Longitude;
+                    SessionStorage.location = $"{latitude.ToString("0.000000")} , {longitude.ToString("0.000000")}";
                     return $"{latitude.ToString("0.000000")} , {longitude.ToString("0.000000")}";
                 }
                 else

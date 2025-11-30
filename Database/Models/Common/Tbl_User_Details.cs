@@ -11,7 +11,7 @@ namespace Income.Database.Models.Common
     public class Tbl_User_Details
     {
         [PrimaryKey]
-        public Guid id { get; set; }
+        public Guid id { get; set; } = Guid.NewGuid();
         public string username { get; set; } = "";
         public string password { get; set; } = "";
         public int tenant_id { get; set; } = new();

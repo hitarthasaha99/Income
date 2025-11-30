@@ -130,7 +130,21 @@ namespace Income.Common
         his_block_3,
         his_block_4,
         his_block_5,
-        his_block_6
+        his_block_6,
+        his_block_7a,
+        his_block_7b,
+        his_block_7c,
+        his_block_7d,
+        his_block_8,
+        his_block_9a,
+        his_block_9b,
+        his_block_10,
+        his_block_11a,
+        his_block_11b,
+        his_block_A,
+        his_block_B,
+        his_block_12,
+        his_block_2
     }
 
     public class CommonList
@@ -234,10 +248,10 @@ namespace Income.Common
             {
                 return new List<Tbl_Lookup>
                 {
-                    !IsSubstitutionAllowed ? new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Original - 01"} : null,
-                    IsSubstitutionAllowed ? new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Substitute - 02"} : null,
+                    new Tbl_Lookup { id = 1, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Original - 01"},
+                    new Tbl_Lookup { id = 2, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Substitute - 02"},
                     new Tbl_Lookup { id = 3, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Casualty - 03"},
-                    new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "get a substitution - 09"},
+                    new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_SURVEY_CODE_HHD, title = "Get a substitution - 09"},
                 }.Where(x => x != null).ToList();
             }
         }
@@ -252,6 +266,7 @@ namespace Income.Common
 
         public List<Tbl_Lookup> LOOKUP_CONST_STATUS_LIST = new()
         {
+            new Tbl_Lookup { id = 0, lookup_type = CommonConstants.LOOKUP_CAPI_SUBMIT_STATUS, title = "Original"},
             new Tbl_Lookup { id = 10, lookup_type = CommonConstants.LOOKUP_CAPI_SUBMIT_STATUS, title = "Ongoing"},
             new Tbl_Lookup { id = 11, lookup_type = CommonConstants.LOOKUP_CAPI_SUBMIT_STATUS, title = "ASSIGN TO ENUMERATOR"},
             new Tbl_Lookup { id = 12, lookup_type = CommonConstants.LOOKUP_CAPI_SUBMIT_STATUS, title = "RETURN BACK TO ENUMERATOR"},

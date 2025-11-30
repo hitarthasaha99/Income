@@ -1,5 +1,6 @@
-﻿@page "/dashboard/sch0.0/block_9"
+﻿@page "/dashboard/his/block_12"
 @using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
 @using Income.Database.Models.SCH0_0
 @layout Income.Components.Layout.DashboardLayout
 @inject IJSRuntime JSRuntime
@@ -15,35 +16,27 @@
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
-                <span class="text-primary fw-bolder me-2">[Block 9]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
+                <span class="text-primary fw-bolder me-2">[Block 12]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
             </h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
+            <textarea disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
         </div>
     </div>
     @* Supervisor Comments *@
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
-                <span class="text-primary fw-bolder me-2">[Block 10]</span> Remarks by Field Supervisor (FS)/Senior Statistical Officer (SSO)
+                <span class="text-primary fw-bolder me-2">[Block 13]</span> Remarks by Field Supervisor (FS)/Senior Statistical Officer (SSO)
             </h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks"></textarea>
+            <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks"></textarea>
         </div>
     </div>
 </div>
 <div class="footer">
-    @* Remarks Card *@
-    @* <div class="card custom-card">
-        <div class="card-header">
-            <h3 class="card-title">Remarks</h3>
-        </div>
-        <div class="card-body">
-            <textarea class="form-control disabled w-100" rows="2"></textarea>
-        </div>
-    </div> *@
+    
     <div class="d-flex justify-content-between align-items-center">
 
         <!-- Left: Back button -->
@@ -75,9 +68,9 @@
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     DateTime survey_time = DateTime.Now;
     CommonQueries commonQueries = new();
-    DBQueries SCH_0_0_Queries = new();
+    DBQueries dB = new();
     bool is_error = false;
-    Tbl_Sch_0_0_Block_0_1 tbl_Sch_0_0_Block_0_1 = new();
+    Tbl_Block_1? block_1;
     string EnumeratorRemarks = string.Empty;
     string SupervisorRemarks = string.Empty;
 
@@ -85,19 +78,18 @@
     {
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
-            block_uri = "/dashboard/sch0.0/block_9",
-            block_title = "Sch 0.0 Block 9/10",
-            block_code = CommonEnum.sch_0_0_block_9.ToString(),
+            block_uri = "/dashboard/his/block_12",
+            block_title = "HIS Block 12/13",
+            block_code = CommonEnum.his_block_12.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
-        tbl_Sch_0_0_Block_0_1 = await SCH_0_0_Queries.FetchBlock1();
-        if (tbl_Sch_0_0_Block_0_1 != null)
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
+        if (block_1 != null)
         {
-            EnumeratorRemarks = tbl_Sch_0_0_Block_0_1.EnumeratorRemarks ?? string.Empty;
-            SupervisorRemarks = tbl_Sch_0_0_Block_0_1.SupervisorRemarks ?? string.Empty;
+            EnumeratorRemarks = block_1.block_12_remark ?? string.Empty;
+            SupervisorRemarks = block_1.block_13_remark ?? string.Empty;
         }
         StateHasChanged();
-        return;
     }
 
     async void GoBack()
@@ -112,30 +104,30 @@
         {
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                tbl_Sch_0_0_Block_0_1.EnumeratorRemarks = EnumeratorRemarks;
+                block_1!.block_12_remark = EnumeratorRemarks;
             }
             else if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
             {
-                tbl_Sch_0_0_Block_0_1.SupervisorRemarks = SupervisorRemarks;
+                block_1!.block_13_remark = SupervisorRemarks;
             }
             else
             {
-                NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
+                NavigationManager.NavigateTo("/dashboard/his/block_2");
                 return;
             }
-            int update = await SCH_0_0_Queries.SaveBlock1(tbl_Sch_0_0_Block_0_1) ?? 0;
+            int update = await dB.SaveAsync<Tbl_Block_1>(block_1);
             if (update > 0)
             {
                 if (go_next)
                 {
-                    NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
+                    NavigationManager.NavigateTo("/dashboard/his/block_2");
                 }
                 else
                 {
                     toastService.ShowSuccess("Data saved successfully.");
                 }
             }
-            
+
             else
             {
                 toastService.ShowError("Failed to save data. Please try again.");
@@ -147,7 +139,7 @@
         }
         finally
         {
-            
+
         }
     }
 }

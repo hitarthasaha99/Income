@@ -8,12 +8,13 @@
 @inject IToastService toastService
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
+@inject ILoggingService loggingService
 
 <div class="main-content">
-     <CommonContentHeader />
+     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date"/>
     <div class="card custom-card">
         <div class="card-header p-2">
-            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - A]</span>Monthly Household Income from different sources.</h3>
+            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - A]</span>Monthly Household Income from different sources</h3>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -30,56 +31,56 @@
                             <td>A1</td>
                             <td>Income from Regular wage/salary (Block 5)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A1"/>
                             </td>
                         </tr>
                         <tr>
                             <td>A2</td>
                             <td>Income from Casual work (Block 6)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A2" />
                             </td>
                         </tr>
                         <tr>
                             <td>A3</td>
                             <td>Income from Self-employment – Crop cultivation (Block 7a)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A3" />
                             </td>
                         </tr>
                         <tr>
                             <td>A4</td>
                             <td>Income from Self-employment – Allied activity (Block 7b)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A4" />
                             </td>
                         </tr>
                         <tr>
                             <td>A5</td>
                             <td>Income from Self-employment – Non-agriculture activity (Block 7c)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A5" />
                             </td>
                         </tr>
                         <tr>
                             <td>A6</td>
                             <td>Income from transfer receipts (Block 8)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A6" />
                             </td>
                         </tr>
                         <tr>
                             <td>A7</td>
                             <td>Income from assets (Block 9)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A7" />
                             </td>
                         </tr>
                         <tr>
                             <td>A8</td>
                             <td>Total Income</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@A8"/>
                             </td>
                         </tr>
                     </tbody>
@@ -104,11 +105,112 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex justify-content-end">
-                <NavLink class="btn btn-primary">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-primary" @onclick=@(() => Next())>Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
     </div>
 </div>
-@code {
 
+@code {
+    private DateTime survey_date = DateTime.Now;
+
+    private double A1;
+    private double A2;
+    private double A3;
+    private double A4;
+    private double A5;
+    private double A6;
+    private double A7;
+    private double A8;
+    DBQueries dB = new();
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialization logic can be added here
+        var a1 = await dB.Fetch_SCH_HIS_Block5(SessionStorage.selected_hhd_id);
+        var a2 = await dB.Fetch_SCH_HIS_Block6(SessionStorage.selected_hhd_id);
+        var block_7a = await dB.Fetch_SCH_HIS_Block7A(SessionStorage.selected_hhd_id);
+        var block_7b = await dB.Fetch_SCH_HIS_Block7B(SessionStorage.selected_hhd_id);
+        var block_7c = await dB.Fetch_SCH_HIS_Block7C(SessionStorage.selected_hhd_id);
+        var block_8 = await dB.Fetch_SCH_HIS_Block8(SessionStorage.selected_hhd_id);
+        var block_8_Q6 = await dB.Fetch_SCH_HIS_Block8_6(SessionStorage.selected_hhd_id);
+        var block_9a = await dB.Fetch_SCH_HIS_Block9a(SessionStorage.selected_hhd_id);
+        var block_9b = await dB.Fetch_SCH_HIS_Block9B(SessionStorage.selected_hhd_id);
+
+
+        A1 = a1 != null && a1.Count > 0 ? a1.Sum(x => x.item_9.GetValueOrDefault()) : 0;
+        A2 = a2 != null && a2.Count > 0 ? a2.Sum(x => x.item_4.GetValueOrDefault()) : 0;
+        A3 = (block_7a != null ? (block_7a.item_6.GetValueOrDefault() + block_7a.item_4.GetValueOrDefault()) : 0) / 12;
+        A4 = block_7b != null ? (block_7b.item_9.GetValueOrDefault() / 12) : 0;
+        A5 = block_7c != null ? (block_7c.item_7_12.GetValueOrDefault()) : 0;
+        A6 = block_8 != null ? (block_8.item_1.GetValueOrDefault() + block_8.item_2.GetValueOrDefault()
+        + (block_8.item_3.GetValueOrDefault() + block_8.item_4.GetValueOrDefault() + block_8.item_5.GetValueOrDefault()) / 12 + block_8_Q6.Sum(x => x.item_5.GetValueOrDefault()) / 12) : 0;
+
+        A7 = block_9a != null ? (block_9a.item_1_6.GetValueOrDefault() / 12) + (block_9a.item_2.GetValueOrDefault() / 12)
+        + (block_9a.item_3.GetValueOrDefault()) + (block_9a.item_4.GetValueOrDefault()) : 0;
+
+        if (block_9b != null)
+        {
+            int block_9b_sum = block_9b.item_5_1_4.GetValueOrDefault() + block_9b.item_5_2_4.GetValueOrDefault() + block_9b.item_5_3_4.GetValueOrDefault()
+                    + (block_9b.item_6.GetValueOrDefault() + block_9b.item_7.GetValueOrDefault()) / 12 - (block_9b.item_5_1_5.GetValueOrDefault() + block_9b.item_5_2_5.GetValueOrDefault() + block_9b.item_5_3_5.GetValueOrDefault()) / 12;
+
+            A7 += block_9b_sum;
+        }
+
+        A8 = A1 + A2 + A3 + A4 + A5 + A6 + A7;
+
+        if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        {
+            var block_A = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
+            if (block_A == null)
+            {
+                block_A = new Tbl_Block_A
+                {
+                    fsu_id = SessionStorage.SelectedFSUId,
+                    hhd_id = SessionStorage.selected_hhd_id,
+                    item_1 = A1,
+                    item_2 = A2,
+                    item_3 = A3,
+                    item_4 = A4,
+                    item_5 = A5,
+                    item_6 = A6,
+                    item_7 = A7,
+                    item_8 = A8
+                };
+                await dB.SaveAsync<Tbl_Block_A>(block_A);
+            }
+            else
+            {
+                block_A.item_1 = A1;
+                block_A.item_2 = A2;
+                block_A.item_3 = A3;
+                block_A.item_4 = A4;
+                block_A.item_5 = A5;
+                block_A.item_6 = A6;
+                block_A.item_7 = A7;
+                block_A.item_8 = A8;
+                await dB.SaveAsync<Tbl_Block_A>(block_A);
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    private void Next()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("dashboard/his/block_B");
+        }
+        catch (Exception ex)
+        {
+            loggingService.LogError("Block A", ex);
+        }
+    }
 }

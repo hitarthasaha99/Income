@@ -9,6 +9,9 @@
 @using System.Linq.Expressions
 @using System.Reflection
 @inject IJSRuntime JSRuntime
+@inject ILoggingService loggingService
+@inject IValidator<Tbl_Block_11a> Validator
+
 <div class="my-2">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
         
@@ -21,8 +24,7 @@
     @if (editContext !=null)
     {
         <EditForm EditContext="editContext">
-            @* <DataAnnotationsValidator />
-            <ValidationSummary /> *@
+            
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped mb-0">
@@ -149,18 +151,14 @@
             Back
         </NavLink>
         <div class="d-flex">
-            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                @* <NavLink class="btn btn-primary me-2 is_sso action" href="/save">
-                    <i class="bi bi-floppy-fill me-1"></i>
-                    Save
-                </NavLink> *@
-                <button class="btn btn-primary me-2 is_sso action" href="/save" @onclick="SaveAsync">
+                <button class="btn btn-primary me-2 is_sso action" @onclick="@(() => SaveAsync(false))">
                     <i class="bi bi-floppy-fill me-1"></i>
                     Save
                 </button>
             }
-            <NavLink class="btn btn-outline-primary" href="/next">
+            <NavLink class="btn btn-outline-primary" @onclick="@(() => SaveAsync(true))">
                 Next
                 <i class="bi bi-chevron-right ms-1"></i>
             </NavLink>
@@ -172,23 +170,38 @@
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
     DateTime survey_time = DateTime.Now;
-    // private List<Tbl_Block_11a> block3Members = new();
-    // Create Object
-    private Tbl_Block_11a selectBlock11A = new Tbl_Block_11a();
+
+    private Tbl_Block_11a? selectBlock11A = new Tbl_Block_11a();
     EditContext editContext;
     ValidationMessageStore messageStore;
+    DBQueries dQ = new DBQueries();
     private Block_11a_Validator validator = new();
     private bool isQ11_2Enable = false;
     private bool isQ11_3Enable = false;
     private bool isQ11_4_5Enable = false;
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
-        editContext = new EditContext(selectBlock11A);
-        messageStore = new ValidationMessageStore(editContext);
+        try
+        {
+            selectBlock11A = await dQ.Fetch_SCH_HIS_Block11(SessionStorage.selected_hhd_id);
+            if (selectBlock11A == null)
+            {
+                selectBlock11A = new()
+                {
+                    id = Guid.NewGuid(),
+                };
+            }
+            editContext = new EditContext(selectBlock11A);
+            messageStore = new ValidationMessageStore(editContext);
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            await loggingService.LogError("HIS_Block_11a_Page", ex);
+        }
     }
-
-
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
     {
@@ -217,61 +230,76 @@
 
 
     ////Check When select Q11_1 choose code 1 then enable Q11_3 and choose no code 2 then select Q11_3 input field
-  private void q11_1Condition(ChangeEventArgs e)
-{
-    if (int.TryParse(e.Value?.ToString(), out int value))
+    private void q11_1Condition(ChangeEventArgs e)
     {
-        selectBlock11A.item_1 = value;
-
-        isQ11_2Enable = value == 1;
-        isQ11_3Enable = value == 2;
-
-        // When Q11.2 is disabled → clear value + validation
-        if (!isQ11_2Enable)
+        if (int.TryParse(e.Value?.ToString(), out int value))
         {
-            selectBlock11A.item_2 = null;
+            selectBlock11A.item_1 = value;
 
-            // Clear item_2 validation when item1 changes
-            var item2Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_2));
-            messageStore.Clear(item2Field);
+            isQ11_2Enable = value == 1;
+            isQ11_3Enable = value == 2;
+
+            // When Q11.2 is disabled → clear value + validation
+            if (!isQ11_2Enable)
+            {
+                selectBlock11A.item_2 = null;
+
+                // Clear item_2 validation when item1 changes
+                var item2Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_2));
+                messageStore.Clear(item2Field);
+            }
+
+            if (!isQ11_3Enable)
+            {
+                selectBlock11A.item_3 = null;
+                selectBlock11A.item_4 = null;
+                selectBlock11A.item_5 = null;
+                isQ11_4_5Enable = false;
+            }
         }
+        else
+        {
+            selectBlock11A.item_1 = null;
+            selectBlock11A.item_2 = null;
+            selectBlock11A.item_3 = null;
+            selectBlock11A.item_4 = null;
+            selectBlock11A.item_5 = null;
 
-        if (!isQ11_3Enable)
+            isQ11_2Enable = false;
+            isQ11_3Enable = false;
+            isQ11_4_5Enable = false;
+
+            // Clear all error messages
+            messageStore.Clear();
+        }
+        editContext.NotifyValidationStateChanged();
+    }
+
+    private void q11_3Condition(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int value))
+        {
+            selectBlock11A.item_3 = value;
+            isQ11_4_5Enable = value == 1;
+            if (!isQ11_4_5Enable)
+            {
+                selectBlock11A.item_4 = null;
+                selectBlock11A.item_5 = null;
+
+                var item4Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_4));
+                var item5Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_5));
+                messageStore.Clear(item4Field);
+                messageStore.Clear(item5Field);
+
+                editContext.NotifyValidationStateChanged();
+            }
+        }
+        else
         {
             selectBlock11A.item_3 = null;
             selectBlock11A.item_4 = null;
             selectBlock11A.item_5 = null;
             isQ11_4_5Enable = false;
-        }
-    }
-    else
-    {
-        selectBlock11A.item_1 = null;
-        selectBlock11A.item_2 = null;
-        selectBlock11A.item_3 = null;
-        selectBlock11A.item_4 = null;
-        selectBlock11A.item_5 = null;
-
-        isQ11_2Enable = false;
-        isQ11_3Enable = false;
-        isQ11_4_5Enable = false;
-
-        // Clear all error messages
-        messageStore.Clear();
-    }
-    editContext.NotifyValidationStateChanged();
-}
-
-    private void q11_3Condition(ChangeEventArgs e)
-{
-    if (int.TryParse(e.Value?.ToString(), out int value))
-    {
-        selectBlock11A.item_3 = value;
-        isQ11_4_5Enable = value == 1;
-        if (!isQ11_4_5Enable)
-        {
-            selectBlock11A.item_4 = null;
-            selectBlock11A.item_5 = null;
 
             var item4Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_4));
             var item5Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_5));
@@ -281,38 +309,59 @@
             editContext.NotifyValidationStateChanged();
         }
     }
-    else
+
+
+    private async Task SaveAsync(bool is_go_next = false)
     {
-        selectBlock11A.item_3 = null;
-        selectBlock11A.item_4 = null;
-        selectBlock11A.item_5 = null;
-        isQ11_4_5Enable = false;
-
-        var item4Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_4));
-        var item5Field = new FieldIdentifier(selectBlock11A, nameof(selectBlock11A.item_5));
-        messageStore.Clear(item4Field);
-        messageStore.Clear(item5Field);
-
-        editContext.NotifyValidationStateChanged();
-    }
-}
-
-
-    private async Task SaveAsync()
-    {
-        var validationResult = await validator.ValidateAsync(selectBlock11A);
-        messageStore.Clear();
-
-        if (!validationResult.IsValid)
+        try
         {
-            foreach (var error in validationResult.Errors)
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                // Only JSO can save
+                NavigationManager.NavigateTo("/dashboard/his/block_11b");
+                return;
+            }
+            messageStore.Clear();
+            var validation = Validator.Validate(selectBlock11A);
+
+            foreach (var error in validation.Errors)
             {
                 var fieldIdentifier = new FieldIdentifier(selectBlock11A, error.PropertyName);
                 messageStore.Add(fieldIdentifier, error.ErrorMessage);
             }
             editContext.NotifyValidationStateChanged();
-            return;
+
+            if (!validation.IsValid)
+            {
+                toastService.ShowError("Please resolve all the errors");
+                return;
+            }
+            else
+            {
+                int saved = await dQ.Save_SCH_HIS_Block11a(selectBlock11A);
+                if (saved > 0)
+                {
+                    toastService.ShowSuccess("Saved successfully");
+                }
+                else
+                {
+                    toastService.ShowSuccess("Data could not be saved");
+                }
+            }
+
+            if (!is_go_next)
+            {
+                return;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_11b");
+            }
+        }
+        catch (Exception ex)
+        {
+            await loggingService.LogError("HIS_Block_11a_Page_SaveAsync", ex);
         }
     }
-
+            
 }

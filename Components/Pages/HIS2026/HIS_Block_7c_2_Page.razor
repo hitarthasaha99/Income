@@ -120,7 +120,7 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
@@ -416,6 +416,7 @@
             editContext.NotifyValidationStateChanged();
             if (validation.IsValid)
             {
+                fields.isUpdated = true;
                 int saved = await dQ.Save_SCH_HIS_Block7_Q10_List(fields) ?? 0;
                 if (saved > 0)
                 {
@@ -447,9 +448,9 @@
             NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
             return;
         }
-        if (Q9Needed && NICFields.Count == 0)
+        if (Q9Needed && ActivityList.Any(x => !x.isUpdated))
         {
-            toastService.ShowError("Need to add atleast one entry before proceeding");
+            toastService.ShowError("Please save all entries before proceeding");
             return;
         }
         else

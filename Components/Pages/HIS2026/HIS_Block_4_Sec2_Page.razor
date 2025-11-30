@@ -1,5 +1,6 @@
 ﻿@page "/dashboard/his/block_4_2"
 @using Blazored.FluentValidation
+@using FluentValidation
 @using Income.Common.HIS2026
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
@@ -12,10 +13,9 @@
 @inject IToastService toastService
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
+@inject IValidator<Tbl_Block_4_Q5> Validator
 
 
-<EditForm Model="fields">
-    <FluentValidationValidator />
     <div class="main-content">
         <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                              survey_time="@survey_time" />
@@ -110,7 +110,6 @@
             </div>
         </div>
     </div>
-</EditForm>
 <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
     <HeaderTemplate>
         <h5 class="modal-title">Details of non-agricultural economic activity(ies) carried out by one or more household member in last 365 days</h5>
@@ -119,7 +118,6 @@
         @if (fields != null)
         {
             <EditForm EditContext="editContext">
-                <FluentValidationValidator />
                 <div class="row">
                     <div class="col-sm-12">
                         <!-- Serial Number -->
@@ -211,6 +209,7 @@
 
 @code {
     EditContext editContext = default!;
+    ValidationMessageStore messageStore = default!;
     Modal AddModal = default!;
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
@@ -227,10 +226,22 @@
 
     async void Validate()
     {
-        bool isValid = editContext.Validate();
-        if (isValid)
+        messageStore.Clear();
+        var validation = Validator.Validate(fields);
+
+        foreach (var error in validation.Errors)
+        {
+            var fieldIdentifier = new FieldIdentifier(fields, error.PropertyName);
+            messageStore.Add(fieldIdentifier, error.ErrorMessage);
+        }
+        editContext.NotifyValidationStateChanged();
+        if (validation.IsValid)
         {
             await SaveQ5();
+        }
+        else
+        {
+            toastService.ShowError("Please resolve the validation errors");
         }
     }
 
@@ -253,7 +264,6 @@
         if (block_4 != null)
         {
             NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
-            editContext = new EditContext(fields);
         }
         else
         {
@@ -261,6 +271,15 @@
         }
 
         StateHasChanged();
+    }
+
+    private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear validation messages for this specific field
+        messageStore.Clear(e.FieldIdentifier);
+
+        // Update validation state
+        editContext.NotifyValidationStateChanged();
     }
 
     async Task LoadData()
@@ -273,7 +292,7 @@
     async Task SaveQ5()
     {
         var obj = fields;
-        if (NICfields != null && NICfields.Count > 0 && NICfields.Any(x => x.NicCode == fields.NicCode))
+        if (NICfields != null && NICfields.Count > 0 && NICfields.Any(x => x.NicCode == fields.NicCode && x.id != fields.id && x.is_deleted != true))
         {
             toastService.ShowError("Cannot add the same NIC code again");
             return;
@@ -297,11 +316,16 @@
                 fields.Block4Id = block_4.id;
                 fields.SerialNumber = NICfields.Count == 0 ? 1 : NICfields.Count + 1;
                 editContext = new EditContext(fields);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += EditContext_OnFieldChanged;
                 await AddModal.ShowAsync();
             }
             else if (action == "UPDATE")
             {
-                fields = data;
+                fields = ObjectCloneHelper.ShallowCopy(data);
+                editContext = new EditContext(fields);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += EditContext_OnFieldChanged;
                 await AddModal.ShowAsync();
             }
             else if (action == "CLOSE")
@@ -361,9 +385,7 @@
     private void OnNicCodeChanged(ChangeEventArgs e)
     {
         string? val = e.Value?.ToString();
-        // Clear validation error
-        editContext?.NotifyFieldChanged(
-            FieldIdentifier.Create(() => fields.NicCode));
+        
         if (int.TryParse(e.Value?.ToString(), out int selectedNic))
         {
             fields.NicCode = selectedNic;
@@ -384,6 +406,9 @@
             fields.NicCode = null;
             fields.ActivityName = null;
         }
+        // Clear validation error
+        editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => fields.NicCode));
     }
 
 
