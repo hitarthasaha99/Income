@@ -124,7 +124,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
             </div>
         </div>
         <div class="row mb-4">
@@ -167,21 +167,18 @@
                         </div>
                     </div>
 
-                    <!-- 2. Name -->
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">2</span> Name of Member
-                            </label>
-
-                            <InputText class="form-control"
-                                       @bind-Value="newMember.item_2"
-                                       placeholder="Enter Name of member"
-                                       @oninput="ClearNameError"
-                                       autocomplete="off"
-                                       autocorrect="off"
-                                       autocapitalize="off"
-                                       spellcheck="false" />
+                                    <!-- Name of Member input -->
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold d-flex align-items-start">
+                                            <span class="me-2">2.</span> Name of Member
+                                        </label>
+                                        <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" @oninput="ClearNameError" autocomplete="off"
+                                                   onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+                                                   maxlength="50"
+                                                   autocorrect="off"
+                                                   autocapitalize="off"
+                                                   spellcheck="false" />
+                                        <ValidationMessage For="@(() => newMember.item_2)" />
 
                             <ValidationMessage For="@(() => newMember.item_2)" />
                         </div>
