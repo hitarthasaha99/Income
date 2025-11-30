@@ -296,7 +296,7 @@
                         <!-- Monthly Expenditure -->
                         <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                             <div>
-                                <label class="form-label"><span class="form-badge">9</span>usual monthly consumption expenditure of the household (in Rs.)	SSS number for Schedule HIS 2026</label>
+                                <label class="form-label"><span class="form-badge">9</span>usual monthly consumption expenditure of the household (in Rs.)</label>
                                 <input class="form-control no-spinner"
                                                 type="number"
                                                 step="1"
@@ -540,7 +540,7 @@
 
         if (!isWithin5Percent_i)
         {
-            firstWarning = $"(i) Population mismatch:\n" +
+            firstWarning = $"W025(i) : Population mismatch:\n" +
                 $"{listedTotal} should be within ±5% of {su_population}.\n\n";
             validationMessage += firstWarning;
 
@@ -548,7 +548,7 @@
 
         if (!isWithin5Percent_ii)
         {
-            secondWarning = $"(ii) Population mismatch:\n" +
+            secondWarning = $"\nW025(ii): Population mismatch:\n" +
                 $"{listedTotal * number_of_sub_units} should be within ±5% of {approx_population_fsu}.\n\n";
             validationMessage += secondWarning;
 
@@ -561,13 +561,15 @@
         // If message exists, show confirm dialog
         if (!string.IsNullOrWhiteSpace(validationMessage))
         {
-            validationMessage += "Do you want to continue?";
 
             var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
             var confirmation = await dialog.ShowAsync(
                 title: "Alert",
                 message1: validationMessage,
+                message2: "Do you want to continue?",
                 confirmDialogOptions: options
+
+
             );
 
             if (confirmation)
@@ -578,9 +580,10 @@
                 }
                 if (!isWithin5Percent_ii)
                 {
-                    warningVM.AddWarning(secondWarning, "0", "7", "0");
+                    warningVM.AddWarning(secondWarning.Trim(), "0", "7", "0");
                 }
-                await warningVM.SaveWarningAsync(false, "0", "7", 0);
+                await warningVM.SaveWarningAsync1("0", "7", 0);
+
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             }
         }
@@ -593,7 +596,16 @@
 
     async Task HandleDelete(Guid id)
     {
-
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Alert",
+            message1: "Are you sure you want to delete?",
+            confirmDialogOptions: options
+        );
+        if(!confirmation)
+        {
+            return;
+        }
         int item_index = ListItems.FindIndex(l => l.id == id);
         if (item_index != -1)
         {
@@ -640,7 +652,7 @@
                 isAdd = false;
                 if (data != null)
                 {
-                    fields = data;
+                    fields = data.ShallowCopy();
                     // Recreate EditContext for the new model
                     if (fields.Block_7_5 > 30)
                     {
@@ -747,7 +759,7 @@
             await SCH_0_0_Queries.SaveUpdateSCH0Block7(block_5_obj);
             if (block_5_obj.Block_7_5 > 30)
             {
-                warningVM.AddWarning("W000: Household size is greater than 30", "0", "7", "5", block_5_obj.Block_7_3.GetValueOrDefault());
+                warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", block_5_obj.Block_7_3.GetValueOrDefault());
                 await warningVM.SaveWarningAsync(false, "0", "7", 1);
             }
         }

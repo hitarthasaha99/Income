@@ -676,6 +676,16 @@
     {
         try
         {
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmation = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Do you want to proceed?",
+                confirmDialogOptions: options
+            );
+            if (!confirmation)
+            {
+                return;                
+            }
             preloadService.Show(SpinnerColor.Info, "Doing Selection, Please wait...");
 
             await SCH_0_0_Queries.UpdateAllRowsForColumnAsync(SessionStorage.SelectedFSUId);

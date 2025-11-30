@@ -155,6 +155,10 @@ namespace Income.Viewmodels
             {
                 //Console.WriteLine("Error in SaveWarningAsync: " + ex.Message);
             }
+            finally
+            {
+                _tempWarnings.Clear();
+            }
         }
 
 
