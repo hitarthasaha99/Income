@@ -24,7 +24,7 @@
 
             @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                 <Button class="btn btn-primary is_sso action" hidden @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
+                 <Button class="btn btn-primary is_sso action" @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
             }
             @if (ShowValidateButton)
             {
