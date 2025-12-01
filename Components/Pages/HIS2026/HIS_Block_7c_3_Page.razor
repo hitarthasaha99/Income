@@ -87,14 +87,14 @@
             </h5>
         </div>
         <div class="card-body">
-            <textarea class="form-control w-100" rows="4" @bind="@remarks"></textarea>
+            <textarea maxlength="500" class="form-control w-100" rows="4" @bind="@remarks"></textarea>
         </div>
     </div>
 
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
@@ -121,6 +121,12 @@
     DateTime survey_date = DateTime.Now;
     string remarks = string.Empty;
     string item_9_warning = string.Empty;
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
 
     protected override async Task OnInitializedAsync()
     {

@@ -99,7 +99,15 @@ namespace Income.Viewmodels.SCH0_0
                 }
                 if (field_name == "name_of_hamlet")
                 {
-                    tbl_Sch_0_0_block_2_1[index].hamlet_name = e.Value.ToString();
+                    var text = e.Value?.ToString() ?? "";
+
+                    // Remove emojis
+                    text = RemoveEmojis(text);
+
+                    // Optionally trim spaces
+                    text = text.Trim();
+
+                    tbl_Sch_0_0_block_2_1[index].hamlet_name = text;
                 }
                 else
                 {
@@ -122,6 +130,16 @@ namespace Income.Viewmodels.SCH0_0
                 return;
             }
         }
+
+        public static string RemoveEmojis(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            // Removes characters outside BMP (Basic Multilingual Plane)
+            return System.Text.RegularExpressions.Regex.Replace(input, @"[^\u0000-\uFFFF]", "");
+        }
+
 
         public void CalculateTotalPopulationPercentage()
         {

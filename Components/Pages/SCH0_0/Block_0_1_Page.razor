@@ -230,7 +230,7 @@
                     <h3 class="card-title"><span class="text-primary fw-bolder me-2">18</span>Remarks</h3>
                 </div>
                 <div class="card-body">
-                    <textarea disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control disabled w-100" placeholder="" rows="2" @bind="block_0_1_VM.block_0_1.remarks"></textarea>
+                    <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control disabled w-100" placeholder="" rows="2" @bind="block_0_1_VM.block_0_1.remarks"></textarea>
                 </div>
             </div>
         </div>
@@ -312,7 +312,7 @@
                     {
                         IsBlock_1_14_ErrorMessageVisible = true;
                         Block_1_14_ErrorMessage =
-                            "W: Wide variation in approximate population and frame population";
+                            "W006: Wide variation in approximate population and frame population";
                     }
                 }
             }
@@ -325,7 +325,7 @@
                 {
                     IsBlock_1_14_ErrorMessageVisible = true;
                     Block_1_14_ErrorMessage =
-                        "W: Wide variation in approximate population and frame population";
+                        "W006: Wide variation in approximate population and frame population";
                 }
             }
         }
@@ -406,8 +406,10 @@
             if(!string.IsNullOrEmpty(Block_1_14_ErrorMessage))
             {
                 warningVM.AddWarning(Block_1_14_ErrorMessage, "0", "1", "14");
-                await warningVM.SaveWarningAsync(false, "0", "1", 0);
             }
+            await warningVM.SaveWarningAsync("0", "1", 0);
+            warningVM._tempWarnings.Clear();
+
 
             // If this is only a Save (not Next), stop here
             if (!goNext)
@@ -474,6 +476,7 @@
         {
             block_0_1_VM.SurveyCodeSelectionChanged(args);
             editContext?.NotifyFieldChanged(editContext.Field(nameof(block_0_1_VM.block_0_1.Block_1_16)));
+            editContext?.NotifyFieldChanged(editContext.Field(nameof(block_0_1_VM.block_0_1.Block_1_14)));
         }
         catch (Exception ex)
         {
@@ -507,5 +510,4 @@
             block_0_1_VM.block_0_1.Block_1_17 = null;
         }
     }
-
 }

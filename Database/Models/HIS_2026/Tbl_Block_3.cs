@@ -11,16 +11,12 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_3 : Tbl_Base
+    public class Tbl_Block_3 : Tbl_Base, IHISModel
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
         public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
         //s.no.
         public int? serial_no { get; set; }
         //name of member
-        //[Required(ErrorMessage = "Name is required")]
-        //[RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "Name must only contain letters and spaces")]
         public string? item_2 { get; set; }
         //relation to head(code)
         public int? item_3 { get; set; }

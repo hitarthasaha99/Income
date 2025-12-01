@@ -7,8 +7,6 @@ namespace Income.Database.Models.SCH0_0
 {
     public class Tbl_Sch_0_0_Block_0_1 : Tbl_Base
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
 
         [MaxLength(50)]
         public string? Block_0_1 { get; set; }

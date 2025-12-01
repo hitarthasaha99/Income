@@ -124,7 +124,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
             </div>
         </div>
         <div class="row mb-4">
@@ -167,21 +167,18 @@
                         </div>
                     </div>
 
-                    <!-- 2. Name -->
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">2</span> Name of Member
-                            </label>
-
-                            <InputText class="form-control"
-                                       @bind-Value="newMember.item_2"
-                                       placeholder="Enter Name of member"
-                                       @oninput="ClearNameError"
-                                       autocomplete="off"
-                                       autocorrect="off"
-                                       autocapitalize="off"
-                                       spellcheck="false" />
+                                    <!-- Name of Member input -->
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label fw-bold d-flex align-items-start">
+                                            <span class="me-2">2.</span> Name of Member
+                                        </label>
+                                        <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" @oninput="ClearNameError" autocomplete="off"
+                                                   onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+                                                   maxlength="50"
+                                                   autocorrect="off"
+                                                   autocapitalize="off"
+                                                   spellcheck="false" />
+                                        <ValidationMessage For="@(() => newMember.item_2)" />
 
                             <ValidationMessage For="@(() => newMember.item_2)" />
                         </div>
@@ -304,16 +301,16 @@
                                     @onchange="ClearItem7">
 
                                 <option value="">-Select-</option>
-                                <option value="1">not literate</option>
-                                <option value="2">literate without schooling</option>
-                                <option value="3">below primary</option>
-                                <option value="4">primary</option>
-                                <option value="5">middle</option>
-                                <option value="6">secondary</option>
-                                <option value="7">higher secondary</option>
-                                <option value="8">diploma</option>
-                                <option value="10">graduate</option>
-                                <option value="11">postgraduate</option>
+                                <option value="1">not literate - 01</option>
+                                <option value="2">literate without schooling - 02</option>
+                                <option value="3">below primary - 03</option>
+                                <option value="4">primary - 04</option>
+                                <option value="5">middle - 05</option>
+                                <option value="6">secondary - 06</option>
+                                <option value="7">higher secondary - 07</option>
+                                <option value="8">diploma - 08</option>
+                                <option value="10">graduate - 10</option>
+                                <option value="11">postgraduate - 11</option>
 
                             </select>
 
@@ -343,6 +340,22 @@
                                     @onchange="ClearItem8">
 
                                 @* options *@
+                                <option value="">-Select-</option>
+                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                <option value="4">regular wage/ salary – 04 </option>
+                                <option value="5">casual labour – 05 </option>
+                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                <option value="7">student / attended educational institution - 07 </option>
+                                <option value="8">attended domestic duties only – 08 </option>
+                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                <option value="10">earning from rent – 10 </option>
+                                <option value="11">earning from pensions -11 </option>
+                                <option value="12">earning from remittances -12 </option>
+                                <option value="13">earning from interest - 13 </option>
+                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                             </select>
 
                             <ValidationMessage For="@(() => newMember.item_8)" />
@@ -365,6 +378,22 @@
                                     @onchange="ClearItem9">
 
                                 @* options *@
+                                <option value="">-Select-</option>
+                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                <option value="4">regular wage/ salary – 04 </option>
+                                <option value="5">casual labour – 05 </option>
+                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                <option value="7">student / attended educational institution - 07 </option>
+                                <option value="8">attended domestic duties only – 08 </option>
+                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                <option value="10">earning from rent – 10 </option>
+                                <option value="11">earning from pensions -11 </option>
+                                <option value="12">earning from remittances -12 </option>
+                                <option value="13">earning from interest - 13 </option>
+                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                             </select>
 
                             <ValidationMessage For="@(() => newMember.item_9)" />
@@ -393,6 +422,23 @@
                                     @onchange="ClearItem10">
 
                                 @* options *@
+                                <option value="">-Select-</option>
+                                <!-- Same options as above for primary -->
+                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                <option value="4">regular wage/ salary – 04 </option>
+                                <option value="5">casual labour – 05 </option>
+                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                <option value="7">student / attended educational institution - 07 </option>
+                                <option value="8">attended domestic duties only – 08 </option>
+                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                <option value="10">earning from rent – 10 </option>
+                                <option value="11">earning from pensions -11 </option>
+                                <option value="12">earning from remittances -12 </option>
+                                <option value="13">earning from interest - 13 </option>
+                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                             </select>
 
                             <ValidationMessage For="@(() => newMember.item_10)" />
@@ -415,6 +461,22 @@
                                     @onchange="ClearItem11">
 
                                 @* options *@
+                                <option value="">-Select-</option>
+                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                <option value="4">regular wage/ salary – 04 </option>
+                                <option value="5">casual labour – 05 </option>
+                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                <option value="7">student / attended educational institution - 07 </option>
+                                <option value="8">attended domestic duties only – 08 </option>
+                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                <option value="10">earning from rent – 10 </option>
+                                <option value="11">earning from pensions -11 </option>
+                                <option value="12">earning from remittances -12 </option>
+                                <option value="13">earning from interest - 13 </option>
+                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                             </select>
 
                             <ValidationMessage For="@(() => newMember.item_11)" />

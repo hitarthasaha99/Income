@@ -65,7 +65,7 @@ namespace Income.Services
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", SessionStorage.auth_token);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    client.Timeout = TimeSpan.FromSeconds(300);
+                    client.Timeout = TimeSpan.FromSeconds(120);
 
                     string apiURL = $"api/SURVEY/v1/{controller}/{action}";
 

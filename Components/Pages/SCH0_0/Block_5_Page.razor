@@ -13,6 +13,8 @@
         SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time"  
     />
+    <ConfirmDialog @ref="dialog" />
+
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
@@ -74,7 +76,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="" rows="2"></textarea>
+            <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="@remarks" placeholder="" rows="2"></textarea>
         </div>
     </div>
     <div class="row">
@@ -101,11 +103,13 @@
     DateTime survey_time = DateTime.Now;
     CommonQueries commonQueries = new();
     DBQueries SCH_0_0_Queries = new();
+    Tbl_Sch_0_0_Block_4? block_4 = new();
     List<Tbl_Sch_0_0_Block_5> block_5 = new();
     double? total_population_percentage = new();
     bool is_selection_done = false;
     string? remarks = string.Empty;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
+    private ConfirmDialog dialog = default!;
 
     async void GoBack()
     {
@@ -123,20 +127,24 @@
         await commonQueries.InsertVisitedBlock(vb);
         var response = await SCH_0_0_Queries.FetchSCH0Block5Data();
         block_0_1 = await SCH_0_0_Queries.FetchBlock1();
-
+        block_4 = await SCH_0_0_Queries.GetBlock4();
         if (response == null || response.Count == 0)
         {
             if (block_0_1 != null)
             {
                 block_5 = new();
-                for (var i = 0; i < block_0_1.number_of_sub_division_of_su_to_be_formed; i++)
+                if (block_4 != null)
                 {
-                    block_5.Add(new Tbl_Sch_0_0_Block_5
+                    for (var i = 0; i < block_4.number_of_sub_division_of_su_to_be_formed; i++)
                     {
-                        id = Guid.NewGuid(),
-                        serial_number = i+1,
-                    });
+                        block_5.Add(new Tbl_Sch_0_0_Block_5
+                        {
+                            id = Guid.NewGuid(),
+                            serial_number = i + 1,
+                        });
+                    }
                 }
+                
                 StateHasChanged();
             }
             else
@@ -178,6 +186,19 @@
         }
         if (action == "SELECTION")
         {
+            if(PopulationVariationExists())
+            {
+                var options_0 = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                var confirmation_0 = await dialog.ShowAsync(
+                    title: "Alert",
+                    message1: "All the sub-divisions need to have more or less equal population. Do you want to continue?",
+                    confirmDialogOptions: options_0);
+
+                if (!confirmation_0)
+                {
+                    return;
+                }
+            }
             Random num = new Random();
             int? from_val = block_5[0].serial_number;
             int? to_val = block_5[block_5.Count - 1].serial_number;
@@ -229,6 +250,23 @@
             }
         }
     }
+    public bool PopulationVariationExists()
+    {
+        try
+        {
+            var percentages = block_5
+                      .Select(row => row.Percentage.GetValueOrDefault()) // Extract Percentage values.
+                      .ToList();
+            double minValue = percentages.Min();
+            double maxValue = percentages.Max();
+            return Math.Abs(maxValue - minValue) > 5;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
     void HandleChange(ChangeEventArgs args, Guid id)
     {
         try

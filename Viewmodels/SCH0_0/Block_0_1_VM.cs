@@ -151,7 +151,21 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
                 ShowItem17 = block_0_1.Block_1_17 != null;
                 ShowItem17RemarksField = ShowItem17 && block_0_1.Block_1_17.GetValueOrDefault() == 9;
-                DisablePopulation = SessionStorage.hamlet_selection_done;
+                if(block_0_1.Block_1_16.GetValueOrDefault() is 2 or 3 or 5 or 6 or 7)
+                {
+                    DisablePopulation = true;
+                }
+                else
+                {
+                    if (!SessionStorage.FSU_Submitted)
+                    {
+                        DisablePopulation = SessionStorage.hamlet_selection_done;
+                    }
+                    else
+                    {
+                        DisablePopulation = true;
+                    }
+                }
             }
             OnPropertyChanged(nameof(block_0_1));
         }

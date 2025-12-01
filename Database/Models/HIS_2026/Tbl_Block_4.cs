@@ -1,4 +1,5 @@
-﻿using Income.Database.Models.Common;
+﻿using Income.Common;
+using Income.Database.Models.Common;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,9 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_4 : Tbl_Base
+    public class Tbl_Block_4 : Tbl_Base, IHISModel
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
-        public int hhd_id { get; set; }
+        public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
 
         // Q4.1 – Household size (auto-populated from Block 3)
         public int? item_1 { get; set; }

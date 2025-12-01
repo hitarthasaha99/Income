@@ -106,7 +106,7 @@
    
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
@@ -268,6 +268,12 @@
     DBQueries dB = new();
     bool isAdd;
 
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
@@ -359,6 +365,11 @@
         try
         {
             messageStore.Clear();
+            if (ActivityList.Any(x => x.code == block_7_1.code && x.id != block_7_1.id && x.is_deleted != true))
+            {
+                toastService.ShowError("Cannot add the same crop code more than once");
+                return;
+            }
             var result = await Validator.ValidateAsync(block_7_1);
             foreach (var error in result.Errors)
             {

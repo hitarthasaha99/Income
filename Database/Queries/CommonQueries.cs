@@ -1,5 +1,6 @@
 ﻿using Income.Common;
 using Income.Database.Models.Common;
+using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
 using System;
 using System.Collections.Generic;
@@ -529,6 +530,7 @@ namespace Income.Database.Queries
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_3>();
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_2_1>();
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_2_2>();
+                await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_4>();
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_5>();
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_7>();               
                 await _database.DeleteAllAsync<Tbl_Fsu_List>();
@@ -573,25 +575,75 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<string> DeleteBlockDataForCasulaty()
+        public async Task<int> DeleteBlockDataForCasulaty()
         {
             await _database.ExecuteAsync("BEGIN TRANSACTION");
             try
             {
-                await _database.ExecuteAsync($@"DELETE FROM Block_2 WHERE fsu_id = {SessionStorage.SelectedFSUId} AND hhd_id = {SessionStorage.selected_hhd_id} AND tenant_id = {SessionStorage.tenant_id} AND survey_id = '{SessionStorage.surveyId}'");
-                await _database.ExecuteAsync($@"DELETE FROM Block_3 WHERE fsu_id = {SessionStorage.SelectedFSUId} AND hhd_id = {SessionStorage.selected_hhd_id} AND tenant_id = {SessionStorage.tenant_id} AND survey_id = '{SessionStorage.surveyId}'");
-                await _database.ExecuteAsync($@"DELETE FROM Block_4 WHERE fsu_id = {SessionStorage.SelectedFSUId} AND hhd_id = {SessionStorage.selected_hhd_id} AND tenant_id = {SessionStorage.tenant_id} AND survey_id = '{SessionStorage.surveyId}'");
-                
-                await _database.ExecuteAsync($@"DELETE FROM Tbl_Warning WHERE fsu_id = {SessionStorage.SelectedFSUId} AND hhd_id = {SessionStorage.selected_hhd_id}");
+                int fsuId = SessionStorage.SelectedFSUId;
+                int hhdId = SessionStorage.selected_hhd_id;
+                bool submitted = SessionStorage.FSU_Submitted;
+
+                // List of all block tables involved
+                var tables = new Type[]
+                {
+            typeof(Tbl_Block_3),
+            typeof(Tbl_Block_4),
+            typeof(Tbl_Block_4_Q5),
+            typeof(Tbl_Block_5),
+            typeof(Tbl_Block_6),
+            typeof(Tbl_Block_7a),
+            typeof(Tbl_Block_7a_1),
+            typeof(Tbl_Block_7b),
+            typeof(Tbl_Block_7c),
+            typeof(Tbl_Block_7c_NIC),
+            typeof(Tbl_Block_7c_Q10),
+            typeof(Tbl_Block_7d),
+            typeof(Tbl_Block_8),
+            typeof(Tbl_Block_8_Q6),
+            typeof(Tbl_Block_9a),
+            typeof(Tbl_Block_9b),
+            typeof(Tbl_Block_10),
+            typeof(Tbl_Block_11a),
+            typeof(Tbl_Block_11b),
+            typeof(Tbl_Block_A),
+            typeof(Tbl_Block_B),
+            typeof(Tbl_Block_FieldOperation),
+            typeof(Tbl_Warning)
+                };
+
+                foreach (var table in tables)
+                {
+                    if (submitted)
+                    {
+                        // Soft delete → set is_deleted = 1
+                        string query =
+                            $"UPDATE {table.Name} SET is_deleted = 1 " +
+                            $"WHERE fsu_ref_id = ? AND hhd_id = ?";
+
+                        await _database.ExecuteAsync(query, fsuId, hhdId);
+                    }
+                    else
+                    {
+                        // Hard delete → remove records
+                        string query =
+                            $"DELETE FROM {table.Name} " +
+                            $"WHERE fsu_ref_id = ? AND hhd_id = ?";
+
+                        await _database.ExecuteAsync(query, fsuId, hhdId);
+                    }
+                }
+
                 await _database.ExecuteAsync("COMMIT");
-                return CommonConstants.SUCCESS_TEXT;
+                return 1;
             }
             catch (Exception ex)
             {
                 await _database.ExecuteAsync("ROLLBACK");
-                return $"Facing error while cleaning database : {ex}";
+                return 0;
             }
         }
+
 
         public async Task<int?> UpdateFsuDownloadStatus(int Fsu_ID)
         {

@@ -8,12 +8,13 @@
 @inject IToastService toastService
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
+@inject ILoggingService loggingService
 
 <div class="main-content">
-    <CommonContentHeader />
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
     <div class="card custom-card">
         <div class="card-header p-2">
-            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - B]</span>Monthly Household Expenditure.</h3>
+            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - B]</span>Monthly Household Expenditure</h3>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -30,28 +31,28 @@
                             <td>B1</td>
                             <td>Expenditure on food & non-food items (Block 10)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@B1"/>
                             </td>
                         </tr>
                         <tr>
                             <td>B2</td>
                             <td>Transfer paid to non-household member (Block 11a)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@B2"/>
                             </td>
                         </tr>
                         <tr>
                             <td>B3</td>
                             <td>Direct taxes paid (Block 11b)</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@B3"/>
                             </td>
                         </tr>
                         <tr>
                             <td>B4</td>
                             <td>Total expenditure</td>
                             <td>
-                                <input class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled value="@B4"/>
                             </td>
                         </tr>
                     </tbody>
@@ -65,7 +66,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" rows="4"></textarea>
+            <textarea maxlength="500" class="form-control disabled w-100" rows="4"></textarea>
         </div>
     </div>
 </div>
@@ -76,11 +77,80 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex justify-content-end">
-                <NavLink class="btn btn-primary">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-primary" @onclick="@(() => Next())">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
     </div>
 </div>
 @code {
+    private DateTime survey_date = DateTime.Now;
 
+    private double B1;
+    private double B2;
+    private double B3;
+    private double B4;
+
+    DBQueries dB = new();
+
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialization logic can be added here
+        var block_10 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_10>();
+        var block_11a = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_11a>();
+        var block_11b = await dB.FetchListAsync<Tbl_Block_11b>();
+
+        B1 = block_10 != null ? block_10.item_23.GetValueOrDefault() : 0;
+        B2 = block_11a != null ? (block_11a.item_2.GetValueOrDefault() + (block_11a.item_5.GetValueOrDefault() + block_11a.item_6.GetValueOrDefault())/12) : 0;
+        B3 = block_11b != null && block_11b.Count > 0 ? block_11b.Sum(x => x.item_4.GetValueOrDefault())/12 : 0;
+
+        B4 = B1 + B2 + B3;
+
+        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        {
+            var block_B = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
+            if (block_B == null)
+            {
+                block_B = new Tbl_Block_B
+                {
+                    fsu_id = SessionStorage.SelectedFSUId,
+                    hhd_id = SessionStorage.selected_hhd_id,
+                    item_1 = B1,
+                    item_2 = B2,
+                    item_3 = B3,
+                    item_4 = B4,
+                };
+                await dB.SaveAsync<Tbl_Block_B>(block_B);
+            }
+            else
+            {
+                block_B.item_1 = B1;
+                block_B.item_2 = B2;
+                block_B.item_3 = B3;
+                block_B.item_4 = B4;
+
+                await dB.SaveAsync<Tbl_Block_B>(block_B);
+            }
+        }
+        
+
+        StateHasChanged();
+    }
+
+    private void Next()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("dashboard/his/block_12");
+        }
+        catch (Exception ex)
+        {
+            loggingService.LogError("Block B", ex);
+        }
+    }
 }

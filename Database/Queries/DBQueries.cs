@@ -830,7 +830,7 @@ namespace Income.Database.Queries
                     {
                         int deleted = await _database.DeleteAsync(exists);
                     }
-                    await ReserializeHHD(exists);
+                    await ReserializeHHD();
                     return 1;
                 }
                 return 0;
@@ -842,7 +842,7 @@ namespace Income.Database.Queries
             }
         }
 
-        private async Task ReserializeHHD(Tbl_Sch_0_0_Block_7 deleted)
+        public async Task ReserializeHHD()
         {
             try
             {
@@ -853,32 +853,13 @@ namespace Income.Database.Queries
                     // Order by current serial
                     var allOrdered = households.OrderBy(h => h.Block_7_1).ToList();
 
-                    // Identify deleted serial position
-                    int deletedSerial1 = deleted.Block_7_1 ?? 0;
-
-                    // Start from the next serial
-                    int nextSerial = deletedSerial1;
-
-                    foreach (var h in allOrdered.Where(h => h.Block_7_1 > deletedSerial1))
+                    int nextSerial = 1;
+                    foreach (var h in allOrdered)
                     {
                         h.Block_7_1 = nextSerial++;
                     }
 
-                    //2. Re-serialize Block_7_3 for is_household = 2 after deleted entry
-                    // Consider only households with is_household = 2
-
                     int hhdSrl = 1;
-                    //var onlyHhd = allOrdered
-                    //    .Where(h => h.is_household == 2)
-                    //    .OrderBy(h => h.Block_7_3)
-                    //    .ToList();
-
-                    //// Find deleted household's Block_7_3 position (only if it was household=2)
-                    //int deletedSerial3 = deleted.is_household == 2 ? deleted.Block_7_3 ?? 0 : 0;
-
-                    //int nextHhdSerial = deletedSerial3;
-
-
 
                     foreach(var hhd in allOrdered)
                     {
@@ -1308,6 +1289,12 @@ namespace Income.Database.Queries
                 else
                 {
                     status = await _database.InsertAsync(tbl_block_1);
+                    var hhd = await GetCurrentHHD(SessionStorage.SelectedFSUId, tbl_block_1.hhd_id.GetValueOrDefault());
+                    if (hhd != null)
+                    {
+                        hhd.hhdStatus = hhd.status == "SUBSTITUTED" ? null : 11;
+                        await Update_SCH0_0_Block_7(hhd);
+                    }
                 }
                 return status;
             }
@@ -2714,6 +2701,248 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<Tbl_Block_10?> Fetch_SCH_HIS_Block10()
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_10>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 10: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block10(Tbl_Block_10 tbl_block_10)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_10>().Where(x => x.id == tbl_block_10.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_10);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_10);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 10: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<Tbl_Block_11a?> Fetch_SCH_HIS_Block11(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_11a>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 11a: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block11a(Tbl_Block_11a tbl_block_11a)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_11a>().Where(x => x.id == tbl_block_11a.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    status = await _database.UpdateAsync(tbl_block_11a);
+                }
+                else
+                {
+                    status = await _database.InsertAsync(tbl_block_11a);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 11a: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<List<Tbl_Block_11b>> Fetch_SCH_HIS_Block11b(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_11b>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 11b: {ex.Message}");
+                return new();
+            }
+        }
+
+        public async Task<int> Save_SCH_HIS_Block11b(Tbl_Block_11b tbl_block_11b)
+        {
+            try
+            {
+                int status = new();
+                var check_existence = await _database.Table<Tbl_Block_11b>().Where(x => x.id == tbl_block_11b.id).FirstOrDefaultAsync();
+                if (check_existence != null)
+                {
+                    tbl_block_11b.is_updated = true;
+                    status = await _database.UpdateAsync(tbl_block_11b);
+                }
+                else
+                {
+                    tbl_block_11b.is_updated = false;
+                    status = await _database.InsertAsync(tbl_block_11b);
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While saving SCH HIS Block 11b: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public enum DeleteFilter
+        {
+            ExcludeDeleted,   // default: SAME behaviour as now
+            IncludeAll,       // return everything
+            OnlyDeleted       // return only deleted rows
+        }
+
+
+        public async Task<T?> FetchSingleForFsuAndHhdAsync<T>(
+    DeleteFilter filter = DeleteFilter.ExcludeDeleted)
+    where T : Tbl_Base, IHISModel, new()
+        {
+            var query = _database.Table<T>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId)
+                .Where(x => x.hhd_id == SessionStorage.selected_hhd_id);
+
+            // apply delete filter
+            query = filter switch
+            {
+                DeleteFilter.ExcludeDeleted => query.Where(x => x.is_deleted == null || x.is_deleted == false),
+                DeleteFilter.OnlyDeleted => query.Where(x => x.is_deleted == true),
+                DeleteFilter.IncludeAll => query, // no filter
+                _ => query
+            };
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+
+        public async Task<List<T>> FetchListAsync<T>(
+    DeleteFilter filter = DeleteFilter.ExcludeDeleted)
+    where T : Tbl_Base, IHISModel, new()
+        {
+            try
+            {
+                var query = _database.Table<T>()
+                    .Where(x => x.fsu_id == SessionStorage.SelectedFSUId)
+                    .Where(x => x.hhd_id == SessionStorage.selected_hhd_id);
+
+                // apply delete filter
+                query = filter switch
+                {
+                    DeleteFilter.ExcludeDeleted => query.Where(x => x.is_deleted == null || x.is_deleted == false),
+                    DeleteFilter.OnlyDeleted => query.Where(x => x.is_deleted == true),
+                    DeleteFilter.IncludeAll => query,
+                    _ => query
+                };
+
+                return await query.ToListAsync();
+            }
+            catch
+            {
+                return new List<T>();
+            }
+        }
+
+
+
+
+        public async Task<int> SaveAsync<T>(T entity) where T : Tbl_Base, new()
+        {
+            if (entity == null)
+                return 0;
+
+            // Check if exists in database
+            var existing = await _database.Table<T>()
+                .FirstOrDefaultAsync(x => x.id == entity.id);
+
+            entity.survey_timestamp = DateTime.Now;
+
+            if (existing == null)
+            {
+                // INSERT
+                entity.id = Guid.NewGuid();
+                entity.survey_coordinates = SessionStorage.location;
+                await _database.InsertAsync(entity);
+                return 1;
+            }
+            else
+            {
+                // UPDATE
+                await _database.UpdateAsync(entity);
+                return 1;
+            }
+        }
+
+        public async Task DeleteEntryAsync<T>(Guid id) where T : Tbl_Base, new()
+        {
+            // Fetch entry by ID
+            var entry = await _database.Table<T>().FirstOrDefaultAsync(x => x.id == id);
+
+            if (entry == null)
+                return;
+
+            // If FSU is submitted → soft delete
+            if (SessionStorage.FSU_Submitted)
+            {
+                entry.is_deleted = true;
+                await _database.UpdateAsync(entry);
+            }
+            else
+            {
+                // Hard delete
+                await _database.DeleteAsync(entry);
+            }
+        }
+
+
         //Warning and Comment related queries
         public async Task<int> UpsertWarningAsync(List<Tbl_Warning> warnings)
         {
@@ -2749,6 +2978,8 @@ namespace Income.Database.Queries
             return result;
         }
 
+
+
         
 
         public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "HIS")
@@ -2776,6 +3007,19 @@ namespace Income.Database.Queries
         {
             return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.block == block && x.serial_number == serial && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
         }
+
+        public async Task<List<Tbl_Warning>> GetWarningTableDataForBlock(int fsuId, int hddId, string schedule, string block)
+        {
+            return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && x.schedule == schedule && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.block == block && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+        }
+
+        public async Task<List<Tbl_Warning>> GetChildCommentsAsync(Guid parentId)
+        {
+            return await _database.Table<Tbl_Warning>()
+                .Where(x => x.parent_comment_id == parentId && (x.is_deleted == null || x.is_deleted == false))
+                .ToListAsync();
+        }
+
 
         public Task<int> DeleteWarningTableDataForSerial(int fsuId, int hddId, string block, int serial, Guid id)
         {

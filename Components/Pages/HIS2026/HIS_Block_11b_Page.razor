@@ -19,9 +19,9 @@
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">Block 11b: Particulars of direct tax (income tax, professional tax, etc.) paid</span>
             </h3>
-            <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
+            @* <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                 <i class="fi fi-rr-plus me-1"></i>Add
-            </button>
+            </button> *@
         </div>
         @* Card Body *@
         <div class="card-body p-0">
@@ -45,24 +45,51 @@
                     </thead>
 
                     <tbody>
-                        @foreach (var user in showDataTable11B)
+                        @foreach (var member in showDataTable11B)
                         {
                             <tr>
-                                <td>@user.item_1</td>
-                                <td>@user.item_2</td>
-                                <td>@user.item_3</td>
-                                <td>@user.item_4</td>
+                                <td>@member.item_1</td>
+                                <td>@member.item_2</td>
+                                <td>@member.item_3</td>
+                                <td>@member.item_4</td>
+                                <td class="d-flex align-items-center">
+                                    <button class="btn btn-sm btn-primary me-2"
+                                            @onclick="@(() => HandleModal("UPDATE", member))">
+                                        <i class="bi bi-pencil-square me-1"></i>Edit
+                                    </button>
+                                    
+                                </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+                <div class="mb-3 px-2">
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                </div>
             </div>
+        </div>
+        @* Remarks Section *@
+        <div class="mb-3 px-2">
+            <label for="remarksTextarea" class="form-label">Remarks</label>
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-sm-6">
+            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-outline-primary" @onclick="@(() => ValidateAndSave(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+            </div>
+        </div>
+
+    </div>
 
     @* Model Popup When Click Add Button *@
-    <Modal @ref="AddModal" id="addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Fullscreen="ModalFullscreen.MediumDown">
+    <Modal @ref="AddModal" id="addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Fullscreen="ModalFullscreen.ExtraLargeDown">
         <HeaderTemplate>
             <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
         </HeaderTemplate>
@@ -72,14 +99,7 @@
                 <div class="modal-content">
                     @if (editContext != null)
                     {
-
                         <EditForm EditContext="editContext">
-
-
-                            <div class="modal-header">
-                                <h5 class="modal-title">Add Item</h5>
-                            </div>
-
                             <div class="modal-body">
                                 <div class="row">
 
@@ -94,19 +114,8 @@
                                         <label class="form-label fw-bold">
                                             2. Name of Member
                                         </label>
-                                        <InputText @bind-Value="table11B.item_2" @oninput="clearItem2Error"
-                                                   class="form-control form-control-sm"
-                                                   id="memberName"
-                                                   autocomplete="off"
-                                                   autocapitalize="off"
-                                                   autocorrect="off"
-                                                   spellcheck="false"
-                                                   onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)" />
+                                        <input value="@table11B.item_2" readonly class="form-control form-control-sm"/>
 
-                                        @if (!string.IsNullOrEmpty(item_2Error))
-                                        {
-                                            <small class="text-danger">@item_2Error</small>
-                                        }
                                     </div>
 
                                     <div class="col-sm-6 mb-3">
@@ -146,7 +155,7 @@
         </BodyTemplate>
         <FooterTemplate>
             <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
-            <button type="submit" @onclick="@(() => handleSave())" class="btn btn-primary" form="YourEditFormId"><i class="fi fi-rr-disk me-1"></i>@((isAdd ? "Save" : "Update"))</button>
+            <button type="submit" @onclick="@(() => ValidateAndSave())" class="btn btn-primary" form="YourEditFormId"><i class="fi fi-rr-disk me-1"></i>@((isAdd ? "Save" : "Update"))</button>
         </FooterTemplate>
     </Modal>
 
@@ -166,12 +175,16 @@
     private string? item_3Error = null;
     private bool is11B_4Enable = false;
     CommonQueries commonQueries = new();
-
+    DBQueries dB = new();
 
     EditContext editContext;
     ValidationMessageStore messageStore;
 
-
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
+    }
 
 
     protected override async Task OnInitializedAsync()
@@ -185,8 +198,73 @@
 
         // Insert the visited block record asynchronously
         await commonQueries.InsertVisitedBlock(vb);
+
+        await SyncBlock11b();
+        await LoadData();
         StateHasChanged();
     }
+
+    private async Task LoadData()
+    {
+        showDataTable11B = await dB.Fetch_SCH_HIS_Block11b(SessionStorage.selected_hhd_id);
+    }
+
+    public async Task SyncBlock11b()
+    {
+        var block3Members = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
+        var block11bList = await dB.Fetch_SCH_HIS_Block11b(SessionStorage.selected_hhd_id);
+
+        // Step 3: Create missing
+        foreach (var m in block3Members)
+        {
+            if (!block11bList.Any(x => x.fk_block_3 == m.id))
+            {
+                await dB.Save_SCH_HIS_Block11b(new Tbl_Block_11b
+                {
+                    id = Guid.NewGuid(),
+                    fk_block_3 = m.id,
+                    hhd_id = m.hhd_id,
+                    item_1 = m.serial_no,
+                    item_2 = m.item_2,
+                    is_updated = false
+                });
+            }
+        }
+
+        // Step 4: Update changed
+        foreach (var row in block11bList)
+        {
+            var member = block3Members.FirstOrDefault(x => x.id == row.fk_block_3);
+            if (member != null)
+            {
+                bool updated = false;
+
+                if (row.item_1 != member.serial_no)
+                {
+                    row.item_1 = member.serial_no;
+                    updated = true;
+                }
+
+                if (row.item_2 != member.item_2)
+                {
+                    row.item_2 = member.item_2;
+                    updated = true;
+                }
+
+                if (updated)
+                    await dB.Save_SCH_HIS_Block11b(row);
+            }
+        }
+
+        // Step 5: Remove orphans
+        foreach (var row in block11bList
+            .Where(x => !block3Members.Any(m => m.id == x.fk_block_3)))
+        {
+            await dB.DeleteEntryAsync<Tbl_Block_11b>(row.id);
+        }
+    }
+
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
     {
@@ -208,7 +286,7 @@
         editContext?.NotifyFieldChanged(identifier);
     }
 
-   
+
 
 
     //Check the 11b_3 yes then enable 11b_4 input field
@@ -235,38 +313,79 @@
     }
 
     //Save Data And show List
-    private async Task handleSave()
+    private async Task ValidateAndSave(bool is_go_next = false)
     {
-        // Clear previous errors
-        messageStore.Clear();
-        error = false;
-
-        // Validate model using FluentValidation
-        var validationResult = Validator.Validate(table11B);
-
-        // Add errors to message store for display in EditForm
-        foreach (var error in validationResult.Errors)
+        try
         {
-            var fieldIdentifier = new FieldIdentifier(table11B, error.PropertyName);
-            messageStore.Add(fieldIdentifier, error.ErrorMessage);
-        }
-        editContext.NotifyValidationStateChanged();
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_A");
+                return;
+            }
 
-        if (!validationResult.IsValid)
+            if (is_go_next)
+            {
+                if(showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
+                {
+                    toastService.ShowError("Please save all the entries before proceeding");
+                    return;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/dashboard/his/block_A");
+                    return;
+                }
+            }
+
+            // Clear previous errors
+            messageStore.Clear();
+
+            // Validate model using FluentValidation
+            var validationResult = Validator.Validate(table11B);
+
+            // Add errors to message store for display in EditForm
+            foreach (var error in validationResult.Errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(table11B, error.PropertyName);
+                messageStore.Add(fieldIdentifier, error.ErrorMessage);
+            }
+            editContext.NotifyValidationStateChanged();
+
+            if (!validationResult.IsValid)
+            {
+                toastService.ShowError("Please correct the errors and try again");
+                return;
+            }
+
+            // Save to database
+            var saved = await dB.Save_SCH_HIS_Block11b(table11B);
+            if (saved > 0)
+            {
+                await AddModal.HideAsync();
+                await LoadData();
+                toastService.ShowSuccess("Details updated successfully");
+            }
+            else
+            {
+                toastService.ShowError("Failed to update details. Please try again.");
+            }
+
+            if (is_go_next)
+            {
+                // Navigate to the next block/page
+                if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
+                {
+                    toastService.ShowError("Please save all the entries before proceeding");
+                    return;
+                }
+                NavigationManager.NavigateTo("/dashboard/his/block_A");
+            }
+        }
+        catch (Exception ex)
         {
-            error = true;
-            return;
+            Console.WriteLine(ex.Message);
         }
-        table11B.item_1 = showDataTable11B.Count + 1;
-        showDataTable11B.Add(table11B);
-
-        table11B = new Tbl_Block_11b();
-        is11B_4Enable = false;
-        item_2Error = null;
-        item_3Error = null;
-
-        await JSRuntime.InvokeVoidAsync("closeModal", "addModal");
-        toastService.ShowSuccess("Member added successfully!");
+        
     }
 
     //Clear all error when input any thing
@@ -278,33 +397,14 @@
     {
         try
         {
-            if (action == "ADD")
-            {
-                isAdd = true;
-
-                // Create empty object with serial number
-                table11B = new Tbl_Block_11b();
-                table11B.item_1 = showDataTable11B.Count + 1;
-
-                // Initialize EditContext and validation messages
-                editContext = new EditContext(table11B);
-                messageStore = new ValidationMessageStore(editContext);
-                editContext.OnFieldChanged += EditContext_OnFieldChanged;
-
-                // Reset enable state for amount input
-                is11B_4Enable = false;
-
-                await AddModal.ShowAsync();
-            }
-            else if (action == "UPDATE")
+            if (action == "UPDATE")
             {
                 isAdd = false;
 
                 if (data != null)
                 {
                     // Load existing data
-                    table11B = data;
-
+                    table11B = ObjectCloneHelper.ShallowCopy(data);
                     editContext = new EditContext(table11B);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;

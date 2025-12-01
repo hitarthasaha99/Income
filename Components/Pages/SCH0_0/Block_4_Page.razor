@@ -58,7 +58,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="" rows="2"></textarea>
+            <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" rows="2"></textarea>
         </div>
     </div>
     <div class="row">
@@ -201,6 +201,11 @@
         if (block_4?.approximate_population_su > block_0_1.Block_1_14)
         {
             toastService.ShowError("Approximate population of the SU cannot be greater than the total population of the selected FSU.");
+            return;
+        }
+        else if (block_4?.approximate_population_su <= 0)
+        {
+            toastService.ShowError("Approximate population of the SU cannot be zero or negative.");
             return;
         }
         block_0_1.remarks_block_4 = remarks;

@@ -10,10 +10,9 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.HIS_2026
 {
-    public class Tbl_Block_11b : Tbl_Base
+    public class Tbl_Block_11b : Tbl_Base, IHISModel
     {
-        [PrimaryKey]
-        public Guid id { get; set; }
+        public Guid fk_block_3 { get; set; }
         public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
         //S. no. of the member 
         public int? item_1 { get;set; }
@@ -23,5 +22,6 @@ namespace Income.Database.Models.HIS_2026
         public int? item_3 { get;set; }
         //Amount of direct tax paid (net of refunds) in last financial year (in Rs.)
         public int? item_4 { get;set; }
+        public bool? is_updated { get; set; }
     }
 }

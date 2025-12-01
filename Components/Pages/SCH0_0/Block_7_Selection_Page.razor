@@ -135,7 +135,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
             </div>
         </div>
         <div class="row">
@@ -676,6 +676,16 @@
     {
         try
         {
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmation = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Do you want to proceed?",
+                confirmDialogOptions: options
+            );
+            if (!confirmation)
+            {
+                return;                
+            }
             preloadService.Show(SpinnerColor.Info, "Doing Selection, Please wait...");
 
             await SCH_0_0_Queries.UpdateAllRowsForColumnAsync(SessionStorage.SelectedFSUId);
