@@ -57,7 +57,6 @@
                             <th>others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc.</th>
                             <th>Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)</th>
                         </tr>
-
                         <tr>
                             <th></th>
                             <th>(1)</th>
@@ -103,7 +102,6 @@
                 </table>
             </div>
         </div>
-        
     </div>
 </div>
 <div class="footer">
@@ -137,7 +135,8 @@
        CloseOnEscape="false"
        UseStaticBackdrop="true"
        ShowCloseButton="false"
-       Fullscreen="ModalFullscreen.LargeDown">
+       Fullscreen="ModalFullscreen.MediumDown"
+       Size="ModalSize.ExtraLarge">
 
     <HeaderTemplate>
         <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
@@ -195,7 +194,7 @@
                                     </div>
                                 </label>
                                 <InputNumber @bind-Value="newMember.item_3_i"
-                                             class="form-control no-spinner form-control-sm"
+                                             class="form-control no-spinner"
                                              autocomplete="off"
                                              onkeypress="return event.key >= '0' && event.key <= '9'"
                                              autocorrect="off"
