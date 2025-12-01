@@ -167,20 +167,26 @@
                         </div>
                     </div>
 
-                                    <!-- Name of Member input -->
-                                    <div class="col-sm-6 mb-3">
-                                        <label class="form-label fw-bold d-flex align-items-start">
-                                            <span class="me-2">2.</span> Name of Member
-                                        </label>
-                                        <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" @oninput="ClearNameError" autocomplete="off"
-                                                   onkeypress="return /^[A-Za-z ]$/.test(event.key)"
-                                                   maxlength="50"
-                                                   autocorrect="off"
-                                                   autocapitalize="off"
-                                                   spellcheck="false" />
-                                        <ValidationMessage For="@(() => newMember.item_2)" />
+                    <!-- 2. Name of Member input -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold d-flex align-items-start">
+                                <span class="me-2">2.</span> Name of Member
+                            </label>
 
-                            <ValidationMessage For="@(() => newMember.item_2)" />
+                            <InputText class="form-control form-control-sm"
+                                       @bind-Value="newMember.item_2"
+                                       placeholder="Enter Name of member"
+                                       @oninput="ClearNameError"
+                                       autocomplete="off"
+                                       onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+                                       maxlength="50"
+                                       autocorrect="off"
+                                       autocapitalize="off"
+                                       spellcheck="false" />
+                                    <ValidationMessage For="@(() => newMember.item_2)" />
+                            
+                                        <ValidationMessage For="@(() => newMember.item_2)" />
                         </div>
                     </div>
 
@@ -238,6 +244,7 @@
                             }
                         </div>
                     </div>
+
                     <!-- 5. Age -->
                     <div class="col-sm-12">
                         <div class="mb-3">
@@ -338,7 +345,7 @@
                             <select class="form-select"
                                     value="@newMember.item_8"
                                     @onchange="ClearItem8">
-
+                              
                                 @* options *@
                                 <option value="">-Select-</option>
                                 <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
@@ -366,8 +373,9 @@
                             }
                         </div>
                     </div>
+
+                    <!-- Item 9 -->
                     <div class="col-sm-12">
-                        <!-- Item 9 -->
                         <div class="mb-3">
                             <label class="form-label">
                                 <span class="form-badge">9</span> Secondary
@@ -404,7 +412,7 @@
                             }
                         </div>
                     </div>
-                    
+
                     <!-- Activity Status 365 days -->
                     <div class="col-sm-12">
                         <h4>Activity status (During 365 days)</h4>
@@ -449,6 +457,7 @@
                             }
                         </div>
                     </div>
+
                     <!-- Item 11 -->
                     <div class="col-sm-12">
                         <div class="mb-3">
@@ -496,29 +505,31 @@
                     <!-- Item 12 -->
                     <div class="col-sm-12">
                         <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">12</span>
-                            Beneficiary of govt scheme (yes-1 / no-2)
-                        </label>
+                            <label class="form-label">
+                                <span class="form-badge">12</span> Beneficiary of govt scheme (yes-1 / no-2)
+                            </label>
 
-                        <InputSelect class="form-select"
-                                     @bind-value="newMember.item_12"
-                                     @onchange="ClearItem12"
-                                     disabled="@isItem12Disabled">
+                            <InputSelect class="form-select"
+                                         @bind-value="newMember.item_12"
+                                         @onchange="ClearItem12"
+                                         disabled="@isItem12Disabled">
 
-                            <option value="">-Select-</option>
-                            <option value="1">yes</option>
-                            <option value="2">no</option>
+                                <option value="">-Select-</option>
+                                <option value="1">yes</option>
+                                <option value="2">no</option>
 
-                        </InputSelect>
+                            </InputSelect>
 
-                        <ValidationMessage For="@(() => newMember.item_12)" />
+                            <ValidationMessage For="@(() => newMember.item_12)" />
+                        </div>
                     </div>
-                    </div>
+
                 </div>
+
             </EditForm>
         }
     </BodyTemplate>
+
     <FooterTemplate>
         <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
         <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
