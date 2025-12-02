@@ -11,124 +11,138 @@
 @inject IValidator<Tbl_Block_8> Validator
 @inject ILoggingService loggingService
 
-<div class="my-2">
-    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
-    <div class="card card-style2">
-        <div class="card-header d-flex align-items-center justify-content-between">
-            <h3 class="card-title m-0 d-flex align-items-center">
-                <span class="text-primary me-2">Block 8: Income from Transfer receipts </span>
-            </h3>
-        </div>
+@if (editContext != null)
+{
+    <EditForm EditContext="editContext">
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+            <div class="main-content">
+                <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="text-primary me-1">Block 8:</span>Income from Transfer receipts
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Q.no.</th>
+                                        <th>Question description</th>
+                                        <th>Reference Period </th>
+                                        <th>Amount received (in whole no. of Rs.)</th>
+                                    </tr>
 
-        @if (editContext != null)
-        {
-            <EditForm EditContext="editContext">
-                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label"><span class="form-badge">Q8.1</span></label>
+                                        </td>
+                                        <td>Pension (payments received from companies/government after retirement)</td>
+                                        <td>Last month</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
+                                            value="@model.item_1" @oninput="e => UpdateFieldAndValidate(() => model.item_1, e)" />
+                                            <ValidationMessage For="() => model.item_1" />
+                                        </td>
+                                    </tr>
 
-                <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th class="fw-bold fs-6">Q.no.</th>
-                                <th class="fw-bold fs-6">Question description</th>
-                                <th class="fw-bold fs-6">Reference Period </th>
-                                <th class="fw-bold fs-6">Amount received (in whole no. of Rs.)</th>
-                            </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label"><span class="form-badge">Q8.2</span></label>
+                                        </td>
+                                        <td>Transfers receipts from other households in the form of family support payments (such as alimony, child and parental support), regular receipts from inheritances and trust funds, regular monetary gifts received</td>
+                                        <td>Last month</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
+                                            value=@model.item_2 @oninput="e => UpdateFieldAndValidate(() => model.item_2, e)"/>
+                                            <ValidationMessage For="() => model.item_2" />                                                                                                                                    
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label"><span class="form-badge">Q8.3</span></label>
+                                        </td>
+                                        <td>Remittances received from abroad and financial support received from other households</td>
+                                        <td>Last 365 days</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
+                                            value=@model.item_3 @oninput="e => UpdateFieldAndValidate(() => model.item_3, e)"/>
+                                            <ValidationMessage For="() => model.item_3" />   
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label"><span class="form-badge">Q8.4</span></label>
+                                        </td>
+                                        <td>Stipend, scholarship (includes Government stipend)</td>
+                                        <td>Last 365 days</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
+                                            value=@model.item_4  @oninput="e => UpdateFieldAndValidate(() => model.item_4, e)"/>
+                                            <ValidationMessage For="() => model.item_4" />   
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label"><span class="form-badge">Q8.5</span></label>
+                                        </td>
+                                        <td>retirement benefits including gratuity, social security benefits, CGEGIS etc. (excluding maturity value of PF, lump sum leave encashment received at the time of retirement)</td>
+                                        <td>Last 365 days</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                value=@model.item_5 @oninput="e => UpdateFieldAndValidate(() => model.item_5, e)" />
+                                            <ValidationMessage For="() => model.item_5" />   
+                                        </td>
+                                    </tr>
 
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Q8.1 </td>
-                                <td>pension (payments received from companies/government after retirement)</td>
-                                <td>Last month</td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
-                                    value="@model.item_1" @oninput="e => UpdateFieldAndValidate(() => model.item_1, e)" />
-                                    <ValidationMessage For="() => model.item_1" />
-                                </td>
-                          
-
-                            </tr>
-
-                            <tr>
-                                <td>Q8.2 </td>
-                                <td>transfers receipts from other households in the form of family support payments (such as alimony, child and parental support), regular receipts from inheritances and trust funds, regular monetary gifts received</td>
-                                <td>Last month</td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
-                                    value=@model.item_2 @oninput="e => UpdateFieldAndValidate(() => model.item_2, e)"/>
-                                    <ValidationMessage For="() => model.item_2" />                                                                                                                                    
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Q8.3 </td>
-                                <td>remittances received from abroad and financial support received from other households</td>
-                                <td>Last 365 days</td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
-                                    value=@model.item_3 @oninput="e => UpdateFieldAndValidate(() => model.item_3, e)"/>
-                                    <ValidationMessage For="() => model.item_3" />   
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Q8.4</td>
-                                <td>stipend, scholarship (includes Government stipend)</td>
-                                <td>Last 365 days</td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
-                                    value=@model.item_4  @oninput="e => UpdateFieldAndValidate(() => model.item_4, e)"/>
-                                    <ValidationMessage For="() => model.item_4" />   
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Q8.5</td>
-                                <td>retirement benefits including gratuity, social security benefits, CGEGIS etc. (excluding maturity value of PF, lump sum leave encashment received at the time of retirement)</td>
-                                <td>Last 365 days</td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                     value=@model.item_5 @oninput="e => UpdateFieldAndValidate(() => model.item_5, e)" />
-                                    <ValidationMessage For="() => model.item_5" />   
-                                </td>
-                            </tr>
-
-                        </tbody>
+                                </tbody>
                     
-                    </table>
-
-                    <div class="mb-3 px-2">
-                        <label for="remarksTextarea" class="form-label">Remarks</label>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                @* Remarks Card *@
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <h5 class="card-title m-0">
+                            Remarks
+                        </h5>
+                    </div>
+                    <div class="card-body">
                         <textarea class="form-control" @bind="remarks" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="d-flex">
+                            <NavLink class="btn btn-outline-secondary" href="/back">
+                                <i class="fi fi-rr-angle-left me-1"></i>Back
+                            </NavLink>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center justify-content-end">
+                            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                            {
+                                <button @onclick="() => ValidateAndSave(false)" class="btn btn-outline-primary me-2 is_sso action">
+                                    <i class="fi fi-rr-disk me-1"></i>Save
+                                </button>
+                            }
+                            <button @onclick="(() => ValidateAndSave(true))" class="btn btn-primary">
+                                Next<i class="fi fi-rr-angle-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                </fieldset>
-            </EditForm>
-            
-        }
-
-        
-    </div>
-    <div class="d-flex justify-content-between mb-3">
-        <NavLink class="btn btn-outline-primary" href="/back">
-            <i class="bi bi-chevron-left me-1"></i>
-            Back
-        </NavLink>
-        <div class="d-flex">
-            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
-            {
-                <button @onclick="() => ValidateAndSave(false)" class="btn btn-primary me-2 is_sso action">
-                    <i class="bi bi-floppy-fill me-1"></i>
-                    Save
-                </button>
-            }
-            <button @onclick="(() => ValidateAndSave(true))" class="btn btn-outline-primary">
-                Next
-                <i class="bi bi-chevron-right ms-1"></i>
-            </button>
-        </div>
-    </div>
-</div>
+            </div>
+        </fieldset>
+    </EditForm>    
+} 
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;

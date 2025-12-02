@@ -116,34 +116,34 @@
         </div>
     </div>
 </div>
-    <!-- 🔹 Footer Navigation (Always visible) -->
-    <div>
-        <!-- Remarks textarea -->
-        <div class="card custom-card">
-            <div class="card-header">
-                <h3 class="card-title">Remarks</h3>
-            </div>
-            <div class="card-body">
-                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+<!-- 🔹 Footer Navigation (Always visible) -->
+<div class="footer">
+    <!-- Remarks textarea -->
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
+                    <i class="fi fi-rr-angle-left me-1"></i>Back
+                </NavLink>
             </div>
         </div>
-        <div class="row mb-4">
-            <div class="col-sm-6">
-                <div class="d-flex">
-                    <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
-                        <i class="fi fi-rr-angle-left me-1"></i>Back
-                    </NavLink>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="d-flex align-items-center justify-content-end">
-                    <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
-                        Next<i class="fi fi-rr-angle-right ms-1"></i>
-                    </NavLink>
-                </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
+                    Next<i class="fi fi-rr-angle-right ms-1"></i>
+                </NavLink>
             </div>
         </div>
     </div>
+</div>
 
 
 <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
