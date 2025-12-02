@@ -58,7 +58,7 @@
                                         @if (!SessionStorage.hamlet_selection_done)
                                         {
                                             <td>
-                                            <button class="btn btn-link fs-6 text-danger" hidden="@(SessionStorage.hamlet_selection_done)" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="fi fi-rr-trash me-2"></i></button>
+                                            <button class="btn btn-link fs-6 text-danger" disabled="@(item.serial_no <= totalSU)" hidden="@(SessionStorage.hamlet_selection_done)" @onclick="@(() => block_2_1_VM.RemoveRow(item))"><i class="fi fi-rr-trash me-2"></i></button>
                                             </td>
                                         }
                                     </tr>
@@ -118,6 +118,7 @@
     private List<string> validationErrors = new();
     private string validationMessage = "";
     bool is_sel;
+    int totalSU;
     async void GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -164,6 +165,11 @@
         await commonQueries.InsertVisitedBlock(vb);
         await block_2_1_VM.Init(toastService);
         block_0_1 = await sch_0_0_Queries.FetchBlock1();
+        var fsu_response = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+        if (fsu_response != null)
+        {
+            totalSU = fsu_response.totalsu.GetValueOrDefault();
+        }
         remarks = block_0_1?.remarks_block_2_1;
         StateHasChanged();
     }
