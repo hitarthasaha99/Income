@@ -149,7 +149,7 @@
             }
             else
             {
-                DisableEdit = block_0_1.Block_1_15 <= 1 && SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
+                DisableEdit = block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             }
         }
 

@@ -1221,7 +1221,7 @@
                 isAdd = false;
                 if (data != null)
                 {
-                    newMember = data;
+                    newMember = data.ShallowCopy();
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
@@ -1322,7 +1322,21 @@
 
     async void HandleSubmit(string action = "")
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_4_1");
+        if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_4_1");
+            return;
+        }
+        if(block3Members.Count == 0)
+        {
+            toastService.ShowError("Please add a member before proceeding");
+            return;
+        }
+        else
+        {
+            //SaveWarnings()
+            NavigationManager.NavigateTo("/dashboard/his/block_4_1");
+        }
     }
 }
 
