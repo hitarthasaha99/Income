@@ -167,20 +167,26 @@
                         </div>
                     </div>
 
-                                    <!-- Name of Member input -->
-                                    <div class="col-sm-6 mb-3">
-                                        <label class="form-label fw-bold d-flex align-items-start">
-                                            <span class="me-2">2.</span> Name of Member
-                                        </label>
-                                        <InputText class="form-control form-control-sm" @bind-Value="newMember.item_2" placeholder="Enter Name of member" @oninput="ClearNameError" autocomplete="off"
-                                                   onkeypress="return /^[A-Za-z ]$/.test(event.key)"
-                                                   maxlength="50"
-                                                   autocorrect="off"
-                                                   autocapitalize="off"
-                                                   spellcheck="false" />
-                                        <ValidationMessage For="@(() => newMember.item_2)" />
+                    <!-- 2. Name of Member input -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">2</span> Name of Member
+                            </label>
 
-                            <ValidationMessage For="@(() => newMember.item_2)" />
+                            <InputText class="form-control form-control-sm"
+                                       @bind-Value="newMember.item_2"
+                                       placeholder="Enter Name of member"
+                                       @oninput="ClearNameError"
+                                       autocomplete="off"
+                                       onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+                                       maxlength="50"
+                                       autocorrect="off"
+                                       autocapitalize="off"
+                                       spellcheck="false" />
+                                    <ValidationMessage For="@(() => newMember.item_2)" />
+                            
+                        </div>
                         </div>
 
                     <!-- 3. Relation to head -->
@@ -233,10 +239,11 @@
 
                             @if (!string.IsNullOrEmpty(genderWarning))
                             {
-                                <div class="text-success">@genderWarning</div>
+                                <div class="form-text text-success">@genderWarning</div>
                             }
                         </div>
                     </div>
+
                     <!-- 5. Age -->
                     <div class="col-sm-12">
                         <div class="mb-3">
@@ -255,7 +262,7 @@
 
                             @if (!string.IsNullOrEmpty(ageRelationWarning))
                             {
-                                <div class="text-success">@ageRelationWarning</div>
+                                <div class="form-text text-success">@ageRelationWarning</div>
                             }
                         </div>
                     </div>
@@ -283,7 +290,7 @@
 
                             @if (!string.IsNullOrEmpty(maritalStatusWarning))
                             {
-                                <div class="text-success">@maritalStatusWarning</div>
+                                <div class="form-text text-success">@maritalStatusWarning</div>
                             }
                         </div>
                     </div>
@@ -317,207 +324,219 @@
 
                             @if (!string.IsNullOrEmpty(item_7Warning))
                             {
-                                <div class="text-success">@item_7Warning</div>
+                                <div class="form-text text-success">@item_7Warning</div>
                             }
                         </div>
                     </div>
 
                     <!-- Activity Status 30 days -->
                     <div class="col-sm-12">
-                        <h4>Activity status (During 30 days)</h4>
-                    </div>
+                        <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Activity status (During 30 days)</h6>
+                                <div class="row">
+                                    <!-- Item 8 -->
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <span class="form-badge">8</span> Primary
+                                            </label>
 
-                    <!-- Item 8 -->
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">8</span> Primary
-                            </label>
+                                            <select class="form-select"
+                                                    value="@newMember.item_8"
+                                                    @onchange="ClearItem8">
 
-                            <select class="form-select"
-                                    value="@newMember.item_8"
-                                    @onchange="ClearItem8">
+                                                @* options *@
+                                                <option value="">-Select-</option>
+                                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                                <option value="4">regular wage/ salary – 04 </option>
+                                                <option value="5">casual labour – 05 </option>
+                                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                                <option value="7">student / attended educational institution - 07 </option>
+                                                <option value="8">attended domestic duties only – 08 </option>
+                                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                                <option value="10">earning from rent – 10 </option>
+                                                <option value="11">earning from pensions -11 </option>
+                                                <option value="12">earning from remittances -12 </option>
+                                                <option value="13">earning from interest - 13 </option>
+                                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                            </select>
 
-                                @* options *@
-                                <option value="">-Select-</option>
-                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                <option value="4">regular wage/ salary – 04 </option>
-                                <option value="5">casual labour – 05 </option>
-                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                <option value="7">student / attended educational institution - 07 </option>
-                                <option value="8">attended domestic duties only – 08 </option>
-                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                <option value="10">earning from rent – 10 </option>
-                                <option value="11">earning from pensions -11 </option>
-                                <option value="12">earning from remittances -12 </option>
-                                <option value="13">earning from interest - 13 </option>
-                                <option value="14">unfit for work due to disability or illness – 14 </option>
-                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                            </select>
+                                            <ValidationMessage For="@(() => newMember.item_8)" />
 
-                            <ValidationMessage For="@(() => newMember.item_8)" />
+                                            @if (!string.IsNullOrEmpty(item_8Warning))
+                                            {
+                                                <div class="form-text text-success">@item_8Warning</div>
+                                            }
+                                        </div>
+                                    </div>
 
-                            @if (!string.IsNullOrEmpty(item_8Warning))
-                            {
-                                <div class="text-success">@item_8Warning</div>
-                            }
+                                    <!-- Item 9 -->
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <span class="form-badge">9</span> Secondary
+                                            </label>
+
+                                            <select class="form-select"
+                                                    value="@newMember.item_9"
+                                                    @onchange="ClearItem9">
+
+                                                @* options *@
+                                                <option value="">-Select-</option>
+                                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                                <option value="4">regular wage/ salary – 04 </option>
+                                                <option value="5">casual labour – 05 </option>
+                                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                                <option value="7">student / attended educational institution - 07 </option>
+                                                <option value="8">attended domestic duties only – 08 </option>
+                                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                                <option value="10">earning from rent – 10 </option>
+                                                <option value="11">earning from pensions -11 </option>
+                                                <option value="12">earning from remittances -12 </option>
+                                                <option value="13">earning from interest - 13 </option>
+                                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                            </select>
+
+                                            <ValidationMessage For="@(() => newMember.item_9)" />
+
+                                            @if (!string.IsNullOrEmpty(item_9Warning))
+                                            {
+                                                <div class="form-text text-success">@item_9Warning</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-12">
-                        <!-- Item 9 -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">9</span> Secondary
-                            </label>
-
-                            <select class="form-select"
-                                    value="@newMember.item_9"
-                                    @onchange="ClearItem9">
-
-                                @* options *@
-                                <option value="">-Select-</option>
-                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                <option value="4">regular wage/ salary – 04 </option>
-                                <option value="5">casual labour – 05 </option>
-                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                <option value="7">student / attended educational institution - 07 </option>
-                                <option value="8">attended domestic duties only – 08 </option>
-                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                <option value="10">earning from rent – 10 </option>
-                                <option value="11">earning from pensions -11 </option>
-                                <option value="12">earning from remittances -12 </option>
-                                <option value="13">earning from interest - 13 </option>
-                                <option value="14">unfit for work due to disability or illness – 14 </option>
-                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                            </select>
-
-                            <ValidationMessage For="@(() => newMember.item_9)" />
-
-                            @if (!string.IsNullOrEmpty(item_9Warning))
-                            {
-                                <div class="text-success">@item_9Warning</div>
-                            }
-                        </div>
-                    </div>
-                    
                     <!-- Activity Status 365 days -->
                     <div class="col-sm-12">
-                        <h4>Activity status (During 365 days)</h4>
-                    </div>
+                        <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Activity status (During 365 days)</h6>
+                                <div class="row">
+                                    <!-- Item 10 -->
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <span class="form-badge">10</span> Primary
+                                            </label>
 
-                    <!-- Item 10 -->
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">10</span> Primary
-                            </label>
+                                            <select class="form-select"
+                                                    value="@newMember.item_10"
+                                                    @onchange="ClearItem10">
 
-                            <select class="form-select"
-                                    value="@newMember.item_10"
-                                    @onchange="ClearItem10">
+                                                @* options *@
+                                                <option value="">-Select-</option>
+                                                <!-- Same options as above for primary -->
+                                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                                <option value="4">regular wage/ salary – 04 </option>
+                                                <option value="5">casual labour – 05 </option>
+                                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                                <option value="7">student / attended educational institution - 07 </option>
+                                                <option value="8">attended domestic duties only – 08 </option>
+                                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                                <option value="10">earning from rent – 10 </option>
+                                                <option value="11">earning from pensions -11 </option>
+                                                <option value="12">earning from remittances -12 </option>
+                                                <option value="13">earning from interest - 13 </option>
+                                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                            </select>
 
-                                @* options *@
-                                <option value="">-Select-</option>
-                                <!-- Same options as above for primary -->
-                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                <option value="4">regular wage/ salary – 04 </option>
-                                <option value="5">casual labour – 05 </option>
-                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                <option value="7">student / attended educational institution - 07 </option>
-                                <option value="8">attended domestic duties only – 08 </option>
-                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                <option value="10">earning from rent – 10 </option>
-                                <option value="11">earning from pensions -11 </option>
-                                <option value="12">earning from remittances -12 </option>
-                                <option value="13">earning from interest - 13 </option>
-                                <option value="14">unfit for work due to disability or illness – 14 </option>
-                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                            </select>
+                                            <ValidationMessage For="@(() => newMember.item_10)" />
 
-                            <ValidationMessage For="@(() => newMember.item_10)" />
+                                            @if (!string.IsNullOrEmpty(item_10Warning))
+                                            {
+                                                <div class="form-text text-success">@item_10Warning</div>
+                                            }
+                                        </div>
+                                    </div>
 
-                            @if (!string.IsNullOrEmpty(item_10Warning))
-                            {
-                                <div class="text-success">@item_10Warning</div>
-                            }
+                                    <!-- Item 11 -->
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <span class="form-badge">11</span> Secondary
+                                            </label>
+
+                                            <select class="form-select"
+                                                    value="@newMember.item_11"
+                                                    @onchange="ClearItem11">
+
+                                                @* options *@
+                                                <option value="">-Select-</option>
+                                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                                <option value="4">regular wage/ salary – 04 </option>
+                                                <option value="5">casual labour – 05 </option>
+                                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                                <option value="7">student / attended educational institution - 07 </option>
+                                                <option value="8">attended domestic duties only – 08 </option>
+                                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
+                                                <option value="10">earning from rent – 10 </option>
+                                                <option value="11">earning from pensions -11 </option>
+                                                <option value="12">earning from remittances -12 </option>
+                                                <option value="13">earning from interest - 13 </option>
+                                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                            </select>
+
+                                            <ValidationMessage For="@(() => newMember.item_11)" />
+
+                                            @if (!string.IsNullOrEmpty(item_11Warning))
+                                            {
+                                                <div class="form-text text-success">@item_11Warning</div>
+                                            }
+
+                                            @if (!string.IsNullOrEmpty(singleUserWarning))
+                                            {
+                                                <div class="form-text text-success">@singleUserWarning</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <!-- Item 11 -->
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">11</span> Secondary
-                            </label>
-
-                            <select class="form-select"
-                                    value="@newMember.item_11"
-                                    @onchange="ClearItem11">
-
-                                @* options *@
-                                <option value="">-Select-</option>
-                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                <option value="4">regular wage/ salary – 04 </option>
-                                <option value="5">casual labour – 05 </option>
-                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                <option value="7">student / attended educational institution - 07 </option>
-                                <option value="8">attended domestic duties only – 08 </option>
-                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                <option value="10">earning from rent – 10 </option>
-                                <option value="11">earning from pensions -11 </option>
-                                <option value="12">earning from remittances -12 </option>
-                                <option value="13">earning from interest - 13 </option>
-                                <option value="14">unfit for work due to disability or illness – 14 </option>
-                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                            </select>
-
-                            <ValidationMessage For="@(() => newMember.item_11)" />
-
-                            @if (!string.IsNullOrEmpty(item_11Warning))
-                            {
-                                <div class="form-text text-success">@item_11Warning</div>
-                            }
-
-                            @if (!string.IsNullOrEmpty(singleUserWarning))
-                            {
-                                <div class="form-text text-success">@singleUserWarning</div>
-                            }
-                        </div>
-                    </div>
-
                     <!-- Item 12 -->
                     <div class="col-sm-12">
                         <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">12</span>
-                            Beneficiary of govt scheme (yes-1 / no-2)
-                        </label>
+                            <label class="form-label">
+                                <span class="form-badge">12</span> Beneficiary of govt scheme (yes-1 / no-2)
+                            </label>
 
-                        <InputSelect class="form-select"
-                                     @bind-value="newMember.item_12"
-                                     @onchange="ClearItem12"
-                                     disabled="@isItem12Disabled">
+                            <InputSelect class="form-select"
+                                         @bind-value="newMember.item_12"
+                                         @onchange="ClearItem12"
+                                         disabled="@isItem12Disabled">
 
-                            <option value="">-Select-</option>
-                            <option value="1">yes</option>
-                            <option value="2">no</option>
+                                <option value="">-Select-</option>
+                                <option value="1">yes</option>
+                                <option value="2">no</option>
 
-                        </InputSelect>
+                            </InputSelect>
 
-                        <ValidationMessage For="@(() => newMember.item_12)" />
+                            <ValidationMessage For="@(() => newMember.item_12)" />
+                        </div>
                     </div>
-                    </div>
+
                 </div>
+
             </EditForm>
         }
     </BodyTemplate>
+
     <FooterTemplate>
         <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
         <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
@@ -1222,7 +1241,7 @@
                 isAdd = false;
                 if (data != null)
                 {
-                    newMember = data;
+                    newMember = data.ShallowCopy();
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;

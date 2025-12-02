@@ -16,7 +16,7 @@
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7c> Validator
 
-<div class="pb-5">
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
 
     @if (editContext != null)
@@ -24,14 +24,16 @@
         <EditForm EditContext="editContext">
             <FluentValidationValidator />
             
-            <div class="card card-style2 rounded-4">
+            <div class="card custom-card">
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center mb-0">
                             <tbody>
                                 <tr>
                                     <td>
-                                        <div class="badge bg-primary me-1">Q7.11</div>
+                                        <label class="form-label">
+                                            <span class="form-badge">Q7.11</span>
+                                        </label>
                                     </td>
                                     <td>
                                         Imputed value of goods consumed (out of total production through the activity as mentioned in Q 7.9) by the household during last month
@@ -51,7 +53,9 @@
 
                                 <tr>
                                     <td>
-                                        <div class="badge bg-primary me-1">Q7c.9</div>
+                                        <label class="form-label">
+                                            <span class="form-badge">Q7.9</span>
+                                        </label>
                                     </td>
                                     <td>Gross Profit / Loss before tax realized by the establishment during last month (in whole no. of Rs.)</td>
                                     <td>
@@ -63,7 +67,7 @@
                                           <ValidationMessage For="@(() => fields.item_7_12)" />
                                         @if (!string.IsNullOrEmpty(item_9_warning))
                                         {
-                                            <div class="text-success mt-1 fw-bold">
+                                            <div class="text-success form-text">
                                                 @item_9_warning
                                             </div>
                                         }
@@ -78,9 +82,10 @@
 
     }
 
-
+</div>
+<div class="footer">
     @* Remarks Card *@
-    <div class="card card-style2 rounded-4">
+    <div class="card custom-card">
         <div class="card-header">
             <h5 class="card-title m-0">
                 Remarks
@@ -94,12 +99,12 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
+            <button type="button" class="btn btn-outline-secondary me-auto" ><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-primary me-2" @onclick="@(() => Save(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
-                <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => Save(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
 

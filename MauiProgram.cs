@@ -1,5 +1,6 @@
 ﻿using Blazored.Toast;
 using FluentValidation;
+using Income.Common;
 using Income.Database.Models.HIS_2026;
 using Income.Services;
 using Income.Validators.HIS2026;
@@ -43,10 +44,11 @@ namespace Income
 
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             //builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.Configure<EnvironmentConfig>(
+    builder.Configuration.GetSection("EnvironmentConfig"));
 
             builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
             builder.Services.AddSingleton<ILoggingService, LoggingService>();
-
             builder.Services.AddSingleton<Viewmodels.Warning_VM>();
 
 

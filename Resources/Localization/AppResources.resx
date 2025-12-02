@@ -965,7 +965,7 @@
     <value>whether return trip performed (yes-1, no-2</value>
   </data>
   <data name="2_heading" xml:space="preserve">
-    <value>[2] particulars of field operations</value>
+    <value>Particulars of field operations</value>
   </data>
   <data name="State/UT" xml:space="preserve">
     <value>State/UT (code)</value>

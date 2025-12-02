@@ -16,19 +16,19 @@
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7a_1> Validator
 
-<div class="pb-5">
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="DateTime.Now"/>
      @* 7.1 *@
-    <div class="card card-style2 rounded-4">
-        <div class="card-header d-flex align-items-center justify-content-between bg-transparent">
-            <h5 class="card-title m-0">
-                <span class="text-primary me-1">Block 7a:</span>
+    <div class="card custom-card">
+        <div class="card-header">
+            <h5 class="card-title">
+                <span class="text-primary me-2">Block 7a</span>
                  Income from Self-employment - Crop cultivation
             </h5>
             @if (!SessionStorage.FSU_Submitted)
             {
-                <div class="card-tools ms-auto">
-                    <button class="btn btn-primary" disabled="@(!codeListEntryNeeded)" @onclick="@(() => OnShowModalClick("ADD"))"><i class="bi bi-plus me-1"></i>Add</button>
+                <div class="card-tools">
+                    <button class="btn btn-primary" disabled="@(!codeListEntryNeeded)" @onclick="@(() => OnShowModalClick("ADD"))"><i class="fi fi-rr-plus me-1"></i>Add</button>
                 </div>
             }
         </div>
@@ -42,9 +42,9 @@
                 <table class="table table-bordered align-middle text-center mb-0">
                     <thead>
                         <tr>
-                            <th colspan="10" class="bg-transparent text-start">
-                                <label class="form-label fs-6 fw-bold m-0">
-                                    <span class="badge bg-primary me-1 me-2">Q7.1 </span>
+                            <th colspan="10">
+                                <label class="form-label fw-bold m-0">
+                                    <span class="form-badge me-2">Q7.1 </span>
                                     Details of the crops cultivated by one or more member of the household during last 365 days?
                                 </label>
                             </th>
@@ -90,8 +90,8 @@
                                 @if (!SessionStorage.FSU_Submitted)
                                 {
                                     <td class="d-flex align-items-center justify-content-center">
-                                        <button class="btn btn-link me-2 text-muted d-flex align-items-center" @onclick="@(() => OnShowModalClick("UPDATE", item))"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn btn-link text-danger d-flex align-items-center" @onclick="@(() => Delete(item))"><i class="bi bi-trash3"></i></button>
+                                        <button class="btn btn-link me-2 fs-6" @onclick="@(() => OnShowModalClick("UPDATE", item))"><i class="fi fi-rr-pencil"></i></button>
+                                        <button class="btn btn-link text-danger fs-6" @onclick="@(() => Delete(item))"><i class="fi fi-rr-trash"></i></button>
                                     </td>
                                 }
 
@@ -102,159 +102,168 @@
             </div>
         </div>  
     </div>
-
+</div>
    
+<div class="footer">
+    <!-- Remarks textarea -->
+    @* <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea maxlength="500" class="form-control" rows="3" placeholder="Enter remarks here"></textarea>
+        </div>
+    </div> *@
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-secondary"><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-outline-primary" @onclick="Next">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-primary" @onclick="Next">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
-        
-    </div>
+    </div>  
+</div>
 
-    <Modal @ref="modal" title="@((isAdd ? "Add Details" : "Update Details"))" IsVerticallyCentered="true">
-        <BodyTemplate>
-            @if (editContext != null)
-            {
-                <EditForm EditContext="editContext">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">1</span> S. No.
-                                </label>
-                                <input type="text" class="form-control form-control-sm" disabled value="@block_7_1.serial_number">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">2</span> Crop code (4 digits)
-                                </label>
-                                <select disabled="@SessionStorage.FSU_Submitted" class="form-select form-select-sm" value="@block_7_1?.code"
-                                        @onchange="e =>
-                                        {
-                                            UpdateFieldAndValidate(() => block_7_1.code, e);
-                                        }">
-                                      <option>Select</option>
-                                    @foreach (var item in Block_7_1_Constants.CropCodes)
-                                    {
-                                        <option value="@item.id">@item.title</option>
-                                    }
-                                </select>
-                                <ValidationMessage For="@(() => block_7_1.code)" />
-
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">3</span> unit (Kg./no.)
-                                </label>
-                                <input type="number" disabled="@SessionStorage.FSU_Submitted" value="@block_7_1?.unit" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                       @oninput="e =>
-                                       {
-                                           UpdateFieldAndValidate(() => block_7_1.unit, e);
-                                       }">
-                                  <ValidationMessage For="@(() => block_7_1.unit)" />
-
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">4</span> Total Quantity Produced (harvested)
-                                </label>
-                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@block_7_1?.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                         @oninput="e =>
-                                       {
-                                           UpdateFieldAndValidate(() => block_7_1.item_4, e);
-                                       }">
-                                  <ValidationMessage For="@(() => block_7_1.item_4)" />
-
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">5</span> Total quantity sold (out of total production)
-                                </label>
-                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@block_7_1?.item_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                       @oninput="e =>
-                                       {
-                                           UpdateFieldAndValidate(() => block_7_1.item_5, e);
-                                       }">
-                                  <ValidationMessage For="@(() => block_7_1.item_5)" />
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">6</span> Total sale value(in Rs.)
-                                </label>
-                                  <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@block_7_1?.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                         @oninput="e =>
-                                       {
-                                           UpdateFieldAndValidate(() => block_7_1.item_6, e);
-                                       }">
-                                  <ValidationMessage For="@(() => block_7_1.item_6)" />
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">7</span> Average per unit sale value (in Rs.)
-                                </label>
-                                  <input disabled="@(block_7_1.item_6.HasValue)" type="number" class="form-control form-control-sm no-spinner" value="@block_7_1?.item_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                         @oninput="e =>
-                                       {
-                                           UpdateFieldAndValidate(() => block_7_1.item_7, e);
-                                       }">
-                                  <ValidationMessage For="@(() => block_7_1.item_7)" />
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group mb-3">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">8</span> Value of pre-harvested sale (Rs.)
-                                </label>
-                                  <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@block_7_1?.item_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                         @oninput="e =>
-                                       {
-                                           UpdateFieldAndValidate(() => block_7_1.item_8, e);
-                                       }">
-                                  <ValidationMessage For="@(() => block_7_1.item_8)" />
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="" class="form-label mb-2 d-flex align-items-start">
-                                    <span class="badge bg-primary me-1">9</span> Value of by-products (Rs.)
-                                </label>
-                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@block_7_1?.item_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                         @oninput="e =>
-                                       {
-                                           UpdateFieldAndValidate(() => block_7_1.item_9, e);
-                                       }">
-                                  <ValidationMessage For="@(() => block_7_1.item_9)" />
-                            </div>
+<Modal @ref="modal" title="@((isAdd ? "Add Details" : "Update Details"))" IsVerticallyCentered="true" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
+    <BodyTemplate>
+        @if (editContext != null)
+        {
+            <EditForm EditContext="editContext">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">1</span> S. No.
+                            </label>
+                            <input type="text" class="form-control" disabled value="@block_7_1.serial_number">
                         </div>
                     </div>
-                </EditForm>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">2</span> Crop code (4 digits)
+                            </label>
+                            <select disabled="@SessionStorage.FSU_Submitted" class="form-select" value="@block_7_1?.code"
+                                    @onchange="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.code, e);
+                                    }">
+                                    <option>Select</option>
+                                @foreach (var item in Block_7_1_Constants.CropCodes)
+                                {
+                                    <option value="@item.id">@item.title</option>
+                                }
+                            </select>
+                            <ValidationMessage For="@(() => block_7_1.code)" />
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">3</span> unit (Kg./no.)
+                            </label>
+                            <input type="number" disabled="@SessionStorage.FSU_Submitted" value="@block_7_1?.unit" class="form-control no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                    @oninput="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.unit, e);
+                                    }">
+                            <ValidationMessage For="@(() => block_7_1.unit)" />
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">4</span> Total Quantity Produced (harvested)
+                            </label>
+                            <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        @oninput="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.item_4, e);
+                                    }">
+                                <ValidationMessage For="@(() => block_7_1.item_4)" />
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">5</span> Total quantity sold (out of total production)
+                            </label>
+                            <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                    @oninput="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.item_5, e);
+                                    }">
+                                <ValidationMessage For="@(() => block_7_1.item_5)" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">6</span> Total sale value(in Rs.)
+                            </label>
+                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        @oninput="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.item_6, e);
+                                    }">
+                                <ValidationMessage For="@(() => block_7_1.item_6)" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">7</span> Average per unit sale value (in Rs.)
+                            </label>
+                                <input disabled="@(block_7_1.item_6.HasValue)" type="number" class="form-control no-spinner" value="@block_7_1?.item_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        @oninput="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.item_7, e);
+                                    }">
+                                <ValidationMessage For="@(() => block_7_1.item_7)" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">8</span> Value of pre-harvested sale (Rs.)
+                            </label>
+                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        @oninput="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.item_8, e);
+                                    }">
+                                <ValidationMessage For="@(() => block_7_1.item_8)" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">9</span> Value of by-products (Rs.)
+                            </label>
+                            <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        @oninput="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.item_9, e);
+                                    }">
+                                <ValidationMessage For="@(() => block_7_1.item_9)" />
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
                 
-            }
+        }
             
-        </BodyTemplate>
-        <FooterTemplate>
-            <Button class="btn btn-outline-primary" @onclick="OnHideModalClick">Close</Button>
-            <Button class="btn btn-primary" @onclick="Save">Save</Button>
-        </FooterTemplate>
-    </Modal>
-</div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button class="btn btn-outline-secondary me-auto" @onclick="OnHideModalClick">Close</Button>
+        <Button class="btn btn-primary" @onclick="Save">Save</Button>
+    </FooterTemplate>
+</Modal>
 
 
 @code {

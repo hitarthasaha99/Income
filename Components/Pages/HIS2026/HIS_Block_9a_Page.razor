@@ -16,22 +16,22 @@
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_9a> Validator
 
-<div class="pb-5">
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
 
     @if (editContext != null)
     {
         <EditForm EditContext="editContext">
             <FluentValidationValidator />
-            <div class="card card-style2 rounded-4">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h3 class="card-title m-0 d-flex align-items-center">
-                        <span class="text-primary me-2">Block 9: Income from Asset</span>
+            <div class="card custom-card">
+                <div class="card-header ">
+                    <h3 class="card-title">
+                        <span class="text-primary me-1">Block 9:</span>Income from Asset
                     </h3>
                 </div>
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h3 class="card-title m-0 d-flex align-items-center">
-                        <span class="text-primary">A. Income from financial assets (interest and dividend income)</span>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        A. Income from financial assets (interest and dividend income)
                     </h3>
                 </div>
                 <div class="card-body p-0">
@@ -40,10 +40,10 @@
                         <table class="table table-bordered align-middle text-center mb-0">
                             <thead>
                                 <tr>
-                                    <th colspan="3" class="bg-transparent text-start">
-                                        <label class="form-label fs-6 fw-bold m-0">
-                                            <span class="badge bg-primary me-1">Q9.1</span>
-                                            
+                                    <th colspan="3">
+                                        <label class="form-label fw-bold mb-0">
+                                            <span class="form-badge">Q9.1</span>
+                                            Interest received in last financial year from
                                         </label>
                                     </th>
                                 </tr>
@@ -124,7 +124,6 @@
                                           <ValidationMessage For="@(() => block_9a.item_1_6)" />
                                       </td>
                                   </tr>
-                                  
                             </tbody>
                         </table>
                     </div>
@@ -132,14 +131,17 @@
             </div>
 
             @* 7.3, 7.4 .... *@
-            <div class="card card-style2 rounded-4">
+            <div class="card custom-card">
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center mb-0">
                             <tbody>
                                 <tr>
                                     <td>
-                                        <div class="badge bg-primary me-1">Q9.2</div>
+                                        <label class="form-label mb-0">
+                                            <span class="form-badge">Q9.2</span>
+                                            Interest received in last financial year from
+                                        </label>
                                     </td>
                                     <td>Dividend received (receipts from investment in an enterprise in which the investor does not work)</td>
                                     <td>Last financial year</td>
@@ -156,7 +158,10 @@
 
                                 <tr>
                                     <td>
-                                        <div class="badge bg-primary me-1">Q9.3</div>
+                                        <label class="form-label mb-0">
+                                            <span class="form-badge">Q9.3</span>
+                                            Interest received in last financial year from
+                                        </label>
                                     </td>
                                     <td>Annuities received from insurance schemes, superannuation funds etc.</td>
                                     <td>Last month</td>
@@ -171,7 +176,10 @@
                                   </tr>
                                   <tr>
                                       <td>
-                                          <div class="badge bg-primary me-1">Q9.4</div>
+                                          <label class="form-label mb-0">
+                                              <span class="form-badge">Q9.4</span>
+                                              Interest received in last financial year from
+                                          </label>
                                       </td>
                                       <td>Other regular receipts from financial assets</td>
                                       <td>Last month</td>
@@ -192,10 +200,10 @@
         </EditForm>
 
     }
-
-
+</div>
+<div class="footer">
     @* Remarks Card *@
-    <div class="card card-style2 rounded-4">
+    <div class="card custom-card">
         <div class="card-header">
             <h5 class="card-title m-0">
                 Remarks
@@ -206,20 +214,17 @@
         </div>
     </div>
 
-
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+            <button class="btn btn-outline-primary"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-primary me-2" @onclick="@(() => Save(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
-                <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => Save(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
-
     </div>
-
 </div>
 
 
