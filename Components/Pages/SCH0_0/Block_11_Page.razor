@@ -22,13 +22,11 @@
                 <span class="text-primary me-2">[Block 11]</span>Particulars of sampling of households
             </h3>
 
-            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-            {
-                 <Button class="btn btn-primary is_sso action" @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
-            }
             @if (ShowValidateButton)
             {
-                <Button class="btn btn-primary is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-memo-circle-check me-1"></i>Validate</Button>
+                <div class="card-tools">
+                    <Button class="btn btn-primary is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-memo-circle-check me-1"></i>Validate</Button>
+                </div>
             }
 
         </div>
@@ -182,6 +180,14 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <Button class="btn btn-primary is_sso action me-2" @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
+                }
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <Button class="btn btn-outline-primary is_sso action me-2" hidden @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
+                }
                 @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
                 {
                     <Button hidden="@SessionStorage.FSU_Submitted" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
