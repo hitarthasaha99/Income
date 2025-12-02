@@ -15,11 +15,11 @@
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
 
-<div class="pb-5">
+<div class="main-content">
     <CommonContentHeader />
-    <div class="card card-style2 rounded-4">
-        <div class="card-header d-flex align-items-center justify-content-between bg-transparent">
-            <h5 class="card-title m-0">
+    <div class="card custom-card">
+        <div class="card-header">
+            <h5 class="card-title">
                 <span class="text-primary me-1">Block 7d:</span>
                 Mode of operation & percentage of shareholding in activities carried out during last 365 days
             </h5>
@@ -34,9 +34,9 @@
                             <table class="table table-bordered align-middle text-center mb-0">
                             <thead>
                                 <tr>
-                                    <th colspan="3" class="bg-transparent text-start">
-                                        <label class="form-label fs-6 fw-bold m-0">
-                                            <span class="badge bg-primary me-1">Q7.12</span>
+                                    <th colspan="4" class="text-start">
+                                        <label class="form-label fw-bold m-0">
+                                            <span class="form-badge">Q7.12</span>
                                             Mode of operation & percentage of shareholding among activity(ies) carried out in last 365 days (To be populated from the responses of Q7.1 - crop cultivation, Q4.4 – allied activity in agriculture & Q7.9 – non-agriculture activity)
                                         </label>
                                     </th>
@@ -95,30 +95,31 @@
         
         
     </div>
-
+</div>
+<div class="footer">
     @* Remarks Card *@
-    <div class="card card-style2 rounded-4 mt-3">
+    <div class="card custom-card">
         <div class="card-header">
             <h5 class="card-title m-0">
                 Remarks
             </h5>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" rows="4"></textarea>
+            <textarea maxlength="500" class="form-control w-100" rows="3"></textarea>
         </div>
     </div>
 
-    <div class="row mt-3">
+    <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary" @onclick="GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+            <button class="btn btn-outline-secondary" @onclick="GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
-                    <button class="btn btn-primary me-2" @onclick="() => SaveClicked(false)"><i class="bi bi-floppy-fill me-1"></i>Save</button>
+                    <button class="btn btn-outline-primary me-2" @onclick="() => SaveClicked(false)"><i class="fi fi-rr-disk me-1"></i>Save</button>
                 }
-                <button class="btn btn-outline-primary" @onclick="() => SaveClicked(true)">Next<i class="bi bi-chevron-right ms-1"></i></button>
+                <button class="btn btn-primary" @onclick="() => SaveClicked(true)">Next<i class="fi fi-rr-angle-right ms-1"></i></button>
             </div>
         </div>
     </div>
@@ -274,7 +275,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4003,
                         item_1 = 2,
-                        item_2 = "animal husbandry"
+                        item_2 = "Animal husbandry"
                     };
                     toAdd.Add(newEntry);
                 }
@@ -290,7 +291,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4004,
                         item_1 = 3,
-                        item_2 = "fisheries"
+                        item_2 = "Fisheries"
                     };
                     toAdd.Add(newEntry);
                 }
@@ -306,7 +307,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4005,
                         item_1 = 4,
-                        item_2 = "agroforestry activity"
+                        item_2 = "Agroforestry activity"
                     };
                     toAdd.Add(newEntry);
                 }
@@ -322,7 +323,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4006,
                         item_1 = 5,
-                        item_2 = "others (bee keeping, sericulture, lac culture, ancillary etc.)"
+                        item_2 = "Others (bee keeping, sericulture, lac culture, ancillary etc.)"
                     };
                     toAdd.Add(newEntry);
                 }

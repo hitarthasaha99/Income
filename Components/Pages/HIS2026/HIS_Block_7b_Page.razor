@@ -17,16 +17,16 @@
 @inject IValidator<Tbl_Block_7b> Validator
 
 
-<div class="pb-5">
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
 
     @if (editContext != null)
     {
         <EditForm EditContext="editContext">
             @* 7.6 *@
-            <div class="card card-style2 rounded-4">
-                <div class="card-header d-flex align-items-center justify-content-between bg-transparent">
-                    <h5 class="card-title m-0">
+            <div class="card custom-card">
+                <div class="card-header">
+                    <h5 class="card-title">
                         <span class="text-primary me-1">Block 7b:</span>
                         Income from Self-employment - Allied Activity in Agriculture
                     </h5>
@@ -42,7 +42,7 @@
                             <thead>
                                 <tr>
                                     <th colspan="3" class="bg-transparent text-start">
-                                        <label class="form-label fs-6 fw-bold m-0">
+                                        <label class="form-label fw-bold m-0">
                                             <span class="badge bg-primary me-1">Q7.6</span>
                                             Receipts from sale during last 365 days
                                         </label>
@@ -206,14 +206,14 @@
                   </div>
               </div>
               @* 7.7 *@
-              <div class="card card-style2 rounded-4">
+              <div class="card custom-card">
                   <div class="card-body p-0">
                       <div class="table-responsive">
                           <table class="table table-bordered align-middle text-center mb-0">
                               <thead>
                                   <tr>
                                       <th colspan="3" class="bg-transparent text-start">
-                                          <label class="form-label fs-6 fw-bold m-0">
+                                          <label class="form-label fw-bold m-0">
                                               <span class="badge bg-primary me-1">Q7.7</span>
                                               Expenses incurred by the household during last 365 days on inputs used for production activity
                                           </label>
@@ -389,7 +389,7 @@
                   </div>
               </div>
               @* 7.8 and 7b.9 *@
-              <div class="card card-style2 rounded-4">
+              <div class="card custom-card">
                   <div class="card-body p-0">
                       <div class="table-responsive">
                           <table class="table table-bordered align-middle text-center mb-0">
@@ -437,31 +437,28 @@
         </EditForm>
         
     }
-
-    
-
-    
-
+</div>
+<div class="footer">
     @* Remarks Card *@
-    <div class="card card-style2 rounded-4">
+    <div class="card custom-card">
         <div class="card-header">
             <h5 class="card-title m-0">
                 Remarks
             </h5>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" rows="4"></textarea>
+            <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" rows="2"></textarea>
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-secondary"><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-primary me-2" @onclick="() => Save(false)"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
-                <NavLink class="btn btn-outline-primary" @onclick="() => Save(true)">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-outline-primary me-2" @onclick="() => Save(false)"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                <NavLink class="btn btn-primary" @onclick="() => Save(true)">Next<i class="fi fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
 

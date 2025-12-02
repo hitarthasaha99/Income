@@ -47,17 +47,16 @@
                         <tr>
                             <th style="min-width:150px;">Number of months worked</th>
                             <th style="min-width:150px;">gross salary</th>
-                            <th style="min-width:100px;">allowances received (including overtime allowance, shift allowance, project allowance)</th>
-                            <th>Other including tips, fees of consultants etc.</th>
-                            <th>bonuses received (festival bonus, profit-sharing or production bonuses or other forms of profit-related payment, performance-based incentive)</th>
-                            <th>other including commission from sales, etc.</th>
-                            <th>sale value of shares offered as part of employee remuneration (employee stock option)</th>
-                            <th>leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.</th>
-                            <th>severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.</th>
-                            <th>others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc.</th>
-                            <th>Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)</th>
+                            <th style="min-width:200px;">allowances received (including overtime allowance, shift allowance, project allowance)</th>
+                            <th style="min-width:200px;">Other including tips, fees of consultants etc.</th>
+                            <th style="min-width:200px;">bonuses received (festival bonus, profit-sharing or production bonuses or other forms of profit-related payment, performance-based incentive)</th>
+                            <th style="min-width:200px;">other including commission from sales, etc.</th>
+                            <th style="min-width:200px;">sale value of shares offered as part of employee remuneration (employee stock option)</th>
+                            <th style="min-width:200px;">leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.</th>
+                            <th style="min-width:200px;">severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.</th>
+                            <th style="min-width:200px;">others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc.</th>
+                            <th style="min-width:200px;">Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)</th>
                         </tr>
-
                         <tr>
                             <th></th>
                             <th>(1)</th>
@@ -103,7 +102,6 @@
                 </table>
             </div>
         </div>
-        
     </div>
 </div>
 <div class="footer">
@@ -113,7 +111,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+            <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter Remarks here.." @bind="@remarks" rows="2"></textarea>
         </div>
     </div>
     <div class="row">
@@ -137,7 +135,8 @@
        CloseOnEscape="false"
        UseStaticBackdrop="true"
        ShowCloseButton="false"
-       Fullscreen="ModalFullscreen.LargeDown">
+       Fullscreen="ModalFullscreen.MediumDown"
+       Size="ModalSize.ExtraLarge">
 
     <HeaderTemplate>
         <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
@@ -148,235 +147,253 @@
         {
             <EditForm EditContext="editContext">
                 <FluentValidationValidator />
-                <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                       <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.1</span> Number of months worked (Last 365 days)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_1"
+                                            class="form-control no-spinner"
+                                            autocomplete="off"
+                                            autocorrect="off"
+                                            autocapitalize="off"
+                                            spellcheck="false"
+                                            min="1" max="12"
+                                            maxlength="2"
+                                            @oninput="item1OnInput"
+                                            onkeypress="if (this.value.length >= 2) return false; return event.key >= '0' && event.key <= '9';">
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_1)" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                       <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.2</span> Gross salary(Last month)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_2"
+                                            class="form-control no-spinner form-control-sm"
+                                            autocomplete="off"
+                                            autocorrect="off"
+                                            autocapitalize="off"
+                                            spellcheck="false"
+                                            @oninput="e => { 
+                                            UpdateFieldAndValidate(() => newMember.item_2, e);
+                                                //newMember.item_2 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
+                                                handleCalculateIncome(); 
+                                            }">
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_2)" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                      <div class="mb-3">
+                          <label class="form-label">
+                                  @* //Q5.3(i) *@
+                                <span class="form-badge">Q5.3(i)</span> allowances received (including overtime allowance, shift allowance, project allowance) (Last month)
+                          </label>
+                        <InputNumber @bind-Value="newMember.item_3_i"
+                                        class="form-control no-spinner"
+                                        autocomplete="off"
+                                        onkeypress="return event.key >= '0' && event.key <= '9'"
+                                        autocorrect="off"
+                                        autocapitalize="off"
+                                        spellcheck="false"
+                                        @oninput="e => {
+                                        UpdateFieldAndValidate(() => newMember.item_3_i, e);
+                                                                                            //newMember.item_3_i = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                        handleCalculateIncome();
+                                                                                }">
+                        </InputNumber>
+                        <ValidationMessage For="@(() => newMember.item_3_i)" />
+                        @* <input type="number" class="form-control no-spinner form-control-sm" value="@newMember.item_4" @oninput="e => { newMember.item_4 = int.TryParse(e.Value?.ToString(), out var v) ? v : 0; handleCalculateIncome(); }" /> *@
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.3(ii)</span>Other including tips, fees of consultants etc. (Last month)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_3_ii"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         @oninput="e => {
+                                          UpdateFieldAndValidate(() => newMember.item_3_ii, e);
+                                          //newMember.item_3_ii = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                         handleCalculateIncome();
+                                        }">
 
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2">Q5.1</span> Number of months worked (Last 365 days)
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_1"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             min="1" max="12"
-                                             maxlength="2"
-                                             @oninput="item1OnInput"
-                                             onkeypress="if (this.value.length >= 2) return false; return event.key >= '0' && event.key <= '9';">
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_1)" />
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2">Q5.2</span> gross salary(Last month)
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_2"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => { 
-                                                UpdateFieldAndValidate(() => newMember.item_2, e);
-                                                 //newMember.item_2 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_2)" />
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <div class="d-flex flex-column">
-                                        @* //Q5.3(i) *@
-                                        <span class="me-2">Q5.3</span> <span>i) allowances received (including overtime allowance, shift allowance, project allowance) (Last month)</span>
-                                    </div>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_3_i"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => { 
-                                                 UpdateFieldAndValidate(() => newMember.item_3_i, e);
-                                                 //newMember.item_3_i = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_3_i)" />
-                                @* <input type="number" class="form-control no-spinner form-control-sm" value="@newMember.item_4" @oninput="e => { newMember.item_4 = int.TryParse(e.Value?.ToString(), out var v) ? v : 0; handleCalculateIncome(); }" /> *@
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_3_ii)" />
 
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2">ii) Other including tips, fees of consultants etc. (Last month)</span>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_3_ii"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => { 
-                                                 UpdateFieldAndValidate(() => newMember.item_3_ii, e);
-                                                 //newMember.item_3_ii = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
+                        </div>
+                    </div>
 
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_3_ii)" />
+                   <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.4(i)</span>Bonuses received (festival bonus, profit-sharing or production bonuses or other forms of profit-related payment, performance-based incentive) (Last 365 days)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_4_i"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         @oninput="e =>
+                                                                                 {
+                                             UpdateFieldAndValidate(() => newMember.item_4_i, e);
+                                                                                                  //newMember.item_4_i = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                             handleCalculateIncome();
+                                         }">
 
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <div class="d-flex flex-column">
-                                        <span class="me-2">Q5.4</span> <span> i)bonuses received (festival bonus, profit-sharing or production bonuses or other forms of profit-related payment, performance-based incentive) (Last 365 days)</span>
-                                    </div>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_4_i"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => 
-                                             { 
-                                                 UpdateFieldAndValidate(() => newMember.item_4_i, e);
-                                                 //newMember.item_4_i = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_4_i)" />
 
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_4_i)" />
+                        </div>
+                   </div>
 
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2">ii) other including commission from sales, etc. (Last 365 days)</span>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_4_ii"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => 
-                                             { 
-                                                 UpdateFieldAndValidate(() => newMember.item_4_ii, e);
-                                                 //newMember.item_4_ii = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
+                   <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.4(ii)</span>Other including commission from sales, etc. (Last 365 days)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_4_ii"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         @oninput="e =>
+                                         {
+                                             UpdateFieldAndValidate(() => newMember.item_4_ii, e);
+                                                                                                   //newMember.item_4_ii = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                             handleCalculateIncome();
+                                         }">
 
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_4_ii)" />
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2"> <span>Q5.5 </span> sale value of shares offered as part of employee remuneration (employee stock option)(Last 365 days)</span>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_5"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => 
-                                             { 
-                                                 UpdateFieldAndValidate(() => newMember.item_5, e);
-                                                 //newMember.item_5 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_4_ii)" />
+                        </div>
+                   </div>
+                   
+                   <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.5 </span> Sale value of shares offered as part of employee remuneration (employee stock option)(Last 365 days)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_5"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         @oninput="e =>
+                                         {
+                                             UpdateFieldAndValidate(() => newMember.item_5, e);
+                                                                                                //newMember.item_5 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                             handleCalculateIncome();
+                                         }">
 
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_5)" />
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2"> <span>Q5.6 </span> leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.(Last 365 days)</span>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_6"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => 
-                                             { 
-                                                 UpdateFieldAndValidate(() => newMember.item_6, e);
-                                                 //newMember.item_6 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_5)" />
+                        </div>
+                   </div>
+                   
+                   <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.6 </span> leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.(Last 365 days)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_6"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         @oninput="e =>
+                                         {
+                                             UpdateFieldAndValidate(() => newMember.item_6, e);
+                                                                                                //newMember.item_6 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                             handleCalculateIncome();
+                                         }">
 
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_6)" />
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2"> <span>Q5.7 </span> severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.(Last 365 days) </span>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_7"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => 
-                                             { 
-                                                 UpdateFieldAndValidate(() => newMember.item_7, e);
-                                                 //newMember.item_7 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_6)" />
+                        </div>
+                   </div>
+                   
+                   <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.7 </span> severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.(Last 365 days)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_7"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         @oninput="e =>
+                                         {
+                                             UpdateFieldAndValidate(() => newMember.item_7, e);
+                                                                                                //newMember.item_7 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                             handleCalculateIncome();
+                                         }">
 
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_7)" />
-                            </div>
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2"> <span>Q5.8 </span> others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc. (Last 365 days) </span>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_8"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             @oninput="e => 
-                                             { 
-                                                 UpdateFieldAndValidate(() => newMember.item_8, e);
-                                                 //newMember.item_8 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null; 
-                                                 handleCalculateIncome(); 
-                                             }">
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_7)" />
+                        </div>
+                   </div>
+                   
+                   <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.8 </span>Others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc. (Last 365 days)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_8"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         @oninput="e =>
+                                         {
+                                             UpdateFieldAndValidate(() => newMember.item_8, e);
+                                                                                                //newMember.item_8 = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
+                                             handleCalculateIncome();
+                                         }">
 
-                                </InputNumber>
-                                <ValidationMessage For="@(() => newMember.item_8)" />
-                            </div>
-                            @* //Calculate Ans *@
-                            <div>
-                                <label class="form-label fw-bold d-flex align-items-start">
-                                    <span class="me-2"> Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12) </span>
-                                </label>
-                                <InputNumber @bind-Value="newMember.item_9"
-                                             class="form-control no-spinner form-control-sm"
-                                             autocomplete="off"
-                                             onkeypress="return event.key >= '0' && event.key <= '9'"
-                                             autocorrect="off"
-                                             autocapitalize="off"
-                                             spellcheck="false"
-                                             readonly>
-                                </InputNumber>
-
-                            </div>
+                            </InputNumber>
+                            <ValidationMessage For="@(() => newMember.item_8)" />
+                        </div>
+                   </div>
+                   
+                    @* //Calculate Ans *@
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)
+                            </label>
+                            <InputNumber @bind-Value="newMember.item_9"
+                                         class="form-control no-spinner"
+                                         autocomplete="off"
+                                         onkeypress="return event.key >= '0' && event.key <= '9'"
+                                         autocorrect="off"
+                                         autocapitalize="off"
+                                         spellcheck="false"
+                                         readonly>
+                            </InputNumber>
                         </div>
                     </div>
                 </div>
@@ -386,7 +403,7 @@
     </BodyTemplate>
 
     <FooterTemplate>
-        <button class="btn btn-secondary"
+        <button class="btn btn-outline-secondary me-auto"
                 @onclick="(() => HandleModal())">
             Close
         </button>
