@@ -423,7 +423,7 @@ namespace Income.Database.Queries
             try
             {
                 fsu_id = fsu_id == 0 ? SessionStorage.SelectedFSUId : fsu_id;
-                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = ? AND tenant_id = ?", fsu_id, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = ?", fsu_id);
                 return data_set;
             }
             catch (Exception ex)
