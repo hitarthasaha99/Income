@@ -35,7 +35,7 @@
                         <label for="" class="form-label">
                             <span class="form-badge">2</span> Approximate population of the SU
                         </label>
-                        <input disabled="@(!AllowEdit)" type="number" class="form-control form-control-sm no-spinner" id="" value="@block_4.approximate_population_su" @oninput="HandleChange">
+                        <input disabled="@(DisableEdit)" type="number" class="form-control form-control-sm no-spinner" id="" value="@block_4.approximate_population_su" @oninput="HandleChange">
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -89,7 +89,7 @@
     CommonFunction commonFunction = new();
     CommonConfig commonConfig = new();
     string? remarks = string.Empty;
-    bool AllowEdit = false;
+    bool DisableEdit = false;
 
     async void GoBack()
     {
@@ -138,12 +138,19 @@
                     block_0_1.number_of_sub_division_of_su_to_be_formed = 1;
                     block_0_1.sample_su_number = 1;
                 }
-                AllowEdit = block_0_1.Block_1_15 > 1 && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO;
+                DisableEdit = block_0_1.Block_1_15 <= 1 && SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             }
         }
         else
         {
-            AllowEdit = !(block_5 != null && block_5.Count > 0 && block_5.Any(x => x.IsChecked == true));
+            if(block_5 != null && block_5.Count > 0 && block_5.Any())
+            {
+                DisableEdit = true;
+            }
+            else
+            {
+                DisableEdit = block_0_1.Block_1_15 <= 1 && SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
+            }
         }
 
         remarks = block_0_1?.remarks_block_4;
