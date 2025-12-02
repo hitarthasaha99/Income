@@ -25,6 +25,12 @@
                 <span class="text-primary me-1">Block 7a:</span>
                  Income from Self-employment - Crop cultivation
             </h5>
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                <div class="card-tools">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                </div>
+            }
             @if (!SessionStorage.FSU_Submitted)
             {
                 <div class="card-tools ms-auto">
@@ -104,9 +110,9 @@
     </div>
 
    
-    <div class="row">
+    <div class="row mt-2">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">

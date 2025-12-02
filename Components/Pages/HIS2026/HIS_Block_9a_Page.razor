@@ -28,15 +28,25 @@
                     <h3 class="card-title m-0 d-flex align-items-center">
                         <span class="text-primary me-2">Block 9: Income from Asset</span>
                     </h3>
+                    @* add comment *@
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+
+                        <div class="card-tools">
+                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        </div>
+                    }
                 </div>
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h3 class="card-title m-0 d-flex align-items-center">
                         <span class="text-primary">A. Income from financial assets (interest and dividend income)</span>
                     </h3>
                 </div>
+            </div>
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                 <div class="card-body p-0">
                     <div class="table-responsive">
-
                         <table class="table table-bordered align-middle text-center mb-0">
                             <thead>
                                 <tr>
@@ -129,7 +139,6 @@
                         </table>
                     </div>
                 </div>
-            </div>
 
             @* 7.3, 7.4 .... *@
             <div class="card card-style2 rounded-4">
@@ -189,6 +198,7 @@
                     </div>
                 </div>
             </div>
+            </fieldset>
         </EditForm>
 
     }
@@ -201,19 +211,26 @@
                 Remarks
             </h5>
         </div>
+        <fieldset disabled ="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
         <div class="card-body">
             <textarea class="form-control w-100" rows="4" @bind="@remarks"></textarea>
         </div>
+        </fieldset>
     </div>
 
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1"></i>Back</button>
+            <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    
                 <NavLink class="btn btn-primary me-2" @onclick="@(() => Save(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+                }
                 <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
             </div>
         </div>
@@ -339,5 +356,10 @@
         {
 
         }
+    }
+    async void GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        return;
     }
 }

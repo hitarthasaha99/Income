@@ -10,7 +10,6 @@
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
 
-
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                          survey_time="@survey_time" />
@@ -21,173 +20,180 @@
             <h3 class="card-title">
                 <span class="text-primary me-2">[1]</span>Identification of sample household
             </h3>
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {           
             <div cllass="card-tools">
-                <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                <NavLink class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
             </div>
+            }
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">1</span>@Loc["sector"]
-                        </label>
-                        <input type="text" class="form-control" value="@block_1.sector_name" disabled>
-                    </div>
-                </div>
-               <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">2</span>@Loc["state_ut_name"]
-                        </label>
-                        <input type="text" class="form-control is_sso" value="@block_1.state_name" disabled>
-                    </div>
-               </div>
-               <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">3</span>@Loc["district_name"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.district_name">
-                    </div>
-               </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">4</span>@Loc["sub_dist"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.town_name">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">5</span>@Loc["vill_name"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.village_name">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">6</span>@Loc["invst_unit_no"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.investigator_unit_no">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">7</span>@Loc["sample_su_no"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.sample_su_number">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">8</span>@Loc["round_number"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.round_number">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">9</span>@Loc["sch_no"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.schedule_number">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">10</span>@Loc["serial_no_sample_fsu"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.serial_number_sample_fsu">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">11</span>@Loc["sample_sub_div_no"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.sample_sub_division_number">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">12</span>@Loc["sample_hh_number"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.sample_hhd_number">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">13</span>@Loc["survey_code"]
-                        </label>
-                        <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
-                            <option value="">Select</option>
-                            @if (commonList.LOOKUP_CONST_HHD_SURVEY_CODE != null && commonList.LOOKUP_CONST_HHD_SURVEY_CODE.Count > 0)
-                            {
-                                @foreach (var item in commonList.LOOKUP_CONST_HHD_SURVEY_CODE)
-                                {
-                                    @if(is_substitute)
-                                    {
-                                        if (item.id != 1)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (item.id != 2)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }                                 
-                                }
-                            }
-                        </select>
-                    </div>
-                </div>
-               <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">14</span>@Loc["reason_for_substitution"]
-                        </label>
-
-                        <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
-                            <option value="">Select</option>
-                            @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
-                            {
-                                @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
-                                {
-                                    <option value="@item.id">@item.title</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    @* When user will select code 9 - others in q.17 the 17.1 will be enabled *@
-                    <div class="col-sm-12" hidden="@(!is_remarks_visible)">
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                <div class="row">
+                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
-                                <span class="form-badge">17.1</span>
-                                Reason
+                                <span class="form-badge">1</span>@Loc["sector"]
                             </label>
-                            <textarea maxlength="50" disabled="@SessionStorage.FSU_Submitted" type="text" rows="1" class="form-control" @bind="block_1.substitution_reason_remark"></textarea>
+                            <input type="text" class="form-control" value="@block_1.sector_name" disabled>
                         </div>
                     </div>
-               </div>
-               <div class="col-sm-12">
-                    <div class="mb-3 col-12">
-                        <label class="form-label"><span class="form-badge">15</span>Remarks</label>
-                        <textarea type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control is_sso" cols="4" @bind="block_1.block_1_remark"></textarea>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">2</span>@Loc["state_ut_name"]
+                            </label>
+                            <input type="text" class="form-control is_sso" value="@block_1.state_name" disabled>
+                        </div>
                     </div>
-               </div>
-            </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">3</span>@Loc["district_name"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.district_name">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">4</span>@Loc["sub_dist"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.town_name">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">5</span>@Loc["vill_name"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.village_name">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">6</span>@Loc["invst_unit_no"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.investigator_unit_no">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">7</span>@Loc["sample_su_no"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.sample_su_number">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">8</span>@Loc["round_number"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.round_number">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">9</span>@Loc["sch_no"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.schedule_number">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">10</span>@Loc["serial_no_sample_fsu"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.serial_number_sample_fsu">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">11</span>@Loc["sample_sub_div_no"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.sample_sub_division_number">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">12</span>@Loc["sample_hh_number"]
+                            </label>
+                            <input type="text" class="form-control is_sso" disabled value="@block_1.sample_hhd_number">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">13</span>@Loc["survey_code"]
+                            </label>
+                            <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
+                                <option value="">Select</option>
+                                @if (commonList.LOOKUP_CONST_HHD_SURVEY_CODE != null && commonList.LOOKUP_CONST_HHD_SURVEY_CODE.Count > 0)
+                                {
+                                    @foreach (var item in commonList.LOOKUP_CONST_HHD_SURVEY_CODE)
+                                    {
+                                        @if (is_substitute)
+                                        {
+                                            if (item.id != 1)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (item.id != 2)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">14</span>@Loc["reason_for_substitution"]
+                            </label>
+
+                            <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
+                                <option value="">Select</option>
+                                @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
+                                {
+                                    @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        @* When user will select code 9 - others in q.17 the 17.1 will be enabled *@
+                        <div class="col-sm-12" hidden="@(!is_remarks_visible)">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="form-badge">17.1</span>
+                                    Reason
+                                </label>
+                                <textarea maxlength="50" disabled="@SessionStorage.FSU_Submitted" type="text" rows="1" class="form-control" @bind="block_1.substitution_reason_remark"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3 col-12">
+                            <label class="form-label"><span class="form-badge">15</span>Remarks</label>
+                            <textarea type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control is_sso" cols="4" @bind="block_1.block_1_remark"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            
         </div>
     </div>
 </div>
@@ -201,7 +207,7 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
                     <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
                 }

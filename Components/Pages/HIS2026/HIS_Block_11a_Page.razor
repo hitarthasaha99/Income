@@ -20,12 +20,22 @@
             <h3 class="card-title m-0 d-flex align-items-center">
                 <span class="text-primary me-2">Block 11a: Particulars of transfers paid on regularly / periodic basis to non-household member</span>
             </h3>
+              @* add comment *@
+ @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+ {
+
+     <div class="card-tools">
+         <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+     </div>
+ }
         </div>
     @if (editContext !=null)
     {
         <EditForm EditContext="editContext">
             
             <div class="card-body p-0">
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped mb-0">
                         <thead>
@@ -141,15 +151,19 @@
                         <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
                     </div>
                 </div>
+                </fieldset>
             </div>
         </EditForm>
     }
     </div>
     <div class="d-flex justify-content-between mb-3">
-        <NavLink class="btn btn-outline-primary" href="/back">
+        @* <NavLink class="btn btn-outline-primary" href="/back">
             <i class="bi bi-chevron-left me-1"></i>
             Back
-        </NavLink>
+        </NavLink> *@
+        <div class="col-sm-6">
+    <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
+</div>
         <div class="d-flex">
             @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
@@ -363,5 +377,9 @@
             await loggingService.LogError("HIS_Block_11a_Page_SaveAsync", ex);
         }
     }
-            
+      async void GoBack()
+{
+    await JSRuntime.InvokeVoidAsync("__handleGoBack");
+    return;
+}      
 }

@@ -27,7 +27,7 @@
             <div class="card-header">
                 <h3 class="card-title"><span class="text-primary me-2">[4]</span>Household Characteristics</h3>
                 <div class="card-tools">
-                    <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink hidden="@((SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             </div>
             <div class="card-body">
@@ -281,7 +281,7 @@
             </div>
             <div class="col-sm-6">
                 <div class="d-flex justify-content-end">
-                    @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                     {
                         <button type="button" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => Save())">
                             <i class="fi fi-rr-disk me-1"></i>Save

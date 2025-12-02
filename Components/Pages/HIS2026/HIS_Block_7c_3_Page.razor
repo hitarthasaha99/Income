@@ -80,6 +80,7 @@
 
 
     @* Remarks Card *@
+    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
     <div class="card card-style2 rounded-4">
         <div class="card-header">
             <h5 class="card-title m-0">
@@ -90,15 +91,20 @@
             <textarea maxlength="500" class="form-control w-100" rows="4" @bind="@remarks"></textarea>
         </div>
     </div>
+    </fieldset>
 
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    
                 <NavLink class="btn btn-primary me-2" @onclick="@(() => Save(false))"><i class="bi bi-floppy-fill me-1"></i>Save</NavLink>
+                }
                 <NavLink class="btn btn-outline-primary" @onclick="@(() => Save(true))">Next<i class="bi bi-chevron-right ms-1"></i></NavLink>
             </div>
         </div>

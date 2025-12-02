@@ -19,9 +19,12 @@
                 <span class="text-primary fw-bolder me-2">[Block 12]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
             </h3>
         </div>
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
         <div class="card-body">
             <textarea disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
         </div>
+        </fieldset>
     </div>
     @* Supervisor Comments *@
     <div class="card custom-card">
@@ -30,9 +33,12 @@
                 <span class="text-primary fw-bolder me-2">[Block 13]</span> Remarks by Field Supervisor (FS)/Senior Statistical Officer (SSO)
             </h3>
         </div>
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
         <div class="card-body">
             <textarea disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks"></textarea>
         </div>
+        </fieldset>
     </div>
 </div>
 <div class="footer">
@@ -48,11 +54,15 @@
 
         <!-- Right: Save + Next buttons -->
         <div class="d-flex">
+            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                
             <NavLink class="btn btn-outline-primary me-2"
                      hidden="@(SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)"
                      @onclick="@(() => HandleSubmit(false))">
                 <i class="fi fi-rr-disk me-1"></i>Save
             </NavLink>
+            }
 
             <NavLink class="btn btn-primary"
                      @onclick="@(() => HandleSubmit(true))">

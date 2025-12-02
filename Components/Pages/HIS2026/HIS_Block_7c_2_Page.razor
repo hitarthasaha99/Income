@@ -26,6 +26,14 @@
                 <span class="text-primary me-1">Block 7.3:</span>
                 Income from Self-employment - Non-agriculture Activity
             </h5>
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                </div>
+            }
         </div>
         <div class="row px-3 py-2">
             <div class="col">
@@ -99,10 +107,14 @@
                                         <td>@item.item_10_11</td>
 
                                         <td class="d-flex align-items-center">
+                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                            {
+                                                
                                             <button class="btn btn-sm btn-primary me-2"
                                                     @onclick="@(() => HandleModal("UPDATE", item))">
                                                 <i class="bi bi-pencil-square me-1"></i>Edit
                                             </button>
+                                            }
                                             @* <button class="btn btn-sm btn-danger"
                                                     @onclick="@(() => HandleDelete(item.id))">
                                                 <i class="bi bi-trash me-1"></i>Delete
@@ -120,7 +132,7 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="bi bi-chevron-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-primary" onclick="@GoBack"><i class="bi bi-chevron-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
@@ -445,7 +457,7 @@
     {
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
+            NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
             return;
         }
         if (Q9Needed && ActivityList.Any(x => !x.isUpdated))

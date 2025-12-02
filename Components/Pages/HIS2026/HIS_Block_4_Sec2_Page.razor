@@ -22,13 +22,25 @@
         <div class="card custom-card">
             <div class="card-header">
                 <h3 class="card-title"><span class="text-primary me-2">[4]</span>Household Characteristics</h3>
-                <div class="card-tools">
+            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                
+            <div class="card-tools">
                     <button class="btn btn-primary is_sso"
                             @onclick="@(() => HandleModal("ADD"))"
                             disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
                         <i class="fi fi-rr-plus me-1"></i>Add Activity
                     </button>
                 </div>
+            }
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                </div>
+            }
             </div>
             <div class="card-body p-0">
                 <!--4.5-->
@@ -67,7 +79,10 @@
                                             <td>@item.BusinessSeasonal</td>
                                             <td>@item.NumberOfMonths</td>
                                             <td>
-                                                <div class="d-flex align-items-center">
+                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                            {
+                                                
+                                            <div class="d-flex align-items-center">
                                                     <button class="btn btn-link fs-6"
                                                             @onclick="@(() => HandleModal("UPDATE", item))">
                                                         <i class="fi fi-rr-pencil"></i>
@@ -77,6 +92,7 @@
                                                         <i class="fi fi-rr-trash"></i>
                                                     </button>
                                                 </div>
+                                            }
                                             </td>
                                         </tr>
                                     }
