@@ -31,9 +31,9 @@
                 {
                     <div class="card-tools">
                         <div class="d-flex align-items-center">
-                            <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => OpenGenerateModal())">
+                            @* <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => OpenGenerateModal())">
                                 <i class="fi fi-rr-calculator me-1"></i>Generate
-                            </button>
+                            </button> *@
 
                             <button class="btn btn-outline-secondary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => CalculateSSS())">
                                 <i class="fi fi-rr-calculator me-1"></i>Calc SSS
@@ -403,6 +403,16 @@
                         item.is_selected = false;
                         await SCH_0_0_Queries.SaveSCH0Block2_2(suList);
                     }
+                }
+
+                var sdList = await SCH_0_0_Queries.FetchSCH0Block5Data();
+                if (sdList != null && sdList.Count > 0)
+                {
+                    foreach (var item in sdList)
+                    {
+                        item.IsChecked = false;
+                    }
+                    await SCH_0_0_Queries.SaveSCH0Block5(sdList);
                 }
                 await LoadData();
             }
