@@ -363,7 +363,14 @@
         }
         if (tbl_Fsu_List != null)
         {
-            AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected);
+            if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected);
+            }
+            else
+            {
+                AllowUpdateListing = false;
+            }
         }
         StateHasChanged();
 
@@ -690,9 +697,9 @@
 
             await SCH_0_0_Queries.UpdateAllRowsForColumnAsync(SessionStorage.SelectedFSUId);
             var existingListingData = await SCH_0_0_Queries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
-            var sss_selection_done = existingListingData.Any(x => x.SSS != 0);
+            var sss_selection_not_done = existingListingData.Any(x => x.SSS == 0);
 
-            if (!sss_selection_done)
+            if (sss_selection_not_done)
             {
                 toastService.ShowError("Please calculate SSS before doing selection, Please try again!");
                 return;

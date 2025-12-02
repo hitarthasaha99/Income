@@ -104,13 +104,10 @@
                                         @if (!SessionStorage.selection_done)
                                             {
                                                 <td class="d-flex align-items-center">
-                                                    @if (!HideInsertBtn)
-                                                    {
-                                                        <button class="btn btn-link me-3 fs-6"
-                                                                @onclick="@(() => HandleModal("INSERT", item))">
-                                                            <i class="fi fi-rr-insert"></i>
-                                                        </button>
-                                                    }                                                 
+                                                    <button class="btn btn-link me-3 fs-6"
+                                                            @onclick="@(() => HandleModal("INSERT", item))">
+                                                        <i class="fi fi-rr-insert"></i>
+                                                    </button>
                                                     <button class="btn btn-link me-3 fs-6"
                                                             @onclick="@(() => HandleModal("UPDATE", item))">
                                                         <i class="fi fi-rr-pencil"></i>
@@ -162,7 +159,7 @@
 
     <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
         <HeaderTemplate>
-            <h5 class="modal-title">@((isAdd ? "Add Household" : "Update Household"))</h5>
+            <h5 class="modal-title">@(modalHeader)</h5>
         </HeaderTemplate>
         <BodyTemplate>
             @if (fields != null)
@@ -358,6 +355,7 @@
     string? remarks = string.Empty;
     int originalSrl = 0;
     bool isAdd = false;
+    string modalHeader = string.Empty;
 
     bool HideInsertBtn = false;
 
@@ -453,7 +451,7 @@
             if (isAdd)
                 fields.Block_7_3 = ReturnHHDSamplingSerialNumber();
             else
-                fields.Block_7_3 = originalSrl;
+                fields.Block_7_3 = originalSrl + 1;
         }
 
     }
@@ -524,7 +522,7 @@
             return;
         }
 
-        if(SessionStorage.FSU_Submitted)
+        if(SessionStorage.FSU_Submitted || SessionStorage.selection_done)
         {
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             return;
@@ -641,6 +639,7 @@
             ShowPopulationWarning = false;
             if (action == "ADD")
             {
+                modalHeader = "Add Household";
                 isAdd = true;
                 if (data == null)
                 {
@@ -662,6 +661,7 @@
             }
             else if (action == "UPDATE")
             {
+                modalHeader = "Update Household";
                 isAdd = false;
                 if (data != null)
                 {
@@ -680,6 +680,7 @@
             }
             else if(action == "INSERT")
             {
+                modalHeader = "Insert Household";
                 isAdd = false;
                 fields = new();
                 if (data != null)
@@ -687,7 +688,7 @@
                     fields.id = Guid.NewGuid();
                     originalSrl = data.Block_7_3.GetValueOrDefault();
                     fields.Block_7_1 = data.Block_7_1;
-                    fields.Block_7_3 = data.Block_7_3;
+                    fields.Block_7_3 = data.is_household == 2 ?  (data.Block_7_3 + 1) : 0;
                     editContext = new EditContext(fields);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += ClearFieldErrorsOnChange;
