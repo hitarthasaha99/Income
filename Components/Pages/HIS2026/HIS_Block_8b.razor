@@ -94,7 +94,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <textarea class="form-control w-100" rows="4" @bind="@remarks"></textarea>
+            <textarea class="form-control w-100" rows="4" @bind="block_1.block_8b_remark"></textarea>
         </div>
     </div>
 
@@ -205,6 +205,8 @@
     private List<Tbl_Block_3> MemberList = [];
     private List<Tbl_Block_8_Q6> SchemeList = [];
     private Tbl_Block_8_Q6 fields = new();
+    private Tbl_Block_1? block_1 = new();
+
     EditContext editContext;
     ValidationMessageStore messageStore;
     bool benefitsEntryNeeded = false;
@@ -216,7 +218,7 @@
     {
         MemberList = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         benefitsEntryNeeded = MemberList != null && MemberList.Any(x => x.item_12 == 1);
-
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         await LoadData();
         StateHasChanged();
     }
@@ -351,7 +353,7 @@
         }
     }
 
-    private void Next()
+    async void Next()
     {
         try
         {
@@ -360,6 +362,13 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_9a");
                 return;
             }
+            if (block_1 != null)
+            {
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
+            }
+
+           
+            NavigationManager.NavigateTo("/dashboard/his/block_9a");
             if (benefitsEntryNeeded && SchemeList.Count == 0)
             {
                 toastService.ShowError("H059: Need to enter atleast entry in Q8.6");

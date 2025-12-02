@@ -66,7 +66,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control disabled w-100" rows="4"></textarea>
+            <textarea maxlength="500" class="form-control disabled w-100" rows="4" @bind="block_1.block_b_remark"></textarea>
         </div>
     </div>
 </div>
@@ -84,6 +84,8 @@
 </div>
 @code {
     private DateTime survey_date = DateTime.Now;
+    private Tbl_Block_1? block_1 = new();
+
 
     private double B1;
     private double B2;
@@ -104,6 +106,8 @@
         var block_10 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_10>();
         var block_11a = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_11a>();
         var block_11b = await dB.FetchListAsync<Tbl_Block_11b>();
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+
 
         B1 = block_10 != null ? block_10.item_23.GetValueOrDefault() : 0;
         B2 = block_11a != null ? (block_11a.item_2.GetValueOrDefault() + (block_11a.item_5.GetValueOrDefault() + block_11a.item_6.GetValueOrDefault())/12) : 0;
@@ -142,10 +146,19 @@
         StateHasChanged();
     }
 
-    private void Next()
+    async void Next()
     {
         try
         {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_12");
+                return;
+            }
+            if (block_1 != null)
+            {
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
+            }
             NavigationManager.NavigateTo("dashboard/his/block_12");
         }
         catch (Exception ex)

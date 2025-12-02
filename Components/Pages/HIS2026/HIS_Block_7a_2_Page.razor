@@ -289,7 +289,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" rows="4" @bind="@remarks"></textarea>
+            <textarea maxlength="500" class="form-control w-100" rows="4" @bind="block_1.block_7a_remark"></textarea>
         </div>
     </div>
 
@@ -314,6 +314,7 @@
     private Modal modal = default!;
     private Tbl_Block_4? block_4 = null;
     private Tbl_Block_7a? block_7A = new();
+    private Tbl_Block_1? block_1 = new();
     private List<Tbl_Block_7a_1> CropIncomeList = [];
     EditContext editContext;
     ValidationMessageStore messageStore;
@@ -335,6 +336,7 @@
     protected override async Task OnInitializedAsync()
     {
         block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         CropIncomeList = await dB.Fetch_SCH_HIS_Block7A_CodeList();
         if (CropIncomeList != null && CropIncomeList.Count > 0)
         {
@@ -473,6 +475,10 @@
             if(!is_go_next)
             {
                 return;
+            }
+            if (block_1 != null)
+            {
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
             else
             {

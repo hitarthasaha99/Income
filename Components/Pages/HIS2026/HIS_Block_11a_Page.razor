@@ -138,7 +138,7 @@
                     </table>
                     <div class="mb-3 px-2">
                         <label for="remarksTextarea" class="form-label">Remarks</label>
-                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_11a_remark"></textarea>
                     </div>
                 </div>
             </div>
@@ -172,6 +172,8 @@
     DateTime survey_time = DateTime.Now;
 
     private Tbl_Block_11a? selectBlock11A = new Tbl_Block_11a();
+        private Tbl_Block_1? block_1 = new();
+
     EditContext editContext;
     ValidationMessageStore messageStore;
     DBQueries dQ = new DBQueries();
@@ -194,6 +196,8 @@
             }
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
+                    block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+
             StateHasChanged();
 
         }
@@ -353,10 +357,13 @@
             {
                 return;
             }
-            else
-            {
+             if (block_1 != null)
+ {
+     await dQ.SaveAsync<Tbl_Block_1>(block_1);
+ }
+            
                 NavigationManager.NavigateTo("/dashboard/his/block_11b");
-            }
+            
         }
         catch (Exception ex)
         {
