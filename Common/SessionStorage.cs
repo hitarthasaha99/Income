@@ -24,8 +24,8 @@ namespace Income.Common
         public static int selected_hhd_seq = new();
         public static string user_name = "";
         public static string location = "";
-        public static DateTime survey_start_date = funcs.ConvertDate("1st July 2025");
-        public static DateTime survey_end_date = funcs.ConvertDate("30th June 2026");
+        public static DateTime survey_start_date = funcs.ConvertDate("1st February 2026");
+        public static DateTime survey_end_date = funcs.ConvertDate("31st January 2027");
         public static int selected_hhd_size = new();
         public static DateTime survey_timestamp = new();
         public static int FSU_Sector = 0;

@@ -234,8 +234,6 @@
 
 
         await Save(action);
-        block_0_1.remarks_block_2_1 = remarks;
-        await sch_0_0_Queries.SaveBlock1(block_0_1);
 
     }
 
@@ -249,6 +247,7 @@
                 toastService.ShowError("Error in saving data");
                 return;
             }
+            
             if (action == "SAVE")
             {
                 toastService.ShowSuccess("Saved successfully");
@@ -256,6 +255,8 @@
             }
             else if (action == "NEXT")
             {
+                block_0_1.remarks_block_2_1 = remarks;
+                await sch_0_0_Queries.SaveBlock1(block_0_1);
                 if (SessionStorage.FSU_Sector == 1)
                 {
                     NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2R");

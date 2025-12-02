@@ -579,6 +579,7 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_Sch_0_0_Block_0_1.id = Guid.NewGuid();
                     tbl_Sch_0_0_Block_0_1.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_Sch_0_0_Block_0_1);
                 }
