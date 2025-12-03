@@ -42,23 +42,23 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
       <AndroidPackageFormat>apk</AndroidPackageFormat>
-      <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.8</ApplicationDisplayVersion>
+      <ApplicationVersion>8</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.8</ApplicationDisplayVersion>
+      <ApplicationVersion>8</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.8</ApplicationDisplayVersion>
+      <ApplicationVersion>8</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.8</ApplicationDisplayVersion>
+      <ApplicationVersion>8</ApplicationVersion>
     </PropertyGroup>
 
     <ItemGroup>
