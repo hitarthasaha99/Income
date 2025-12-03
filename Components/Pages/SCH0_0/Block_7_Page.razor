@@ -48,17 +48,20 @@
                         <tr>
                             <th style="min-width:10px;">Srl.No.</th>
                             <th style="min-width:50px;">House Number</th>
-                            <th style="min-width:100px;">Is the house used only for non-residential purposes? (yes-1, no-2)</th>
-                            <th style="min-width:50px;">Household Serial Number</th>
+                            <th style="min-width:170px;">Is the house used only for non-residential purposes? (yes-1, no-2)</th>
+                            <th style="min-width:70px;">Household Serial Number</th>
                             <th style="min-width:100px;">Name of the head of the household</th>
                             <th style="min-width:50px;">Household Size</th>
-                            <th style="min-width:100px;">Highest education level attained among the household members</th>
+                            <th style="min-width:170px;">Highest education level attained among the household members</th>
                             <th style="min-width:50px;">Household Type</th>
-                            <th style="min-width:100px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
-                            <th style="min-width:100px;">Usual monthly consumption expenditure of the household (Rs.)</th>
+                            <th style="min-width:250px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
+                            <th style="min-width:200px;">Usual monthly consumption expenditure of the household (Rs.)</th>
                             @* <th style="min-width:100px;">SSS number for Schedule HIS 2026</th>
                             <th style="min-width:40px;">Selected</th> *@
-                            <th style="min-width:40px;">Action</th>
+                            @if (!SessionStorage.selection_done)
+                            {
+                                <th style="min-width:40px;">Action</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -73,7 +76,10 @@
                             <th>(7)</th>
                             <th>(8)</th>
                             <th>(9)</th>
-                            <th>(10)</th>
+                            @if (!SessionStorage.selection_done)
+                            {
+                                <th>(10)</th>
+                            }
                         </tr>
                         @if (ListItems != null && ListItems.Count > 0)
                         {
@@ -136,7 +142,9 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+                <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+                    <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+                </fieldset>
             </div>
         </div>
         <div class="row">
@@ -166,158 +174,160 @@
             {
                 <EditForm id="YourEditFormId" EditContext="@editContext" OnValidSubmit="@HandleAddRow">
                     <FluentValidationValidator />
-                    <div class="row">
-                        <!-- Serial Number -->
-                        <div class="mb-3">
+                    <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+                        <div class="row">
+                            <!-- Serial Number -->
+                            <div class="mb-3">
+                                <div class="col-sm-12">
+                                    <label class="form-label"><span class="form-badge">0</span>Serial Number of Row</label>
+                                    <InputNumber class="form-control" @bind-Value="fields.Block_7_1" Disabled="true" />
+                                </div>
+                            </div>
+                            <!-- House Number -->
                             <div class="col-sm-12">
-                                <label class="form-label"><span class="form-badge">0</span>Serial Number of Row</label>
-                                <InputNumber class="form-control" @bind-Value="fields.Block_7_1" Disabled="true" />
-                            </div>
-                        </div>
-                        <!-- House Number -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">1</span>House Number</label>
-                                <InputText class="form-control"
-                                            @bind-Value="fields.Block_7_2"
-                                            />
-                                <ValidationMessage For="@(() => fields.Block_7_2)" />
-                            </div>
-                        </div>
-
-                        <!-- Is Household -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">2</span>Is the house used only for non-residential purposes? (yes-1, no-2)</label>
-                                <InputSelect class="form-select" @bind-Value="fields.is_household" oninput="@(((ChangeEventArgs e) => OnIsHouseholdChanged(e)))">
-                                    <option value="">- Select -</option>
-                                    @if (commonList?.LOOKUP_CONST_YES_NO != null)
-                                    {
-                                        foreach (var item in commonList.LOOKUP_CONST_YES_NO)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }
-                                </InputSelect>
-                                <ValidationMessage For="@(() => fields.is_household)" />
-                            </div>
-                        </div>
-
-                        <!-- Household Serial Number -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">3</span>Household Serial Number</label>
-                                <InputNumber class="form-control" @bind-Value="fields.Block_7_3" Disabled="true" />
-                            </div>
-                        </div>
-
-                        <!-- Head of Household Name -->
-                        <div class="col-sm-12" hidden="@(fields.is_household == 1)"> 
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">4</span>Name of Head of Household</label>
-                                <InputText class="form-control"
-                                           maxlength="50"
-                                            onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
-                                            @bind-Value="fields.Block_7_4"
-                                            @oninput="OnHeadNameInput"/>
-                                <ValidationMessage For="@(() => fields.Block_7_4)" />
-                            </div>
-                        </div>
-
-
-                        <!-- Household Size -->
-                        <div class="col-sm-12" hidden="@(fields.is_household == 1)">
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">5</span>Household Size</label>
-                                <InputNumber class="form-control no-spinner"
-                                                @oninput="OnHHDSizeInput"
-                                                @bind-Value="fields.Block_7_5"
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">1</span>House Number</label>
+                                    <InputText class="form-control"
+                                                @bind-Value="fields.Block_7_2"
                                                 />
-                                <ValidationMessage For="@(() => fields.Block_7_5)" />
-                                <div class="text-success mt-1 fw-bold" hidden="@(!ShowPopulationWarning)">
-                                    @PopulationWarningMessage
+                                    <ValidationMessage For="@(() => fields.Block_7_2)" />
+                                </div>
+                            </div>
+
+                            <!-- Is Household -->
+                            <div class="col-sm-12">
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">2</span>Is the house used only for non-residential purposes? (yes-1, no-2)</label>
+                                    <InputSelect class="form-select" @bind-Value="fields.is_household" oninput="@(((ChangeEventArgs e) => OnIsHouseholdChanged(e)))">
+                                        <option value="">- Select -</option>
+                                        @if (commonList?.LOOKUP_CONST_YES_NO != null)
+                                        {
+                                            foreach (var item in commonList.LOOKUP_CONST_YES_NO)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => fields.is_household)" />
+                                </div>
+                            </div>
+
+                            <!-- Household Serial Number -->
+                            <div class="col-sm-12">
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">3</span>Household Serial Number</label>
+                                    <InputNumber class="form-control" @bind-Value="fields.Block_7_3" Disabled="true" />
+                                </div>
+                            </div>
+
+                            <!-- Head of Household Name -->
+                            <div class="col-sm-12" hidden="@(fields.is_household == 1)"> 
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">4</span>Name of Head of Household</label>
+                                    <InputText class="form-control"
+                                               maxlength="50"
+                                                onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
+                                                @bind-Value="fields.Block_7_4"
+                                                @oninput="OnHeadNameInput"/>
+                                    <ValidationMessage For="@(() => fields.Block_7_4)" />
+                                </div>
+                            </div>
+
+
+                            <!-- Household Size -->
+                            <div class="col-sm-12" hidden="@(fields.is_household == 1)">
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">5</span>Household Size</label>
+                                    <InputNumber class="form-control no-spinner"
+                                                    @oninput="OnHHDSizeInput"
+                                                    @bind-Value="fields.Block_7_5"
+                                                    />
+                                    <ValidationMessage For="@(() => fields.Block_7_5)" />
+                                    <div class="text-success mt-1 fw-bold" hidden="@(!ShowPopulationWarning)">
+                                        @PopulationWarningMessage
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Highest Education Level -->
+                            <div class="col-sm-12" hidden="@(fields.is_household == 1)">
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">6</span>Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</label>
+                                    <InputSelect class="form-select"
+                                                    @bind-Value="fields.Block_7_6" Disabled="@(sector == 1)">
+                                        <option value="">- Select -</option>
+                                        @if (Block_7_Constants.HighestEdu != null)
+                                        {
+                                            foreach (var item in Block_7_Constants.HighestEdu)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => fields.Block_7_6)" />
+                                </div>
+                            </div>
+
+                            <!-- Household Type -->
+                            <div class="col-sm-12" hidden="@(fields.is_household == 1)">
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">7</span>Household Type (entry in code)</label>
+                                    <InputSelect class="form-select" @bind-Value="fields.Block_7_7">
+                                        <option value="">- Select -</option>
+                                        @if (sector == 1 && Block_7_Constants.HHDTypeRural != null)
+                                        {
+                                            foreach (var item in Block_7_Constants.HHDTypeRural)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                        else if (sector == 2 && Block_7_Constants.HHDTypeUrban != null)
+                                        {
+                                            foreach (var item in Block_7_Constants.HHDTypeUrban)
+                                            {
+                                                <option value="@item.id">@item.title</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => fields.Block_7_7)" />
+                                </div>
+                            </div>
+
+                            <!-- Total Land Owned -->
+                            <div class="col-sm-12" hidden="@(fields.is_household == 1)">
+                                <div class="mb-3">
+                                    <label class="form-label"><span class="form-badge">8</span>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</label>
+                                    <InputNumber class="form-control no-spinner"
+                                                    @bind-Value="fields.Block_7_8"
+                                                    step="any"
+                                                    Disabled="@(sector == 2)"
+                                                    onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(event.target.value + event.key)" />
+                                    <ValidationMessage For="@(() => fields.Block_7_8)" />
+                                </div>
+                            </div>
+
+                            <!-- Monthly Expenditure -->
+                            <div class="col-sm-12" hidden="@(fields.is_household == 1)">
+                                <div>
+                                    <label class="form-label"><span class="form-badge">9</span>usual monthly consumption expenditure of the household (in Rs.)</label>
+                                    <input class="form-control no-spinner"
+                                                    type="number"
+                                                    step="1"
+                                                    value="@fields.Block_7_9"
+                                           @oninput="OnMonthlyExpInputText" />
+                                    <ValidationMessage For="@(() => fields.Block_7_9)" />
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Highest Education Level -->
-                        <div class="col-sm-12" hidden="@(fields.is_household == 1)">
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">6</span>Highest education level attained among the household members (entry in code) – (for urban only) code 2 in item 5 of Block 1)</label>
-                                <InputSelect class="form-select"
-                                                @bind-Value="fields.Block_7_6" Disabled="@(sector == 1)">
-                                    <option value="">- Select -</option>
-                                    @if (Block_7_Constants.HighestEdu != null)
-                                    {
-                                        foreach (var item in Block_7_Constants.HighestEdu)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }
-                                </InputSelect>
-                                <ValidationMessage For="@(() => fields.Block_7_6)" />
-                            </div>
-                        </div>
-
-                        <!-- Household Type -->
-                        <div class="col-sm-12" hidden="@(fields.is_household == 1)">
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">7</span>Household Type (entry in code)</label>
-                                <InputSelect class="form-select" @bind-Value="fields.Block_7_7">
-                                    <option value="">- Select -</option>
-                                    @if (sector == 1 && Block_7_Constants.HHDTypeRural != null)
-                                    {
-                                        foreach (var item in Block_7_Constants.HHDTypeRural)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }
-                                    else if (sector == 2 && Block_7_Constants.HHDTypeUrban != null)
-                                    {
-                                        foreach (var item in Block_7_Constants.HHDTypeUrban)
-                                        {
-                                            <option value="@item.id">@item.title</option>
-                                        }
-                                    }
-                                </InputSelect>
-                                <ValidationMessage For="@(() => fields.Block_7_7)" />
-                            </div>
-                        </div>
-
-                        <!-- Total Land Owned -->
-                        <div class="col-sm-12" hidden="@(fields.is_household == 1)">
-                            <div class="mb-3">
-                                <label class="form-label"><span class="form-badge">8</span>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</label>
-                                <InputNumber class="form-control no-spinner"
-                                                @bind-Value="fields.Block_7_8"
-                                                step="any"
-                                                Disabled="@(sector == 2)"
-                                                onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(event.target.value + event.key)" />
-                                <ValidationMessage For="@(() => fields.Block_7_8)" />
-                            </div>
-                        </div>
-
-                        <!-- Monthly Expenditure -->
-                        <div class="col-sm-12" hidden="@(fields.is_household == 1)">
-                            <div>
-                                <label class="form-label"><span class="form-badge">9</span>usual monthly consumption expenditure of the household (in Rs.)</label>
-                                <input class="form-control no-spinner"
-                                                type="number"
-                                                step="1"
-                                                value="@fields.Block_7_9"
-                                       @oninput="OnMonthlyExpInputText" />
-                                <ValidationMessage For="@(() => fields.Block_7_9)" />
-                            </div>
-                        </div>
-                    </div>
-
-                    @* <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-outline-primary"
-                                @onclick="@(() => HandleModal("CLOSE"))">
-                            Close
-                        </button>
-                    </div> *@
+                        @* <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-outline-primary"
+                                    @onclick="@(() => HandleModal("CLOSE"))">
+                                Close
+                            </button>
+                        </div> *@
+                    </fieldset>
                 </EditForm>
             }
         </BodyTemplate>

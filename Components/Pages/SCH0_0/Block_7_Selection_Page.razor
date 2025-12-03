@@ -43,11 +43,11 @@
                                 <i class="fi fi-rr-checkbox me-1"></i>Selection
                             </button>
 
-                            <button class="btn btn-outline-primary btn-sm" @onclick="@(() => ResetSelection())">
+                            <button class="btn btn-outline-primary btn-sm me-2" @onclick="@(() => ResetSelection())">
                                 <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection
                             </button>
 
-                            <button class="btn btn-outline-primary btn-sm" @onclick="@(() => DeleteAllHHDS())">
+                            <button class="btn btn-primary btn-sm" @onclick="@(() => DeleteAllHHDS())">
                                 <i class="fi fi-rr-rotate-left me-1"></i>Delete All Households
                             </button>
                         </div>
@@ -64,14 +64,14 @@
                             <tr>
                                 <th style="min-width:10px;">Srl.No.</th>
                                 <th style="min-width:50px;">House Number</th>
-                                <th style="min-width:100px;">Is the house used only for non-residential purposes?</th>
+                                <th style="min-width:150px;">Is the house used only for non-residential purposes?</th>
                                 <th style="min-width:50px;">Household Serial Number</th>
                                 <th style="min-width:100px;">Name of the head of the household</th>
                                 <th style="min-width:50px;">Household Size</th>
-                                <th style="min-width:100px;">Highest education level attained among the household members</th>
+                                <th style="min-width:150px;">Highest education level attained among the household members</th>
                                 <th style="min-width:50px;">Household Type</th>
-                                <th style="min-width:100px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
-                                <th style="min-width:100px;">Usual monthly consumption expenditure of the household (Rs.)</th>
+                                <th style="min-width:200px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
+                                <th style="min-width:150px;">Usual monthly consumption expenditure of the household (Rs.)</th>
                                 <th style="min-width:100px;">SSS number for Schedule HIS 2026</th>
                                 <th style="min-width:40px;">Selected</th>
                             </tr>
@@ -135,7 +135,9 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+                <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+                    <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+                </fieldset>
             </div>
         </div>
         <div class="row">
@@ -166,20 +168,23 @@
     </HeaderTemplate>
 
     <BodyTemplate>
-        <div class="mb-3">
-            <label>Sector: @sector</label>
-        </div>
-
-            @foreach (var sss in ValidSss)
-            {
-                <div class="input-group mb-2">
-                    <span class="input-group-text" style="width: 80px;">@sss</span>
-                    <input type="number"
-                           class="form-control"
-                           @bind="InputCounts[sss]"
-                           min="0" />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label class="form-label">Sector: @sector</label>
                 </div>
-            }
+                @foreach (var sss in ValidSss)
+                {
+                    <div class="input-group mb-2">
+                        <span class="input-group-text" style="width: 80px;">@sss</span>
+                        <input type="number"
+                                class="form-control"
+                                @bind="InputCounts[sss]"
+                                min="0" />
+                    </div>
+                }
+            </div>
+        </div>
     </BodyTemplate>
 
     <FooterTemplate>

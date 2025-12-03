@@ -21,7 +21,8 @@
             <span class="text-primary me-2"></span>
         </div>
         <div class="card-body">
-            <div class="card p-4 d-flex align-items-center">
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                <div class="card p-4 d-flex align-items-center">
                 @if(!string.IsNullOrEmpty(file.file_image_source))
                 {
                         <img src="@file.file_image_source" alt="sketch map" title="Sketch Map" height="400" />
@@ -40,6 +41,7 @@
             }
  
             </div>
+            </fieldset>
         </div>
     </div>
 </div>
@@ -49,7 +51,9 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+            </fieldset>
         </div>
     </div>
     <div class="row">

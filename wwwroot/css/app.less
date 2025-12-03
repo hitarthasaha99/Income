@@ -210,6 +210,9 @@ input[type="radio"] {
 .text-success{
   color:@successDarkColor !important;
 }
+.fs-13{
+  font-size: 13px;
+}
 .bg-primary{
   background-color: #267DFF !important;
 }
@@ -339,7 +342,15 @@ input[type="radio"] {
       background-color: @SiteDarkPrimary !important;
       border-color: @SiteDarkPrimary;
     }
-  }
+    &.disabled,&:disabled {
+        background-color: lighten(@SitePrimary, 25%);
+        border-color: lighten(@SitePrimary, 25%);
+        color: lighten(@baseColor, 60%);
+        cursor: not-allowed;
+        opacity: 0.65;
+        pointer-events: none;
+      }
+    }
   &.btn-outline-primary {
     background-color:@baseColor;
     border: 1px solid @SitePrimary;
@@ -620,7 +631,7 @@ input[type="radio"] {
   thead {
     tr {
       th {
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 600;
         color: #212121;
         border-bottom: 0;
@@ -631,7 +642,7 @@ input[type="radio"] {
   tbody {
     tr {
       td {
-        font-size: 14px;
+        font-size: 15px;
         color: @siteBlack;
         font-weight: 400 !important;
         i{
@@ -665,7 +676,7 @@ input[type="radio"] {
     thead {
       tr {
         th {
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 700;
           color: @baseColor;
           background-color: @background_color_2;
@@ -688,7 +699,7 @@ input[type="radio"] {
     tbody {
       tr {
         td {
-          font-size: 14px;
+          font-size: 15px;
           color: @siteBlack;
           font-weight: 400;
           background-color: #E9F1FF;
