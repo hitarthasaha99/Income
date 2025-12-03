@@ -133,11 +133,12 @@
                 }
                 else
                 {
+                    int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.Block_1_14.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
                     block_4.sample_su_number = 1;
                     block_4.approximate_population_su = block_0_1.Block_1_14;
-                    block_4.number_of_sub_division_of_su_to_be_formed = 1;
+                    block_4.number_of_sub_division_of_su_to_be_formed = subDivisions;
                     block_0_1.approximate_population_su = block_0_1.Block_1_14;
-                    block_0_1.number_of_sub_division_of_su_to_be_formed = 1;
+                    block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
                     block_0_1.sample_su_number = 1;
                 }
                 DisableEdit = block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
@@ -167,11 +168,12 @@
             }
             else
             {
+                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.Block_1_14.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
                 block_4.sample_su_number = 1;
                 block_4.approximate_population_su = block_0_1.Block_1_14;
-                block_4.number_of_sub_division_of_su_to_be_formed = 1;
+                block_4.number_of_sub_division_of_su_to_be_formed = subDivisions;
                 block_0_1.approximate_population_su = block_0_1.Block_1_14;
-                block_0_1.number_of_sub_division_of_su_to_be_formed = 1;
+                block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
                 block_0_1.sample_su_number = 1;
             }
         }
