@@ -1,4 +1,5 @@
 ﻿using Income.Database.Models.Common;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,11 @@ namespace Income.Common
 {
     public class CommonConfig
     {
+        private readonly AppConfig _appConfig;
+        public CommonConfig(IOptions<AppConfig> config)
+        {
+            _appConfig = config.Value;
+        }
         public SessionStorage sessionStorage { get; set; } = new();
         /// <summary>
         /// Required Fields 
@@ -32,22 +38,10 @@ namespace Income.Common
         }
         public List<Validation_Model> SCH_0_0_BLOCK_1_REQ_FIELDS { get; set; } = new();
 
-        public static readonly string APP_VERSION = "1.0.0";
-
-        //Test
-        //public static readonly string PostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/";
-        //public static readonly string CommonAPIPostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APICommon/api/SURVEY/";
-        //public static readonly string APIIncomeURL = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/";
-
-        //Staging
-        public static readonly string PostAddress = "http://115.124.119.108:83/ApiIncome/";
-        public static readonly string CommonAPIPostAddress = "http://115.124.119.108:83/ApiCommon/api/SURVEY/";
-        public static readonly string APIIncomeURL = "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/";
-
-        //PROD
-        //public static readonly string PostAddress = "https://esigma.mospi.gov.in/apIIncome/";
-        //public static readonly string CommonAPIPostAddress = "https://esigma.mospi.gov.in/apIcOMMON/";
-        //public static readonly string APIIncomeURL = "https://esigma.mospi.gov.in/apIIncome/api/SURVEY/v1/";
+        public string PostAddress => _appConfig.PostAddress;
+        public string CommonAPIPostAddress => _appConfig.CommonAPIPostAddress;
+        public string APIIncomeURL => _appConfig.APIIncomeURL;
+        public string AppVersion => _appConfig.AppVersion;
 
 
         /// <summary>
