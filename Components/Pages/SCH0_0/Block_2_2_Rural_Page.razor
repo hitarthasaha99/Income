@@ -97,7 +97,9 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+            </fieldset>
         </div>
     </div>
     <div class="row">
