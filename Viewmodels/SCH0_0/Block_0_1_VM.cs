@@ -186,15 +186,7 @@ namespace Income.Viewmodels.SCH0_0
 
                 var identificationData = new Tbl_Sch_0_0_Block_0_1();
                 identificationData = block_0_1;
-                if (_isAdd)
-                {
-                    block_0_1.id = Guid.NewGuid();
-                    await SCH_0_0_Queries.SaveBlock1(block_0_1);
-                }
-                else
-                {
-                    await SCH_0_0_Queries.SaveBlock1(block_0_1);
-                }
+                await SCH_0_0_Queries.SaveBlock1(block_0_1);
                 return true;
 
             }

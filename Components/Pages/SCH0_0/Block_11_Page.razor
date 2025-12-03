@@ -184,17 +184,13 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex justify-content-end">
-                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.FSU_Submitted)
                 {
                     <Button class="btn btn-success is_sso action me-2" @onclick="@(() => SubmitData())">Submit to SSO<i class="fi fi-rr-arrow-right ms-1"></i></Button>
                 }
-                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.FSU_Submitted)
                 {
-                    <Button class="btn btn-outline-primary is_sso action me-2" hidden @onclick="@(() => SubmitData())"><i class="fi fi-rr-memo-circle-check me-1"></i>Submit to SSO</Button>
-                }
-                @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
-                {
-                    <Button hidden="@SessionStorage.FSU_Submitted" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
+                    <Button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Exit<i class="fi fi-rr-cross-circle ms-1"></i></NavLink>
             </div>
@@ -340,16 +336,16 @@
             StatusMessage = string.Empty;
             if (surveyCode == 1 || surveyCode == 4)
             {
-                //(iii) surveycode = 1 or 4 -> time should be zero
-                if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
-                {
-                    StatusMessage = "H000: Time taken cannot be blank or zero";
-                    StatusClass = "text-danger";
-                }
+                // //(iii) surveycode = 1 or 4 -> time should be zero
+                // if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
+                // {
+                //     StatusMessage = "H000: Time taken cannot be blank or zero";
+                //     StatusClass = "text-danger";
+                // }
                 //(vi) surveycode = 1 or 4 -> time should be between 5 and 60
-                else if (tbl_Sch_0_0_FieldOperation.time_taken < 5 || tbl_Sch_0_0_FieldOperation.time_taken > 60)
+                if (tbl_Sch_0_0_FieldOperation.time_taken < 5 || tbl_Sch_0_0_FieldOperation.time_taken > 60)
                 {
-                    StatusMessage = "H000: Time taken must be between 5 and 60 hours";
+                    StatusMessage = "H011 (v): Time taken must be between 5 and 60 hours";
                     StatusClass = "text-danger";
                 }
             }
@@ -368,16 +364,16 @@
             StatusMessage = string.Empty;
             int value = tbl_Sch_0_0_FieldOperation.time_taken.GetValueOrDefault();
             //Warning - if time < 5
-            if ((surveyCode == 1 || surveyCode == 4) && value < 5)
-            {
-                StatusClass = "text-success";
-                StatusMessage = "W000: Time taken should be > 5 hours";
-            }
+            // if ((surveyCode == 1 || surveyCode == 4) && value < 5)
+            // {
+            //     StatusClass = "text-success";
+            //     StatusMessage = "W000: Time taken should be > 5 hours";
+            // }
             //For zero case - time should be < 5
-            else if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
+            if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
             {
                 StatusClass = "text-success";
-                StatusMessage = "W000: Time taken should be < 5 hours";
+                StatusMessage = "W011(vi): Time taken should be < 5 hours";
             }
             return !string.IsNullOrEmpty(StatusMessage);
         }
@@ -441,10 +437,17 @@
         }
     }
 
+    bool isBusy = false;
+
     private async Task SubmitData()
     {
         try
         {
+            if(isBusy)
+            {
+                return;
+            }
+            isBusy = true;
             int lookup_submit_status = 0;
             int lookup_sub_submit_status = 0;
             var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
@@ -461,6 +464,12 @@
             if (warnings.Any(x => x.warning_status == 1))
             {
                 toastService.ShowError("Warnings need to be resolved before submission");
+                return;
+            }
+            var sch00block2 = await DBQueries.FetchBlock2();
+            if (sch00block2 == null)
+            {
+                toastService.ShowError("Please save before proceeding");
                 return;
             }
             Submission_Model data = new();
@@ -515,7 +524,8 @@
             {
                 toastService.ShowSuccess("Data submitted successfully");
                 SessionStorage.FSU_Submitted = true;
-
+                fsu.lookupFsuSubmitStatus = 80;
+                await commonQueries.UpdateFSU(fsu);
                 StateHasChanged();
             }
             else
@@ -526,6 +536,10 @@
         catch (Exception ex)
         {
             await Logger.LogError(ex.Message);
+        }
+        finally
+        {
+            isBusy = false;
         }
     }
 

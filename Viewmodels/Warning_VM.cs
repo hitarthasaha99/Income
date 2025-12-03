@@ -204,6 +204,12 @@ namespace Income.Viewmodels
                     }
                     else
                     {
+                        int child_srl = 1;
+                        var childComments = await dQ.GetChildCommentsAsync(warning.id);
+                        if (childComments != null && childComments.Count > 0)
+                        {
+                            child_srl = childComments.Max(x => x.serial_number.GetValueOrDefault()) + 1;
+                        }
 
                         // Update parent warning
                         warning.warning_status =
@@ -225,6 +231,10 @@ namespace Income.Viewmodels
                             tbl_Warning.hhd_id = warning.hhd_id;
                            tbl_Warning.role_code = SessionStorage.user_role;
                            tbl_Warning.user_name = SessionStorage.full_name;
+                        if(tbl_Warning.serial_number.GetValueOrDefault() == 0)
+                        {
+                            tbl_Warning.serial_number = child_srl;
+                        }
                         List.Add(tbl_Warning);
                         
                         result = await dQ.UpsertWarningAsync(List);

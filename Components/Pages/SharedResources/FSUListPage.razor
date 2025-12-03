@@ -230,9 +230,10 @@
             {
                 SessionStorage.hamlet_selection_done = subUnitData.Any(x => x.IsChecked);
             }
+            var sch00block1 = await dB.FetchBlock1();
+
             if (block_name == "sch0.0")
             {
-                var data = await dB.FetchBlock1();
                 if (SessionStorage.user_role == CommonConstants.USER_CODE_JSO || SessionStorage.user_role == CommonConstants.USER_CODE_JSO2)
                 {
                     // if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
@@ -243,7 +244,7 @@
                 }
                 else
                 {
-                    if (data == null)
+                    if (sch00block1 == null)
                     {
                         toastService.ShowError("Data for FSU was not found. Please download first.");
                         return;
@@ -265,11 +266,19 @@
                 SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
                 SessionStorage.selection_done = await FSU_Selection_Done(fsu_id);
                 SessionStorage.hamlet_selection_done = SessionStorage.selection_done ? true : await CheckHamletSelection(fsu_id);
-                SessionStorage.FSU_Submitted = SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
+                SessionStorage.FSU_Submitted = FsuData?.FirstOrDefault().lookupFsuSubmitStatus is not (0 or 11);
                 SessionStorage.selected_hhd_seq = 0;
                 SessionStorage.selected_hhd_id = 0;
                 string page_name = block_name == "sch0.0" ? "block0_1" : "ssu_page";
-                NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
+                if(sch00block1 == null && SessionStorage.FSU_Submitted)
+                {
+                    toastService.ShowError("Data for FSU was already submitted. Please download first.");
+                    return;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo($"/dashboard/{block_name}/{page_name}");
+                }
             }
             else
             {
