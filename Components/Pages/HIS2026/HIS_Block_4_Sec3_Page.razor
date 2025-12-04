@@ -272,7 +272,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                    <textarea type="text" class="form-control is_sso" disabled="@(SessionStorage.FSU_Submitted))" placeholder="" cols="4"></textarea>
+                    <textarea type="text" class="form-control is_sso" disabled="@(SessionStorage.FSU_Submitted))" placeholder="" cols="4" @bind="block_1.block_4_remark"></textarea>
             </div>
         </div>
         <div class="row">
@@ -368,6 +368,7 @@
     Tbl_Sch_0_0_Block_7? hhd;
     List<Tbl_Block_3> block_3_list = [];
     Tbl_Block_4? block_4;
+    private Tbl_Block_1? block_1 = new();
     List<Tbl_Block_4_Q5> block_4_nic_list = [];
     DBQueries dQ = new();
 
@@ -442,6 +443,7 @@
 
         }
         block_4_nic_list = await dQ.Fetch_SCH_HIS_Block4_NICList();
+        block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         StateHasChanged();
     }
 
@@ -774,6 +776,10 @@
             if (result.IsValid)
             {
                 int save = await dQ.Save_SCH_HIS_Block4(block_4);
+                if (block_1 != null)
+                {
+                    await dQ.SaveAsync<Tbl_Block_1>(block_1);
+                }
                 if (save > 0)
                 {
                     toastService.ShowSuccess("Data succesfully saved");

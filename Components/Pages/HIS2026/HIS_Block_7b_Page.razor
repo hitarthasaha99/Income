@@ -447,7 +447,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" rows="2"></textarea>
+            <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="4"></textarea>
         </div>
     </div>
 
@@ -469,6 +469,7 @@
 
     private Tbl_Block_4? block_4 = null;
     private Tbl_Block_7b? block_7B = new();
+    private Tbl_Block_1? block_1 = new();
     EditContext editContext;
     ValidationMessageStore messageStore;
     int Q7_1_Sum = 0;
@@ -488,6 +489,7 @@
     protected override async Task OnInitializedAsync()
     {
         block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
 
         codeListEntryNeeded = block_4 != null && (block_4.item_4_3.GetValueOrDefault() ||
                                 block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault());
@@ -635,6 +637,10 @@
             if (!is_go_next)
             {
                 return;
+            }
+            if (block_1 != null)
+            {
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
             else
             {

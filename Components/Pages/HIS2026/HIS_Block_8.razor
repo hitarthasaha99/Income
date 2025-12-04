@@ -100,21 +100,11 @@
 
                                 </tbody>
                     
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer">
-                @* Remarks Card *@
-                <div class="card custom-card">
-                    <div class="card-header">
-                        <h5 class="card-title m-0">
-                            Remarks
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <textarea class="form-control" @bind="remarks" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                    </table>
+
+                    <div class="mb-3 px-2">
+                        <label for="remarksTextarea" class="form-label">Remarks</label>
+                        <textarea class="form-control" @bind="block_1.block_8a_remark" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
                     </div>
                 </div>
                 <div class="row">
@@ -150,6 +140,8 @@
     private DBQueries dB = new();
     DateTime survey_time = DateTime.Now;
     private Tbl_Block_8? model;
+    private Tbl_Block_1? block_1 = new();
+
     EditContext editContext;
     ValidationMessageStore messageStore;
     private string? remarks = string.Empty;
@@ -179,6 +171,7 @@
         {
             await loggingService.LogError("HIS Block 8 OnInitializedAsync", ex);
         }
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
     }
 
     private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
@@ -252,10 +245,12 @@
             {
                 return;
             }
-            else
+            if (block_1 != null)
             {
-                NavigationManager.NavigateTo("/dashboard/his/block_8b");
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
+                          NavigationManager.NavigateTo("/dashboard/his/block_8b");
+         
         }
         catch (Exception ex)
         {

@@ -94,7 +94,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="@remarks" rows="2"></textarea>
+            <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" @bind="block_1.block_6_remark" rows="2"></textarea>
         </div>
     </div>
     <div class="row">
@@ -229,6 +229,7 @@
     Modal AddModal = default!;
     private List<Tbl_Block_3> block3Members = new();
     private List<Tbl_Block_6> block6Members = new();
+    private Tbl_Block_1? block_1 = new();
     private Tbl_Block_6 newMember = new();
     bool isAdd = false;
     bool error = false;
@@ -249,6 +250,7 @@
 
         await commonQueries.InsertVisitedBlock(vb);
         block3Members = await dbq.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        block_1 = await dbq.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         var applicableMembers = block3Members?.Where(x => x.item_8 == 5 || x.item_9 == 5).ToList();
 
         await LoadData();
@@ -491,21 +493,24 @@
 
     }
 
-    void Next()
+   async void Next()
     {
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             NavigationManager.NavigateTo("dashboard/his/block_7a");
             return;
         }
-        else
+        if (block_1 != null)
         {
+            await dbq.SaveAsync<Tbl_Block_1>(block_1);
+        }
+      
             if (block6Members.Any(x => !x.isUpdated))
             {
                 toastService.ShowError("Please save/update details for all entries before proceeding");
                 return;
             }
             NavigationManager.NavigateTo("/dashboard/his/block_7a");
-        }
+
     }
 }

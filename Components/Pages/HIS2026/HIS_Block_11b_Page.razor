@@ -63,33 +63,19 @@
                         }
                     </tbody>
                 </table>
+                <div class="mb-3 px-2">
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<div class="footer">
-    @* Remarks Card *@
-    <div class="card custom-card">
-        <div class="card-header">
-            <h5 class="card-title">
-                Remarks
-            </h5>
-        </div>
-        <div class="card-body">
-            <textarea class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here"></textarea>
+        @* Remarks Section *@
+        <div class="mb-3 px-2">
+            <label for="remarksTextarea" class="form-label">Remarks</label>
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind=block_1.block_11b_remark></textarea>
         </div>
     </div>
-    @* Remarks Card
-    <div class="card custom-card">
-        <div class="card-header">
-            <h5 class="card-title">
-                Remarks
-            </h5>
-        </div>
-        <div class="card-body">
-            <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
-        </div>
-    </div> *@
+
     <div class="row">
         <div class="col-sm-6">
             <button class="btn btn-outline-primary"><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
@@ -172,6 +158,8 @@
     DateTime survey_time = DateTime.Now;
     //Create Object Tbl_Block_11b
     private Tbl_Block_11b table11B = new();
+    private Tbl_Block_1? block_1 = new();
+
     //Store Data Using List
     Modal AddModal = default!;
     private List<Tbl_Block_11b> showDataTable11B = new();
@@ -203,6 +191,7 @@
 
         // Insert the visited block record asynchronously
         await commonQueries.InsertVisitedBlock(vb);
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
 
         await SyncBlock11b();
         await LoadData();
@@ -327,6 +316,12 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_A");
                 return;
             }
+            if (block_1 != null)
+            {
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
+            }
+            NavigationManager.NavigateTo("/dashboard/his/block_A");
+
 
             if (is_go_next)
             {
@@ -374,6 +369,7 @@
             {
                 toastService.ShowError("Failed to update details. Please try again.");
             }
+
 
             if (is_go_next)
             {

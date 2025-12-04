@@ -105,7 +105,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" rows="3"></textarea>
+            <textarea maxlength="500" class="form-control w-100" rows="4" @bind = "block_1.block_7d_remark"></textarea>
         </div>
     </div>
 
@@ -131,6 +131,8 @@
     Tbl_Block_4? block_4;
     List<Tbl_Block_7c_NIC> NICFields = new();
     List<Tbl_Block_7d> Block7DList = new();
+    private Tbl_Block_1 block_1 = new();
+
     EditContext? editContext;
     string remarks = string.Empty;
     DBQueries dQ = new();
@@ -160,6 +162,8 @@
             editContext.OnValidationRequested += (_, __) => messageStore.Clear();
             // After completing load and sync, trigger one render.
             await InvokeAsync(StateHasChanged);
+            block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+
         }
     }
 
@@ -516,6 +520,10 @@
             {
                 Next();
             }
+            if (block_1 != null)
+            {
+                await dQ.SaveAsync<Tbl_Block_1>(block_1);
+            }
         }
         catch (Exception ex)
         {
@@ -528,7 +536,7 @@
         }
     }
 
-    private void Next()
+    void Next()
     {
         NavigationManager.NavigateTo("/dashboard/his/block_8a");
     }
