@@ -59,7 +59,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
-                <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="" rows="2"></textarea>
+                <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="" rows="2"></textarea>
             </fieldset>
         </div>
     </div>
@@ -133,14 +133,15 @@
                 }
                 else
                 {
+                    int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.Block_1_14.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
                     block_4.sample_su_number = 1;
                     block_4.approximate_population_su = block_0_1.Block_1_14;
-                    block_4.number_of_sub_division_of_su_to_be_formed = 1;
+                    block_4.number_of_sub_division_of_su_to_be_formed = subDivisions;
                     block_0_1.approximate_population_su = block_0_1.Block_1_14;
-                    block_0_1.number_of_sub_division_of_su_to_be_formed = 1;
+                    block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
                     block_0_1.sample_su_number = 1;
                 }
-                DisableEdit = block_0_1.Block_1_15 <= 1 && SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
+                DisableEdit = block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             }
         }
         else
@@ -153,6 +154,28 @@
             {
                 DisableEdit = block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             }
+
+            if (selected_su != null)
+            {
+                block_4.sample_su_number = selected_su?.serial_number;
+                var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
+                block_4.approximate_population_su = (int)calc;
+                block_0_1.approximate_population_su = (int)calc;
+                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+                block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
+                block_0_1.number_of_sub_division_of_su_to_be_formed = block_4.number_of_sub_division_of_su_to_be_formed;
+                block_0_1.sample_su_number = selected_su?.serial_number;
+            }
+            else
+            {
+                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.Block_1_14.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+                block_4.sample_su_number = 1;
+                block_4.approximate_population_su = block_0_1.Block_1_14;
+                block_4.number_of_sub_division_of_su_to_be_formed = subDivisions;
+                block_0_1.approximate_population_su = block_0_1.Block_1_14;
+                block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
+                block_0_1.sample_su_number = 1;
+            }
         }
 
         remarks = block_0_1?.remarks_block_4;
@@ -160,6 +183,30 @@
 
         StateHasChanged();
         return;
+    }
+
+    void AssignOrUpdateData()
+    {
+        // if (selected_su != null)
+        // {
+        //     block_4.sample_su_number = selected_su?.serial_number;
+        //     var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
+        //     block_4.approximate_population_su = (int)calc;
+        //     block_0_1.approximate_population_su = (int)calc;
+        //     int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+        //     block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
+        //     block_0_1.number_of_sub_division_of_su_to_be_formed = block_4.number_of_sub_division_of_su_to_be_formed;
+        //     block_0_1.sample_su_number = selected_su?.serial_number;
+        // }
+        // else
+        // {
+        //     block_4.sample_su_number = 1;
+        //     block_4.approximate_population_su = block_0_1.Block_1_14;
+        //     block_4.number_of_sub_division_of_su_to_be_formed = 1;
+        //     block_0_1.approximate_population_su = block_0_1.Block_1_14;
+        //     block_0_1.number_of_sub_division_of_su_to_be_formed = 1;
+        //     block_0_1.sample_su_number = 1;
+        // }
     }
 
     void HandleChange(ChangeEventArgs eventArgs)

@@ -337,6 +337,47 @@
         }
     }
 
+    void CheckWarning()
+    {
+        try
+        {
+            // Your existing logic
+            int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
+            int framePop = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
+            int value = block_0_1_VM.block_0_1.Block_1_14.GetValueOrDefault();
+            if (sector == 1)
+            {
+                if (framePop > 0)
+                {
+                    double change = ((double)(value - framePop) / framePop) * 100;
+                    if (Math.Abs(change) >= 20)
+                    {
+                        IsBlock_1_14_ErrorMessageVisible = true;
+                        Block_1_14_ErrorMessage =
+                            "W006: Wide variation in approximate population and frame population";
+                    }
+                }
+            }
+            else if (sector == 2)
+            {
+                int maxValue = (int)(framePop * 4 * 1.2);
+                int minValue = (int)(framePop * 4 * 0.80);
+
+                if (value < minValue || value > maxValue)
+                {
+                    IsBlock_1_14_ErrorMessageVisible = true;
+                    Block_1_14_ErrorMessage =
+                        "W006: Wide variation in approximate population and frame population";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
+
 
     async void GoBack()
     {
@@ -349,6 +390,10 @@
         //NavigationManager.LocationChanged += Nav_LocationChanged;
         block_0_1_VM.NotifyUiUpdate += StateHasChanged;
         await block_0_1_VM.Init();
+        if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_14.HasValue)
+        {
+            CheckWarning();
+        }
         editContext = new EditContext(block_0_1_VM.block_0_1);
     }
 

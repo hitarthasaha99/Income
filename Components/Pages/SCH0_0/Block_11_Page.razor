@@ -309,16 +309,16 @@
         {
             tbl_Sch_0_0_FieldOperation.time_taken = value;
             //Warning - if time < 5
-            if ((surveyCode == 1 || surveyCode == 4) && value < 5)
-            {
-                StatusClass = "text-success";
-                StatusMessage = "W000: Time taken should be > 5 hours";
-            }
+            // if ((surveyCode == 1 || surveyCode == 4) && value < 5)
+            // {
+            //     StatusClass = "text-success";
+            //     StatusMessage = "W000: Time taken should be > 5 hours";
+            // }
             //For zero case - time should be < 5
-            else if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
+            if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
             {
                 StatusClass = "text-success";
-                StatusMessage = "W000: Time taken should be < 5 hours";
+                StatusMessage = "W011(vi): Time taken should be < 5 hours";
             }
         }
         else
