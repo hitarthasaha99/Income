@@ -43,6 +43,8 @@
                             <th class="text-center" colspan="1">Last 365 days</th>
                             <th class="text-center" colspan="3">Last month</th>
                             <th class="text-center" colspan="6">Last 365 days</th>
+                            <th style="min-width:200px;" rowspan="2">Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)</th>
+                            <th style="min-width:50px;" rowspan="2">Action</th>
                         </tr>
                         <tr>
                             <th style="min-width:150px;">Number of months worked</th>
@@ -55,7 +57,6 @@
                             <th style="min-width:200px;">leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.</th>
                             <th style="min-width:200px;">severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.</th>
                             <th style="min-width:200px;">others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc.</th>
-                            <th style="min-width:200px;">Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)</th>
                         </tr>
                         <tr>
                             <th></th>
@@ -167,6 +168,7 @@
                             <ValidationMessage For="@(() => newMember.item_1)" />
                         </div>
                     </div>
+
                     <div class="col-sm-12">
                        <div class="mb-3">
                             <label class="form-label">
@@ -185,15 +187,16 @@
                                             }">
                             </InputNumber>
                             <ValidationMessage For="@(() => newMember.item_2)" />
-                        </div>
+                       </div>
                     </div>
+
                     <div class="col-sm-12">
                       <div class="mb-3">
                           <label class="form-label">
                                   @* //Q5.3(i) *@
-                                <span class="form-badge">Q5.3(i)</span> allowances received (including overtime allowance, shift allowance, project allowance) (Last month)
+                                <span class="form-badge">Q5.3(i)</span> Allowances received (including overtime allowance, shift allowance, project allowance) (Last month)
                           </label>
-                        <InputNumber @bind-Value="newMember.item_3_i"
+                          <InputNumber @bind-Value="newMember.item_3_i"
                                         class="form-control no-spinner"
                                         autocomplete="off"
                                         onkeypress="return event.key >= '0' && event.key <= '9'"
@@ -205,11 +208,12 @@
                                                                                             //newMember.item_3_i = string.IsNullOrWhiteSpace(e.Value?.ToString()) ? (int?)null : int.TryParse(e.Value?.ToString(), out var v) ? v : (int?)null;
                                         handleCalculateIncome();
                                                                                 }">
-                        </InputNumber>
+                          </InputNumber>
                         <ValidationMessage For="@(() => newMember.item_3_i)" />
                         @* <input type="number" class="form-control no-spinner form-control-sm" value="@newMember.item_4" @oninput="e => { newMember.item_4 = int.TryParse(e.Value?.ToString(), out var v) ? v : 0; handleCalculateIncome(); }" /> *@
                         </div>
                     </div>
+
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
@@ -310,7 +314,7 @@
                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
-                                <span class="form-badge">Q5.6 </span> leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.(Last 365 days)
+                                <span class="form-badge">Q5.6 </span> Leave encashments; remuneration for time not worked such as for annual leave, holidays or other paid leave, Leave Fare Concession etc.(Last 365 days)
                             </label>
                             <InputNumber @bind-Value="newMember.item_6"
                                          class="form-control no-spinner"
@@ -334,7 +338,7 @@
                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
-                                <span class="form-badge">Q5.7 </span> severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.(Last 365 days)
+                                <span class="form-badge">Q5.7 </span> Severance and termination pay, termination benefits including social security benefits like maturity benefits of CGEGIS etc.(Last 365 days)
                             </label>
                             <InputNumber @bind-Value="newMember.item_7"
                                          class="form-control no-spinner"
