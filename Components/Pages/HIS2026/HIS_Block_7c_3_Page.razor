@@ -92,7 +92,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" rows="3" @bind="@remarks"></textarea>
+            <textarea maxlength="500" class="form-control w-100" rows="4" @bind="block_1.block_7c_remark"></textarea>
         </div>
     </div>
 
@@ -122,6 +122,7 @@
     EditContext editContext;
     ValidationMessageStore messageStore;
     DBQueries dB = new();
+    private Tbl_Block_1 block_1 = new();
     bool isAdd;
     DateTime survey_date = DateTime.Now;
     string remarks = string.Empty;
@@ -137,6 +138,8 @@
     {
         await LoadData();
         NICBlock7 = await dB.Fetch_SCH_HIS_Block7_NICList();
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+
         Q10 = await dB.Fetch_SCH_HIS_Block7_Q10_List();
         NICSUM = NICBlock7.Sum(x => x.GrossValue).GetValueOrDefault();
         ActivitySum = Q10.Sum(x => x.item_10_11).GetValueOrDefault();
@@ -258,10 +261,13 @@
             {
                 return;
             }
-            else
+            if (block_1 != null)
             {
-                NavigationManager.NavigateTo("/dashboard/his/block_7d");
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
+           
+                NavigationManager.NavigateTo("/dashboard/his/block_7d");
+         
         }
         catch (Exception ex)
         {

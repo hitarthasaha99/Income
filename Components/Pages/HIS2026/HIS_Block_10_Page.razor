@@ -501,6 +501,7 @@
     EditContext editContext;
     ValidationMessageStore messageStore;
     DBQueries dQ = new DBQueries();
+    private Tbl_Block_1? block_1 = new();
 
     protected async override Task OnInitializedAsync()
     {
@@ -522,6 +523,8 @@
         {
             await loggingService.LogError("HIS_Block_10_Page_OnInitializedAsync", ex);
         }
+        block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+
         StateHasChanged();
     }
 
@@ -590,10 +593,12 @@
             {
                 return;
             }
-            else
+            if (block_1 != null)
             {
-                NavigationManager.NavigateTo("/dashboard/his/block_11a");
+                await dQ.SaveAsync<Tbl_Block_1>(block_1);
             }
+                NavigationManager.NavigateTo("/dashboard/his/block_11a");
+            
         }
         catch (Exception ex)
         {

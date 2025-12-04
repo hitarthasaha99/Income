@@ -122,57 +122,43 @@
 
                                             <ValidationMessage For="@(() => selectBlock11A.item_4)" />
                                     </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label class="form-label mb-0">
-                                            <span class="form-badge">Q11.5</span>
-                                        </label> 
-                                    </td>
-                                    <td>
-                                        If code 1 in 11.3,<br />
-                                        Total amount (in Rs.) transferred during the last 365 days
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled="@(!isQ11_4_5Enable)"
-                                        value="@selectBlock11A.item_5"
-                                         @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_5, e)"
-                                        />
-                                         <ValidationMessage For="@(() => selectBlock11A.item_5)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label class="form-label mb-0">
-                                            <span class="form-badge">Q11.6</span>
-                                        </label> 
-                                    </td>
-                                    <td>Total amount (in Rs.) of regular transfer made to Non-profit organization(s) for charitable purposes during the last 365 days </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                        value="@selectBlock11A.item_6"
-                                        @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_6, e)"
-                                        />
-                                        <ValidationMessage For="@(() => selectBlock11A.item_6)" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            </tr>
+                            <tr>
+                                <td>Q11.5</td>
+                                <td>
+                                    If code 1 in 11.3,<br />
+                                    Total amount (in Rs.) transferred during the last 365 days
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled="@(!isQ11_4_5Enable)"
+                                    value="@selectBlock11A.item_5"
+                                     @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_5, e)"
+                                    />
+                                     <ValidationMessage For="@(() => selectBlock11A.item_5)" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Q11.6</td>
+                                <td>Total amount (in Rs.) of regular transfer made to Non-profit organization(s) for charitable purposes during the last 365 days </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                    value="@selectBlock11A.item_6"
+                                    @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_6, e)"
+                                    />
+                                    <ValidationMessage For="@(() => selectBlock11A.item_6)" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mb-3 px-2">
+                        <label for="remarksTextarea" class="form-label">Remarks</label>
+                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_11a_remark"></textarea>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="footer">
-             @* Remarks Card *@
-            <div class="card custom-card">
-                <div class="card-header">
-                    <h5 class="card-title">
-                        Remarks
-                    </h5>
                 </div>
                 <div class="card-body">
                     <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here"></textarea>
                 </div>
+            </div>
             </div>
             <div class="row">
                 <div class="col-sm-6">
@@ -208,6 +194,8 @@
     DateTime survey_time = DateTime.Now;
 
     private Tbl_Block_11a? selectBlock11A = new Tbl_Block_11a();
+        private Tbl_Block_1? block_1 = new();
+
     EditContext editContext;
     ValidationMessageStore messageStore;
     DBQueries dQ = new DBQueries();
@@ -230,6 +218,8 @@
             }
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
+                    block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+
             StateHasChanged();
 
         }
@@ -389,10 +379,13 @@
             {
                 return;
             }
-            else
-            {
+             if (block_1 != null)
+ {
+     await dQ.SaveAsync<Tbl_Block_1>(block_1);
+ }
+            
                 NavigationManager.NavigateTo("/dashboard/his/block_11b");
-            }
+            
         }
         catch (Exception ex)
         {
