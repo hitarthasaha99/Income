@@ -28,6 +28,14 @@
                     <h3 class="card-title">
                         <span class="text-primary me-1">Block 9:</span>Income from Asset
                     </h3>
+                    @* add comment *@
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+
+                        <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        </div>
+                    }
                 </div>
                 <div class="card-header">
                     <h3 class="card-title">
@@ -36,6 +44,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
+                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
                         <table class="table table-bordered align-middle text-center mb-0">
                             <thead>
@@ -126,6 +135,8 @@
                                   </tr>
                             </tbody>
                         </table>
+                        </fieldset>
+
                     </div>
                 </div>
             </div>
@@ -134,6 +145,8 @@
             <div class="card custom-card">
                 <div class="card-body p-0">
                     <div class="table-responsive">
+                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                         <table class="table table-bordered align-middle text-center mb-0">
                             <tbody>
                                 <tr>
@@ -194,6 +207,7 @@
                                   </tr>
                             </tbody>
                         </table>
+                        </fieldset>
                     </div>
                 </div>
             </div>
@@ -210,17 +224,24 @@
             </h5>
         </div>
         <div class="card-body">
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
             <textarea class="form-control w-100" rows="4" @bind="block_1.block_9a_remark"></textarea>
+            </fieldset>
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
+            <button class="btn btn-outline-primary" @onclick="GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    
                 <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => Save(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                }
                 <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
@@ -241,6 +262,10 @@
     string remarks = string.Empty;
     string item_9_1_warning = string.Empty;
 
+    async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+    }
     protected override async Task OnInitializedAsync()
     {
         block_9a = await dB.Fetch_SCH_HIS_Block9a(SessionStorage.selected_hhd_id);

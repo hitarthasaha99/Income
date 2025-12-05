@@ -17,14 +17,23 @@
 @inject IValidator<Tbl_Block_7a> Validator
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date"/>
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
 
     @if (editContext != null)
     {
         <EditForm EditContext="editContext">
-            <FluentValidationValidator/>
+            <FluentValidationValidator />
             <div class="card custom-card">
                 <div class="card-body p-0">
+                    @* add comment *@
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+
+                        <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        </div>
+                    }
+                    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center mb-0">
                             <thead>
@@ -43,7 +52,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-
                                 <tr>
                                     <td>1</td>
                                     <td>Seeds </td>
@@ -54,108 +62,108 @@
                                                    UpdateFieldAndValidate(() => block_7A.item_2_1, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_1)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Manures, chemicals, bio-fertilizers, plant protection materials (chemicals/bio-pesticides) </td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>2</td>
+                                      <td>Manures, chemicals, bio-fertilizers, plant protection materials (chemicals/bio-pesticides) </td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_2, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_2)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Feed and fodder</td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>3</td>
+                                      <td>Feed and fodder</td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_3, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_3)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Diesel, electricity and other fuel charges</td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>4</td>
+                                      <td>Diesel, electricity and other fuel charges</td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_4, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_4)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Irrigation / water charges</td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>5</td>
+                                      <td>Irrigation / water charges</td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_5, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_5)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>6</td>
-                                    <td>Cost of hiring, repair and maintenance of machinery and equipment used for crop production </td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>6</td>
+                                      <td>Cost of hiring, repair and maintenance of machinery and equipment used for crop production </td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_6, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_6)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>7</td>
-                                    <td>Labour cost (human and animal)</td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>7</td>
+                                      <td>Labour cost (human and animal)</td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_7, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_7)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>8</td>
-                                    <td>Lease rent for land used for crop production</td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>8</td>
+                                      <td>Lease rent for land used for crop production</td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_8, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_8)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>9</td>
-                                    <td>Interest paid on loans utilized for the purpose of crop production and cost of crop insurance / premium </td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>9</td>
+                                      <td>Interest paid on loans utilized for the purpose of crop production and cost of crop insurance / premium </td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_9, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_2_9)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>10</td>
-                                    <td>Transportation & packaging charges  </td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>10</td>
+                                      <td>Transportation & packaging charges  </td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_10" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
@@ -169,7 +177,7 @@
                                     <td>11</td>
                                     <td>Storage charges (includes cold storage charges)</td>
                                     <td>
-                                          <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_11" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_11" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_11, e);
@@ -182,7 +190,7 @@
                                     <td>12</td>
                                     <td>Others (include veterinary services etc.)</td>
                                     <td>
-                                          <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_12" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_12" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_2_12, e);
@@ -201,10 +209,12 @@
                             </tbody>
                         </table>
                     </div>
+                    </fieldset>
                 </div>
             </div>
 
             @* 7.3, 7.4 .... *@
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
             <div class="card custom-card">
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -222,9 +232,9 @@
                                                    UpdateFieldAndValidate(() => block_7A.item_3, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_3)" />
-                                    </td>
-                                </tr>
-                                  
+                                      </td>
+                                  </tr>
+
 
                                 <tr>
                                     <td>
@@ -238,31 +248,31 @@
                                                    UpdateFieldAndValidate(() => block_7A.item_4, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_4)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="badge bg-primary me-1">Q7.5</div>
-                                    </td>
-                                    <td>Imputed value of crops consumed by the household or bartered to other households out of total production during last 365 days (in whole no. of Rs.) </td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>
+                                          <div class="badge bg-primary me-1">Q7.5</div>
+                                      </td>
+                                      <td>Imputed value of crops consumed by the household or bartered to other households out of total production during last 365 days (in whole no. of Rs.) </td>
+                                      <td>
                                           <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7A.item_5, e);
                                                }" />
                                           <ValidationMessage For="@(() => block_7A.item_5)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="badge bg-primary me-1">Q7a.9</div>
-                                    </td>
-                                    <td>Gross Profit / Loss before tax realized by the establishment during last 365 days (in whole no. of Rs.) </td>
-                                    <td>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td>
+                                          <div class="badge bg-primary me-1">Q7a.9</div>
+                                      </td>
+                                      <td>Gross Profit / Loss before tax realized by the establishment during last 365 days (in whole no. of Rs.) </td>
+                                      <td>
                                           <input class="form-control form-control-sm no-spinner" value="@block_7A.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled />
                                           <ValidationMessage For="@(() => block_7A.item_6)" />
-                                          @if(!string.IsNullOrEmpty(item_6_warning))
+                                        @if (!string.IsNullOrEmpty(item_6_warning))
                                         {
                                             <div class="text-success mt-1 fw-bold">
                                                 @item_6_warning
@@ -275,11 +285,12 @@
                     </div>
                 </div>
             </div>
+            </fieldset>
         </EditForm>
-        
+
     }
     @* 7.2 *@
-    
+
 </div>
 <div class="footer">
     @* Remarks Card *@
@@ -289,19 +300,24 @@
                 Remarks
             </h5>
         </div>
-        <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" rows="4" @bind="block_1.block_7a_remark"></textarea>
-        </div>
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+            <div class="card-body">
+                <textarea maxlength="500" class="form-control w-100" rows="4" @bind="block_1.block_7a_remark"></textarea>
+            </div>
+        </fieldset>
     </div>
 
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-secondary"><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {         
                 <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => Save(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                }
                 <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
@@ -425,16 +441,16 @@
         }
         catch (Exception ex)
         {
-            
+
         }
-        
+
     }
 
     private async Task Save(bool is_go_next = false)
     {
         try
         {
-            if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
                 NavigationManager.NavigateTo("/dashboard/his/block_7b");
                 return;
@@ -473,7 +489,7 @@
                 }
             }
 
-            if(!is_go_next)
+            if (!is_go_next)
             {
                 return;
             }
@@ -488,7 +504,7 @@
         }
         catch (Exception ex)
         {
-            
+
         }
     }
 }

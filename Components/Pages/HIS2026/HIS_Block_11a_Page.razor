@@ -23,9 +23,19 @@
                     <h3 class="card-title">
                         <span class="text-primary me-1">Block 11a:</span>Particulars of transfers paid on regularly / periodic basis to non-household member
                     </h3>
+                     @* add comment *@
+ @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+ {
+
+     <div class="card-tools d-flex justify-content-end align-items-end p-2">
+         <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+     </div>
+ }
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
+                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                         <table class="table table-bordered table-striped mb-0">
                             <thead>
                                 <tr>
@@ -150,20 +160,27 @@
                             </tr>
                         </tbody>
                     </table>
+</fieldset>
                     <div class="mb-3 px-2">
                         <label for="remarksTextarea" class="form-label">Remarks</label>
+                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                         <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_11a_remark"></textarea>
+                        </fieldset>
                     </div>
                 </div>
                 <div class="card-body">
+                    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                     <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here"></textarea>
-                </div>
+                    </fieldset>
+                </div> 
             </div>
             <div class="row">
                 <div class="col-sm-6">
                     <div class="d-flex">
-                        <NavLink class="btn btn-outline-primary" href="/back">
-                            <i class="fi fi-rr-angle-left me-1"></i>Back
+                        <NavLink class="btn btn-outline-primary" @onclick="GoBack">
+                            <i class="fi fi-rr-angle-left me-1" ></i>Back
                         </NavLink>
                     </div>
                 </div>
@@ -184,6 +201,7 @@
                 </div>
             </div>
         </div>
+        </div>
     </EditForm>
 }
 
@@ -202,6 +220,11 @@
     private bool isQ11_2Enable = false;
     private bool isQ11_3Enable = false;
     private bool isQ11_4_5Enable = false;
+
+     async Task GoBack()
+ {
+     await JSRuntime.InvokeVoidAsync("__handleGoBack");
+ }
 
     protected async override Task OnInitializedAsync()
     {

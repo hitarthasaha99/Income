@@ -16,7 +16,6 @@
 @if (editContext != null)
 {
     <EditForm EditContext="editContext">
-        <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
             <div class="main-content">
                 <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
                 <div class="card custom-card">
@@ -24,9 +23,19 @@
                         <h3 class="card-title">
                             <span class="text-primary me-1">Block 10:</span>Expenditure details
                         </h3>
+                        @* add comment *@
+                        @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                        {
+
+                            <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                                <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                            </div>
+                        }
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
+                            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                             <table class="table table-bordered table-striped mb-0 align-middle">
                                 <thead>
                                     <tr>
@@ -39,7 +48,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="8"class="text-center">
+                                        <td colspan="8" class="text-center">
                                             <label class="fw-bold fs-6">Food items</label>
                                         </td>
                                     </tr>
@@ -47,15 +56,15 @@
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.1</span>
-                                            </label> 
+                                            </label>
                                         </td>
                                         <td>Vegetables including ginger, garlic & fruits (fresh)</td>
                                         <td>Last 7 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_1"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_1, e); handleCalculate(); }" />
+                                                   value="@model.item_1"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_1, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_1)" />
                                         </td>
@@ -72,9 +81,9 @@
                                         <td>Last 7 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_2"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_2, e); handleCalculate(); }" />
+                                                   value="@model.item_2"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_2, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_2)" />
                                         </td>
@@ -89,9 +98,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_3"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_3, e); handleCalculate(); }" />
+                                                   value="@model.item_3"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_3, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_3)" />
                                         </td>
@@ -106,9 +115,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_4"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_4, e); handleCalculate(); }" />
+                                                   value="@model.item_4"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_4, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_4)" />
                                         </td>
@@ -123,9 +132,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_5"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_5, e); handleCalculate(); }" />
+                                                   value="@model.item_5"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_5, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_5)" />
                                         </td>
@@ -145,9 +154,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_6"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_6, e); handleCalculate(); }" />
+                                                   value="@model.item_6"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_6, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_6)" />
                                         </td>
@@ -162,9 +171,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_7"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_7, e); handleCalculate(); }" />
+                                                   value="@model.item_7"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_7, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_7)" />
                                         </td>
@@ -179,9 +188,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_8"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_8, e); handleCalculate(); }" />
+                                                   value="@model.item_8"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_8, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_8)" />
                                         </td>
@@ -196,9 +205,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_9"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_9, e); handleCalculate(); }" />
+                                                   value="@model.item_9"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_9, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_9)" />
                                         </td>
@@ -213,9 +222,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_10"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_10, e); handleCalculate(); }" />
+                                                   value="@model.item_10"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_10, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_10)" />
                                         </td>
@@ -230,9 +239,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_11"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_11, e); handleCalculate(); }" />
+                                                   value="@model.item_11"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_11, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_11)" />
                                         </td>
@@ -247,9 +256,9 @@
                                         <td>Last 30 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_12"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_12, e); handleCalculate(); }" />
+                                                   value="@model.item_12"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_12, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_12)" />
                                         </td>
@@ -264,9 +273,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_13"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_13, e); handleCalculate(); }" />
+                                                   value="@model.item_13"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_13, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_13)" />
                                         </td>
@@ -281,9 +290,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_14"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_14, e); handleCalculate(); }" />
+                                                   value="@model.item_14"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_14, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_14)" />
                                         </td>
@@ -303,9 +312,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_15"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_15, e); handleCalculate(); }" />
+                                                   value="@model.item_15"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_15, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_15)" />
                                         </td>
@@ -320,9 +329,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_16"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_16, e); handleCalculate(); }" />
+                                                   value="@model.item_16"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_16, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_16)" />
                                         </td>
@@ -337,9 +346,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_17"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_17, e); handleCalculate(); }" />
+                                                   value="@model.item_17"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_17, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_17)" />
                                         </td>
@@ -354,9 +363,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_18"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_18, e); handleCalculate(); }" />
+                                                   value="@model.item_18"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_18, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_18)" />
                                         </td>
@@ -371,9 +380,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_19"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_19, e); handleCalculate(); }" />
+                                                   value="@model.item_19"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_19, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_19)" />
                                         </td>
@@ -388,9 +397,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_20"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_20, e); handleCalculate(); }" />
+                                                   value="@model.item_20"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_20, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_20)" />
                                         </td>
@@ -405,9 +414,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_21"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_21, e); handleCalculate(); }" />
+                                                   value="@model.item_21"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_21, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_21)" />
                                         </td>
@@ -422,9 +431,9 @@
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_22"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_22, e); handleCalculate(); }" />
+                                                   value="@model.item_22"
+                                                   onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e => { UpdateFieldAndValidate(() => model.item_22, e); handleCalculate(); }" />
 
                                             <ValidationMessage For="@(() => model.item_22)" />
                                         </td>
@@ -444,10 +453,14 @@
 
                                 </tbody>
                             </table>
+                            </fieldset>
 
                             <div class="mb-3 px-2">
                                 <label for="remarksTextarea" class="form-label">Remarks</label>
+                                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                                 <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_10_remark"></textarea>
+                                </fieldset>
                             </div>
                         </div>
                     </div>
@@ -455,7 +468,7 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="d-flex">
-                            <NavLink class="btn btn-outline-primary" href="/back">
+                            <NavLink class="btn btn-outline-primary" @onclick="GoBack">
                                 <i class="fi fi-rr-angle-left me-1"></i>Back
                             </NavLink>
                         </div>
@@ -477,11 +490,10 @@
                     </div>
                 </div>
             </div>
-        </fieldset>
-    </EditForm>
+      </EditForm>
 }
 
-   
+
 
 
 @code {
@@ -494,6 +506,10 @@
     ValidationMessageStore messageStore;
     DBQueries dQ = new DBQueries();
     private Tbl_Block_1? block_1 = new();
+    async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+    }
 
     protected async override Task OnInitializedAsync()
     {
@@ -589,14 +605,14 @@
             {
                 await dQ.SaveAsync<Tbl_Block_1>(block_1);
             }
-                NavigationManager.NavigateTo("/dashboard/his/block_11a");
-            
+            NavigationManager.NavigateTo("/dashboard/his/block_11a");
+
         }
         catch (Exception ex)
         {
             await loggingService.LogError("HIS_Block_10_Page_ValidateAndSave", ex);
         }
-        
+
     }
 
     private void handleCalculate()

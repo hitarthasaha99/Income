@@ -14,7 +14,6 @@
 @if (editContext != null)
 {
     <EditForm EditContext="editContext">
-        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
             <div class="main-content">
                 <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
                 <div class="card custom-card">
@@ -22,9 +21,19 @@
                         <h3 class="card-title">
                             <span class="text-primary me-1">Block 8:</span>Income from Transfer receipts
                         </h3>
+                    @* add comment *@
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+
+                        <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        </div>
+                    }
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
+                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                             <table class="table table-bordered table-striped mb-0">
                                 <thead>
                                     <tr>
@@ -101,23 +110,27 @@
                                 </tbody>
                     
                     </table>
+                            </fieldset>
 
                     <div class="mb-3 px-2">
                         <label for="remarksTextarea" class="form-label">Remarks</label>
+                            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                         <textarea class="form-control" @bind="block_1.block_8a_remark" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                        </fieldset>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="d-flex">
-                            <NavLink class="btn btn-outline-secondary" href="/back">
+                                <NavLink class="btn btn-outline-secondary" @onclick="GoBack">
                                 <i class="fi fi-rr-angle-left me-1"></i>Back
                             </NavLink>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center justify-content-end">
-                            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                             {
                                 <button @onclick="() => ValidateAndSave(false)" class="btn btn-outline-primary me-2 is_sso action">
                                     <i class="fi fi-rr-disk me-1"></i>Save
@@ -130,7 +143,9 @@
                     </div>
                 </div>
             </div>
-        </fieldset>
+            </div>
+            </div>
+
     </EditForm>    
 } 
 
@@ -146,6 +161,10 @@
     ValidationMessageStore messageStore;
     private string? remarks = string.Empty;
 
+    async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+    }
 
     protected override async Task OnInitializedAsync()
     {
