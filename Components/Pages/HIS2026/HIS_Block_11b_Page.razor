@@ -35,12 +35,14 @@
                             <th>
                                 Amount of direct tax paid (net of refunds) in last financial year (in Rs.)
                             </th>
+                            <th>Action</th>
                         </tr>
                         <tr>
                             <th>(1)</th>
                             <th>(2)</th>
                             <th>(3)</th>
                             <th>(4)</th>
+                            <th>(5)</th>
                         </tr>
                     </thead>
 
@@ -63,19 +65,33 @@
                         }
                     </tbody>
                 </table>
-                <div class="mb-3 px-2">
-                    <label for="remarksTextarea" class="form-label">Remarks</label>
-                    <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
-                </div>
             </div>
         </div>
-        @* Remarks Section *@
-        <div class="mb-3 px-2">
-            <label for="remarksTextarea" class="form-label">Remarks</label>
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind=block_1.block_11b_remark></textarea>
+    </div>
+</div>
+<div class="footer">
+    @* Remarks Card *@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h5 class="card-title">
+                Remarks
+            </h5>
+        </div>
+        <div class="card-body">
+                <textarea class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here" @bind=block_1.block_11b_remark></textarea>
         </div>
     </div>
-
+    @* Remarks Card
+    <div class="card custom-card">
+        <div class="card-header">
+            <h5 class="card-title">
+                Remarks
+            </h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind=block_1.block_11b_remark></textarea>
+        </div>
+    </div> *@
     <div class="row">
         <div class="col-sm-6">
             <button class="btn btn-outline-primary"><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
@@ -87,17 +103,17 @@
         </div>
 
     </div>
+</div>
+@* Model Popup When Click Add Button *@
+<Modal @ref="AddModal" id="addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size=ModalSize.ExtraLarge Fullscreen="ModalFullscreen.MediumDown">
+    <HeaderTemplate>
+        <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
+    </HeaderTemplate>
 
-    @* Model Popup When Click Add Button *@
-    <Modal @ref="AddModal" id="addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size=ModalSize.ExtraLarge Fullscreen="ModalFullscreen.MediumDown">
-        <HeaderTemplate>
-            <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
-        </HeaderTemplate>
-
-        <BodyTemplate>
-            @if (editContext != null)
-            {
-                <EditForm EditContext="editContext">
+    <BodyTemplate>
+        @if (editContext != null)
+        {
+            <EditForm EditContext="editContext">
                     <div class="row">
                         <div class="mb-3">
                             <label class="form-label">
@@ -124,10 +140,10 @@
                                         UpdateFieldAndValidate(() => table11B.item_3, e);
                                         item_3Condition(e);
                                     }"
-                                        class="form-select form-select-sm">
-                                    <option value="">-Select-</option>
-                                    <option value="1">1-yes</option>
-                                    <option value="2">2-no</option>
+                                      class="form-select">
+                                  <option value="">-Select-</option>
+                                  <option value="1">1-yes</option>
+                                  <option value="2">2-no</option>
 
                             </select>
                             <ValidationMessage For="@(() => table11B.item_3)" />
@@ -137,20 +153,18 @@
                                 <span class="form-badge">4</span>Amount of direct tax paid (net of refunds) in last financial year (in Rs.)
                             </label>
                             <input type="number" class="form-control no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@table11B.item_4" disabled="@(!is11B_4Enable)"
-                                    @oninput="e => UpdateFieldAndValidate(() => table11B.item_4, e)" />
+                                   @oninput="e => UpdateFieldAndValidate(() => table11B.item_4, e)" />
                             <ValidationMessage For="@(() => table11B.item_4)" />
                         </div>
                     </div>
-                </EditForm>
-            }
-        </BodyTemplate>
-        <FooterTemplate>
-            <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
-            <button type="submit" @onclick="@(() => ValidateAndSave())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
-        </FooterTemplate>
-    </Modal>
-
-</div>
+            </EditForm>
+        }
+    </BodyTemplate>
+    <FooterTemplate>
+        <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
+        <button type="submit" @onclick="@(() => ValidateAndSave())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
+    </FooterTemplate>
+</Modal>
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;

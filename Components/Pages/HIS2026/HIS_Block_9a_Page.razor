@@ -57,7 +57,7 @@
 
                                 <tr>
                                     <td>1</td>
-                                    <td>saving / deposit accounts with banks/post office/non-banking financial companies</td>
+                                    <td>Saving / deposit accounts with banks/post office/non-banking financial companies</td>
                                     <td>
                                         <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_1" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
@@ -69,7 +69,7 @@
                                   </tr>
                                   <tr>
                                       <td>2</td>
-                                      <td>certificates of deposit (Fixed/Recurring Deposits etc.), government bonds/securities, co-operative credit societies/micro-finance institutions/self-help groups</td>
+                                      <td>Certificates of deposit (Fixed/Recurring Deposits etc.), government bonds/securities, co-operative credit societies/micro-finance institutions/self-help groups</td>
                                       <td>
                                           <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
@@ -81,7 +81,7 @@
                                   </tr>
                                   <tr>
                                       <td>3</td>
-                                      <td>provident funds (government, public, etc.) and other financial institutions</td>
+                                      <td>Provident funds (government, public, etc.) and other financial institutions</td>
                                       <td>
                                           <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
@@ -93,7 +93,7 @@
                                   </tr>
                                   <tr>
                                       <td>4</td>
-                                      <td>loans to non-household members</td>
+                                      <td>Loans to non-household members</td>
                                       <td>
                                           <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
@@ -105,7 +105,7 @@
                                   </tr>
                                   <tr>
                                       <td>5</td>
-                                      <td>other (interest on security deposits, sovereign gold bonds, debentures etc.)</td>
+                                      <td>Other (interest on security deposits, sovereign gold bonds, debentures etc.)</td>
                                       <td>
                                           <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
@@ -117,7 +117,7 @@
                                   </tr>
                                   <tr>
                                       <td>6</td>
-                                      <td>total interest (sum of entries recorded in s. no. 1-5)</td>
+                                      <td>Total interest (sum of entries recorded in s. no. 1-5)</td>
                                       <td>
                                           <input disabled class="form-control form-control-sm no-spinner" value="@block_9a.item_1_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  />
@@ -153,7 +153,7 @@
                                                }" />
                                           <ValidationMessage For="@(() => block_9a.item_2)" />
                                       </td>
-                                  </tr>
+                                </tr>
 
 
                                 <tr>
@@ -210,7 +210,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <textarea class="form-control w-100" rows="4" @bind="block_1.block_9a_remark"></textarea>
+            <textarea class="form-control w-100" rows="2" placeholder="Enter Remarks Here.." @bind="block_1.block_9a_remark"></textarea>
         </div>
     </div>
 

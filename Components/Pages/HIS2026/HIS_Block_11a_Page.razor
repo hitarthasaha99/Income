@@ -150,15 +150,21 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="mb-3 px-2">
-                        <label for="remarksTextarea" class="form-label">Remarks</label>
-                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_11a_remark"></textarea>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here"></textarea>
                 </div>
             </div>
+            </div>
+        </div>
+        <div class="footer">
+            @* Remarks Card *@
+            <div class="card custom-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        Remarks
+                    </h5>
+                </div>
+                <div class="card-body">
+                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here" @bind="block_1.block_11a_remark"></textarea>
+                </div>
             </div>
             <div class="row">
                 <div class="col-sm-6">
