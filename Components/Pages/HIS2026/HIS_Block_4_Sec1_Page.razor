@@ -22,10 +22,15 @@
             <div class="card custom-card">
                 <div class="card-header">
                     <h3 class="card-title"><span class="text-primary me-2">[4]</span>Household Characteristics</h3>
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+                        
                     <div class="card-tools">
-                        <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
+                        <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
                     </div>
+                    }
                 </div>
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
                 <div class="row px-3 pt-3 pb-1">
                     <!--4.1-->
                     <div class="col-md-12">
@@ -185,6 +190,7 @@
                         
                     </div>
                 </div>
+                </fieldset>
             </div>
         </div>
         <div class="footer">
@@ -194,7 +200,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="d-flex justify-content-end">
-                        @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                         {
                             <button type="button" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => Save())">
                                 <i class="fi fi-rr-disk me-1"></i>Save

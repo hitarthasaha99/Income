@@ -15,9 +15,19 @@
     <div class="card custom-card">
         <div class="card-header p-2">
             <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - B]</span>Monthly Household Expenditure</h3>
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                </div>
+            }
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                 <table class="table table-bordered align-middle mb-0">
                     <thead>
                         <tr>
@@ -57,6 +67,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </fieldset>
             </div>
         </div>
     </div>
@@ -68,14 +79,17 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
             <textarea maxlength="500" class="form-control disabled w-100" rows="4" @bind="block_1.block_b_remark"></textarea>
+            </fieldset>
         </div>
     </div>
 </div>
 <div class="footer">
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-secondary"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
+            <button class="btn btn-outline-secondary" @onclick="GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex justify-content-end">

@@ -26,12 +26,21 @@
             <h3 class="card-title">
                 <span class="text-primary me-2">[Block 5]</span>Income from employment – regular wage/salary
             </h3>
+           
             <div class="card-tools">
                 <div class="d-flex align-items-center" hidden="@SessionStorage.FSU_Submitted">
 
                 </div>
 
             </div>
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                </div>
+            }
         </div>
         @* Card Body *@
         <div class="card-body p-0">
@@ -90,6 +99,9 @@
                                 <td>@member.item_7</td>
                                 <td>@member.item_8</td>
                                 <td>@member.item_9</td>
+                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                {
+                                    
                                 <td class="d-flex align-items-center">
                                     <button class="btn btn-link me-3 fs-6"
                                             hidden="@SessionStorage.FSU_Submitted"
@@ -97,6 +109,7 @@
                                         <i class="fi fi-rr-pencil"></i>
                                     </button>
                                 </td>
+                                }
                             </tr>
                         }
                     </tbody>
@@ -111,9 +124,11 @@
         <div class="card-header">
             <h3 class="card-title">Remarks</h3>
         </div>
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
         <div class="card-body">
             <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter Remarks Here.." @bind="@block_1.block_4_remark" rows="2"></textarea>
         </div>
+        </fieldset>
     </div>
     <div class="row">
         <div class="col-sm-6">

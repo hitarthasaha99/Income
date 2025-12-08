@@ -18,7 +18,14 @@
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+    @* add comment *@
+    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+    {
 
+        <div class="card-tools d-flex justify-content-end align-items-end p-2">
+            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+        </div>
+    }
     @if (editContext != null)
     {
         <EditForm EditContext="editContext">
@@ -26,6 +33,7 @@
             
             <div class="card custom-card">
                 <div class="card-body p-0">
+                    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center mb-0">
                             <tbody>
@@ -76,6 +84,7 @@
                             </tbody>
                         </table>
                     </div>
+                    </fieldset>
                 </div>
             </div>
         </EditForm>
@@ -91,19 +100,26 @@
                 Remarks
             </h5>
         </div>
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
         <div class="card-body">
             <textarea maxlength="500" class="form-control w-100" rows="4" @bind="block_1.block_7c_remark"></textarea>
         </div>
+        </fieldset>
     </div>
 
 
     <div class="row">
         <div class="col-sm-6">
-            <button type="button" class="btn btn-outline-secondary me-auto" ><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
+            <button type="button" class="btn btn-outline-secondary me-auto" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    
                 <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => Save(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                }
                 <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
