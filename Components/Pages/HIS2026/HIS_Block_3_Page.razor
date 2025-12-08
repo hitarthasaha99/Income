@@ -16,6 +16,7 @@
 <div class="main-content">
     <!-- Header component showing selected FSU and survey time -->
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+    <ConfirmDialog @ref="dialog" />
     <div class="card custom-card">
         <!-- 🔹 Sticky Top Action Header -->
         <div class="card-header">
@@ -117,11 +118,15 @@
                                             @onclick="@(() => HandleModal("UPDATE", member))">
                                         <i class="fi fi-rr-pencil"></i>
                                     </button>
+                                    @if (!(member.serial_no == 1 && member.item_3 == 1))
+                                    {
+                                        
                                     <button class="btn btn-link fs-6 text-danger"
                                             hidden="@SessionStorage.FSU_Submitted"
                                             @onclick="@(() => HandleDelete(member.id))">
                                         <i class="fi fi-rr-trash"></i>
                                     </button>
+                                    }
                                 </td>
                                 }
                             </tr>
@@ -218,16 +223,16 @@
                                         value="@newMember.item_3"
                                         @onchange="item_3_changed">
 
-                                    <option value="">-Select-</option>
-                                    <option value="1">self-1</option>
-                                    <option value="2">spouse of head-2</option>
-                                    <option value="3">married child-3</option>
-                                    <option value="4">spouse of married child-4</option>
-                                    <option value="5">unmarried child-5</option>
-                                    <option value="6">grandchild-6</option>
-                                    <option value="7">father/mother/father-in-law/mother-in-law-7</option>
-                                    <option value="8">other relatives-8</option>
-                                    <option value="9">non-relatives-9</option>
+                                <option value="">-Select-</option>
+                                <option value="1">self - 1</option>
+                                <option value="2">spouse of head - 2</option>
+                                <option value="3">married child - 3</option>
+                                <option value="4">spouse of married child - 4</option>
+                                <option value="5">unmarried child - 5</option>
+                                <option value="6">grandchild - 6</option>
+                                <option value="7">father/mother/father-in-law/mother-in-law - 7</option>
+                                <option value="8">brother/sister/brother-in-law/sister-in-law/other relatives - 8</option>
+                                <option value="9">servants/employees/other non-relatives - 9</option>
 
                                 </select>
 
@@ -246,10 +251,10 @@
                                         value="@newMember.gender"
                                         @onchange="genderClear">
 
-                                    <option value="">-Select-</option>
-                                    <option value="1">male-1</option>
-                                    <option value="2">female-2</option>
-                                    <option value="3">transgender-3</option>
+                                <option value="">-Select-</option>
+                                <option value="1">male - 1</option>
+                                <option value="2">female - 2</option>
+                                <option value="3">transgender - 3</option>
 
                                 </select>
 
@@ -269,21 +274,27 @@
                                     <span class="form-badge">5</span> Age (years)
                                 </label>
 
-                                <InputNumber class="form-control no-spinner"
-                                             @bind-Value="newMember.age"
-                                             @oninput="(e) => ageClear(e)" />
+                            <InputNumber class="form-control no-spinner"
+                                         @bind-Value="newMember.age"
+                                         @oninput="(e) => ageClear(e)"
+                                         onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                            <ValidationMessage For="@(() => newMember.age)" />
 
                                 @if (!string.IsNullOrEmpty(ageWarning))
                                 {
                                     <div class="text-success">@ageWarning</div>
                                 }
 
-                                @if (!string.IsNullOrEmpty(ageRelationWarning))
-                                {
-                                    <div class="form-text text-success">@ageRelationWarning</div>
-                                }
-                            </div>
+                            @if (!string.IsNullOrEmpty(ageRelationWarning))
+                            {
+                                <div class="form-text text-success">@ageRelationWarning</div>
+                            }
+                            @if (!string.IsNullOrEmpty(singleUserWarning))
+                            {
+                                <div class="form-text text-success">@singleUserWarning</div>
+                            }
                         </div>
+                    </div>
 
                         <!-- 6. Marital status -->
                         <div class="col-sm-12">
@@ -296,11 +307,11 @@
                                         value="@newMember.item_6"
                                         @onchange="clearItem_6">
 
-                                    <option value="">-Select-</option>
-                                    <option value="1">never married – 1</option>
-                                    <option value="2">currently married – 2</option>
-                                    <option value="3">widowed – 3</option>
-                                    <option value="4">divorced/separated – 4</option>
+                                <option value="">-Select-</option>
+                                <option value="1">never married – 1</option>
+                                <option value="2">currently married (including living together) – 2</option>
+                                <option value="3">widowed – 3</option>
+                                <option value="4">divorced/separated – 4</option>
 
                                 </select>
 
@@ -324,17 +335,17 @@
                                         value="@newMember.item_7"
                                         @onchange="ClearItem7">
 
-                                    <option value="">-Select-</option>
-                                    <option value="1">not literate - 01</option>
-                                    <option value="2">literate without schooling - 02</option>
-                                    <option value="3">below primary - 03</option>
-                                    <option value="4">primary - 04</option>
-                                    <option value="5">middle - 05</option>
-                                    <option value="6">secondary - 06</option>
-                                    <option value="7">higher secondary - 07</option>
-                                    <option value="8">diploma - 08</option>
-                                    <option value="10">graduate - 10</option>
-                                    <option value="11">postgraduate - 11</option>
+                                <option value="">-Select-</option>
+                                <option value="1">not literate (i.e. not able to read or write a simple message with understanding in any language) - 01 </option>
+                                <option value="2">literate without formal schooling (like NFEC, AEC, TLC, literate without any schooling, etc.) - 02 </option>
+                                <option value="3">below primary - 03</option>
+                                <option value="4">primary - 04</option>
+                                <option value="5">upper primary/middle - 05</option>
+                                <option value="6">secondary - 06</option>
+                                <option value="7">higher secondary - 07</option>
+                                <option value="8">diploma /certificate course - 08</option>
+                                <option value="10">graduate - 10</option>
+                                <option value="11">postgraduate and above - 11</option>
 
                                 </select>
 
@@ -364,24 +375,24 @@
                                                         value="@newMember.item_8"
                                                         @onchange="ClearItem8">
 
-                                                    @* options *@
-                                                    <option value="">-Select-</option>
-                                                    <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                                    <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                                    <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                                    <option value="4">regular wage/ salary – 04 </option>
-                                                    <option value="5">casual labour – 05 </option>
-                                                    <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                                    <option value="7">student / attended educational institution - 07 </option>
-                                                    <option value="8">attended domestic duties only – 08 </option>
-                                                    <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                                    <option value="10">earning from rent – 10 </option>
-                                                    <option value="11">earning from pensions -11 </option>
-                                                    <option value="12">earning from remittances -12 </option>
-                                                    <option value="13">earning from interest - 13 </option>
-                                                    <option value="14">unfit for work due to disability or illness – 14 </option>
-                                                    <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                                </select>
+                                                @* options *@
+                                                <option value="">-Select-</option>
+                                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
+                                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
+                                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
+                                                <option value="4">regular wage/ salary – 04 </option>
+                                                <option value="5">casual labour – 05 </option>
+                                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
+                                                <option value="7">student / attended educational institution - 07 </option>
+                                                <option value="8">attended domestic duties only – 08 </option>
+                                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.),sewing, tailoring, weaving, etc. for household use - 09</option>
+                                                <option value="10">earning from rent – 10 </option>
+                                                <option value="11">earning from pensions -11 </option>
+                                                <option value="12">earning from remittances -12 </option>
+                                                <option value="13">earning from interest - 13 </option>
+                                                <option value="14">unfit for work due to disability or illness – 14 </option>
+                                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
+                                            </select>
 
                                                 <ValidationMessage For="@(() => newMember.item_8)" />
 
@@ -534,10 +545,9 @@
                                     <span class="form-badge">12</span> Beneficiary of govt scheme (yes-1 / no-2)
                                 </label>
 
-                                <InputSelect class="form-select"
-                                             @bind-value="newMember.item_12"
-                                             @onchange="ClearItem12"
-                                             disabled="@isItem12Disabled">
+                            <InputSelect class="form-select"
+                                         @bind-value="newMember.item_12"
+                                         @onchange="ClearItem12">
 
                                     <option value="">-Select-</option>
                                     <option value="1">yes</option>
@@ -571,7 +581,7 @@
     private Tbl_Block_3 newMember = new();
     private Tbl_Block_1? block_1 = new();
     Tbl_Sch_0_0_Block_7 hhd = new();
-
+    private ConfirmDialog dialog = default!;
     private String? nameError = null;
     private string? relationError = null;
     // Errors and warnings for fields
@@ -597,7 +607,7 @@
     private string? item_10Warning = null;
     private string? item_11Warning = null;
     // Age flag
-    private bool isItem12Disabled = true;
+    // private bool isItem12Disabled = true;
     DBQueries DBQueries = new();
     CommonQueries commonQueries = new();
     bool isAdd = false;
@@ -663,6 +673,7 @@
         //check again if change Relation to head change
         CheckGenderWarning();
         checkAgeReletionWarning();
+        checkSingleUser();
 
     }
 
@@ -680,14 +691,13 @@
         checkAgeWarning();           // Check age >= 120
         checkAgeReletionWarning();   // Check relation rule (age < head age)
         checkSingleUser();
-        //Call method
-        handleCol_12();
         checkItem_6Warning();
         CheckItem7Warning();
         CheckItem8Warning();
         CheckItem9Warning();
         CheckItem10Warning();
         CheckItem11Warning();
+        ClearItem12Error();
     }
 
 
@@ -783,29 +793,9 @@
         else
             newMember.item_12 = null;
 
-        // Run your logic (enable/disable + clear when age < 15)
-        handleCol_12();
-
         // Refresh UI
         StateHasChanged();
     }
-
-
-
-    //if age > 15 then Enable col_12
-    private void handleCol_12()
-    {
-        if (newMember.age.HasValue && newMember.age.Value >= 15)
-        {
-            isItem12Disabled = false;
-        }
-        else
-        {
-            isItem12Disabled = true;
-            newMember.item_12 = null;
-        }
-    }
-
 
 
     //Gender Warning..............................................
@@ -837,7 +827,7 @@
         // Check if age has a value
         if (newMember.age.HasValue)
         {
-            if (newMember.age.Value >= 120)
+            if (newMember.age.Value > 120)
             {
                 ageWarning = "W006(i): Invalid Entry, Please check the entry.";
                 StateHasChanged();
@@ -955,12 +945,14 @@
                 StateHasChanged();
                 return;
             }
+
         }
 
 
         StateHasChanged();
     }
 
+    //Check Single User..............................................................
 
     private void checkSingleUser()
     {
@@ -968,7 +960,9 @@
 
         if (newMember.age.HasValue)
         {
-            // Rule: If household size is 1, age must be ≥ 6
+            // relation code 1-9 must be selected
+            if (!newMember.item_3.HasValue || newMember.item_3.Value < 1 || newMember.item_3.Value > 9)
+                return;
             if (newMember.age.Value < 6)
             {
                 singleUserWarning = "W006(vii): Please check the entry";
@@ -977,6 +971,7 @@
 
         StateHasChanged();
     }
+
 
     //Marital status Warning..........................
 
@@ -993,7 +988,7 @@
         // Rule: if marital-status != 1 → age must be >= 15
         if (maritalStatus != 1 && age < 15)
         {
-            maritalStatusWarning = "W007(v): Please check the entryies recorded against cols. 3 & 5";
+            maritalStatusWarning = "W007(v): Please check the entries recorded against cols. 3 & 5";
         }
 
         StateHasChanged();
@@ -1010,6 +1005,11 @@
         if (!age.HasValue || !edu.HasValue)
             return;
 
+        if(age<=3 && edu > 1)
+        {
+            item_7Warning = "W008(ii): Please check the entries recorded against cols. 7 & 5";
+            return;
+        }
         // Rule iii: If 4 <= age <= 6, edu must be <= 3
         if (age >= 4 && age <= 6 && edu > 3)
         {
@@ -1309,6 +1309,17 @@
 
     async Task HandleDelete(Guid id)
     {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Alert",
+            message1: "Are you sure you want to delete?",
+            confirmDialogOptions: options
+        );
+        if (!confirmation)
+        {
+            return;
+        }
+
         int item_index = block3Members.FindIndex(l => l.id == id);
         if (item_index != -1)
         {
@@ -1322,6 +1333,7 @@
             {
                 toastService.ShowSuccess("Entry deleted successfully!");
             }
+            await ReorderSerialNumbers();
             await LoadData();
         }
         else
@@ -1357,6 +1369,27 @@
         await LoadData();
 
     }
+    private async Task ReorderSerialNumbers()
+    {
+        // Get fresh list
+        block3Members = await DBQueries.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
+        // Sort by old serial no
+        block3Members = block3Members
+            .Where(x => x.is_deleted != true)
+            .OrderBy(x => x.serial_no)
+            .ToList();
+
+        int newSerial = 1;
+
+        foreach (var member in block3Members)
+        {
+            member.serial_no = newSerial;
+            await DBQueries.Save_SCH_HIS_Block3(member);  // update in DB
+            newSerial++;
+        }
+    }
+
 
     async void HandleSubmit(string action = "")
     {
@@ -1374,5 +1407,7 @@
 
 
     }
+
+
 }
 
