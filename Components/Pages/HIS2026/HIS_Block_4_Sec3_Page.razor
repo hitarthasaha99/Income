@@ -26,11 +26,17 @@
         <div class="card custom-card">
             <div class="card-header">
                 <h3 class="card-title"><span class="text-primary me-2">[4]</span>Household Characteristics</h3>
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+                        
                 <div class="card-tools">
-                    <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
+                    }
             </div>
             <div class="card-body">
+                    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                 <div class="row">
                     <!--4.6-->
                     <div class="col-sm-12">
@@ -261,6 +267,7 @@
                         </div>
                     </div>
                 </div>
+                </fieldset>
                
             </div>
         </div>
@@ -271,9 +278,12 @@
             <div class="card-header">
                 <h3 class="card-title">Remarks</h3>
             </div>
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
             <div class="card-body">
                     <textarea type="text" class="form-control is_sso" disabled="@(SessionStorage.FSU_Submitted))" placeholder="" cols="4" @bind="block_1.block_4_remark"></textarea>
             </div>
+            </fieldset>
         </div>
         <div class="row">
             <div class="col-sm-6">
@@ -281,7 +291,7 @@
             </div>
             <div class="col-sm-6">
                 <div class="d-flex justify-content-end">
-                    @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                     {
                         <button type="button" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => Save())">
                             <i class="fi fi-rr-disk me-1"></i>Save
@@ -343,10 +353,14 @@
                                 <td>@item.comment</td>
                                 <td class="text-center">@item.item_no</td>
                                 <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
+                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                {
+                                    
                                 <td class="text-center">
                                     <button class="btn btn-link fs-6 me-2" @onclick="@(() => Update(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-pencil"></i></button>
                                     <button class="btn btn-link fs-6 text-danger" @onclick="@(() => Delete(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-trash"></i></button>
                                 </td>
+                                }
                             </tr>
                         }
                     </tbody>

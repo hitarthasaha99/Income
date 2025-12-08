@@ -19,6 +19,14 @@
             <h3 class="card-title">
                 <span class="text-primary me-1">Block 11b:</span>Particulars of direct tax (income tax, professional tax, etc.) paid
             </h3>
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                </div>
+            }
             @* <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                 <i class="fi fi-rr-plus me-1"></i>Add
             </button> *@
@@ -55,46 +63,33 @@
                                 <td>@member.item_3</td>
                                 <td>@member.item_4</td>
                                 <td class="d-flex align-items-center">
+                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                    {
+                                        
                                     <button class="btn btn-link fs-6"
                                             @onclick="@(() => HandleModal("UPDATE", member))">
                                         <i class="fi fi-rr-pencil"></i>
                                     </button>
+                                    }
                                     
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+                <div class="mb-3 px-2">
+                    <label for="remarksTextarea" class="form-label">Remarks</label>
+                    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
+                    <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                    </fieldset>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<div class="footer">
-    @* Remarks Card *@
-    <div class="card custom-card">
-        <div class="card-header">
-            <h5 class="card-title">
-                Remarks
-            </h5>
-        </div>
-        <div class="card-body">
-                <textarea class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here" @bind=block_1.block_11b_remark></textarea>
-        </div>
-    </div>
-    @* Remarks Card
-    <div class="card custom-card">
-        <div class="card-header">
-            <h5 class="card-title">
-                Remarks
-            </h5>
-        </div>
-        <div class="card-body">
-            <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind=block_1.block_11b_remark></textarea>
-        </div>
-    </div> *@
+    </div> 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-primary"><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-primary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
@@ -331,7 +326,7 @@
                 return;
             }
             // Clear previous errors
-            messageStore.Clear();
+            messageStore?.Clear();
 
             // Validate model using FluentValidation
             var validationResult = Validator.Validate(table11B);
@@ -362,22 +357,29 @@
             {
                 toastService.ShowError("Failed to update details. Please try again.");
             }
-
-
-            if (is_go_next)
-            {
-                // Navigate to the next block/page
-                if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
-                {
-                    toastService.ShowError("Please save all the entries before proceeding");
-                    return;
-                }
-                NavigationManager.NavigateTo("/dashboard/his/block_A");
-            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+        }
+
+    }
+
+    private void Navigate()
+    {
+        try
+        {
+            // Navigate to the next block/page
+            if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
+            {
+                toastService.ShowError("Please save all the entries before proceeding");
+                return;
+            }
+            NavigationManager.NavigateTo("/dashboard/his/block_A");
+        }
+        catch (Exception ex)
+        {
+            
         }
 
     }

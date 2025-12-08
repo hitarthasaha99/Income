@@ -21,10 +21,14 @@
             <h3 class="card-title">
                 <span class="text-primary me-2">[1]</span>Identification of sample household
             </h3>
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
             <div cllass="card-tools">
-                <NavLink hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO))" class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
-            </div>
+                <NavLink class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+            </div>             
+            }
         </div>
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
         <div class="card-body">
             <div class="row">
                 <div class="col-sm-12">
@@ -182,6 +186,7 @@
                </div>
             </div>
         </div>
+        </fieldset>
     </div>
 </div>
 
@@ -194,7 +199,7 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
                     <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
                 }
