@@ -463,34 +463,7 @@
 
                             await UpdateFsu(item.fsuHouses);
                             var houses = item.fsuHouses != null && item.fsuHouses.Count > 0 ? item.fsuHouses.Count : 0;
-                            var saved_response = await commonService.GetAsync(CommonConfig.APIIncomeURL,$"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{item.fsu_id}/{item.lookupFsuSubmitStatus}");
-                            if (!string.IsNullOrEmpty(saved_response))
-                            {
-                                // saved_fsu_responses.Add(saved_response);
-                                // var deserializedHouses = JsonConvert.DeserializeObject<saved_response_top_layer>(saved_response);
-                                // if (deserializedHouses?.result?.submitted_json_data != null)
-                                // {
-                                //     var bindLayer = JsonConvert.DeserializeObject<bind_layer>(deserializedHouses.result.submitted_json_data);
-                                //     List<Tbl_Sch_0_0_Block_5> dataList = bindLayer?.TravelSch00Block5aList?.ToList() ?? new List<Tbl_Sch_0_0_Block_5>();
-                                //     int count = 0;
-                                //     foreach (var Item in dataList)
-                                //     {
-                                //         if (Item.is_selected_travel == true && Item.status_travel != "SUBSTITUTED")
-                                //         {
-                                //             count++;
-                                //         }
-                                //     }
-                                //     item.total_hhd = count;
-                                // }
-                                // else
-                                // {
-                                //     item.total_hhd = 0;
-                                // }
-                            }
-                            else
-                            {
-                                item.total_hhd = 0;
-                            }
+                            
                             if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2))
                             {
                                 item.completed_hhd = (item.total_hhd.GetValueOrDefault(0) - (item.submittedbyEnumaretorToSuperviosr.GetValueOrDefault(0) + item.submiitedbySuperviosrToDs.GetValueOrDefault(0) + item.returntoSuperviosrbyDS.GetValueOrDefault(0)));

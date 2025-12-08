@@ -29,6 +29,7 @@ namespace Income.Database.Queries
             {
                 if (data != null)
                 {
+                    /*SCH00*/
                     var sch00_block_0_1 = data.IncomeSch00block0;
                     if (sch00_block_0_1 != null)
                     {
@@ -97,6 +98,211 @@ namespace Income.Database.Queries
                         }
                     }
 
+                    /*SCH HIS*/
+                    var sch_his_object_list = data.IncomeSchHISDto;
+                    if (sch_his_object_list != null && sch_his_object_list.Count > 0)
+                    {
+                        foreach (var hhd in sch_his_object_list)
+                        {
+                            var block_1 = hhd.IncomeBlock1;
+                            var block_2 = hhd.IncomeBlockFieldOp;
+                            var block_3 = hhd.IncomeBlock3;
+                            var block_4 = hhd.IncomeBlock4;
+                            var block_4_nic = hhd.IncomeBlock4Q5;
+                            var block_5 = hhd.IncomeBlock5;
+                            var block_6 = hhd.IncomeBlock6;
+                            var block_7 = hhd.IncomeBlock7A;
+                            var block_7A_Q1 = hhd.IncomeBlock7AQ1;
+                            var block_7B = hhd.IncomeBlock7B;
+                            var block_7C = hhd.IncomeBlock7C;
+                            var block_7C_Q1 = hhd.IncomeBlock7CQ1;
+                            var block_7C_Q10 = hhd.IncomeBlock7CQ10;
+                            var block_7D = hhd.IncomeBlock7D;
+                            var block_8 = hhd.IncomeBlock8;
+                            var block_8Q6 = hhd.IncomeBlock8Q6;
+                            var block_9a = hhd.IncomeBlock9A; 
+                            var block_9b = hhd.IncomeBlock9B;
+                            var block_10 = hhd.IncomeBlock10;
+                            var block_11a = hhd.IncomeBlock11A;
+                            var block_11b = hhd.IncomeBlock11B;
+                            var block_a = hhd.IncomeBlockA;
+                            var block_b = hhd.IncomeBlockB;
+                            var block_warning = hhd.IncomeWarningList;
+
+                            if(block_1 != null)
+                            {
+                                await SaveAsync<Tbl_Block_1>(block_1);
+                            }
+
+                            if (block_2 != null)
+                            {
+                                await SaveAsync<Tbl_Block_FieldOperation>(block_2);
+                            }
+
+                            if (block_3 != null && block_3.Count > 0)
+                            {
+                                foreach(var item in block_3)
+                                {
+                                    await SaveAsync<Tbl_Block_3>(item);
+                                }
+                            }
+
+                            if (block_4 != null)
+                            {
+                                await SaveAsync<Tbl_Block_4>(block_4);
+                            }
+
+                            if (block_4_nic != null && block_4_nic.Count > 0)
+                            {
+                                foreach (var item in block_4_nic)
+                                {
+                                    await SaveAsync<Tbl_Block_4_Q5>(item);
+                                }
+                            }
+
+                            if (block_5 != null && block_5.Count > 0)
+                            {
+                                foreach (var item in block_5)
+                                {
+                                    await SaveAsync<Tbl_Block_5>(item);
+                                }
+                            }
+
+                            if (block_6 != null && block_6.Count > 0)
+                            {
+                                foreach (var item in block_6)
+                                {
+                                    await SaveAsync<Tbl_Block_6>(item);
+                                }
+                            }
+
+                            if (block_7 != null && block_7.Count > 0)
+                            {
+                                foreach (var item in block_7)
+                                {
+                                    await SaveAsync<Tbl_Block_7a>(item);
+                                }
+                            }
+
+                            if (block_7A_Q1 != null && block_7A_Q1.Count > 0)
+                            {
+                                foreach (var item in block_7A_Q1)
+                                {
+                                    await SaveAsync<Tbl_Block_7a_1>(item);
+                                }
+                            }
+
+                            if (block_7B != null && block_7B.Count > 0)
+                            {
+                                foreach (var item in block_7B)
+                                {
+                                    await SaveAsync<Tbl_Block_7b>(item);
+                                }
+                            }
+
+                            if (block_7C != null && block_7C.Count > 0)
+                            {
+                                foreach (var item in block_7C)
+                                {
+                                    await SaveAsync<Tbl_Block_7c>(item);
+                                }
+                            }
+
+                            if (block_7C_Q1 != null && block_7C_Q1.Count > 0)
+                            {
+                                foreach (var item in block_7C_Q1)
+                                {
+                                    await SaveAsync<Tbl_Block_7c_NIC>(item);
+                                }
+                            }
+
+                            if (block_7C_Q10 != null && block_7C_Q10.Count > 0)
+                            {
+                                foreach (var item in block_7C_Q10)
+                                {
+                                    await SaveAsync<Tbl_Block_7c_Q10>(item);
+                                }
+                            }
+
+                            if (block_7D != null && block_7D.Count > 0)
+                            {
+                                foreach (var item in block_7D)
+                                {
+                                    await SaveAsync<Tbl_Block_7d>(item);
+                                }
+                            }
+
+                            if (block_8 != null && block_8.Count > 0)
+                            {
+                                foreach (var item in block_8)
+                                {
+                                    await SaveAsync<Tbl_Block_8>(item);
+                                }
+                            }
+
+                            if (block_8Q6 != null && block_8Q6.Count > 0)
+                            {
+                                foreach (var item in block_8Q6)
+                                {
+                                    await SaveAsync<Tbl_Block_8_Q6>(item);
+                                }
+                            }
+
+                            if (block_9a != null && block_9a.Count > 0)
+                            {
+                                foreach (var item in block_9a)
+                                {
+                                    await SaveAsync<Tbl_Block_9a>(item);
+                                }
+                            }
+
+                            if (block_9b != null && block_9b.Count > 0)
+                            {
+                                foreach (var item in block_9b)
+                                {
+                                    await SaveAsync<Tbl_Block_9b>(item);
+                                }
+                            }
+
+                            if (block_10 != null)
+                            {
+                                await SaveAsync<Tbl_Block_10>(block_10);
+                            }
+
+                            if (block_11a != null)
+                            {
+                                await SaveAsync<Tbl_Block_11a>(block_11a);
+                            }
+
+                            if (block_11b != null && block_11b.Count > 0)
+                            {
+                                foreach (var item in block_11b)
+                                {
+                                    await SaveAsync<Tbl_Block_11b>(item);
+                                }
+                            }
+
+                            if (block_a != null)
+                            {
+                                await SaveAsync<Tbl_Block_A>(block_a);
+                            }
+
+                            if (block_b != null)
+                            {
+                                await SaveAsync<Tbl_Block_B>(block_b);
+                            }
+
+                            if (block_warning != null && block_warning.Count > 0)
+                            {
+                                foreach (var item in block_warning)
+                                {
+                                    await SaveAsync<Tbl_Warning>(item);
+                                }
+                            }
+
+                        }
+                    }
+
                     return 1;
                 }
                 else
@@ -114,23 +320,65 @@ namespace Income.Database.Queries
         {
             try
             {
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_0_1 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_2_1 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_3 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_4 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Sch_0_0_FieldOperation WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
-                await _database.ExecuteAsync($"DELETE FROM Tbl_Warning WHERE fsu_id = {fsuID} AND tenant_id = {SessionStorage.tenant_id}");
+                var tenantId = SessionStorage.tenant_id;
+
+                // List of all tables to delete from
+                var tables = new List<string>
+                {
+                    // Existing tables
+                    "Tbl_Sch_0_0_Block_0_1",
+                    "Tbl_Sch_0_0_Block_2_1",
+                    "Tbl_Sch_0_0_Block_2_2",
+                    "Tbl_Sch_0_0_Block_3",
+                    "Tbl_Sch_0_0_Block_4",
+                    "Tbl_Sch_0_0_Block_5",
+                    "Tbl_Sch_0_0_Block_7",
+                    "Tbl_Sch_0_0_FieldOperation",
+                    "Tbl_Warning",
+
+                    // New HIS tables
+                    "Tbl_Block_1",
+                    "Tbl_Block_3",
+                    "Tbl_Block_4",
+                    "Tbl_Block_4_Q5",
+                    "Tbl_Block_5",
+                    "Tbl_Block_6",
+                    "Tbl_Block_7a",
+                    "Tbl_Block_7a_1",
+                    "Tbl_Block_7b",
+                    "Tbl_Block_7c",
+                    "Tbl_Block_7c_NIC",
+                    "Tbl_Block_7c_Q10",
+                    "Tbl_Block_7d",
+                    "Tbl_Block_8",
+                    "Tbl_Block_8_Q6",
+                    "Tbl_Block_9a",
+                    "Tbl_Block_9b",
+                    "Tbl_Block_10",
+                    "Tbl_Block_11a",
+                    "Tbl_Block_11b",
+                    "Tbl_Block_A",
+                    "Tbl_Block_B",
+                    "Tbl_Block_FieldOperation"
+                };
+
+                // Execute delete for each table
+                foreach (var table in tables)
+                {
+                    await _database.ExecuteAsync(
+                        $"DELETE FROM {table} WHERE fsu_id = ? AND tenant_id = ?",
+                        fsuID, tenantId
+                    );
+                }
 
                 return 1;
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
         }
+
 
         public async Task<int> DoUpdateListing(int fsuID, int option)
         {

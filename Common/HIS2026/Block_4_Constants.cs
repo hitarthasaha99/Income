@@ -46,7 +46,7 @@ namespace Income.Common.HIS2026
 
         public static readonly List<Tbl_Lookup> Q4_10 =
         [
-            new() { id = 1, title = "agricultural activivty : crop production - 1" },
+            new() { id = 1, title = "agricultural activity : crop production - 1" },
             new() { id = 2, title = "for animal husbandry / dairy - 2" },
             new() { id = 3, title = "other agricultural activity - 3" },
             new() { id = 4, title = "non-agricultural activity - 4" },

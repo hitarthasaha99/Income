@@ -41,17 +41,20 @@ namespace Income.Validators.HIS2026
             {
                 RuleFor(x => x.item_6).NotEmpty().WithMessage("H018: Invalid Entry, Please check the entry");
 
-                RuleFor(x => x.item_7)
-                    .NotNull()
-                    .GreaterThan(0)
-                    .When(x => x.item_6.HasValue && x.item_6.Value == 1)
-                    .WithMessage("H019: Invalid Entry, Please check the entry")
-                    .DependentRules(() =>
-                    {
-                        RuleFor(x => x.item_7)
-                            .Must(HaveMaxThreeDecimals)
-                            .WithMessage("H019: Invalid Entry, Please check the entry");
-                    });
+                When(x => x.item_6 == 1, () =>
+                {
+                    RuleFor(x => x.item_7)
+                        .NotNull()
+                        .GreaterThan(0)
+                        .WithMessage("H019: Invalid Entry, Please check the entry")
+                        .DependentRules(() =>
+                        {
+                            RuleFor(x => x.item_7)
+                                .Must(HaveMaxThreeDecimals)
+                                .WithMessage("H019: Invalid Entry, Please check the entry");
+                        });
+                });
+
 
                 RuleFor(x => x.item_8)
                     .NotEmpty()
@@ -66,9 +69,10 @@ namespace Income.Validators.HIS2026
 
                 RuleFor(x => x.item_9).NotEmpty().WithMessage("H021: Invalid Entry, Please check the entry");
 
-                RuleFor(x => x.item_10)
+                When(x => x.item_9 == 1 || x.item_9 == 2 || x.item_9 == 3, () =>
+                {
+                    RuleFor(x => x.item_10)
                     .NotEmpty()
-                    .When(x => x.item_9 == 1 || x.item_9 == 2 || x.item_9 == 3)
                     .WithMessage("H022(i): Please check the entry")
                     .DependentRules(() =>
                     {
@@ -76,6 +80,9 @@ namespace Income.Validators.HIS2026
                             .Must(IsValidCommaSeparatedList)
                             .WithMessage("Item 10 must contain only values 1,2,3,4,9.");
                     });
+                });
+
+                
 
                 RuleFor(x => x.item_11).NotEmpty().WithMessage("H023: Invalid Entry, Please check the entry");
 

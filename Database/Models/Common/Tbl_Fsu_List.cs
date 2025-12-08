@@ -10,53 +10,30 @@ namespace Income.Database.Models.Common
 {
     public class Tbl_Fsu_List : Tbl_Base
     {
-        public int? village_id { get; set; }
-        public string? village_name { get; set; }
-        public int? town_id { get; set; }
-        public string? town_name { get; set; }
         public string? iv_unit { get; set; }
         public string? block { get; set; }
         public int? total_hhd { get; set; }
         public int? completed_hhd { get; set; }
         public int? framepop { get; set; }
         public bool? is_selection_done { get; set; }
-        public Guid? fsu_survey_id { get; set; }
         public int? lookup_fsu_submit_status { get; set; }
-        public int? framehh { get; set; }
-        public int? su_d { get; set; }
-        public int? su_n { get; set; }
-        public int? sector { get; set; }
         public string? st { get; set; }
-        public string? stnew { get; set; }
-        public int? yr { get; set; }
-        public string? fsu { get; set; }
         public string? sro { get; set; }
         public string? nss_reg { get; set; }
         public string? strm { get; set; }
         public string? sstrm { get; set; }
         public string? dc { get; set; }
-        public string? sp { get; set; }
         public string? dn { get; set; }
-        public string? tehc { get; set; }
         public string? tehn { get; set; }
         public string? fc { get; set; }
         public string? hh { get; set; }
-        public string? ro_name { get; set; }
-        public string? sro_name { get; set; }
         public string? fsuname { get; set; }
-        public string? tvc { get; set; }
-        public string? tvn { get; set; }
         public string? stn { get; set; }
-        public string? asro { get; set; }
-        public string? aro { get; set; }
-        public string? ro_code { get; set; }
         public string? sample { get; set; }
-        public string? block_id { get; set; }
         public int? totalsu { get; set; }
         public int? selsu { get; set; }
         public int? subrnd { get; set; }
         public int? sec { get; set; }
-        public int? visit_no { get; set; }
         public int? quarter { get; set; }
         public int? lookupFsuSubmitStatus { get; set; }
         public string? enumaretor { get; set; }
@@ -75,8 +52,6 @@ namespace Income.Database.Models.Common
         public int? updatelistingcount { get; set; } = 0;
         [JsonIgnore]
         public bool NeedDownload { get; set; } = false;
-        public decimal? a { get; set; }
-        public decimal? b { get; set; }
 
     }
 
