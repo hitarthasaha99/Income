@@ -27,8 +27,20 @@
             </h5>
             @if (!SessionStorage.FSU_Submitted)
             {
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    
                 <div class="card-tools">
                     <button class="btn btn-primary" disabled="@(!benefitsEntryNeeded)" @onclick="@(() => OnShowModalClick("ADD"))"><i class="fi fi-rr-plus me-1"></i>Add</button>
+                </div>
+                }
+            }
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -73,10 +85,14 @@
                                 <td>@item.item_5</td>
                                 @if (!SessionStorage.FSU_Submitted)
                                 {
+                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                    {
+                                        
                                     <td class="d-flex align-items-center">
                                         <button class="btn btn-link me-2 fs-6" @onclick="@(() => OnShowModalClick("UPDATE", item))"><i class="fi fi-rr-pencil"></i></button>
                                         <button class="btn btn-link text-danger fs-6" @onclick="@(() => Delete(item))"><i class="fi fi-rr-trash"></i></button>
                                     </td>
+                                    }
                                 }
 
                             </tr>
@@ -96,14 +112,16 @@
             </h5>
         </div>
         <div class="card-body">
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
             <textarea class="form-control w-100" rows="4" @bind="block_1.block_8b_remark"></textarea>
+            </fieldset>
         </div>
     </div>
 
 
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-secondary"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
+            <button class="btn btn-outline-secondary" @onclick="GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
@@ -118,6 +136,8 @@
         @if (editContext != null)
         {
             <EditForm EditContext="editContext">
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="mb-3">
@@ -188,14 +208,19 @@
                             </div>
                         </div>
                     </div>
+                </fieldset>
                 </EditForm>
 
         }
 
     </BodyTemplate>
     <FooterTemplate>
-        <Button class="btn btn-outline-secondary me-auto" @onclick="OnHideModalClick">Close</Button>
+        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        {
+            
         <Button class="btn btn-primary" @onclick="Save">Save</Button>
+        }
+        <Button class="btn btn-outline-secondary me-auto" @onclick="OnHideModalClick">Close</Button>
     </FooterTemplate>
 </Modal>
 
@@ -214,6 +239,10 @@
     bool isAdd;
     private string remarks = string.Empty;
 
+    async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+    }
     protected override async Task OnInitializedAsync()
     {
         MemberList = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);

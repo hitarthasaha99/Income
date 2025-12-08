@@ -22,16 +22,28 @@
             <h3 class="card-title">
                 <span class="text-primary me-2">[Block 3]</span>demographic and other particulars of household members
             </h3>
+            
             <div class="card-tools">
                 <div class="d-flex align-items-center" hidden="@SessionStorage.FSU_Submitted">
                     @*  <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
                         <i class="fi fi-rr-settings me-1"></i>Generate
                     </button> *@
+                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                    {
                     <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                         <i class="fi fi-rr-plus me-1"></i>Add
                     </button>
+                        
+                    }
                 </div>
+                @* add comment *@
+                @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                {
 
+                    <div class="card-tools">
+                        <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    </div>
+                }
             </div>
         </div>
         <!-- Scrollable table -->
@@ -96,6 +108,9 @@
                                 <td>
                                     @(member.item_12 == 1 ? "yes" : member.item_12 == 2 ? "no" : "")
                                 </td>
+                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                {
+                                    
                                 <td class="d-flex align-items-center">
                                     <button class="btn btn-link me-3 fs-6"
                                             hidden="@SessionStorage.FSU_Submitted"
@@ -108,6 +123,7 @@
                                         <i class="fi fi-rr-trash"></i>
                                     </button>
                                 </td>
+                                }
                             </tr>
                         }
                     </tbody>
@@ -116,34 +132,36 @@
         </div>
     </div>
 </div>
-<!-- 🔹 Footer Navigation (Always visible) -->
-<div class="footer">
-    <!-- Remarks textarea -->
-    <div class="card custom-card">
-        <div class="card-header">
-            <h3 class="card-title">Remarks</h3>
-        </div>
-        <div class="card-body">
-                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here"></textarea>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="d-flex">
-                <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
-                    <i class="fi fi-rr-angle-left me-1"></i>Back
-                </NavLink>
+    <!-- 🔹 Footer Navigation (Always visible) -->
+    <div>
+        <!-- Remarks textarea -->
+    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+        <div class="card custom-card">
+            <div class="card-header">
+                <h3 class="card-title">Remarks</h3>
+            </div>
+            <div class="card-body">
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_3_remark"></textarea>
             </div>
         </div>
-        <div class="col-sm-6">
-            <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
-                    Next<i class="fi fi-rr-angle-right ms-1"></i>
-                </NavLink>
+        </fieldset>
+        <div class="row mb-4">
+            <div class="col-sm-6">
+                <div class="d-flex">
+                    <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
+                        <i class="fi fi-rr-angle-left me-1"></i>Back
+                    </NavLink>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="d-flex align-items-center justify-content-end">
+                    <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
+                        Next<i class="fi fi-rr-angle-right ms-1"></i>
+                    </NavLink>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">

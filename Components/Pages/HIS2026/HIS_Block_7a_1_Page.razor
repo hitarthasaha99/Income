@@ -25,10 +25,23 @@
                 <span class="text-primary me-2">Block 7a</span>
                  Income from Self-employment - Crop cultivation
             </h5>
+
             @if (!SessionStorage.FSU_Submitted)
             {
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    
                 <div class="card-tools">
                     <button class="btn btn-primary" disabled="@(!codeListEntryNeeded)" @onclick="@(() => OnShowModalClick("ADD"))"><i class="fi fi-rr-plus me-1"></i>Add</button>
+                </div>
+                }
+            }
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -89,10 +102,14 @@
                                 <td>@item.item_9</td>
                                 @if (!SessionStorage.FSU_Submitted)
                                 {
+                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                    {
+                                        
                                     <td class="d-flex align-items-center justify-content-center">
                                         <button class="btn btn-link me-2 fs-6" @onclick="@(() => OnShowModalClick("UPDATE", item))"><i class="fi fi-rr-pencil"></i></button>
                                         <button class="btn btn-link text-danger fs-6" @onclick="@(() => Delete(item))"><i class="fi fi-rr-trash"></i></button>
                                     </td>
+                                    }
                                 }
 
                             </tr>
@@ -116,7 +133,7 @@
     </div> *@
     <div class="row">
         <div class="col-sm-6">
-            <button class="btn btn-outline-secondary"><i class="fi fi-rr-angle-left me-1" onclick="@GoBack"></i>Back</button>
+            <button class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">

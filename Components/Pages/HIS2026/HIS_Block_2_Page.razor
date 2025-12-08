@@ -23,11 +23,21 @@
             <h3 class="card-title">
                 <span class="text-primary me-1">[2]</span>@Loc["2_heading"]
             </h3>
+            @* add comment *@
+            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+
+                <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                </div>
+            }
         </div>
 
         @if (editContext != null)
         {
             <EditForm EditContext="editContext">
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-12">
@@ -216,6 +226,7 @@
                         </div>
                     </div>
                 </div>
+                </fieldset>
             </EditForm>
         }
     </div>
@@ -227,7 +238,7 @@
             </div>
             <div class="col-sm-6">
                 <div class="d-flex align-items-center justify-content-end">
-                    @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
+                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                     {
                         <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
                     }

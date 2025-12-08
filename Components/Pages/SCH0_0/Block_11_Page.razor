@@ -336,12 +336,12 @@
             StatusMessage = string.Empty;
             if (surveyCode == 1 || surveyCode == 4)
             {
-                // //(iii) surveycode = 1 or 4 -> time should be zero
-                // if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
-                // {
-                //     StatusMessage = "H000: Time taken cannot be blank or zero";
-                //     StatusClass = "text-danger";
-                // }
+                //(iii) surveycode = 1 or 4 -> time should be zero
+                if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
+                {
+                    StatusMessage = "H011 (iii): Time taken cannot be blank or zero";
+                    StatusClass = "text-danger";
+                }
                 //(vi) surveycode = 1 or 4 -> time should be between 5 and 60
                 if (tbl_Sch_0_0_FieldOperation.time_taken < 5 || tbl_Sch_0_0_FieldOperation.time_taken > 60)
                 {
