@@ -21,7 +21,7 @@
         <!-- 🔹 Sticky Top Action Header -->
         <div class="card-header">
             <h3 class="card-title">
-                <span class="text-primary me-2">[Block 3]</span>demographic and other particulars of household members
+                <span class="text-primary me-2">[Block 3]</span>Demographic and other particulars of household members
             </h3>
             
             <div class="card-tools">
@@ -137,36 +137,36 @@
         </div>
     </div>
 </div>
-    <!-- 🔹 Footer Navigation (Always visible) -->
-    <div>
-        <!-- Remarks textarea -->
+<!-- 🔹 Footer Navigation (Always visible) -->
+<div class="footer">
+    <!-- Remarks textarea -->
     <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
         <div class="card custom-card">
             <div class="card-header">
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_3_remark"></textarea>
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark"></textarea>
             </div>
         </div>
-        </fieldset>
-        <div class="row mb-4">
-            <div class="col-sm-6">
-                <div class="d-flex">
-                    <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
-                        <i class="fi fi-rr-angle-left me-1"></i>Back
-                    </NavLink>
-                </div>
+    </fieldset>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
+                    <i class="fi fi-rr-angle-left me-1"></i>Back
+                </NavLink>
             </div>
-            <div class="col-sm-6">
-                <div class="d-flex align-items-center justify-content-end">
-                    <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
-                        Next<i class="fi fi-rr-angle-right ms-1"></i>
-                    </NavLink>
-                </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit("NEXT"))">
+                    Next<i class="fi fi-rr-angle-right ms-1"></i>
+                </NavLink>
             </div>
         </div>
     </div>
+</div>
 
 
 <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
@@ -197,7 +197,7 @@
                                     <span class="form-badge">2</span> Name of Member
                                 </label>
 
-                                <InputText class="form-control form-control-sm"
+                                <InputText class="form-control"
                                            @bind-Value="newMember.item_2"
                                            placeholder="Enter Name of member"
                                            @oninput="ClearNameError"
@@ -370,12 +370,15 @@
                                                 <label class="form-label">
                                                     <span class="form-badge">8</span> Primary
                                                 </label>
+                                                <CustomDropdown Value="@newMember.item_8"
+                                                            ValueChanged="@(v => OnItem8Changed(v))"
+                                                            Options="@ItemOptions" />
 
-                                                <select class="form-select"
+                                            @*     <select class="form-select"
                                                         value="@newMember.item_8"
                                                         @onchange="ClearItem8">
 
-                                                @* options *@
+                                                options
                                                 <option value="">-Select-</option>
                                                 <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                                 <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
@@ -392,7 +395,7 @@
                                                 <option value="13">earning from interest - 13 </option>
                                                 <option value="14">unfit for work due to disability or illness – 14 </option>
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                            </select>
+                                            </select> *@
 
                                                 <ValidationMessage For="@(() => newMember.item_8)" />
 
@@ -405,16 +408,18 @@
 
                                         <!-- Item 9 -->
                                         <div class="col-sm-12">
-                                            <div class="mb-3">
+                                            <div>
                                                 <label class="form-label">
                                                     <span class="form-badge">9</span> Secondary
                                                 </label>
-
-                                                <select class="form-select"
+                                                <CustomDropdown Value="@newMember.item_9"
+                                                            ValueChanged="@(v => OnItem9Changed(v))"
+                                                            Options="@ItemOptions" />
+                                                @* <select class="form-select"
                                                         value="@newMember.item_9"
                                                         @onchange="ClearItem9">
 
-                                                    @* options *@
+                                                    options
                                                     <option value="">-Select-</option>
                                                     <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                                     <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
@@ -431,7 +436,7 @@
                                                     <option value="13">earning from interest - 13 </option>
                                                     <option value="14">unfit for work due to disability or illness – 14 </option>
                                                     <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                                </select>
+                                                </select> *@
 
                                                 <ValidationMessage For="@(() => newMember.item_9)" />
 
@@ -457,12 +462,14 @@
                                                 <label class="form-label">
                                                     <span class="form-badge">10</span> Primary
                                                 </label>
-
-                                                <select class="form-select"
+                                                <CustomDropdown Value="@newMember.item_10"
+                                                                ValueChanged="@(v => OnItem10Changed(v))"
+                                                                Options="@ItemOptions" />
+                                                @* <select class="form-select"
                                                         value="@newMember.item_10"
                                                         @onchange="ClearItem10">
 
-                                                    @* options *@
+                                                    options
                                                     <option value="">-Select-</option>
                                                     <!-- Same options as above for primary -->
                                                     <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
@@ -480,7 +487,7 @@
                                                     <option value="13">earning from interest - 13 </option>
                                                     <option value="14">unfit for work due to disability or illness – 14 </option>
                                                     <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                                </select>
+                                                </select> *@
 
                                                 <ValidationMessage For="@(() => newMember.item_10)" />
 
@@ -493,16 +500,18 @@
 
                                         <!-- Item 11 -->
                                         <div class="col-sm-12">
-                                            <div class="mb-3">
+                                            <div>
                                                 <label class="form-label">
                                                     <span class="form-badge">11</span> Secondary
                                                 </label>
-
-                                                <select class="form-select"
+                                                <CustomDropdown Value="@newMember.item_11"
+                                                            ValueChanged="@(v => OnItem11Changed(v))"
+                                                            Options="@ItemOptions" />
+                                                @* <select class="form-select"
                                                         value="@newMember.item_11"
                                                         @onchange="ClearItem11">
 
-                                                    @* options *@
+                                                    options
                                                     <option value="">-Select-</option>
                                                     <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
                                                     <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
@@ -519,7 +528,7 @@
                                                     <option value="13">earning from interest - 13 </option>
                                                     <option value="14">unfit for work due to disability or illness – 14 </option>
                                                     <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                                </select>
+                                                </select> *@
 
                                                 <ValidationMessage For="@(() => newMember.item_11)" />
 
@@ -731,56 +740,88 @@
         CheckItem7Warning();
     }
 
-
-    private void ClearItem8(ChangeEventArgs e)
+    private void OnItem8Changed(int? value)
     {
         ClearItem8Error();
         item_8Error = null;
-
-        if (int.TryParse(e.Value?.ToString(), out int v))
-            newMember.item_8 = v;
-        else
-            newMember.item_8 = null;
-
+        newMember.item_8 = value;
         CheckItem8Warning();
         StateHasChanged();
     }
-    private void ClearItem9(ChangeEventArgs e)
+    // private void ClearItem8(ChangeEventArgs e)
+    // {
+    //     ClearItem8Error();
+    //     item_8Error = null;
+
+    //     if (int.TryParse(e.Value?.ToString(), out int v))
+    //         newMember.item_8 = v;
+    //     else
+    //         newMember.item_8 = null;
+
+    //     CheckItem8Warning();
+    //     StateHasChanged();
+    // }
+
+    private void OnItem9Changed(int? value)
     {
         ClearItem9Error();
         item_9Error = null;
-
-        if (int.TryParse(e.Value?.ToString(), out int v))
-            newMember.item_9 = v;
-        else
-            newMember.item_9 = null;
+        newMember.item_9 = value;
         CheckItem9Warning();
         StateHasChanged();
     }
-    private void ClearItem10(ChangeEventArgs e)
+    // private void ClearItem9(ChangeEventArgs e)
+    // {
+    //     ClearItem9Error();
+    //     item_9Error = null;
+
+    //     if (int.TryParse(e.Value?.ToString(), out int v))
+    //         newMember.item_9 = v;
+    //     else
+    //         newMember.item_9 = null;
+    //     CheckItem9Warning();
+    //     StateHasChanged();
+    // }
+    private void OnItem10Changed(int? value)
     {
         ClearItem10Error();
         item_10Error = null;
-
-        if (int.TryParse(e.Value?.ToString(), out int v))
-            newMember.item_10 = v;
-        else
-            newMember.item_10 = null;
+        newMember.item_10 = value;
         CheckItem10Warning();
         StateHasChanged();
     }
-    private void ClearItem11(ChangeEventArgs e)
+    // private void ClearItem10(ChangeEventArgs e)
+    // {
+    //     ClearItem10Error();
+    //     item_10Error = null;
+
+    //     if (int.TryParse(e.Value?.ToString(), out int v))
+    //         newMember.item_10 = v;
+    //     else
+    //         newMember.item_10 = null;
+    //     CheckItem10Warning();
+    //     StateHasChanged();
+    // }
+    private void OnItem11Changed(int? value)
     {
         ClearItem11Error();
         item_11Error = null;
-
-        if (int.TryParse(e.Value?.ToString(), out int v))
-            newMember.item_11 = v;
-        else
-            newMember.item_11 = null;
+        newMember.item_11 = value;
         CheckItem11Warning();
         StateHasChanged();
     }
+    // private void ClearItem11(ChangeEventArgs e)
+    // {
+    //     ClearItem11Error();
+    //     item_11Error = null;
+
+    //     if (int.TryParse(e.Value?.ToString(), out int v))
+    //         newMember.item_11 = v;
+    //     else
+    //         newMember.item_11 = null;
+    //     CheckItem11Warning();
+    //     StateHasChanged();
+    // }
     private void ClearItem12(ChangeEventArgs e)
     {
         // Clear validation error
@@ -1407,7 +1448,24 @@
 
 
     }
-
-
+    // Item 8,9,10,11 List
+    private List<CustomDropdown.OptionItem> ItemOptions = new()
+    {
+        new CustomDropdown.OptionItem{ Value=1, Text="Self-employed in agriculture (own account worker/employer) - 01" },
+        new CustomDropdown.OptionItem{ Value=2, Text="Self-employed in non- agriculture (own account worker/employer) – 02" },
+        new CustomDropdown.OptionItem{ Value=3, Text="Unpaid family worker in agriculture or non-agriculture – 03" },
+        new CustomDropdown.OptionItem{ Value=4, Text="Regular wage/ salary – 04" },
+        new CustomDropdown.OptionItem{ Value=5, Text="Casual labour – 05" },
+        new CustomDropdown.OptionItem{ Value=6, Text="Did not work but was seeking and/or available for work – 06" },
+        new CustomDropdown.OptionItem{ Value=7, Text="Student / attended educational institution - 07" },
+        new CustomDropdown.OptionItem{ Value=8, Text="Attended domestic duties only – 08" },
+        new CustomDropdown.OptionItem{ Value=9, Text="Attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09" },
+        new CustomDropdown.OptionItem{ Value=10, Text="Earning from rent – 10" },
+        new CustomDropdown.OptionItem{ Value=11, Text="Earning from pensions -11" },
+        new CustomDropdown.OptionItem{ Value=12, Text="Earning from remittances -12" },
+        new CustomDropdown.OptionItem{ Value=13, Text="Earning from interest - 13" },
+        new CustomDropdown.OptionItem{ Value=14, Text="Unfit for work due to disability or illness – 14" },
+        new CustomDropdown.OptionItem{ Value=15, Text="Others (including children not attending school, begging, prostitution, etc.) – 15" },
+    };
 }
 
