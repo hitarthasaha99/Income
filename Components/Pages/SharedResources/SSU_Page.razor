@@ -262,8 +262,7 @@
 		if (data != null && data.Count > 0)
 		{
 			hhd_list = new();
-			List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.Block_7_3).ToList();
-			int i = 1;
+			List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ToList();
 			foreach (var item in selected)
 			{
 				hhd_list.Add(item);
@@ -354,6 +353,7 @@
 							if (hhd_data != null)
 							{
 								data.IncomeSchHISDto.Add(hhd_data);
+								hhd.hhdStatus = 21;
 							}
 						}
 
@@ -371,6 +371,10 @@
 						if (response != null && response.IsSuccessStatusCode)
 						{
 							toastService.ShowSuccess("Data submitted successfully");
+							foreach (var hhd in hhd_list)
+							{
+								await dQ.SaveUpdateSCH0Block7(hhd);
+							}
 							SessionStorage.FSU_Submitted = true;
 							StateHasChanged();
 						}
@@ -687,6 +691,7 @@
 
 	private async Task ValidateAndSetSubmissionStatusSSO(List<Tbl_Sch_0_0_Block_7> hhd_list)
 	{
+		//This is a two way logic. SSO can submit to DS OR refer-back to ENM.
 		try
 		{
 
@@ -699,6 +704,7 @@
 
 	private async Task ValidateAndSetSubmissionStatusDS(List<Tbl_Sch_0_0_Block_7> hhd_list)
 	{
+		//DS can only referback to SUP
 		try
 		{
 

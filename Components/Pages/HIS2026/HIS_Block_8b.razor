@@ -113,7 +113,7 @@
 
     </div>
 </div>
-<Modal @ref="modal" title="@((isAdd ? "Add Details" : "Update Details"))" IsVerticallyCentered="true" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
+<Modal @ref="modal" title="@((isAdd ? "Add Details" : "Update Details"))" IsVerticallyCentered="true" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
     <BodyTemplate>
         @if (editContext != null)
         {
@@ -366,9 +366,7 @@
             {
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
-
            
-            NavigationManager.NavigateTo("/dashboard/his/block_9a");
             if (benefitsEntryNeeded && SchemeList.Count == 0)
             {
                 toastService.ShowError("H059: Need to enter atleast entry in Q8.6");

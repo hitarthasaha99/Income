@@ -426,7 +426,7 @@
 
             if (isValid)
             {
-                if(block_0_1_VM.ShowItem17RemarksField && string.IsNullOrEmpty(block_0_1_VM.block_0_1.remarks_block_1_17))
+                if(block_0_1_VM.ShowItem17RemarksField && string.IsNullOrWhiteSpace(block_0_1_VM.block_0_1.remarks_block_1_17))
                 {
                     toastService.ShowError("Enter remarks before proceeding");
                     return;

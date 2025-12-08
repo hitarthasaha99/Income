@@ -83,26 +83,11 @@
                         <input type="text" class="form-control is_sso" disabled value="@block_1.sample_su_number">
                     </div>
                 </div>
+                
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
-                            <span class="form-badge">8</span>@Loc["round_number"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.round_number">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">9</span>@Loc["sch_no"]
-                        </label>
-                        <input type="text" class="form-control is_sso" disabled value="@block_1.schedule_number">
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">10</span>@Loc["serial_no_sample_fsu"]
+                            <span class="form-badge">8</span>@Loc["serial_no_sample_fsu"]
                         </label>
                         <input type="text" class="form-control is_sso" disabled value="@block_1.serial_number_sample_fsu">
                     </div>
@@ -110,7 +95,7 @@
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
-                            <span class="form-badge">11</span>@Loc["sample_sub_div_no"]
+                            <span class="form-badge">9</span>@Loc["sample_sub_div_no"]
                         </label>
                         <input type="text" class="form-control is_sso" disabled value="@block_1.sample_sub_division_number">
                     </div>
@@ -118,7 +103,15 @@
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
-                            <span class="form-badge">12</span>@Loc["sample_hh_number"]
+                            <span class="form-badge">10</span>@Loc["sss_number"]
+                        </label>
+                        <input type="text" class="form-control is_sso" disabled value="@block_1.sss_number">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">11</span>@Loc["sample_hh_number"]
                         </label>
                         <input type="text" class="form-control is_sso" disabled value="@block_1.sample_hhd_number">
                     </div>
@@ -126,7 +119,7 @@
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
-                            <span class="form-badge">13</span>@Loc["survey_code"]
+                            <span class="form-badge">12</span>@Loc["survey_code"]
                         </label>
                         <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
                             <option value="">Select</option>
@@ -156,7 +149,7 @@
                <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
-                            <span class="form-badge">14</span>@Loc["reason_for_substitution"]
+                            <span class="form-badge">13</span>@Loc["reason_for_substitution"]
                         </label>
 
                         <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
@@ -174,7 +167,7 @@
                     <div class="col-sm-12" hidden="@(!is_remarks_visible)">
                         <div class="mb-3">
                             <label class="form-label">
-                                <span class="form-badge">17.1</span>
+                                <span class="form-badge">13.1</span>
                                 Reason
                             </label>
                             <textarea maxlength="50" disabled="@SessionStorage.FSU_Submitted" type="text" rows="1" class="form-control" @bind="block_1.substitution_reason_remark"></textarea>
@@ -213,7 +206,7 @@
 </div>
 
 
-<Modal @ref="comment_vm.AddModal" Title="Comment" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
+<Modal @ref="comment_vm.AddModal" Title="Comment" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
     <BodyTemplate>
         <div class="mb-3">
             <div class="row mb-2">
@@ -385,9 +378,7 @@
 
     async void Update(Tbl_Comments data)
     {
-
         comment_vm.LoadDataById(data);
-
     }
 
     async void GoBack()
@@ -460,9 +451,9 @@
             block_1.village_name = sch_0_block_1_res.Block_0_4;
             block_1.investigator_unit_no = sch_0_block_1_res.Block_1_7;
             block_1.sample_su_number = GetSelectedSUNumber?.Where(x => x.IsChecked == true)?.FirstOrDefault()?.serial_number.ToString();//sch_0_block_1_res.Block_1_8;
-            block_1.round_number = "80";//sch_0_block_1_res.Block_1_9;
             block_1.schedule_number = "HIS2026";
-            block_1.serial_number_sample_fsu = SessionStorage.SelectedFSUId.ToString();//sch_0_block_1_res.Block_1_11;
+            block_1.sss_number = hhd?.SSS ?? 0;
+            block_1.serial_number_sample_fsu = SessionStorage.SelectedFSUId.ToString();
             block_1.sample_sub_division_number = subD;
             block_1.sample_hhd_number = SessionStorage.selected_hhd_seq;
             block_1.town_name = sch_0_block_1_res.Block_0_4;
@@ -498,7 +489,7 @@
             return;
         }
 
-        if (is_remarks_visible && string.IsNullOrEmpty(block_1.substitution_reason_remark))
+        if (is_remarks_visible && string.IsNullOrWhiteSpace(block_1.substitution_reason_remark))
         {
             toastService.ShowError("Please provide a reason before proceeding");
             return;

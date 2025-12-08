@@ -57,7 +57,7 @@
                         <label class="form-label">
                             <span class="form-badge">2.1</span>Date of start of field work
                         </label>
-                        <input type="text" class="form-control is_sso" @bind="block_0_1.survey_timestamp" disabled>
+                            <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_start_date" disabled>
                     </div>
                 </div>
                <div class="col-sm-12">
@@ -270,7 +270,10 @@
             }
             else
             {
-
+                if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.FSU_Submitted)
+                {
+                    tbl_Sch_0_0_FieldOperation.field_work_end_date = DateTime.Now;
+                }
                 if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                 {
                     tbl_Sch_0_0_FieldOperation.supervisor_name = SessionStorage.user_name;
@@ -315,7 +318,7 @@
             //     StatusMessage = "W000: Time taken should be > 5 hours";
             // }
             //For zero case - time should be < 5
-            if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
+            if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && (value >= 5))
             {
                 StatusClass = "text-success";
                 StatusMessage = "W011(vi): Time taken should be < 5 hours";
@@ -336,12 +339,12 @@
             StatusMessage = string.Empty;
             if (surveyCode == 1 || surveyCode == 4)
             {
-                // //(iii) surveycode = 1 or 4 -> time should be zero
-                // if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
-                // {
-                //     StatusMessage = "H000: Time taken cannot be blank or zero";
-                //     StatusClass = "text-danger";
-                // }
+                //(iii) surveycode = 1 or 4 -> time should be zero
+                if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
+                {
+                    StatusMessage = "H011 (iii): Time taken cannot be blank or zero";
+                    StatusClass = "text-danger";
+                }
                 //(vi) surveycode = 1 or 4 -> time should be between 5 and 60
                 if (tbl_Sch_0_0_FieldOperation.time_taken < 5 || tbl_Sch_0_0_FieldOperation.time_taken > 60)
                 {

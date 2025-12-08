@@ -98,14 +98,14 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
-                <NavLink class="btn btn-primary" @onclick="@(() => ValidateAndSave(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+                <NavLink class="btn btn-primary" @onclick="@(() => Navigate())">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
 
     </div>
 </div>
 @* Model Popup When Click Add Button *@
-<Modal @ref="AddModal" id="addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size=ModalSize.ExtraLarge Fullscreen="ModalFullscreen.MediumDown">
+<Modal @ref="AddModal" id="addModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size=ModalSize.ExtraLarge Fullscreen="ModalFullscreen.LargeDown">
     <HeaderTemplate>
         <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
     </HeaderTemplate>
@@ -330,27 +330,6 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_A");
                 return;
             }
-            if (block_1 != null)
-            {
-                await dB.SaveAsync<Tbl_Block_1>(block_1);
-            }
-            NavigationManager.NavigateTo("/dashboard/his/block_A");
-
-
-            if (is_go_next)
-            {
-                if(showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
-                {
-                    toastService.ShowError("Please save all the entries before proceeding");
-                    return;
-                }
-                else
-                {
-                    NavigationManager.NavigateTo("/dashboard/his/block_A");
-                    return;
-                }
-            }
-
             // Clear previous errors
             messageStore.Clear();
 
@@ -400,7 +379,18 @@
         {
             Console.WriteLine(ex.Message);
         }
-        
+
+    }
+
+    private void Navigate()
+    {
+        // Navigate to the next block/page
+        if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
+        {
+            toastService.ShowError("Please save all the entries before proceeding");
+            return;
+        }
+        NavigationManager.NavigateTo("/dashboard/his/block_A");
     }
 
     //Clear all error when input any thing
