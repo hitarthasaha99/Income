@@ -384,17 +384,6 @@
 
     }
 
-    private void Navigate()
-    {
-        // Navigate to the next block/page
-        if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
-        {
-            toastService.ShowError("Please save all the entries before proceeding");
-            return;
-        }
-        NavigationManager.NavigateTo("/dashboard/his/block_A");
-    }
-
     //Clear all error when input any thing
     private void clearItem2Error() => item_2Error = null;
     private void clearItem3Error() => item_3Error = null;
