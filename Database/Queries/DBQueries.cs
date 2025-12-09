@@ -1412,7 +1412,7 @@ namespace Income.Database.Queries
 
         public async Task<int> Update_SCH0_0_Block_5AHHD_Status(int status, int hhd_id, int fsu_id)
         {
-            var query = "UPDATE Tbl_Sch_0_0_Block_5 SET hhdStatus = ? WHERE Block_5A_3 = ? AND fsu_id = ?";
+            var query = "UPDATE Tbl_Sch_0_0_Block_7 SET hhdStatus = ? WHERE Block_7_3 = ? AND fsu_id = ?";
             return await _database.ExecuteAsync(query, status, hhd_id, fsu_id);
         }
         public async Task<int> Update_SCH0_0_Block_5Download_Status(int status, int hhd_id, int fsu_id)

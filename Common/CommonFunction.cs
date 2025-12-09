@@ -276,45 +276,6 @@ namespace Income.Common
             }
         }
 
-        public async Task WriteJsonToFileAsync(string json, string baseFileName = "TravelJSON")
-        {
-            try
-            {
-                string documentsPath = string.Empty;
-#if ANDROID
-                await RequestPermissionsAsync();
-#endif
-#if ANDROID
-                documentsPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)?.AbsolutePath ?? string.Empty;
-#endif
-#if WINDOWS
-                documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-#endif
-                // Get the app's local folder
-                string timestamp = DateTime.Now.ToString("yyyy-MMM-dd_HH-mm-ss-fff");
-                string filePath = Path.Combine(documentsPath, "Income_JSON", $"{baseFileName}_{timestamp}.json");
-
-                // Extract directory path
-                string directoryPath = Path.GetDirectoryName(filePath);
-
-                // Check if the directory exists, and create it if it doesn't
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-
-                using (var writer = new StreamWriter(filePath, false))
-                {
-                    await writer.WriteAsync(json);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error writing JSON to file: {ex.Message}");
-            }
-        }
-
-
         public async Task<string> Export()
         {
             try

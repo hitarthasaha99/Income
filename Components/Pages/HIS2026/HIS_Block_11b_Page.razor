@@ -369,6 +369,11 @@
     {
         try
         {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_A");
+                return;
+            }
             // Navigate to the next block/page
             if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
             {

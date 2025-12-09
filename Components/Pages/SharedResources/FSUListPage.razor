@@ -254,7 +254,7 @@
             else if (block_name == "his")
             {
                 var data = await dB.GetSelectedBlock7List(fsu_id);
-                if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
+                if (data == null || data.Count == 0)
                 {
                     toastService.ShowError("Please ensure the selection is done and the data is downloaded Sucessfully.");
                     return;
