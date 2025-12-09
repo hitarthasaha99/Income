@@ -1404,6 +1404,31 @@
             return;
         }
 
+        CheckGenderWarning();
+        checkAgeWarning();
+        checkAgeReletionWarning();
+        checkSingleUser();
+        checkItem_6Warning();
+        CheckItem7Warning();
+        CheckItem8Warning();
+        CheckItem9Warning();
+        CheckItem10Warning();
+        CheckItem11Warning();
+
+
+        if(!string.IsNullOrEmpty(genderWarning))
+        {
+            warningVM.AddWarning(genderWarning, "HIS", "3", "4", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(ageWarning))
+        {
+            warningVM.AddWarning(ageWarning, "HIS", "3", "4", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(ageRelationWarning))
+        {
+            warningVM.AddWarning(ageRelationWarning, "HIS", "3", "5", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+
         await DBQueries.Save_SCH_HIS_Block3(newMember);
         // toastService.ShowSuccess("Member added successfully!");
         toastService.ShowSuccess(isAdd ? "Member added successfully!" : "Member updated successfully!");
