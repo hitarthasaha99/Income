@@ -81,7 +81,7 @@
                     <label for="remarksTextarea" class="form-label">Remarks</label>
                     <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-                    <textarea class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
+                    <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here"></textarea>
                     </fieldset>
                 </div>
             </div>

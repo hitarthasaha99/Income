@@ -1,0 +1,64 @@
+﻿@inject IJSRuntime jsRuntime
+<div class="custom-dropdown" @ref="DropdownRef">
+    <div class="selected-item" @onclick="ToggleDropdown">
+        @SelectedText
+    </div>
+    @if (IsOpen)
+    {
+        <div class="dropdown-options">
+            @foreach (var option in Options)
+            {
+                <div class="option" @onclick="() => SelectOption(option)" @onclick:stopPropagation>
+                    @option.Text
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int? Value { get; set; }
+    [Parameter] public EventCallback<int?> ValueChanged { get; set; }
+    [Parameter] public List<OptionItem> Options { get; set; } = new List<OptionItem>();
+
+    private bool IsOpen = false;
+    private ElementReference DropdownRef;
+
+    private string SelectedText => Options.FirstOrDefault(o => o.Value == Value)?.Text ?? "-Select-";
+
+    private void ToggleDropdown()
+    {
+        IsOpen = !IsOpen;
+    }
+
+    private async Task SelectOption(OptionItem option)
+    {
+        Value = option.Value;
+        IsOpen = false;
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    // Detect clicks outside to close dropdown
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("registerOutsideClickHandler", DotNetObjectReference.Create(this), DropdownRef);
+        }
+    }
+
+    [JSInvokable]
+    public void CloseDropdown()
+    {
+        IsOpen = false;
+        StateHasChanged();
+    }
+
+    [Inject] private IJSRuntime JS { get; set; }
+
+    public class OptionItem
+    {
+        public int? Value { get; set; }
+        public string Text { get; set; }
+    }
+}
