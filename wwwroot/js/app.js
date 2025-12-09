@@ -179,4 +179,12 @@ async function downloadFile (fileName, base64Data) {
     const base_64 = "data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64," + base64Data;
     return base_64;
 }
+window.registerOutsideClickHandler = (dotNetHelper, dropdownElement) => {
+    document.addEventListener('click', function (e) {
+        if (!dropdownElement.contains(e.target)) {
+            dotNetHelper.invokeMethodAsync('CloseDropdown');
+        }
+    });
+};
+
 
