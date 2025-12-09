@@ -155,6 +155,11 @@
                 DisableEdit = block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             }
 
+            if(!DisableEdit)
+            {
+                return;
+            }
+
             if (selected_su != null)
             {
                 block_4.sample_su_number = selected_su?.serial_number;

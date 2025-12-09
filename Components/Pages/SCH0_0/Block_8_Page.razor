@@ -273,7 +273,7 @@
         var response = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
         if (response != null && response.Count > 0)
         {
-            population = response.Count();
+            population = response.Sum(x => x.Block_7_5.GetValueOrDefault());
 
             if(sector == 1)
             {

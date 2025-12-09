@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -319,14 +320,16 @@ namespace Income.Common
             try
             {
                 string documentsPath = string.Empty;
+
 #if ANDROID
                 await RequestPermissionsAsync();
+                documentsPath = Android.OS.Environment
+                    .GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)?
+                    .AbsolutePath ?? string.Empty;
 #endif
-#if ANDROID
-                documentsPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)?.AbsolutePath ?? string.Empty;
-#endif
+
 #if WINDOWS
-                documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 #endif
 
                 if (string.IsNullOrEmpty(documentsPath))
@@ -334,50 +337,95 @@ namespace Income.Common
                     documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 }
 
-                string ExportPath = Path.Combine(documentsPath, "Income_EXPORT");
+                // Main export folder
+                string exportFolder = Path.Combine(documentsPath, "Income_EXPORT");
+                Directory.CreateDirectory(exportFolder);
 
-                // Create the folder if it doesn't exist
-                if (!Directory.Exists(ExportPath))
+                string timestamp = DateTime.Now.ToString("dd_MMM_yyyy_HH-mm-ss");
+
+                // TEMP folder to put files BEFORE zipping
+                string tempExport = Path.Combine(exportFolder, $"TEMP_{timestamp}");
+                Directory.CreateDirectory(tempExport);
+
+                // ===============================
+                // 1. Copy Income.db3 into TEMP
+                // ===============================
+
+                string dbName = "Income.db3";
+                string sourceDbPath = Path.Combine(FileSystem.AppDataDirectory, dbName);
+
+                if (!File.Exists(sourceDbPath))
+                    return CommonConstants.FAILURE_TEXT;
+
+                string tempDbPath = Path.Combine(tempExport, $"Income_{timestamp}.db3");
+                File.Copy(sourceDbPath, tempDbPath, true);
+
+
+                // ===============================
+                // 2. Copy SubmissionJSON folder into TEMP
+                // ===============================
+
+                string submissionJsonFolder = Path.Combine(documentsPath, "Income_Logs", "SubmissionJSON");
+
+                if (Directory.Exists(submissionJsonFolder))
                 {
-                    Directory.CreateDirectory(ExportPath);
+                    string tempSubmissionJson = Path.Combine(tempExport, "SubmissionJSON");
+                    CopyDirectory(submissionJsonFolder, tempSubmissionJson);
                 }
 
 
-                string[] fileNames = { "Income.db3" };
-                string sourceFile = FileSystem.AppDataDirectory;
-                string sourcePath = string.Empty;
-                string targetLogPath = string.Empty;
-                string message = "";
+                // ===============================
+                // 3. Create ZIP
+                // ===============================
 
-                foreach (var fileName in fileNames)
-                {
+                string zipFileName = $"Income_Export_{SessionStorage.user_name}_{timestamp}.zip";
+                string zipFilePath = Path.Combine(exportFolder, zipFileName);
 
-                    sourcePath = Path.Combine(sourceFile, fileName);
-                    string timestamp = DateTime.Now.ToString("dd_MMM_yyyy_HH-mm-ss");
-                    string fileNameWithDate = Path.GetFileNameWithoutExtension(fileName) + "_" + timestamp + Path.GetExtension(fileName);
-                    targetLogPath = Path.Combine(ExportPath, fileNameWithDate);
-                    if (!File.Exists(sourcePath))
-                    {
-                        //await Shell.Current.DisplayAlert("Alert", "File does not exist", "OK");
-                        return CommonConstants.FAILURE_TEXT;
-                    }
-                    if (File.Exists(targetLogPath))
-                    {
-                        File.Delete(targetLogPath);
-                    }
-                    // Open the source file
-                    File.Copy(sourcePath, targetLogPath);
+                if (File.Exists(zipFilePath))
+                    File.Delete(zipFilePath);
 
-                    message = $"{CommonConstants.SUCCESS_TEXT}: DB Exported At {targetLogPath}/{fileNameWithDate}";
-                }
-                return message;
+                ZipFile.CreateFromDirectory(
+                    tempExport,
+                    zipFilePath,
+                    CompressionLevel.Optimal,
+                    includeBaseDirectory: false
+                );
+
+
+                // ===============================
+                // 4. Delete TEMP folder (but keep ZIP)
+                // ===============================
+
+                Directory.Delete(tempExport, true);
+
+                return $"{CommonConstants.SUCCESS_TEXT}: Export created at {zipFilePath}";
             }
             catch (Exception ex)
             {
                 return $"DB Export Failed : {ex.Message} : {CommonConstants.FAILURE_TEXT}";
-                //await Shell.Current.DisplayAlert("Fail", "File has been export failed", "OK");
             }
         }
+
+        private void CopyDirectory(string sourceDir, string destinationDir)
+        {
+            DirectoryInfo dir = new DirectoryInfo(sourceDir);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            Directory.CreateDirectory(destinationDir);
+
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                string targetFilePath = Path.Combine(destinationDir, file.Name);
+                file.CopyTo(targetFilePath, true);
+            }
+
+            foreach (DirectoryInfo subDir in dirs)
+            {
+                string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                CopyDirectory(subDir.FullName, newDestinationDir);
+            }
+        }
+
 
         public async Task<string> DownloadPrintedFile(string file_data, string file_name)
         {
