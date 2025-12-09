@@ -1364,7 +1364,8 @@
         }
 
         await DBQueries.Save_SCH_HIS_Block3(newMember);
-        toastService.ShowSuccess("Member added successfully!");
+        // toastService.ShowSuccess("Member added successfully!");
+        toastService.ShowSuccess(isAdd ? "Member added successfully!" : "Member updated successfully!");
         await AddModal.HideAsync();
         await LoadData();
 
