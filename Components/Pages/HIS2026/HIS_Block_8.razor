@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @using FluentValidation
+@using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Linq.Expressions
@@ -154,7 +155,7 @@
     DateTime survey_time = DateTime.Now;
     private Tbl_Block_8? model;
     private Tbl_Block_1? block_1 = new();
-
+    CommonQueries commonQueries = new();
     EditContext editContext;
     ValidationMessageStore messageStore;
     private string? remarks = string.Empty;
@@ -189,6 +190,14 @@
             await loggingService.LogError("HIS Block 8 OnInitializedAsync", ex);
         }
         block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_8a",
+            block_title = "HIS Block 8a",
+            block_code = CommonEnum.his_block_8a.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
+        StateHasChanged();
     }
 
     private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)

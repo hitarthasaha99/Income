@@ -101,7 +101,7 @@
 @code {
     private DateTime survey_date = DateTime.Now;
     private Tbl_Block_1? block_1 = new();
-
+    CommonQueries commonQueries = new();
 
     private double B1;
     private double B2;
@@ -158,7 +158,13 @@
             }
         }
         
-
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_B",
+            block_title = "HIS Block B",
+            block_code = CommonEnum.his_block_B.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

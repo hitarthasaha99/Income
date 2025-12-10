@@ -287,6 +287,7 @@
     private Modal modal = default!;
     private Tbl_Block_4? block_4 = null;
     private Tbl_Block_7a_1 block_7_1 = new();
+    CommonQueries commonQueries = new();
     private List<Tbl_Block_7a_1> ActivityList = [];
     EditContext editContext;
     ValidationMessageStore messageStore;
@@ -305,7 +306,14 @@
         block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
         codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault());
 
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_7a",
+            block_title = "HIS Block 7a",
+            block_code = CommonEnum.his_block_7a.ToString(),
+        };
         await LoadData();
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 
