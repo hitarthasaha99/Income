@@ -459,7 +459,7 @@
                                 <label for="remarksTextarea" class="form-label">Remarks</label>
                                 <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-                                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="3" placeholder="Enter remarks here" @bind="block_1.block_10_remark"></textarea>
+                                <textarea maxlength="500" class="form-control" id="remarksTextarea" @bind="block_1.block_10_remark" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
                                 </fieldset>
                             </div>
                     </div>

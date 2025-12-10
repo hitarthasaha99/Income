@@ -181,14 +181,14 @@
                                 <span class="form-badge">17.1</span>
                                 Reason
                             </label>
-                            <textarea maxlength="50" disabled="@SessionStorage.FSU_Submitted" type="text" rows="1" class="form-control" @bind="block_1.substitution_reason_remark"></textarea>
+                            <textarea maxlength="50" disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control" @bind="block_1.substitution_reason_remark" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
                         </div>
                     </div>
                </div>
                <div class="col-sm-12">
                     <div class="mb-3 col-12">
                         <label class="form-label"><span class="form-badge">15</span>Remarks</label>
-                        <textarea maxlength="500" type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control is_sso" cols="4" @bind="block_1.block_1_remark"></textarea>
+                        <textarea maxlength="500" type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control is_sso w-100" @bind="block_1.block_1_remark" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
                     </div>
                </div>
             </div>
@@ -259,7 +259,7 @@
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label for="commentBox" class="form-label">Enter your comment</label>
-                        <textarea class="form-control" id="commentBox" rows="2" @bind="comment_vm.comment"></textarea>
+                        <textarea class="form-control" id="commentBox" @bind="comment_vm.comment" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
                         @if (comment_vm.ShowError)
                         {
                             <div class="text-danger mt-2">Comment cannot be empty.</div>

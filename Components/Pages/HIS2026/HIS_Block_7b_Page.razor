@@ -465,7 +465,7 @@
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="4"></textarea>
+                <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="2" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
         </div>
         </fieldset>
     </div>

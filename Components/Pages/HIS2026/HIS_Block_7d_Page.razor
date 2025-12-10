@@ -114,8 +114,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-            <textarea maxlength="500" class="form-control w-100" rows="4" @bind = "block_1.block_7d_remark"></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7d_remark" placeholder="Enter your remarks..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>

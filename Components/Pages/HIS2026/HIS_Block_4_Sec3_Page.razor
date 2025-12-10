@@ -281,7 +281,7 @@
                 <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
             <div class="card-body">
-                    <textarea type="text" class="form-control is_sso" disabled="@(SessionStorage.FSU_Submitted))" placeholder="" cols="4" @bind="block_1.block_4_remark"></textarea>
+                <textarea type="text" class="form-control is_sso w-100" disabled="@(SessionStorage.FSU_Submitted))" placeholder="Enter your text here..." rows="2" @bind="block_1.block_4_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </div>
             </fieldset>
         </div>
@@ -325,7 +325,7 @@
                 </div>
                 <div class="col-sm-12">
                     <label for="commentBox" class="form-label">Enter your comment</label>
-                    <textarea class="form-control" id="commentBox" rows="2" @bind="comment_vm.comment"></textarea>
+                    <textarea class="form-control" id="commentBox" rows="2" @bind="comment_vm.comment" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
                     @if (comment_vm.ShowError)
                     {
                         <div class="form-text text-danger">Comment cannot be empty.</div>

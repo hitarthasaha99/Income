@@ -221,7 +221,7 @@
                                     <span class="form-badge">17.1</span>
                                     Reason
                                 </label>
-                                <textarea maxlength="50" disabled="@SessionStorage.hamlet_selection_done" type="text" rows="1" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17"></textarea>
+                                <textarea maxlength="50" disabled="@SessionStorage.hamlet_selection_done" type="text" rows="2" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
                             </div>
                         </div>
                     </div>
