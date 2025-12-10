@@ -229,6 +229,7 @@
     Modal AddModal = default!;
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
+    CommonQueries commonQueries = new();
     DateTime survey_time = DateTime.Now;
     DBQueries dQ = new();
     int hhdStatus = 0;
@@ -286,6 +287,13 @@
             toastService.ShowError("Unexpected error: Block 4 data not found");
         }
 
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_4_2",
+            block_title = "HIS Block 4_2",
+            block_code = CommonEnum.his_block_4_2.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

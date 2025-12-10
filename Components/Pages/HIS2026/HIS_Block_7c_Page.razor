@@ -204,6 +204,7 @@
     DateTime survey_date = DateTime.Now;
     Modal AddModal = default!;
     Tbl_Block_7c_NIC fields = new();
+    CommonQueries commonQueries = new();
     List<Tbl_Block_7c_NIC> NICFields = [];
     EditContext editContext;
     string remarks = string.Empty;
@@ -229,9 +230,15 @@
         {
             Q9Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2);
         }
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_7c",
+            block_title = "HIS Block 7c",
+            block_code = CommonEnum.his_block_7c.ToString(),
+        };
 
         await LoadData();
-
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

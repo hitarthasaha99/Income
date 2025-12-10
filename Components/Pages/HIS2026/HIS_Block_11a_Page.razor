@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @using FluentValidation
+@using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Income.Validators.HIS2026
 @using Microsoft.AspNetCore.Components.Forms
@@ -210,6 +211,7 @@
     ValidationMessageStore messageStore;
     DBQueries dQ = new DBQueries();
     private Block_11a_Validator validator = new();
+        CommonQueries commonQueries = new();
     private bool isQ11_2Enable = false;
     private bool isQ11_3Enable = false;
     private bool isQ11_4_5Enable = false;
@@ -242,6 +244,14 @@
         {
             await loggingService.LogError("HIS_Block_11a_Page", ex);
         }
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+          block_uri = "/dashboard/his/block_11a",
+          block_title = "HIS Block 11a",
+          block_code = CommonEnum.his_block_11a.ToString(),
+        };
+      await commonQueries.InsertVisitedBlock(vb);
+     StateHasChanged();
     }
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
