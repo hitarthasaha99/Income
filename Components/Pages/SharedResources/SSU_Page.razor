@@ -86,7 +86,7 @@
 													{
 														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="me-3"><i class="fi fi-rr-arrow-right"></i></NavLink>
 													}
-													<NavLink @onclick="@(() => HandleComments(item))"><i class="fi fi-rr-comment-alt"></i></NavLink>
+													@* <NavLink @onclick="@(() => HandleComments(item))"><i class="fi fi-rr-comment-alt"></i></NavLink> *@
 												}
 
 											</div>
@@ -137,7 +137,7 @@
 										</td>
 										<td>@(item.OriginalHouseholdID)</td>
 										<td>
-											<NavLink class="btn btn-outline-primary" hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO && item.hhdStatus == 12) ? false : true)">Download <i class="fi fi-rr-download"></i></NavLink>
+											<NavLink class="btn btn-outline-primary" hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO && item.hhdStatus == 12) ? false : true)">Sync<i class="fi fi-rr-download"></i></NavLink>
 										</td>
 									</tr>
 								}
@@ -167,8 +167,15 @@
 				}
 				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
 				{
-					<button class="btn btn-primary" onclick="@(() => Submit(SubmissionMode.sso_to_jso))">Refer back to ENM<i class="fi fi-rr-arrow-right ms-1"></i></button>
-					<button class="btn btn-primary" onclick="@(() => Submit(SubmissionMode.sso_to_ds))">Submit to DS<i class="fi fi-rr-arrow-right ms-1"></i></button>
+					<button class="btn btn-primary me-2"
+							onclick="@(() => Submit(SubmissionMode.sso_to_jso))">
+						Refer back to ENM<i class="fi fi-rr-arrow-left ms-1"></i>
+					</button>
+
+					<button class="btn btn-primary"
+							onclick="@(() => Submit(SubmissionMode.sso_to_ds))">
+						Submit to DS<i class="fi fi-rr-arrow-right ms-1"></i>
+					</button>
 				}
 				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)
 				{
@@ -482,7 +489,7 @@
 			{
 				var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(fsu_response);
 
-				preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
+				preloadService.Show(SpinnerColor.Light, "Syncing data, please wait.");
 				var currentFSU = fsu_list?.FirstOrDefault(x => x.fsu_id == SessionStorage.SelectedFSUId);
 				if (currentFSU != null)
 				{
@@ -499,7 +506,11 @@
 		}
 		catch (Exception ex)
 		{
-			
+
+		}
+		finally
+		{
+			preloadService.Hide();
 		}
 	}
 
@@ -833,22 +844,28 @@
 				if (submissionMode == SubmissionMode.sso_to_jso)
 				{
 					//If referring back to JSO, SSO needs to have rejected atleast one warning
-					bool rejectedWarnings = warnings.Any(x => x.warning_status == 3);
-					if(!rejectedWarnings)
+					if (warnings.Count > 0)
 					{
-						errors.Add("Need to have atleast one rejected warning to refer back");
-						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+						bool rejectedWarnings = warnings.Any(x => x.warning_status == 3);
+						if (!rejectedWarnings)
+						{
+							errors.Add("Need to have atleast one rejected warning to refer back");
+							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+						}
 					}
 				}
 				if (submissionMode == SubmissionMode.sso_to_ds)
 				{
 					//If submitting to DS, SSO needs to have accepted all warnings
-					bool pendingWarnings = warnings.Any(x => x.warning_status == 3 || x.warning_status == 2);
-					if (pendingWarnings)
+					if (warnings.Count > 0)
 					{
-						errors.Add("Need to have accept all warnings to submit");
-						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
-					}
+						bool pendingWarnings = warnings.Any(x => x.warning_status == 3 || x.warning_status == 2);
+						if (pendingWarnings)
+						{
+							errors.Add("Need to have accept all warnings to submit");
+							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+						}
+					}				
 				}
 			}
 			return errorDict;

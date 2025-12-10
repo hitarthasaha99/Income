@@ -1448,6 +1448,24 @@ namespace Income.Database.Queries
             return await _database.UpdateAllAsync(rows);
         }
 
+        public async Task<int> ResetSubmissionStatus(int fsu_id)
+        {
+            // Retrieve rows from the table where fsu_id matches the provided value
+            var rows = await _database.Table<Tbl_Sch_0_0_Block_7>()
+                                      .Where(x => x.fsu_id == fsu_id) // Filter by fsu_id
+                                      .ToListAsync();
+
+            // Iterate over each row and update the specific column
+            foreach (var row in rows)
+            {
+                row.status = "";
+                row.hhdStatus = 0;
+                row.needDownload = 0;
+            }
+            // Use UpdateAllAsync to update all records in the table
+            return await _database.UpdateAllAsync(rows);
+        }
+
         public async Task<List<Tbl_Comments>> GetItemsAsync(string block)
         {
             try
