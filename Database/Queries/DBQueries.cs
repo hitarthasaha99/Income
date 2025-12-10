@@ -3159,7 +3159,14 @@ namespace Income.Database.Queries
         }
 
 
+        public async Task<int> InsertAsync<T>(T entity) where T : Tbl_Base, new()
+        {
+            if (entity == null)
+                return 0;
 
+            await _database.InsertAsync(entity);
+            return 1;
+        }
 
         public async Task<int> SaveAsync<T>(T entity) where T : Tbl_Base, new()
         {
@@ -3207,6 +3214,18 @@ namespace Income.Database.Queries
                 // Hard delete
                 await _database.DeleteAsync(entry);
             }
+        }
+
+        public async Task HardDeleteEntryAsync<T>(Guid id) where T : Tbl_Base, new()
+        {
+            // Fetch entry by ID
+            var entry = await _database.Table<T>().FirstOrDefaultAsync(x => x.id == id);
+
+            if (entry == null)
+                return;
+
+            await _database.DeleteAsync(entry);
+
         }
 
 

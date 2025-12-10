@@ -52,7 +52,7 @@
             SessionStorage.UserRole.JSO => top.warning_status switch
             {
                 1 => "warningWrap",
-                2 => "acceptedWrap",
+                2 or 4 or 5 => "acceptedWrap",
                 3 => "dangerWrap",
                 _ => ""
             },

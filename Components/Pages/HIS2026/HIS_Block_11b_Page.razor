@@ -202,7 +202,10 @@
         await commonQueries.InsertVisitedBlock(vb);
         block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
 
-        await SyncBlock11b();
+        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        {
+            await SyncBlock11b();
+        }
         await LoadData();
         StateHasChanged();
     }

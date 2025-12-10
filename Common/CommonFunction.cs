@@ -455,7 +455,7 @@ namespace Income.Common
             {
                 if (status.ToString().ToLower().Contains("submitted") || status.ToString().ToLower().Contains("accepted"))
                     return "success";
-                else if (status.ToString().ToLower().Contains("return"))
+                else if (status.ToString().ToLower().Contains("referred"))
                     return "danger";
                 else if (status.ToString().ToLower() == "ongoing")
                     return "primary";

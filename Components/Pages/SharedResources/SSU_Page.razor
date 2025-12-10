@@ -10,6 +10,8 @@
 @inject IJSRuntime JSRuntime
 @inject NetworkService networkService
 @inject Warning_VM warningVM
+@inject ILoggingService loggingService
+
 
 <div class="main-content">
 	<CommonContentHeader SelectedFsuId="@SelectedFsuId"
@@ -19,6 +21,7 @@
 
 	<ConfirmDialog @ref="dialog" />
 	<ErrorPopup @ref="errorPopup" ErrorDict="errorDict"></ErrorPopup>
+
 
 	<div class="card custom-card">
 		<div class="card-header">
@@ -133,11 +136,22 @@
 											</span>
 										</td>
 										<td>
-											<div class="badge badge-warning">@(SetSurveyStatus(item))</div>
+											@{
+												var surveyStatus = SetSurveyStatus(item);
+												var surveyStatusColor = commonFunction.ReturnStatusColor(surveyStatus);
+											}
+											<div class="badge badge-@surveyStatusColor">@(surveyStatus)</div>
 										</td>
 										<td>@(item.OriginalHouseholdID)</td>
 										<td>
-											<NavLink class="btn btn-outline-primary" hidden="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO && item.hhdStatus == 12) ? false : true)">Sync<i class="fi fi-rr-download"></i></NavLink>
+											@if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && item.hhdStatus == 12)
+											{
+												<button class="btn btn-outline-primary d-flex align-items-center py-1 px-2" onclick="@(() => Sync(item))">
+													<i class="fi fi-rr-rotate-right me-1 @(isSyncing ? "spin" : "")"></i>
+													@((isSyncing ? "Syncing..." : "Sync"))
+												</button>
+											}
+											
 										</td>
 									</tr>
 								}
@@ -167,9 +181,12 @@
 				}
 				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
 				{
+					
+				
 					<button class="btn btn-primary me-2"
 							onclick="@(() => Submit(SubmissionMode.sso_to_jso))">
-						Refer back to ENM<i class="fi fi-rr-arrow-left ms-1"></i>
+						<i class="fi fi-rr-arrow-left me-1"></i>
+						Refer back to ENM
 					</button>
 
 					<button class="btn btn-primary"
@@ -203,6 +220,7 @@
 	CommonFunction funcs = new();
 	ConfirmDialog dialog = default!;
 	Dictionary<int, List<string>> errorDict = new();
+	bool isSyncing = false;
 
 	private ErrorPopup? errorPopup;
 
@@ -368,11 +386,11 @@
 
 						foreach(var hhd in hhd_list)
 						{
+							hhd.hhdStatus = 21;
 							var hhd_data = await GetHHDData(hhd);
 							if (hhd_data != null)
 							{
 								data.IncomeSchHISDto.Add(hhd_data);
-								hhd.hhdStatus = 21;
 							}
 						}
 
@@ -424,18 +442,19 @@
 
 						foreach (var hhd in hhd_list)
 						{
+							if (mode == SubmissionMode.sso_to_jso)
+							{
+								hhd.hhdStatus = 12;
+							}
+							else
+							{
+								hhd.hhdStatus = 31;
+							}
 							var hhd_data = await GetHHDData_OnlyWarnings(hhd, currentRole, mode);
 							if (hhd_data != null)
 							{
 								data.IncomeSchHISDto.Add(hhd_data);
-								if (mode == SubmissionMode.sso_to_jso)
-								{
-									hhd.hhdStatus = 12;
-								}
-								else
-								{
-									hhd.hhdStatus = 31;
-								}
+
 							}
 						}
 
@@ -466,7 +485,57 @@
 			}
 			else if(currentRole == SessionStorage.UserRole.DS)
 			{
-				await ValidateAndSetSubmissionStatusDS(hhd_list);
+				var result = await ValidateSubmissionStatusDS(hhd_list);
+				if (result != null)
+				{
+					bool allEmpty = result.All(kvp => kvp.Value.Count == 0);
+					if (!allEmpty)
+					{
+						toastService.ShowError("Error while validating");
+						errorDict = result;
+						errorPopup?.ShowPopup();
+						return;
+					}
+					else
+					{
+						Submission_Model data = new();
+						data.IncomeSchHISDto = [];
+
+						foreach (var hhd in hhd_list)
+						{
+							hhd.hhdStatus = 22;
+							var hhd_data = await GetHHDData_OnlyWarnings(hhd, currentRole, mode);
+							if (hhd_data != null)
+							{
+								data.IncomeSchHISDto.Add(hhd_data);
+
+							}
+						}
+
+						string json = JsonConvert.SerializeObject(data);
+						Upsert_Model payload = new()
+						{
+							lookup_fsu_submit_status = 22,
+							fsu_id = SessionStorage.SelectedFSUId.ToString(),
+							submitted_json_data = json,
+							survey_id = SessionStorage.surveyId,
+							created_on = DateTime.Now
+						};
+
+						var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
+						if (response != null && response.IsSuccessStatusCode)
+						{
+							toastService.ShowSuccess("Data submitted successfully");
+							await SyncFSUHouseStatus();
+							SessionStorage.FSU_Submitted = true;
+							StateHasChanged();
+						}
+						else
+						{
+							toastService.ShowError("Data could not be submitted");
+						}
+					}
+				}
 			}
 
 		}
@@ -479,6 +548,91 @@
 			await LoadData();
 		}
 	}
+
+	private async Task Sync(Tbl_Sch_0_0_Block_7 hhd)
+	{
+		isSyncing = true;
+		try
+		{
+			if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+			{
+				toastService.ShowWarning("No Internet Connection. Please try again when you're back online!");
+				return;
+			}
+			preloadService.Show(SpinnerColor.Light, "Fetching data from central database for offline access. Please wait...");
+
+			var response = await networkService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{hhd.fsu_id}/{CommonConstants.LOOKUP_CAPI_SUBMIT_STATUS_REF_BACK}");
+
+			if (string.IsNullOrEmpty(response))
+			{
+				toastService.ShowError($"No data found on server for this FSU. Synchronization failed.");
+				return;
+			}
+			else
+			{
+				var deserialized = JsonConvert.DeserializeObject<Upsert_Model>(response);
+				if (deserialized != null)
+				{
+					var received_data = JsonConvert.DeserializeObject<Submission_Model>(deserialized.submitted_json_data);
+					if (received_data != null && received_data.IncomeSch00block0 != null)
+					{
+						var hhdDTo = received_data.IncomeSchHISDto;
+						if (hhdDTo != null)
+						{
+							var currentHHD = hhdDTo.FirstOrDefault(x => x.IncomeBlock1?.hhd_id == hhd.Block_7_3);
+							if (currentHHD != null)
+							{
+								hhd.needDownload = 0;
+								await dQ.Update_SCH0_0_Block_7(hhd);
+								var incomingWarningList = currentHHD.IncomeWarningList;
+
+								//Save incoming warnings
+								if (incomingWarningList != null && incomingWarningList.Count > 0)
+								{
+									// var newWarnings = incomingWarningList.Where(w => existingWarnings.All(e => e.id != w.id)).ToList();
+									// foreach (var warning in newWarnings)
+									// {
+									// 	await dQ.SaveAsync<Tbl_Warning>(warning);
+									// }
+									var existingWarnings = await dQ.GetWarningList(hhd.Block_7_3.GetValueOrDefault());
+									foreach (var item in existingWarnings)
+									{
+										await dQ.HardDeleteEntryAsync<Tbl_Warning>(item.id);
+									}
+									foreach (var warning in incomingWarningList)
+									{
+										await dQ.InsertAsync<Tbl_Warning>(warning);
+									}
+								}
+								toastService.ShowSuccess("Synced successfully");
+							}
+						}
+					}
+					else
+					{
+						await loggingService.LogError($"Data received for {hhd.fsu_id} was null");
+						toastService.ShowError($"No data received from server");
+					}
+				}
+				else
+				{
+					await loggingService.LogError($"Data received for {hhd.fsu_id} was null");
+					toastService.ShowError($"No data received from server");
+				}
+
+			}
+		}
+		catch (Exception ex)
+		{
+			await loggingService.LogError("SSU Page - Sync", ex);
+		}
+		finally
+		{
+			isSyncing = false;
+			preloadService.Hide();
+		}
+	}
+
 
 	private async Task SyncFSUHouseStatus()
 	{
@@ -862,7 +1016,7 @@
 						bool pendingWarnings = warnings.Any(x => x.warning_status == 3 || x.warning_status == 2);
 						if (pendingWarnings)
 						{
-							errors.Add("Need to have accept all warnings to submit");
+							errors.Add("Need to accept all warnings before submission");
 							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 						}
 					}				
@@ -880,16 +1034,42 @@
 		}
 	}
 
-	private async Task ValidateAndSetSubmissionStatusDS(List<Tbl_Sch_0_0_Block_7> hhd_list)
+	private async Task<Dictionary<int, List<string>>?> ValidateSubmissionStatusDS(List<Tbl_Sch_0_0_Block_7> hhd_list)
 	{
-		//DS can only referback to SUP
 		try
 		{
+			preloadService.Show(SpinnerColor.Primary, "Validating. Please wait while we process the data.");
+			Dictionary<int, List<string>> errorDict = new();
+			//Block wise checks
+			foreach (var hhd in hhd_list)
+			{
+				List<string> errors = [];
+				int status = 0;
+				status = ReturnSubmissionStatus(SessionStorage.UserRole.DS, hhd);
 
+				SessionStorage.SelectedFSUId = hhd.fsu_id;
+				SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+				var warnings = await dQ.FetchListAsync<Tbl_Warning>() ?? new();
+				//If referring back to SSO, DS needs to have rejected atleast one warning
+				if (warnings.Count > 0)
+				{
+					bool rejectedWarnings = warnings.Any(x => x.warning_status == 3);
+					if (!rejectedWarnings)
+					{
+						errors.Add("Need to have atleast one rejected warning to refer back");
+						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+					}
+				}
+			}
+			return errorDict;
 		}
 		catch (Exception ex)
 		{
-
+			return null;
+		}
+		finally
+		{
+			preloadService.Hide();
 		}
 	}
 
