@@ -277,7 +277,7 @@
                             <InputNumber class="form-control no-spinner"
                                          @bind-Value="newMember.age"
                                          @oninput="(e) => ageClear(e)"
-                                         onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                         onkeypress="if(this.value.length >= 3) return false; return /^[0-9]$/.test(event.key);" />
                             <ValidationMessage For="@(() => newMember.age)" />
 
                                 @if (!string.IsNullOrEmpty(ageWarning))
@@ -692,10 +692,21 @@
 
         var value = e.Value?.ToString();
 
+        // if (string.IsNullOrEmpty(value))
+        //     newMember.age = null;
+        // else
+        //     newMember.age = int.Parse(value);
         if (string.IsNullOrEmpty(value))
+        {
             newMember.age = null;
-        else
-            newMember.age = int.Parse(value);
+            return;
+        }
+        if (value.Length > 3)
+        {
+            value = value.Substring(0, 3);
+        }
+        newMember.age = int.Parse(value);
+
 
         checkAgeWarning();           // Check age >= 120
         checkAgeReletionWarning();   // Check relation rule (age < head age)
