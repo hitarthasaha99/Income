@@ -408,7 +408,7 @@
         }
         catch (Exception ex)
         {
-            loggingService.LogError(ex.ToString());
+            await loggingService.LogError(ex.ToString());
         }
     }
 }

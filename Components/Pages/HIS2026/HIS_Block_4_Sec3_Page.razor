@@ -12,6 +12,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject Warning_VM warningVM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_4> Validator
 
@@ -700,7 +701,7 @@
             {
                 Item8WarningMessage = $"W028(ii): Please check the entry against Q4.4 and/or Q4.5";
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -789,6 +790,23 @@
             editContext.NotifyValidationStateChanged();
             if (result.IsValid)
             {
+                CheckWarningForItem8();
+                CheckWarningForItem10();
+                CheckWarningForItem16();
+
+                if(!string.IsNullOrEmpty(Item8WarningMessage))
+                {
+                    warningVM.AddWarning(Item8WarningMessage, "HIS", "4", "8", SessionStorage.selected_hhd_id);
+                }
+                if (!string.IsNullOrEmpty(Item10WarningMessage))
+                {
+                    warningVM.AddWarning(Item10WarningMessage, "HIS", "4", "10", SessionStorage.selected_hhd_id);
+                }
+                if (!string.IsNullOrEmpty(Item16WarningMessage))
+                {
+                    warningVM.AddWarning(Item16WarningMessage, "HIS", "4", "16", SessionStorage.selected_hhd_id);
+                }
+                await warningVM.SaveWarningAsync("HIS", "4");
                 int save = await dQ.Save_SCH_HIS_Block4(block_4);
                 if (block_1 != null)
                 {

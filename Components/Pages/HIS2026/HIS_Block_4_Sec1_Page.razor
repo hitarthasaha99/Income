@@ -11,6 +11,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject Warning_VM warningVM
 @inject LocalizationService Loc
 
 @if (block_4 != null)
@@ -311,6 +312,12 @@
             bool isValid = Validate();
             if (isValid)
             {
+                CheckWarnings();
+                if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
+                {
+                    warningVM.AddWarning(Block_4_1_ErrorMessage, "HIS", "4", "1" ,SessionStorage.selected_hhd_id);
+                }
+                await warningVM.SaveWarningAsync("HIS", "4");
                 var saved = await dQ.Save_SCH_HIS_Block4(block_4);
                 if (saved > 0)
                 {

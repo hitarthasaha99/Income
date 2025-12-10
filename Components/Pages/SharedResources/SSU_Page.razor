@@ -167,12 +167,12 @@
 				}
 				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
 				{
-					<button class="btn btn-primary">Refer back to ENM<i class="fi fi-rr-arrow-right ms-1"></i></button>
-					<button class="btn btn-primary">Submit to DS<i class="fi fi-rr-arrow-right ms-1"></i></button>
+					<button class="btn btn-primary" onclick="@(() => Submit(SubmissionMode.sso_to_jso))">Refer back to ENM<i class="fi fi-rr-arrow-right ms-1"></i></button>
+					<button class="btn btn-primary" onclick="@(() => Submit(SubmissionMode.sso_to_ds))">Submit to DS<i class="fi fi-rr-arrow-right ms-1"></i></button>
 				}
 				@if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)
 				{
-					<button class="btn btn-primary">Refer back to SSO<i class="fi fi-rr-arrow-right ms-1"></i></button>
+					<button class="btn btn-primary" onclick="@(() => Submit(SubmissionMode.ds_to_sso))">Refer back to SSO<i class="fi fi-rr-arrow-right ms-1"></i></button>
 				}
 
 			</div>
@@ -256,19 +256,31 @@
 			block_code = CommonEnum.ssu_list_page.ToString(),
 		};
 		await commonQueries.InsertVisitedBlock(vb);
-		var data = await dQ.GetBlock7Data(SessionStorage.SelectedFSUId);
-		SessionStorage.selected_hhd_seq = 0;
-		SessionStorage.selected_hhd_id = 0;
-		if (data != null && data.Count > 0)
+		await LoadData();
+	}
+
+	private async Task LoadData()
+	{
+		try
 		{
-			hhd_list = new();
-			List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ToList();
-			foreach (var item in selected)
+			var data = await dQ.GetBlock7Data(SessionStorage.SelectedFSUId);
+			SessionStorage.selected_hhd_seq = 0;
+			SessionStorage.selected_hhd_id = 0;
+			if (data != null && data.Count > 0)
 			{
-				hhd_list.Add(item);
+				hhd_list = new();
+				List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ToList();
+				foreach (var item in selected)
+				{
+					hhd_list.Add(item);
+				}
 			}
+			StateHasChanged();
 		}
-		StateHasChanged();
+		catch (Exception ex)
+		{
+
+		}
 	}
 
 	private async Task Submit(SubmissionMode? mode = null)
@@ -387,7 +399,63 @@
 			}
 			else if(currentRole == SessionStorage.UserRole.SSO)
 			{
-				await ValidateAndSetSubmissionStatusSSO(hhd_list);
+				var result = await ValidateSubmissionStatusSSO(hhd_list, mode);
+				if (result != null)
+				{
+					bool allEmpty = result.All(kvp => kvp.Value.Count == 0);
+					if (!allEmpty)
+					{
+						toastService.ShowError("Error while validating");
+						errorDict = result;
+						errorPopup?.ShowPopup();
+						return;
+					}
+					else
+					{
+						Submission_Model data = new();
+						data.IncomeSchHISDto = [];
+
+						foreach (var hhd in hhd_list)
+						{
+							var hhd_data = await GetHHDData_OnlyWarnings(hhd, currentRole, mode);
+							if (hhd_data != null)
+							{
+								data.IncomeSchHISDto.Add(hhd_data);
+								if (mode == SubmissionMode.sso_to_jso)
+								{
+									hhd.hhdStatus = 12;
+								}
+								else
+								{
+									hhd.hhdStatus = 31;
+								}
+							}
+						}
+
+						string json = JsonConvert.SerializeObject(data);
+						Upsert_Model payload = new()
+						{
+							lookup_fsu_submit_status = mode == SubmissionMode.sso_to_ds? 31 : 12,
+							fsu_id = SessionStorage.SelectedFSUId.ToString(),
+							submitted_json_data = json,
+							survey_id = SessionStorage.surveyId,
+							created_on = DateTime.Now
+						};
+
+						var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
+						if (response != null && response.IsSuccessStatusCode)
+						{
+							toastService.ShowSuccess("Data submitted successfully");
+							await SyncFSUHouseStatus();
+							SessionStorage.FSU_Submitted = true;
+							StateHasChanged();
+						}
+						else
+						{
+							toastService.ShowError("Data could not be submitted");
+						}
+					}
+				}
 			}
 			else if(currentRole == SessionStorage.UserRole.DS)
 			{
@@ -401,7 +469,37 @@
 		}
 		finally
 		{
+			await LoadData();
+		}
+	}
 
+	private async Task SyncFSUHouseStatus()
+	{
+		try
+		{
+			var fsu_response = await networkService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
+			if (fsu_response != null)
+			{
+				var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(fsu_response);
+
+				preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
+				var currentFSU = fsu_list?.FirstOrDefault(x => x.fsu_id == SessionStorage.SelectedFSUId);
+				if (currentFSU != null)
+				{
+					var fsuHouseList = currentFSU.fsuHouses;
+					if (fsuHouseList != null && fsuHouseList.Count > 0)
+					{
+						foreach (var item in fsuHouseList)
+						{
+							await dQ.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
+						}
+					}
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			
 		}
 	}
 
@@ -689,16 +787,79 @@
 		}
 	}
 
-	private async Task ValidateAndSetSubmissionStatusSSO(List<Tbl_Sch_0_0_Block_7> hhd_list)
+	private async Task<SCH_HIS_Model?> GetHHDData_OnlyWarnings(Tbl_Sch_0_0_Block_7 hhd, SessionStorage.UserRole role, SubmissionMode? mode = null)
+	{
+		try
+		{
+			int status = ReturnSubmissionStatus(role, hhd, mode);
+
+			SessionStorage.SelectedFSUId = hhd.fsu_id;
+			SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+			var warnings = await dQ.FetchListAsync<Tbl_Warning>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+
+			SCH_HIS_Model model = new()
+			{
+				Id = Guid.NewGuid(),
+				hhd_id = hhd.Block_7_3.GetValueOrDefault(),
+				hhd_status = status,
+				IncomeWarningList = warnings
+			};
+
+			return model;
+		}
+		catch (Exception ex)
+		{
+			return null;
+		}
+	}
+
+	private async Task<Dictionary<int, List<string>>?> ValidateSubmissionStatusSSO(List<Tbl_Sch_0_0_Block_7> hhd_list, SubmissionMode? submissionMode)
 	{
 		//This is a two way logic. SSO can submit to DS OR refer-back to ENM.
 		try
 		{
+			preloadService.Show(SpinnerColor.Primary, "Validating. Please wait while we process the data.");
+			Dictionary<int, List<string>> errorDict = new();
+			//Block wise checks
+			foreach (var hhd in hhd_list)
+			{
+				List<string> errors = [];
+				int status = 0;
+				status = ReturnSubmissionStatus(SessionStorage.UserRole.SSO, hhd);
 
+				SessionStorage.SelectedFSUId = hhd.fsu_id;
+				SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+				var warnings = await dQ.FetchListAsync<Tbl_Warning>() ?? new();
+				if (submissionMode == SubmissionMode.sso_to_jso)
+				{
+					//If referring back to JSO, SSO needs to have rejected atleast one warning
+					bool rejectedWarnings = warnings.Any(x => x.warning_status == 3);
+					if(!rejectedWarnings)
+					{
+						errors.Add("Need to have atleast one rejected warning to refer back");
+						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+					}
+				}
+				if (submissionMode == SubmissionMode.sso_to_ds)
+				{
+					//If submitting to DS, SSO needs to have accepted all warnings
+					bool pendingWarnings = warnings.Any(x => x.warning_status == 3 || x.warning_status == 2);
+					if (pendingWarnings)
+					{
+						errors.Add("Need to have accept all warnings to submit");
+						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+					}
+				}
+			}
+			return errorDict;
 		}
 		catch (Exception ex)
 		{
-
+			return null;
+		}
+		finally
+		{
+			preloadService.Hide();
 		}
 	}
 

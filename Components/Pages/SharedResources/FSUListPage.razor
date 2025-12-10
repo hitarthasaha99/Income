@@ -65,7 +65,18 @@
                                     </td>
                                     <td>@item.framepop</td>
                                     <td>
-                                        <div class="badge badge-warning">-</div>
+                                    <td>
+                                        @{
+                                            bool noTotal = item.total_hhd == 0;
+                                            bool noCompleted = item.completed_hhd == 0;
+                                            string badgeClass = noTotal? "" :  noCompleted ? "badge-success" : "badge-warning";
+                                        }
+
+                                        <div class="badge @badgeClass">
+                                            @(noTotal ? "-" : $"{item.completed_hhd}/{item.total_hhd}")
+                                        </div>
+                                    </td>
+                                        
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
@@ -212,6 +223,7 @@
         }
         finally
         {
+            await Fsu_Load();
             preloadService.Hide();
             StateHasChanged();
         }
@@ -441,7 +453,7 @@
             {
                 List<string> saved_fsu_responses = new List<string>();
                 preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
-                
+
                 List<Tbl_Sch_0_0_Block_7> OldFsuWiseBlockData = new List<Tbl_Sch_0_0_Block_7>();
                 var response = await commonService.GetAsync(CommonConfig.APIIncomeURL,$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
                 if (response != null)
@@ -463,7 +475,7 @@
 
                             await UpdateFsu(item.fsuHouses);
                             var houses = item.fsuHouses != null && item.fsuHouses.Count > 0 ? item.fsuHouses.Count : 0;
-                            
+
                             if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2))
                             {
                                 item.completed_hhd = (item.total_hhd.GetValueOrDefault(0) - (item.submittedbyEnumaretorToSuperviosr.GetValueOrDefault(0) + item.submiitedbySuperviosrToDs.GetValueOrDefault(0) + item.returntoSuperviosrbyDS.GetValueOrDefault(0)));
@@ -480,7 +492,30 @@
                             {
                                 item.completed_hhd = item.total_hhd.GetValueOrDefault(0);
                             }
-                           // item.completed_hhd = int.TryParse(item.completed_hhd?.ToString(), out int result) ? result : 0;
+                            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                            {
+                                int pendingHouses = 0;
+                                int totalHouses = 0;
+                                if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                                {
+                                    pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 0 || x.lookup_submit_status == 11 || x.lookup_submit_status == 12);
+                                    totalHouses = item.fsuHouses.Count();
+                                }
+                                item.completed_hhd = pendingHouses;
+                                item.total_hhd = totalHouses;
+                            }
+                            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+                            {
+                                int pendingHouses = 0;
+                                int totalHouses = 0;
+                                if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                                {
+                                    pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 21 || x.lookup_submit_status == 22);
+                                    totalHouses = item.fsuHouses.Count();
+                                }
+                                item.completed_hhd = pendingHouses;
+                                item.total_hhd = totalHouses;
+                            }
                             item.fsu_houses = item.fsuHouses != null ? JsonConvert.SerializeObject(item.fsuHouses) : "";
                             tbl_Fsu_List.Add(item);
                             temp_fsu_list.Add(item);
@@ -737,7 +772,6 @@
                     foreach (var item in FsuHouseList)
                     {
                        await dB.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
-                        //await dB.SaveHhdStatus(item.hhd_id , item.lookup_submit_status,item.fsu_id);
                     }
                 }
                 return;

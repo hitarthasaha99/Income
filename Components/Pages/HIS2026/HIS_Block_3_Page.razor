@@ -91,47 +91,57 @@
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach (var member in block3Members)
-                        {
-                            <tr>
-                                <td>@member.serial_no</td>
-                                <td>@member.item_2</td>
-                                <td>@member.item_3</td>
-                                <td>@member.gender</td>
-                                <td>@member.age</td>
-                                <td>@member.item_6</td>
-                                <td>@member.item_7</td>
-                                <td>@member.item_8</td>
-                                <td>@member.item_9</td>
-                                <td>@member.item_10</td>
-                                <td>@member.item_11</td>
-                                <td>
-                                    @(member.item_12 == 1 ? "yes" : member.item_12 == 2 ? "no" : "")
-                                </td>
-                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                {
-                                    
-                                <td class="d-flex align-items-center">
-                                    <button class="btn btn-link me-3 fs-6"
-                                            hidden="@SessionStorage.FSU_Submitted"
-                                            @onclick="@(() => HandleModal("UPDATE", member))">
-                                        <i class="fi fi-rr-pencil"></i>
-                                    </button>
-                                    @if (!(member.serial_no == 1 && member.item_3 == 1))
+                    @if (block3Members.Count != 0)
+                    {
+                        <tbody>
+                            @foreach (var member in block3Members)
+                            {
+                                <tr>
+                                    <td>@member.serial_no</td>
+                                    <td>@member.item_2</td>
+                                    <td>@member.item_3</td>
+                                    <td>@member.gender</td>
+                                    <td>@member.age</td>
+                                    <td>@member.item_6</td>
+                                    <td>@member.item_7</td>
+                                    <td>@member.item_8</td>
+                                    <td>@member.item_9</td>
+                                    <td>@member.item_10</td>
+                                    <td>@member.item_11</td>
+                                    <td>
+                                        @(member.item_12 == 1 ? "yes" : member.item_12 == 2 ? "no" : "")
+                                    </td>
+                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                                     {
-                                        
-                                    <button class="btn btn-link fs-6 text-danger"
-                                            hidden="@SessionStorage.FSU_Submitted"
-                                            @onclick="@(() => HandleDelete(member.id))">
-                                        <i class="fi fi-rr-trash"></i>
-                                    </button>
+
+                                        <td class="d-flex align-items-center">
+                                            <button class="btn btn-link me-3 fs-6"
+                                                    hidden="@SessionStorage.FSU_Submitted"
+                                                    @onclick="@(() => HandleModal("UPDATE", member))">
+                                                <i class="fi fi-rr-pencil"></i>
+                                            </button>
+                                            @if (!(member.serial_no == 1 && member.item_3 == 1))
+                                            {
+
+                                                <button class="btn btn-link fs-6 text-danger"
+                                                        hidden="@SessionStorage.FSU_Submitted"
+                                                        @onclick="@(() => HandleDelete(member.id))">
+                                                    <i class="fi fi-rr-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
                                     }
-                                </td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
+                                </tr>
+                            }
+                        </tbody>
+
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="text-center" colspan="12"><div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i> No Data Found</div></td>
+                        </tr>
+                    }
                 </table>
             </div>
         </div>
@@ -146,7 +156,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark"></textarea>
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="(block_1.block_3_remark)"></textarea>
             </div>
         </div>
     </fieldset>
@@ -640,7 +650,7 @@
             block_code = CommonEnum.sch_0_0_block_7.ToString(),
         };
         hhd = await DBQueries.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
-        block_1 = await DBQueries.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+        block_1 = await DBQueries.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? new();
         await commonQueries.InsertVisitedBlock(vb);
         await LoadData();
         StateHasChanged();
@@ -1161,7 +1171,7 @@
         // Codes 01, 02, 04, 05 in col.10 require age >= 10
         if ((col10 == 1 || col10 == 2 || col10 == 4 || col10 == 5) && age < 10)
         {
-            item_10Warning = "W008(ii): Please check the entries recorded against Cols. 10 & 5";
+            item_10Warning = "W010(ii): Please check the entries recorded against Cols. 10 & 5";
         }
 
         StateHasChanged();
@@ -1181,7 +1191,7 @@
         // Codes 01, 02, 04, 05 in col.11 require age >= 10
         if ((col11 == 1 || col11 == 2 || col11 == 4 || col11 == 5) && age < 10)
         {
-            item_11Warning = "W008(ii): Please check the entries recorded against Cols. 11 & 5";
+            item_11Warning = "W011(ii): Please check the entries recorded against Cols. 11 & 5";
         }
 
         StateHasChanged();
@@ -1428,9 +1438,38 @@
         {
             warningVM.AddWarning(ageRelationWarning, "HIS", "3", "5", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
+        if (!string.IsNullOrEmpty(singleUserWarning))
+        {
+            warningVM.AddWarning(singleUserWarning, "HIS", "3", "5", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(maritalStatusWarning))
+        {
+            warningVM.AddWarning(maritalStatusWarning, "HIS", "3", "6", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(item_7Warning))
+        {
+            warningVM.AddWarning(item_7Warning, "HIS", "3", "7", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(item_8Warning))
+        {
+            warningVM.AddWarning(item_8Warning, "HIS", "3", "8", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(item_9Warning))
+        {
+            warningVM.AddWarning(item_9Warning, "HIS", "3", "9", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(item_10Warning))
+        {
+            warningVM.AddWarning(item_10Warning, "HIS", "3", "10", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+        if (!string.IsNullOrEmpty(item_11Warning))
+        {
+            warningVM.AddWarning(item_11Warning, "HIS", "3", "11", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
+
+        await warningVM.SaveWarningAsync("HIS", "3", newMember.serial_no.GetValueOrDefault());
 
         await DBQueries.Save_SCH_HIS_Block3(newMember);
-        // toastService.ShowSuccess("Member added successfully!");
         toastService.ShowSuccess(isAdd ? "Member added successfully!" : "Member updated successfully!");
         await AddModal.HideAsync();
         await LoadData();
@@ -1463,6 +1502,12 @@
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             NavigationManager.NavigateTo("/dashboard/his/block_4_1");
+            return;
+        }
+
+        if(block3Members.Count == 0)
+        {
+            toastService.ShowError("Please add a member before proceeding");
             return;
         }
 

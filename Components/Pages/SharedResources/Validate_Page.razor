@@ -35,13 +35,36 @@
 @* Comment Card *@
 @if (ParentWarning != null && ParentWarning.Count > 0)
 {
+    var role = SessionStorage.GetUserRole();
+
     @foreach (var top in ParentWarning)
     {
-        var wrapClass = top.warning_status switch
+        string wrapClass = role switch
         {
-            1 => "warningWrap",
-            2 => "acceptedWrap",
-            3 => "dangerWrap",
+            SessionStorage.UserRole.SSO => top.warning_status switch
+            {
+                1 or 2 => "warningWrap",
+                4 => "acceptedWrap",
+                3 => "dangerWrap",
+                _ => ""
+            },
+
+            SessionStorage.UserRole.JSO => top.warning_status switch
+            {
+                1 => "warningWrap",
+                2 => "acceptedWrap",
+                3 => "dangerWrap",
+                _ => ""
+            },
+
+            SessionStorage.UserRole.DS => top.warning_status switch
+            {
+                1 or 4 => "warningWrap",
+                5 => "acceptedWrap",
+                3 => "dangerWrap",
+                _ => ""
+            },
+
             _ => ""
         };
         var buttonClass = top.warning_status switch
