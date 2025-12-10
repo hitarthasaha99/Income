@@ -30,7 +30,7 @@
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
+            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>
@@ -44,7 +44,7 @@
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-            <textarea maxlength="500" disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks"></textarea>
+            <textarea maxlength="500" disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>

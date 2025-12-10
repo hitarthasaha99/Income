@@ -80,8 +80,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-            <textarea maxlength="500" class="form-control disabled w-100" rows="4" @bind="block_1.block_b_remark"></textarea>
+                <textarea maxlength="500" class="form-control disabled w-100" rows="2" @bind="block_1.block_b_remark" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>
