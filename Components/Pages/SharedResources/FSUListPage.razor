@@ -770,6 +770,15 @@
         {
             if (Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
             {
+                bool confirmation = await dialog.ShowAsync(
+                                    title: "Confirmation Required",
+                                    message1: "This will wipe existing data from servers for this FSU.",
+                                    message2: "Are you sure you want to continue?"
+                                    );
+                if (!confirmation)
+                {
+                    return;
+                }
                 preloadService.Show(SpinnerColor.Primary, "Clearing data");
                 var response = await commonService.PostAsync(CommonConfig.BaseController, CommonConfig.UpdateListingAction, new { fsu_reference_Id = fsuID, survey_Id = SessionStorage.surveyId, is_updateListingCount = false });
                 if (response != null && response.IsSuccessStatusCode)

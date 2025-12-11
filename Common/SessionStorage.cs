@@ -32,6 +32,8 @@ namespace Income.Common
         public static bool selection_done = false;
         public static bool hamlet_selection_done = false;
         public static bool FSU_Submitted = false;
+        public static int sss = 0;
+        public static string hhd_head = string.Empty;
         public static void ClearSession()
         {
             SelectedFSUId = 0;
@@ -54,6 +56,8 @@ namespace Income.Common
             selection_done = false;
             hamlet_selection_done = false;
             FSU_Submitted = false;
+            sss = 0;
+            hhd_head = string.Empty;
         }
 
         public static void ClearFSUFlags()
@@ -65,6 +69,8 @@ namespace Income.Common
             selection_done = false;
             hamlet_selection_done = false;
             FSU_Submitted = false;
+            sss = 0;
+            hhd_head = string.Empty;
         }
 
         public static UserRole GetUserRole()

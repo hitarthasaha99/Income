@@ -282,6 +282,11 @@
 			block_title = "SSU List Page",
 			block_code = CommonEnum.ssu_list_page.ToString(),
 		};
+
+		SessionStorage.selected_hhd_id = 0;
+		SessionStorage.selected_hhd_seq = 0;
+		SessionStorage.sss = 0;
+		SessionStorage.hhd_head = string.Empty;
 		await commonQueries.InsertVisitedBlock(vb);
 		await LoadData();
 	}
@@ -586,6 +591,8 @@
 							{
 								hhd.needDownload = 0;
 								await dQ.Update_SCH0_0_Block_7(hhd);
+
+								var block2 = currentHHD.IncomeBlockFieldOp;
 								var incomingWarningList = currentHHD.IncomeWarningList;
 
 								//Save incoming warnings
@@ -605,6 +612,11 @@
 									{
 										await dQ.InsertAsync<Tbl_Warning>(warning);
 									}
+								}
+
+								if(block2 != null)
+								{
+									await dQ.SaveAsync<Tbl_Block_FieldOperation>(block2);
 								}
 								toastService.ShowSuccess("Synced successfully");
 							}
@@ -962,6 +974,8 @@
 
 			SessionStorage.SelectedFSUId = hhd.fsu_id;
 			SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+
+			var block_2 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>();
 			var warnings = await dQ.FetchListAsync<Tbl_Warning>(DBQueries.DeleteFilter.IncludeAll) ?? new();
 
 			SCH_HIS_Model model = new()
@@ -969,6 +983,7 @@
 				Id = Guid.NewGuid(),
 				hhd_id = hhd.Block_7_3.GetValueOrDefault(),
 				hhd_status = status,
+				IncomeBlockFieldOp = block_2,
 				IncomeWarningList = warnings
 			};
 
@@ -1115,18 +1130,22 @@
 		return status;
 	}
 
-	
+
 
 	async Task HandleStartSurvey(Tbl_Sch_0_0_Block_7 data)
 	{
 		var name = commonFunction.GetUserRoleName(SessionStorage.user_role);
+		SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+		SessionStorage.selected_hhd_seq = data.SSS_household_id.GetValueOrDefault();
+		SessionStorage.selected_hhd_size = data.Block_7_5.GetValueOrDefault();
+		SessionStorage.sss = data.SSS;
+		SessionStorage.hhd_head = data.Block_7_4 ?? "";
+
 		if (name == CommonConstants.ROLE_NAME_JSO)
 		{
 			if (data.hhdStatus == 0 || data.hhdStatus == 11 || data.hhdStatus == 15)
 			{
-				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
-				SessionStorage.selected_hhd_seq = data.SSS_household_id.GetValueOrDefault();
-				SessionStorage.selected_hhd_size = data.Block_7_5.GetValueOrDefault();
+				
 				preloadService.Show(SpinnerColor.Light, "Fetching location details...");
 				SessionStorage.location = await funcs.fetchGeoLocation();
 				preloadService.Show(SpinnerColor.Light, "Updating location details...");

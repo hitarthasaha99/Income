@@ -144,6 +144,11 @@ namespace Income.Viewmodels.SCH0_0
             }
             else
             {
+                if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                {
+                    SessionStorage.location = block_0_1.survey_coordinates ?? string.Empty;
+                    SessionStorage.survey_timestamp = block_0_1.survey_timestamp.GetValueOrDefault();
+                }
                 Block_1_4_Selected = Block_0_1_Constants.Sample.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_4))?.title ?? string.Empty;
                 Block_1_5_Selected = Block_0_1_Constants.Sector.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_5))?.title ?? string.Empty;
                 Block_1_12_Selected = Block_0_1_Constants.FrameCode.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_12))?.title ?? string.Empty;

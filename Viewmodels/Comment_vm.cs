@@ -76,6 +76,7 @@ namespace Income.Viewmodels
             try
             {   
                 Tbl_Warning Dto = new();
+                Dto.warning_type = 99;
                 Dto.warning_message = comment;
                 Dto.item_no = item_no;
                 Dto.serial_number = Serialnumber ?? 0;

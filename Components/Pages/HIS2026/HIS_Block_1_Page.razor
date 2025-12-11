@@ -383,7 +383,7 @@
 
     async void Update(Tbl_Comments data)
     {
-        comment_vm.LoadDataById(data);
+        //comment_vm.LoadDataById(data);
     }
 
     async void GoBack()
@@ -439,8 +439,8 @@
             else
             {
                 SessionStorage.location = block_1.survey_coordinates;
+                SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
             }
-            SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
             is_remarks_visible = block_1.substitution_reason == 9 ? true : false;
         }
         else
