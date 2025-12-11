@@ -65,13 +65,25 @@
                                     </td>
                                     <td>@item.framepop</td>
                                     <td>
-                                        <div class="badge badge-warning">-</div>
+                                    <td>
+                                        @{
+                                            bool noTotal = item.total_hhd == 0;
+                                            bool noCompleted = item.completed_hhd == 0;
+                                            string badgeClass = noTotal? "" :  noCompleted ? "badge-success" : "badge-warning";
+                                        }
+
+                                        <div class="badge @badgeClass">
+                                            @(noTotal ? "-" : $"{item.completed_hhd}/{item.total_hhd}")
+                                        </div>
+                                    </td>
+                                        
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
+                                            <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-download ms-1"></i></NavLink>
                                         </div>
                                     </td>
                                 </tr>
@@ -212,6 +224,7 @@
         }
         finally
         {
+            await Fsu_Load();
             preloadService.Hide();
             StateHasChanged();
         }
@@ -254,7 +267,7 @@
             else if (block_name == "his")
             {
                 var data = await dB.GetSelectedBlock7List(fsu_id);
-                if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
+                if (data == null || data.Count == 0)
                 {
                     toastService.ShowError("Please ensure the selection is done and the data is downloaded Sucessfully.");
                     return;
@@ -441,7 +454,7 @@
             {
                 List<string> saved_fsu_responses = new List<string>();
                 preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
-                
+
                 List<Tbl_Sch_0_0_Block_7> OldFsuWiseBlockData = new List<Tbl_Sch_0_0_Block_7>();
                 var response = await commonService.GetAsync(CommonConfig.APIIncomeURL,$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
                 if (response != null)
@@ -463,34 +476,7 @@
 
                             await UpdateFsu(item.fsuHouses);
                             var houses = item.fsuHouses != null && item.fsuHouses.Count > 0 ? item.fsuHouses.Count : 0;
-                            var saved_response = await commonService.GetAsync(CommonConfig.APIIncomeURL,$"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{item.fsu_id}/{item.lookupFsuSubmitStatus}");
-                            if (!string.IsNullOrEmpty(saved_response))
-                            {
-                                // saved_fsu_responses.Add(saved_response);
-                                // var deserializedHouses = JsonConvert.DeserializeObject<saved_response_top_layer>(saved_response);
-                                // if (deserializedHouses?.result?.submitted_json_data != null)
-                                // {
-                                //     var bindLayer = JsonConvert.DeserializeObject<bind_layer>(deserializedHouses.result.submitted_json_data);
-                                //     List<Tbl_Sch_0_0_Block_5> dataList = bindLayer?.TravelSch00Block5aList?.ToList() ?? new List<Tbl_Sch_0_0_Block_5>();
-                                //     int count = 0;
-                                //     foreach (var Item in dataList)
-                                //     {
-                                //         if (Item.is_selected_travel == true && Item.status_travel != "SUBSTITUTED")
-                                //         {
-                                //             count++;
-                                //         }
-                                //     }
-                                //     item.total_hhd = count;
-                                // }
-                                // else
-                                // {
-                                //     item.total_hhd = 0;
-                                // }
-                            }
-                            else
-                            {
-                                item.total_hhd = 0;
-                            }
+
                             if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2))
                             {
                                 item.completed_hhd = (item.total_hhd.GetValueOrDefault(0) - (item.submittedbyEnumaretorToSuperviosr.GetValueOrDefault(0) + item.submiitedbySuperviosrToDs.GetValueOrDefault(0) + item.returntoSuperviosrbyDS.GetValueOrDefault(0)));
@@ -507,7 +493,30 @@
                             {
                                 item.completed_hhd = item.total_hhd.GetValueOrDefault(0);
                             }
-                           // item.completed_hhd = int.TryParse(item.completed_hhd?.ToString(), out int result) ? result : 0;
+                            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                            {
+                                int pendingHouses = 0;
+                                int totalHouses = 0;
+                                if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                                {
+                                    pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 0 || x.lookup_submit_status == 11 || x.lookup_submit_status == 12);
+                                    totalHouses = item.fsuHouses.Count();
+                                }
+                                item.completed_hhd = pendingHouses;
+                                item.total_hhd = totalHouses;
+                            }
+                            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+                            {
+                                int pendingHouses = 0;
+                                int totalHouses = 0;
+                                if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                                {
+                                    pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 21 || x.lookup_submit_status == 22);
+                                    totalHouses = item.fsuHouses.Count();
+                                }
+                                item.completed_hhd = pendingHouses;
+                                item.total_hhd = totalHouses;
+                            }
                             item.fsu_houses = item.fsuHouses != null ? JsonConvert.SerializeObject(item.fsuHouses) : "";
                             tbl_Fsu_List.Add(item);
                             temp_fsu_list.Add(item);
@@ -740,8 +749,8 @@
                     #if WINDOWS
                     System.Diagnostics.Process.GetCurrentProcess().Kill();
                     #elif ANDROID
-                    var activity = Platform.CurrentActivity;
-                    activity?.FinishAffinity();
+    var activity = Platform.CurrentActivity;
+    activity?.FinishAffinity();
                     #else
                     #endif
                     return;
@@ -755,6 +764,51 @@
         }
     }
 
+    private async Task DoUpdateListing(int fsuID)
+    {
+        try
+        {
+            if (Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
+            {
+                bool confirmation = await dialog.ShowAsync(
+                                    title: "Confirmation Required",
+                                    message1: "This will wipe existing data from servers for this FSU.",
+                                    message2: "Are you sure you want to continue?"
+                                    );
+                if (!confirmation)
+                {
+                    return;
+                }
+                preloadService.Show(SpinnerColor.Primary, "Clearing data");
+                var response = await commonService.PostAsync(CommonConfig.BaseController, CommonConfig.UpdateListingAction, new { fsu_reference_Id = fsuID, survey_Id = SessionStorage.surveyId, is_updateListingCount = false });
+                if (response != null && response.IsSuccessStatusCode)
+                {
+                    toastService.ShowInfo("Data cleared for FSU");
+                    await dB.ResetSubmissionStatus(fsuID);
+                }
+                else
+                {
+                    toastService.ShowError("Failed to clear data. Please try again.");
+                    return;
+                }
+            }
+            else
+            {
+                toastService.ShowError("Need internet connectivity to proceed");
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+        finally
+        {
+            preloadService.Hide();
+            await Fsu_Load();
+        }
+    }
+
     private async Task UpdateFsu(List<fsu_houses>? FsuHouseList = null)
         {
             try
@@ -764,7 +818,6 @@
                     foreach (var item in FsuHouseList)
                     {
                        await dB.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
-                        //await dB.SaveHhdStatus(item.hhd_id , item.lookup_submit_status,item.fsu_id);
                     }
                 }
                 return;

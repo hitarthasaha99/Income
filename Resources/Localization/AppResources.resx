@@ -1041,4 +1041,7 @@
     <value>Supervisor Name</value>
     <comment>Supervisor Name</comment>
   </data>
+  <data name="sss_number" xml:space="preserve">
+    <value>second-stage stratum number:</value>
+  </data>
 </root>

@@ -32,10 +32,14 @@ namespace Income.Viewmodels.SCH0_0
             tbl_Sch_0_0_Block_2_1 = await SCH_0_0_Queries.FetchSCH0Block2_1Data();
             if (tbl_Sch_0_0_Block_2_1 != null && tbl_Sch_0_0_Block_2_1.Count > 0)
             {
-                tbl_Sch_0_0_Block_2_1 = tbl_Sch_0_0_Block_2_1.Where(x => x.is_deleted == false).ToList();
+                tbl_Sch_0_0_Block_2_1 = tbl_Sch_0_0_Block_2_1.Where(x => x.is_deleted == null || x.is_deleted == false).ToList();
                 tbl_Sch_0_0_Block_2_1 = tbl_Sch_0_0_Block_2_1.OrderBy(k => k.serial_no).ToList();
             }
             tbl_Sch_0_0_Block_2_2 = await SCH_0_0_Queries.FetchSCH0Block2_2Data();
+            if (tbl_Sch_0_0_Block_2_2 != null && tbl_Sch_0_0_Block_2_2.Count > 0)
+            {
+                tbl_Sch_0_0_Block_2_2 = tbl_Sch_0_0_Block_2_2.Where(x => x.is_deleted == null || x.is_deleted == false).ToList();
+            }
             var fsu_response = Tbl_Fsu_List = await cQ.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
 
             if (tbl_Sch_0_0_Block_2_2 == null || tbl_Sch_0_0_Block_2_2.Count == 0)

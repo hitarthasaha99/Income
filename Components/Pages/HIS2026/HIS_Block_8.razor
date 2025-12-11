@@ -5,11 +5,13 @@
 @using FluentValidation
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
+@using Income.Viewmodels
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Linq.Expressions
 @using System.Reflection
 @inject IJSRuntime JSRuntime
 @inject IValidator<Tbl_Block_8> Validator
+@inject Warning_VM warningVM
 @inject ILoggingService loggingService
 
 @if (editContext != null)
@@ -275,7 +277,7 @@
             {
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
-                          NavigationManager.NavigateTo("/dashboard/his/block_8b");
+            NavigationManager.NavigateTo("/dashboard/his/block_8b");
          
         }
         catch (Exception ex)

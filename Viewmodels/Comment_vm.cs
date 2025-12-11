@@ -39,14 +39,6 @@ namespace Income.Viewmodels
             try
             {
                 CommentList = await dQ.GetItemsAsync(block);
-                //if (CommentList == null || CommentList.Count == 0)
-                //{
-                //    Serialnumber = 1;
-                //}
-                //else
-                //{
-                //    Serialnumber = CommentList.Count + 1;
-                //}
                 return CommentList;
             }
             catch (Exception)
@@ -54,53 +46,50 @@ namespace Income.Viewmodels
                 return null;
             }
         }
-        public async void LoadDataById(Tbl_Comments data)
+        public async void LoadDataById(Tbl_Warning data)
         {
-            Tbl_Comments CommentList = new();
-            try
-            {
-                CommentList = await dQ.GetItemsAsyncById(data);
-                comment = CommentList.comment;
-                Serialnumber = CommentList.serial_number;
-                trip_serial_number = CommentList.trip_serial_number;
-                item_no = CommentList.item_no ?? string.Empty;
-                ID = CommentList.id;
-                OnPropertyChanged(nameof(comment));
-                OnPropertyChanged(nameof(Serialnumber));
-                OnPropertyChanged(nameof(trip_serial_number));
-                OnPropertyChanged(nameof(item_no));
-                OnPropertyChanged(nameof(ID));
-                return;
+            //Tbl_Warning CommentList = new();
+            //try
+            //{
+            //    CommentList = await dQ.GetItemsAsyncById(data);
+            //    comment = CommentList.comment;
+            //    Serialnumber = CommentList.serial_number;
+            //    trip_serial_number = CommentList.trip_serial_number;
+            //    item_no = CommentList.item_no ?? string.Empty;
+            //    ID = CommentList.id;
+            //    OnPropertyChanged(nameof(comment));
+            //    OnPropertyChanged(nameof(Serialnumber));
+            //    OnPropertyChanged(nameof(trip_serial_number));
+            //    OnPropertyChanged(nameof(item_no));
+            //    OnPropertyChanged(nameof(ID));
+            //    return;
 
-            }
-            catch (Exception)
-            {
-                return;
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    return;
+            //}
         }
 
-        public async Task<int> Save(string block)
+        public async Task<int> Save(string block, string? item_no = null)
         {
             try
             {   
-                Tbl_Comments Dto = new();
-                Dto.comment = comment;
-                Dto.item_no = block == "4.2" ? "1" : item_no;
+                Tbl_Warning Dto = new();
+                Dto.warning_type = 99;
+                Dto.warning_message = comment;
+                Dto.item_no = item_no;
                 Dto.serial_number = Serialnumber ?? 0;
-                Dto.trip_serial_number = trip_serial_number ?? null;
-                Dto.id = ID == null || ID == Guid.Empty ? Guid.NewGuid() : ID;
                 Dto.block = block;
-                Dto.commented_by = SessionStorage.__user_id;
+                Dto.user_id = SessionStorage.__user_id;
+                Dto.user_name = SessionStorage.user_name;
                 Dto.created_on = DateTime.Now;
-                Dto.commenter_full_name = SessionStorage.full_name;
                 Dto.role_code = SessionStorage.user_role;
-                Dto.Is_accepted = false; // Default value
-                Dto.Is_rejected = true; // Default value
-                Dto.comment_status = 1;
+                Dto.warning_status = 3;
+
                 if (!string.IsNullOrEmpty(comment) && !string.IsNullOrWhiteSpace(comment))
                 {
-                    var data = await dQ.SaveBlockTbl_Comments(Dto);
-                    ID = Guid.Empty;
+                    var data = await dQ.SaveAsync<Tbl_Warning>(Dto);
                     return data;
                 }
                 else

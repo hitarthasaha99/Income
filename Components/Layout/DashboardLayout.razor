@@ -107,15 +107,12 @@
             if (message.Contains(CommonConstants.FAILURE_TEXT))
             {
                 ToastService.ShowError(message);
-                return;
             }
             else
             {
                 ToastService.ShowSuccess(message);
-                return;
             }
         }
-        return;
     }
 
     async Task Logout()

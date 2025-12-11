@@ -182,7 +182,7 @@ namespace Income.Services
                     documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 }
 
-                string ExportPath = Path.Combine(documentsPath, "Income_EXPORT");
+                string ExportPath = Path.Combine(documentsPath, "Income_Logs");
 
                 // Create the folder if it doesn't exist
                 if (!Directory.Exists(ExportPath))

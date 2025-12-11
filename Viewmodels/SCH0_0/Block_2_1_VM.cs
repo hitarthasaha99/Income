@@ -158,6 +158,10 @@ namespace Income.Viewmodels.SCH0_0
         {
             _toastService = toastService;
             tbl_Sch_0_0_block_2_1 = await SCH_0_0_Queries.FetchSCH0Block2_1Data();
+            if (tbl_Sch_0_0_block_2_1 != null && tbl_Sch_0_0_block_2_1.Count > 0)
+            {
+                tbl_Sch_0_0_block_2_1 = tbl_Sch_0_0_block_2_1.Where(x => x.is_deleted == null || x.is_deleted == false).ToList();
+            }
             tbl_Sch_0_0_block_2_1 = tbl_Sch_0_0_block_2_1.OrderBy(k => k.serial_no).ToList();
             var fsu_response = await cQ.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
             if (fsu_response != null)

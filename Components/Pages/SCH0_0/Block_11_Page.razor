@@ -57,7 +57,7 @@
                         <label class="form-label">
                             <span class="form-badge">2.1</span>Date of start of field work
                         </label>
-                        <input type="text" class="form-control is_sso" @bind="block_0_1.survey_timestamp" disabled>
+                            <input type="text" class="form-control is_sso" @bind="tbl_Sch_0_0_FieldOperation.field_work_start_date" disabled>
                     </div>
                 </div>
                <div class="col-sm-12">
@@ -73,7 +73,7 @@
                         <label class="form-label">
                             <span class="form-badge">3</span>total time taken to canvass the schedule by the team of enumerator (SE/JSO) (in hours)
                         </label>
-                        <input type="text"
+                        <input type="number"
                                 disabled="@(SessionStorage.FSU_Submitted)"
                                class="form-control is_sso"
                                value="@tbl_Sch_0_0_FieldOperation.time_taken"
@@ -270,7 +270,10 @@
             }
             else
             {
-
+                if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.FSU_Submitted)
+                {
+                    tbl_Sch_0_0_FieldOperation.field_work_end_date = DateTime.Now;
+                }
                 if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                 {
                     tbl_Sch_0_0_FieldOperation.supervisor_name = SessionStorage.user_name;
@@ -315,7 +318,7 @@
             //     StatusMessage = "W000: Time taken should be > 5 hours";
             // }
             //For zero case - time should be < 5
-            if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
+            if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && (value >= 5))
             {
                 StatusClass = "text-success";
                 StatusMessage = "W011(vi): Time taken should be < 5 hours";

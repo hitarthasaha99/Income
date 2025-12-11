@@ -995,4 +995,7 @@
   <data name="SupervisorName" xml:space="preserve">
     <value>पर्यवेक्षक का नाम</value>
   </data>
+  <data name="sss_number" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>

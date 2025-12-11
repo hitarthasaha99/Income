@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject Warning_VM warningVM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7c> Validator
 
@@ -62,7 +63,7 @@
                                 <tr>
                                     <td>
                                         <label class="form-label">
-                                            <span class="form-badge">Q7.9</span>
+                                            <span class="form-badge">Q7c.9</span>
                                         </label>
                                     </td>
                                     <td>Gross Profit / Loss before tax realized by the establishment during last month (in whole no. of Rs.)</td>
@@ -270,6 +271,12 @@
             }
             else
             {
+                CheckItem9Warning();
+                if (!string.IsNullOrEmpty(item_9_warning))
+                {
+                    warningVM.AddWarning(item_9_warning, "HIS", "7C", "7C.9", SessionStorage.selected_hhd_id);
+                    await warningVM.SaveWarningAsync("HIS", "7C");
+                }
                 int saved = await dB.Save_SCH_HIS_Block7C(fields);
                 if (saved > 0)
                 {
@@ -290,7 +297,7 @@
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
            
-                NavigationManager.NavigateTo("/dashboard/his/block_7d");
+            NavigationManager.NavigateTo("/dashboard/his/block_7d");
          
         }
         catch (Exception ex)

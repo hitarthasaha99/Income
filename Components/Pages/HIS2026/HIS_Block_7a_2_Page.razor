@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject Warning_VM warningVM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7a> Validator
 
@@ -443,7 +444,7 @@
             item_6_warning = string.Empty;
             if (block_7A != null && block_7A.item_6 < 0)
             {
-                item_6_warning = $"W043: Please recheck the value";
+                item_6_warning = $"W044(ii): Please recheck the value";
             }
         }
         catch (Exception ex)
@@ -485,6 +486,12 @@
             }
             else
             {
+                CheckItem6Warning();
+                if(!string.IsNullOrEmpty(item_6_warning))
+                {
+                    warningVM.AddWarning(item_6_warning, "HIS", "7A", "7A.9", SessionStorage.selected_hhd_id);
+                    await warningVM.SaveWarningAsync("HIS", "7A");
+                }
                 int saved = await dB.Save_SCH_HIS_Block7A(block_7A);
                 if (saved > 0)
                 {
@@ -505,7 +512,6 @@
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
             NavigationManager.NavigateTo("/dashboard/his/block_7b");
-
         }
         catch (Exception ex)
         {

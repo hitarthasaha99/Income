@@ -799,6 +799,8 @@
                 if (response != null && response.IsSuccessStatusCode)
                 {
                     toastService.ShowSuccess("Update Listing request submitted successfully");
+                    tbl_Fsu_List.updatelistingcount += 1;
+                    await commonQueries.UpdateFSU(tbl_Fsu_List);
                     var res = await SCH_0_0_Queries.DoUpdateListing(SessionStorage.SelectedFSUId, SelectedReason);
                     if (res > 0 && (SelectedReason == 1 || SelectedReason == 2 || SelectedReason == 3))
                     {

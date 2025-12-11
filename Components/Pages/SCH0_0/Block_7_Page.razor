@@ -165,7 +165,7 @@
         </div>
     </div>
 
-    <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.MediumDown">
+    <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
         <HeaderTemplate>
             <h5 class="modal-title">@(modalHeader)</h5>
         </HeaderTemplate>
@@ -537,74 +537,74 @@
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             return;
         }
+
+        var subU = await SCH_0_0_Queries.FetchSCH0Block2_2Data() ?? new();
+        var subD = await SCH_0_0_Queries.FetchSCH0Block5Data() ?? new();
+        var block_4 = await SCH_0_0_Queries.GetBlock4();
+
         int total_listed_population = ListItems.Sum(x => x.Block_7_5.GetValueOrDefault());
-        int no_of_sd = block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault() == 0 ? 1 : block_1_obj.number_of_sub_division_of_su_to_be_formed.GetValueOrDefault();
-        int su_population = block_1_obj.approximate_population_su.GetValueOrDefault() == 0 ? 1 : block_1_obj.approximate_population_su.GetValueOrDefault();
-
-        int approx_population_fsu = block_1_obj.Block_1_14.GetValueOrDefault();
-        int number_of_sub_units = block_1_obj.Block_1_15.GetValueOrDefault();
-
-        int listedTotal = total_listed_population * no_of_sd;
-
-        double lowerLimit = su_population * 0.95;
-        double upperLimit = su_population * 1.05;
-
-        double lowerLimit_1 = approx_population_fsu * 0.95;
-        double upperLimit_1 = approx_population_fsu * 1.05;
-
-        bool isWithin5Percent_i = listedTotal >= lowerLimit && listedTotal <= upperLimit;
-        bool isWithin5Percent_ii = (listedTotal * number_of_sub_units) >= lowerLimit_1
-                                    && (listedTotal * number_of_sub_units) <= upperLimit_1;
-
-        // Build warning message when any condition fails
-        string validationMessage = string.Empty;
-
-        if (!isWithin5Percent_i)
-        {
-            firstWarning = $"W025(i) : Population mismatch:\n" +
-                $"{listedTotal} should be within ±5% of {su_population}.\n\n";
-            validationMessage += firstWarning;
-
-        }
-
-        if (!isWithin5Percent_ii)
-        {
-            secondWarning = $"\nW025(ii): Population mismatch:\n" +
-                $"{listedTotal * number_of_sub_units} should be within ±5% of {approx_population_fsu}.\n\n";
-            validationMessage += secondWarning;
-
-        }
+        double lowerLimit = 0.0;
+        double upperLimit = 0.0;
+        bool isWithin5Percent = false;
 
         block_1_obj.remarks_block_7 = remarks;
-        if(block_1_obj.id != Guid.Empty)
+        if (block_1_obj.id != Guid.Empty)
             await SCH_0_0_Queries.SaveBlock1(block_1_obj);
 
+        //1. No subU and subD OR subU exists but no subD
+        if((subU.Count == 0  && subD.Count == 0) || (subU.Count > 0 && subD.Count == 0))
+        {
+            if(block_4 != null)
+            {
+                lowerLimit = 0.95 * block_4.approximate_population_su.GetValueOrDefault();
+                upperLimit = 1.05 * block_4.approximate_population_su.GetValueOrDefault();
+                isWithin5Percent = total_listed_population >= lowerLimit && total_listed_population <= upperLimit;
+                if(!isWithin5Percent)
+                {
+                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {block_4.approximate_population_su.GetValueOrDefault()}.\n\n";
+                }
+            }
+        }
+
+        //2. subD exists
+        else if (subD.Count > 0)
+        {
+            if (block_4 != null)
+            {
+                double selectedSubDPercentage = 1;
+                var selectedSubD = subD.FirstOrDefault(x => x.IsChecked == true);
+                if (selectedSubD != null)
+                {
+                    selectedSubDPercentage = selectedSubD.Percentage.GetValueOrDefault();
+                }
+                var sDPop = block_4.approximate_population_su.GetValueOrDefault() * (selectedSubDPercentage / 100);
+                lowerLimit = 0.95 * sDPop;
+                upperLimit = 1.05 * sDPop;
+                isWithin5Percent = total_listed_population >= lowerLimit && total_listed_population <= upperLimit;
+                if (!isWithin5Percent)
+                {
+                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {sDPop}";
+                }
+            }
+        }
+
+        
         // If message exists, show confirm dialog
-        if (!string.IsNullOrWhiteSpace(validationMessage))
+        if (!string.IsNullOrWhiteSpace(firstWarning))
         {
 
             var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
             var confirmation = await dialog.ShowAsync(
                 title: "Alert",
-                message1: validationMessage,
+                message1: firstWarning,
                 message2: "Do you want to continue?",
                 confirmDialogOptions: options
-
-
             );
 
             if (confirmation)
             {
-                if (!isWithin5Percent_i)
-                {
-                    warningVM.AddWarning(firstWarning, "0", "7", "0");
-                }
-                if (!isWithin5Percent_ii)
-                {
-                    warningVM.AddWarning(secondWarning.Trim(), "0", "7", "0");
-                }
+                warningVM.AddWarning(firstWarning, "0", "7", "0");
                 await warningVM.SaveWarningAsync("0", "7", 0);
-
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             }
         }

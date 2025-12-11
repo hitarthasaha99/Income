@@ -224,25 +224,33 @@
         _isBusy = true;
         try
         {
-            // Load lists in parallel where possible (no UI changes yet).
-            var fetchCropTask = dQ.Fetch_SCH_HIS_Block7A_CodeList();
-            var fetchNICTask = dQ.Fetch_SCH_HIS_Block7_NICList();
-            var fetchBlock4Task = dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
-            var fetchBlock7DTask = dQ.Fetch_SCH_HIS_Block7D();
+            if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+            {
+                // Load lists in parallel where possible (no UI changes yet).
+                var fetchCropTask = dQ.Fetch_SCH_HIS_Block7A_CodeList();
+                var fetchNICTask = dQ.Fetch_SCH_HIS_Block7_NICList();
+                var fetchBlock4Task = dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
+                var fetchBlock7DTask = dQ.Fetch_SCH_HIS_Block7D();
 
-            await Task.WhenAll(fetchCropTask, fetchNICTask, fetchBlock4Task, fetchBlock7DTask);
+                await Task.WhenAll(fetchCropTask, fetchNICTask, fetchBlock4Task, fetchBlock7DTask);
 
-            CropCodeList = fetchCropTask.Result ?? new List<Tbl_Block_7a_1>();
-            NICFields = fetchNICTask.Result ?? new List<Tbl_Block_7c_NIC>();
-            block_4 = fetchBlock4Task.Result;
-            Block7DList = fetchBlock7DTask.Result ?? new List<Tbl_Block_7d>();
+                CropCodeList = fetchCropTask.Result ?? new List<Tbl_Block_7a_1>();
+                NICFields = fetchNICTask.Result ?? new List<Tbl_Block_7c_NIC>();
+                block_4 = fetchBlock4Task.Result;
+                Block7DList = fetchBlock7DTask.Result ?? new List<Tbl_Block_7d>();
 
-            // Sync (but do not call StateHasChanged inside loops). These methods will perform DB saves
-            // but we only update the in-memory list and then perform a single InvokeAsync(StateHasChanged).
-            await SyncBlock7A_7DAsync_Batched();
-            await SyncBlock4_7DAsync_Batched();
-            await SyncBlock7C_7DAsync_Batched();
-            await dQ.ReserializeBlock7DList();
+                // Sync (but do not call StateHasChanged inside loops). These methods will perform DB saves
+                // but we only update the in-memory list and then perform a single InvokeAsync(StateHasChanged).
+                await SyncBlock7A_7DAsync_Batched();
+                await SyncBlock4_7DAsync_Batched();
+                await SyncBlock7C_7DAsync_Batched();
+                await dQ.ReserializeBlock7DList();
+            }
+            else
+            {
+                Block7DList = await dQ.Fetch_SCH_HIS_Block7D();
+            }
+
 
         }
         catch (Exception ex)

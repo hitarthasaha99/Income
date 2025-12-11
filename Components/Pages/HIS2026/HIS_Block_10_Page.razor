@@ -464,32 +464,34 @@
                                 </fieldset>
                             </div>
                     </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="d-flex">
-                            <NavLink class="btn btn-outline-primary" @onclick="GoBack">
-                                <i class="fi fi-rr-angle-left me-1"></i>Back
-                            </NavLink>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="d-flex align-items-center justify-content-end">
-                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                            {
-                                <button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => ValidateAndSave(false))">
-                                    <i class="fi fi-rr-disk me-1"></i>
-                                    Save
-                                </button>
-                            }
-                            <NavLink class="btn btn-primary" @onclick="@(() => ValidateAndSave(true))">
-                                Next
-                                <i class="fi fi-rr-angle-right ms-1"></i>
-                            </NavLink>
-                        </div>
-                    </div>
-                </div>
+                
                 </div>
         </fieldset>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="d-flex">
+                    <NavLink class="btn btn-outline-primary" @onclick="GoBack">
+                        <i class="fi fi-rr-angle-left me-1"></i>Back
+                    </NavLink>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="d-flex align-items-center justify-content-end">
+                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                    {
+                        <button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => ValidateAndSave(false))">
+                            <i class="fi fi-rr-disk me-1"></i>
+                            Save
+                        </button>
+                    }
+                    <NavLink class="btn btn-primary" @onclick="@(() => ValidateAndSave(true))">
+                        Next
+                        <i class="fi fi-rr-angle-right ms-1"></i>
+                    </NavLink>
+                </div>
+            </div>
+        </div>
 
       </EditForm>
 }

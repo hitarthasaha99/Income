@@ -984,6 +984,20 @@ th.vertical, td.vertical {
     /* border-color: rgb(114 57 234 / 20%); */
 }
 
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 
 
 /* .card.warningWrap {

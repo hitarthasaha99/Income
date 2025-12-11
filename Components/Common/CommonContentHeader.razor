@@ -8,9 +8,11 @@
         <i class="fi fi-rr-arrow-left me-2 fs-5" style="cursor:pointer;" @onclick="() => GoBack()"></i>
         <div class="d-flex">
             <h3 class="page-heading m-0">FSUID: @SelectedFsuId</h3>
-            @if (SessionStorage.selected_hhd_id != 0)
+            @if (SessionStorage.selected_hhd_seq != 0)
             {
-                <h3 class="page-heading m-0 ms-2">HHD ID: @SessionStorage.selected_hhd_id</h3>
+                <h3 class="page-heading m-0 ms-2">SSS: @SessionStorage.sss</h3>
+                <h3 class="page-heading m-0 ms-2">Selected HHD No: @SessionStorage.selected_hhd_seq</h3>
+                <h3 class="page-heading m-0 ms-2">HHD Head Name: @SessionStorage.hhd_head</h3>
             }
         </div>
     </div>
