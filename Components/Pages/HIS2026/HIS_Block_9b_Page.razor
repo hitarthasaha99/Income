@@ -233,8 +233,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-            <textarea maxlength="500" class="form-control w-100" rows="4" @bind="block_1.block_9b_remark"></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_9b_remark" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>
@@ -263,7 +262,7 @@
     private Tbl_Block_9b? block_9b = new();
     private List<Tbl_Block_3> MemberList = [];
     private Tbl_Block_1? block_1 = new();
-
+    CommonQueries commonQueries = new();
     EditContext editContext;
     ValidationMessageStore messageStore;
     DBQueries dB = new();
@@ -290,7 +289,13 @@
         editContext = new EditContext(block_9b);
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
-
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_9b",
+            block_title = "HIS Block 9b",
+            block_code = CommonEnum.his_block_9b.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

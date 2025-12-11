@@ -156,7 +156,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="(block_1.block_3_remark)"></textarea>
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </div>
         </div>
     </fieldset>
@@ -287,7 +287,7 @@
                             <InputNumber class="form-control no-spinner"
                                          @bind-Value="newMember.age"
                                          @oninput="(e) => ageClear(e)"
-                                         onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" />
+                                         onkeypress="if(this.value.length >= 3) return false; return /^[0-9]$/.test(event.key);" />
                             <ValidationMessage For="@(() => newMember.age)" />
 
                                 @if (!string.IsNullOrEmpty(ageWarning))
@@ -647,7 +647,7 @@
         {
             block_uri = "/dashboard/his/block_3",
             block_title = "HIS Block 3",
-            block_code = CommonEnum.sch_0_0_block_7.ToString(),
+            block_code = CommonEnum.his_block_3.ToString(),
         };
         hhd = await DBQueries.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
         block_1 = await DBQueries.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? new();
@@ -702,10 +702,21 @@
 
         var value = e.Value?.ToString();
 
+        // if (string.IsNullOrEmpty(value))
+        //     newMember.age = null;
+        // else
+        //     newMember.age = int.Parse(value);
         if (string.IsNullOrEmpty(value))
+        {
             newMember.age = null;
-        else
-            newMember.age = int.Parse(value);
+            return;
+        }
+        if (value.Length > 3)
+        {
+            value = value.Substring(0, 3);
+        }
+        newMember.age = int.Parse(value);
+
 
         checkAgeWarning();           // Check age >= 120
         checkAgeReletionWarning();   // Check relation rule (age < head age)

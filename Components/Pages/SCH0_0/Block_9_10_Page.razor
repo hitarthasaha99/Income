@@ -19,7 +19,7 @@
             </h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks"></textarea>
+            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" placeholder="Enter your remarks here..." @bind="EnumeratorRemarks" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
         </div>
     </div>
     @* Supervisor Comments *@
@@ -30,7 +30,7 @@
             </h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks"></textarea>
+            <textarea maxlength="500" disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" placeholder="Enter your remarks here..." @bind="SupervisorRemarks" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
         </div>
     </div>
 </div>

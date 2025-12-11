@@ -55,17 +55,17 @@
                         </tr>
                         <tr>
                             <th style="min-width:50px;">sl. no.</th>
-                            <th style="min-width:150px;">raw materials (including goods purchased for trading)</th>
-                            <th style="min-width:150px;">electricity, diesel, other fuel and water charges</th>
-                            <th style="min-width:100px;">internet charges and other related expenses</th>
-                            <th style="min-width:100px;">rent for land, building, etc.</th>
-                            <th style="min-width:100px;">rental charge of machinery and equipment</th>
-                            <th style="min-width:100px;">transportation cost</th>
-                            <th style="min-width:100px;">labour cost</th>
-                            <th style="min-width:100px;">repair and maintenance</th>
-                            <th style="min-width:100px;">interest payment and insurance cost</th>
-                            <th style="min-width:100px;">others</th>
-                            <th style="min-width:100px;">total (sum of entries at s. nos. 01-10</th>
+                            <th style="min-width:150px;">Raw materials (including goods purchased for trading)</th>
+                            <th style="min-width:150px;">Electricity, diesel, other fuel and water charges</th>
+                            <th style="min-width:100px;">Internet charges and other related expenses</th>
+                            <th style="min-width:100px;">Rent for land, building, etc.</th>
+                            <th style="min-width:100px;">Rental charge of machinery and equipment</th>
+                            <th style="min-width:100px;">Transportation cost</th>
+                            <th style="min-width:100px;">Labour cost</th>
+                            <th style="min-width:100px;">Repair and maintenance</th>
+                            <th style="min-width:100px;">Interest payment and insurance cost</th>
+                            <th style="min-width:100px;">Others</th>
+                            <th style="min-width:100px;">Total (sum of entries at s. nos. 01-10</th>
                             <th style="min-width:150px;">Action</th>
                         </tr>
 
@@ -158,7 +158,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">1</span>Raw materials (including goods purchased for trading)</label>
-                            <input class="form-control" value="@fields.item_10_1" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_1" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_1, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_1)" />
                         </div>
@@ -168,7 +168,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">2</span>Electricity, diesel, other fuel and water charges</label>
-                            <input class="form-control" value="@fields.item_10_2" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_2" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_2, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_2)" />
                         </div>
@@ -178,7 +178,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">3</span>Internet charges and other related expenses</label>
-                            <input class="form-control" value="@fields.item_10_3" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_3" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_3, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_3)" />
                         </div>
@@ -188,7 +188,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">4</span>Rent for land, building, etc.</label>
-                            <input class="form-control" value="@fields.item_10_4" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_4" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_4, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_4)" />
                         </div>
@@ -198,7 +198,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">5</span>Rental charge of machinery and equipment</label>
-                            <input class="form-control" value="@fields.item_10_5" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_5" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_5, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_5)" />
                         </div>
@@ -208,7 +208,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">6</span>Transportation cost</label>
-                            <input class="form-control" value="@fields.item_10_6" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_6" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_6, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_6)" />
                         </div>
@@ -218,7 +218,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">7</span>Labour cost</label>
-                            <input class="form-control" value="@fields.item_10_7" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_7" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_7, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_7)" />
                         </div>
@@ -228,7 +228,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">8</span>Repair and maintenance</label>
-                            <input class="form-control" value="@fields.item_10_8" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_8" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_8, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_8)" />
                         </div>
@@ -238,7 +238,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">9</span>Interest payment and insurance cost</label>
-                            <input class="form-control" value="@fields.item_10_9" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_9" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_9, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_9)" />
                         </div>
@@ -248,7 +248,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">10</span>Others</label>
-                            <input class="form-control" value="@fields.item_10_10" disabled="@SessionStorage.FSU_Submitted"
+                            <input type="number" class="form-control" value="@fields.item_10_10" disabled="@SessionStorage.FSU_Submitted"
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_10, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_10)" />
                         </div>
@@ -258,7 +258,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">11</span>Total (sum of entries at s. nos. 01–10)</label>
-                            <input class="form-control" value="@fields.item_10_11" disabled
+                            <input type="number" class="form-control" value="@fields.item_10_11" disabled
                                     @oninput="e => { UpdateFieldAndValidate(() => fields.item_10_11, e); }" />
                             <ValidationMessage For="@(() => fields.item_10_11)" />
                         </div>
@@ -280,6 +280,8 @@
     DateTime survey_date = DateTime.Now;
     Modal AddModal = default!;
     Tbl_Block_7c_Q10 fields = new();
+    CommonQueries commonQueries = new();
+
     List<Tbl_Block_7c_NIC> NICFields = [];
     List<Tbl_Block_7c_Q10> ActivityList = [];
     EditContext editContext;
@@ -338,9 +340,14 @@
                 }
             }
         }
-
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_7c_2",
+            block_title = "HIS Block 7c_2",
+            block_code = CommonEnum.his_block_7c_2.ToString(),
+        };
         await LoadData();
-
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

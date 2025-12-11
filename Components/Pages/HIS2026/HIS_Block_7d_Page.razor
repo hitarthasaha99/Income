@@ -114,8 +114,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-            <textarea maxlength="500" class="form-control w-100" rows="4" @bind = "block_1.block_7d_remark"></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7d_remark" placeholder="Enter your remarks..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>
@@ -143,6 +142,8 @@
     List<Tbl_Block_7c_NIC> NICFields = new();
     List<Tbl_Block_7d> Block7DList = new();
     private Tbl_Block_1 block_1 = new();
+    CommonQueries commonQueries = new();
+
 
     EditContext? editContext;
     string remarks = string.Empty;
@@ -553,6 +554,19 @@
         {
             _isBusy = false;
         }
+    }
+
+    //OnInitializedAsync
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_7d",
+            block_title = "HIS Block 7d",
+            block_code = CommonEnum.his_block_7d.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
+        StateHasChanged();
     }
 
     void Next()

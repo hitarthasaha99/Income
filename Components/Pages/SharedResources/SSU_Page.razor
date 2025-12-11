@@ -234,7 +234,9 @@
 
 	async void GoBack()
 	{
-		await JSRuntime.InvokeVoidAsync("__handleGoBack");
+		// await JSRuntime.InvokeVoidAsync("__handleGoBack");
+		NavigationManager.NavigateTo("/dashboard/fsulist");
+
 		return;
 	}
 

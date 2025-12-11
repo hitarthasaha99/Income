@@ -128,7 +128,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" class="form-control" rows="3" placeholder="Enter remarks here"></textarea>
+            <textarea maxlength="500" class="form-control" rows="3" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
         </div>
     </div> *@
     <div class="row">
@@ -287,6 +287,7 @@
     private Modal modal = default!;
     private Tbl_Block_4? block_4 = null;
     private Tbl_Block_7a_1 block_7_1 = new();
+    CommonQueries commonQueries = new();
     private List<Tbl_Block_7a_1> ActivityList = [];
     EditContext editContext;
     ValidationMessageStore messageStore;
@@ -305,7 +306,14 @@
         block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
         codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault());
 
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_7a",
+            block_title = "HIS Block 7a",
+            block_code = CommonEnum.his_block_7a.ToString(),
+        };
         await LoadData();
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

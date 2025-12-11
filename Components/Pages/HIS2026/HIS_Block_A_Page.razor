@@ -108,8 +108,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-            <textarea maxlength="500" class="form-control disabled w-100" rows="4" @bind="block_1.block_a_remark"></textarea>
+                <textarea maxlength="500" class="form-control disabled w-100" rows="2" @bind="block_1.block_a_remark" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>
@@ -130,7 +129,7 @@
 @code {
     private DateTime survey_date = DateTime.Now;
     private Tbl_Block_1? block_1 = new();
-
+    CommonQueries commonQueries = new();
     private double A1;
     private double A2;
     private double A3;
@@ -217,7 +216,13 @@
                 await dB.SaveAsync<Tbl_Block_A>(block_A);
             }
         }
-
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_A",
+            block_title = "HIS Block A",
+            block_code = CommonEnum.his_block_A.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

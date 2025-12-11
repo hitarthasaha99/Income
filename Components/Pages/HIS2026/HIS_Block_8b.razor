@@ -113,7 +113,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-            <textarea maxlength="500" class="form-control w-100" rows="4" @bind="block_1.block_8b_remark"></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_8b_remark" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>
     </div>
@@ -231,7 +231,7 @@
     private List<Tbl_Block_8_Q6> SchemeList = [];
     private Tbl_Block_8_Q6 fields = new();
     private Tbl_Block_1? block_1 = new();
-
+    CommonQueries commonQueries = new();
     EditContext editContext;
     ValidationMessageStore messageStore;
     bool benefitsEntryNeeded = false;
@@ -248,7 +248,14 @@
         MemberList = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         benefitsEntryNeeded = MemberList != null && MemberList.Any(x => x.item_12 == 1);
         block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_8b",
+            block_title = "HIS Block 8b",
+            block_code = CommonEnum.his_block_8b.ToString(),
+        };
         await LoadData();
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 

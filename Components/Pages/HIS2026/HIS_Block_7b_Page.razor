@@ -465,7 +465,7 @@
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
         <div class="card-body">
-            <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="4"></textarea>
+                <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="2" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
         </div>
         </fieldset>
     </div>
@@ -493,6 +493,7 @@
     private Tbl_Block_4? block_4 = null;
     private Tbl_Block_7b? block_7B = new();
     private Tbl_Block_1? block_1 = new();
+    CommonQueries commonQueries = new();
     EditContext editContext;
     ValidationMessageStore messageStore;
     int Q7_1_Sum = 0;
@@ -525,7 +526,13 @@
         editContext = new EditContext(block_7B);
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
-
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_7b",
+            block_title = "HIS Block 7b",
+            block_code = CommonEnum.his_block_7b.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 
