@@ -38,7 +38,7 @@
             {
 
                 <div class="card-tools">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
             </div>
@@ -222,6 +222,11 @@
     </FooterTemplate>
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList=Rows
+              QuestionList="@(new List<string>(){"5"})"
+              Block="4.2" />
+
 
 @code {
     EditContext editContext = default!;
@@ -240,6 +245,8 @@
     List<Tbl_Block_4_Q5> NICfields = new();
     bool Q5Needed = false;
     private string Block_4_5_ErrorMessage = string.Empty;
+    CommentModal commentModal = default!;
+    List<int> Rows = [];
 
     async void Validate()
     {
@@ -265,7 +272,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-
+        Rows = [];
         if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
         {
             await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
@@ -281,6 +288,10 @@
         if (block_4 != null)
         {
             NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+            for(int i=1; i<=NICfields.Count; i++)
+            {
+                Rows.Add(i);
+            }
         }
         else
         {

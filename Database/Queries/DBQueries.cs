@@ -71,6 +71,7 @@ namespace Income.Database.Queries
                     {
                         foreach (var item in sch00_block_7)
                         {
+                            item.needDownload = 0;
                             await SaveUpdateSCH0Block7(item);
                         }
                     }
@@ -1466,11 +1467,11 @@ namespace Income.Database.Queries
             return await _database.UpdateAllAsync(rows);
         }
 
-        public async Task<List<Tbl_Comments>> GetItemsAsync(string block)
+        public async Task<List<Tbl_Warning>> GetCommentsAsync(string block)
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Comments>("SELECT * FROM Tbl_Comments WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND survey_id = ? AND block = ? AND (parent_comment_id IS NULL OR parent_comment_id == ?)", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, SessionStorage.surveyId, block, Guid.Empty.ToString());
+                var response = await _database.QueryAsync<Tbl_Warning>("SELECT * FROM Tbl_Warning WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND block = ? AND warning_type = ? AND (is_deleted = null OR is_deleted = 0)", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, block, "99");
                 if (response != null && response.Count > 0)
                 {
                     return response;
@@ -1483,62 +1484,6 @@ namespace Income.Database.Queries
             catch (Exception ex)
             {
                 return null;
-            }
-        }
-
-        public async Task<Tbl_Comments> GetItemsAsyncById(Tbl_Comments data)
-        {
-            try
-            {
-                var response = await _database.QueryAsync<Tbl_Comments>("SELECT * FROM Tbl_Comments WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND survey_id = ? AND block = ? AND id = ?", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, SessionStorage.surveyId, data.block, data.id);
-                if (response != null && response.Count > 0)
-                {
-                    return response.FirstOrDefault();
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        public async Task<int> SaveBlockTbl_Comments(Tbl_Comments Comments)
-        {
-            try
-            {
-                int status = 0;
-                var check_existance = await _database.Table<Tbl_Comments>().Where(x => x.id == Comments.id).ToListAsync();
-                if (check_existance != null && check_existance.Count > 0)
-                {
-                    status = await _database.UpdateAsync(Comments);
-                }
-                else
-                {
-                    status = await _database.InsertAsync(Comments);
-                }
-                return status;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
-
-
-        public async Task<int> DeleteComments(Tbl_Comments Comments)
-        {
-            try
-            {
-                var data = await _database.DeleteAsync(Comments);
-                return data;
-            }
-            catch (Exception ex)
-            {
-                return 0;
             }
         }
 
@@ -3107,6 +3052,14 @@ namespace Income.Database.Queries
             ExcludeDeleted,   // default: SAME behaviour as now
             IncludeAll,       // return everything
             OnlyDeleted       // return only deleted rows
+        }
+
+
+        public async Task<T> FetchByIdAsync<T>(Guid id) where T : Tbl_Base, new()
+        {
+            return await _database.Table<T>()
+                .Where(x => x.id == id && (x.is_deleted == null || x.is_deleted == false))
+                .FirstOrDefaultAsync();
         }
 
 

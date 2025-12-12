@@ -22,7 +22,7 @@
     <div class="card custom-card">
         <div class="card-header">
             <h5 class="card-title">
-                <span class="text-primary me-2">Block 7a</span>
+                <span class="text-primary me-2">Block 7.1</span>
                  Income from Self-employment - Crop cultivation
             </h5>
 
@@ -41,7 +41,7 @@
             {
 
                 <div class="card-tools">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -282,6 +282,10 @@
     </FooterTemplate>
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList=RowList
+              QuestionList="@(new List<string>(){"2","3","4","5","6","7","8","9"})"
+              Block="7.1" />
 
 @code {
     private Modal modal = default!;
@@ -294,6 +298,8 @@
     bool codeListEntryNeeded = false;
     DBQueries dB = new();
     bool isAdd;
+    CommentModal commentModal = default!;
+    List<int> RowList = [];
 
     async void GoBack()
     {
@@ -437,6 +443,7 @@
     private async Task LoadData()
     {
         ActivityList = await dB.Fetch_SCH_HIS_Block7A_CodeList();
+        RowList = ActivityList.Select(x => x.serial_number).Distinct().ToList();
         StateHasChanged();
     }
 

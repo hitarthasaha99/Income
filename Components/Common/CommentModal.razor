@@ -1,0 +1,273 @@
+﻿@using Income.Database.Models.Common
+@inject IToastService toastService
+
+<Modal @ref="ModalRef"
+       Title="Comment"
+       CloseOnEscape="true"
+       UseStaticBackdrop="true"
+       ShowCloseButton="false"
+       Size="ModalSize.ExtraLarge"
+       Fullscreen="ModalFullscreen.LargeDown">
+
+    <BodyTemplate>
+        <div class="mb-3">
+            <div class="row mb-2">
+
+                <!-- Select Row -->
+                <div class="col-md-12" hidden="@(!ShowMemberList)">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">1</span>Select row
+                        </label>
+                        @if (MemberList != null && MemberList.Count > 0)
+                        {
+                            <select class="form-select" @bind="SerialNumber">
+                                <option value="">Select</option>
+                                @foreach (var item in MemberList)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            </select>
+                        }
+                        
+                        @if (ShowError && ShowMemberList && SerialNumber.GetValueOrDefault() == 0)
+                        {
+                            <div class="text-danger mt-2">Please select a serial number</div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Question -->
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <span class="form-badge">2</span>Question Number
+                        </label>
+                        <select class="form-select w-100" @bind="item_no">
+                            <option value="@string.Empty">Select</option>
+                            @foreach (var item in QuestionList)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </select>
+                        @if (ShowError && string.IsNullOrEmpty(item_no))
+                        {
+                            <div class="text-danger mt-2">Please select an item</div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Comment -->
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">Enter your comment</label>
+                        <textarea class="form-control"
+                                  @bind="Comment"
+                                  placeholder="Enter your remarks"
+                                  rows="2"></textarea>
+
+                        @if (ShowError && string.IsNullOrWhiteSpace(Comment))
+                        {
+                            <div class="text-danger mt-2">Comment cannot be empty</div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Table -->
+        @if (CommentList?.Any() == true)
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Item Number</th>
+                            @if (ShowMemberList)
+                            {
+                                <th>Member Srl.</th>
+                            }
+                            <th>Comment</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in CommentList)
+                        {
+                            <tr>
+                                <td class="text-center">@item.item_no</td>
+                                @if(ShowMemberList)
+                                {
+                                    <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
+                                }
+                                <td>@item.warning_message</td>
+                                <td class="text-center">
+                                    <button class="btn btn-link me-2"
+                                            @onclick="() => Edit(item)"
+                                            disabled="@(UserRole != item.role_code)">
+                                        <i class="fi fi-rr-pencil"></i>
+                                    </button>
+
+                                    <button class="btn btn-link text-danger"
+                                            @onclick="() => Delete(item)"
+                                            disabled="@(UserRole != item.role_code)">
+                                        <i class="fi fi-rr-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </BodyTemplate>
+
+    <FooterTemplate>
+        <Button class="btn btn-outline-secondary me-auto" @onclick="Close">Close</Button>
+        <Button class="btn btn-primary" @onclick="SaveOrUpdate">Submit</Button>
+    </FooterTemplate>
+
+</Modal>
+
+@code
+{
+    DBQueries dQ = new();
+    // Parameters to pass from parent
+    [Parameter] public List<int>? MemberList { get; set; }
+    [Parameter] public List<string> QuestionList { get; set; }
+    [Parameter] public string Block { get; set; }
+    Modal ModalRef = default!;
+
+    public string UserRole { get; set; } = SessionStorage.user_role;
+    public bool ShowError;
+
+    public bool ShowMemberList = false;
+    public string? Comment { get; set; } = null;
+    public int? SerialNumber { get; set; } = null;
+    public string? item_no { get; set; } = null;
+
+    public List<Tbl_Warning> CommentList = [];
+    private bool isUpdate = false;
+    private Tbl_Warning? editObject = null;
+
+    public async Task Open()
+    {
+        await ModalRef.ShowAsync();
+        isUpdate = false;
+        await LoadData();
+    }
+
+    public void Close()
+    {
+        ModalRef.HideAsync();
+        CommentList = [];
+    }
+
+    private async Task LoadData()
+    {
+        CommentList = await dQ.GetCommentsAsync(Block);
+        ShowMemberList = MemberList != null && MemberList.Count > 0;
+        StateHasChanged();
+    }
+
+    private async Task Edit(Tbl_Warning item)
+    {
+        isUpdate = true;
+        Comment = item.warning_message;
+        SerialNumber = item.serial_number;
+        item_no = item.item_no;
+        editObject = await dQ.FetchByIdAsync<Tbl_Warning>(item.id);
+    }
+
+    private async Task SaveOrUpdate()
+    {
+        try
+        {
+            ShowError = false;
+            if (string.IsNullOrWhiteSpace(Comment))
+            {
+                ShowError = true;
+                toastService?.ShowError("Please enter some comment to save!");
+                return;
+            }
+            if (ShowMemberList && SerialNumber.GetValueOrDefault() == 0)
+            {
+                ShowError = true;
+                return;
+            }
+            if (string.IsNullOrEmpty(item_no))
+            {
+                ShowError = true;
+                return;
+            }
+            if(isUpdate)
+            {
+                if (editObject != null)
+                {
+                    editObject.warning_message = Comment;
+                    editObject.item_no = item_no;
+                    editObject.serial_number = SerialNumber ?? 0;
+                    await dQ.SaveAsync<Tbl_Warning>(editObject);
+                }
+            }
+            else
+            {
+                Tbl_Warning Dto = new();
+                Dto.warning_type = 99;
+                Dto.warning_message = Comment;
+                Dto.item_no = item_no;
+                Dto.serial_number = SerialNumber ?? 0;
+                Dto.block = Block;
+                Dto.user_id = SessionStorage.__user_id;
+                Dto.user_name = SessionStorage.user_name;
+                Dto.created_on = DateTime.Now;
+                Dto.role_code = SessionStorage.user_role;
+                Dto.warning_status = 3;
+
+                if (!string.IsNullOrWhiteSpace(Comment))
+                {
+                    var data = await dQ.SaveAsync<Tbl_Warning>(Dto);
+                }
+                else
+                {
+                    toastService?.ShowError("Please enter some comment to save!");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+        finally
+        {
+            isUpdate = false;
+            Reset();
+            await LoadData();
+        }
+    }
+
+    private async Task Delete(Tbl_Warning data)
+    {
+        try
+        {
+            await dQ.DeleteEntryAsync<Tbl_Warning>(data.id);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Could not delete comment");
+        }
+        finally
+        {
+            await LoadData();
+        }
+    }
+
+    private void Reset()
+    {
+        CommentList = [];
+        Comment = null;
+        item_no = null;
+        SerialNumber = null;
+    }
+}

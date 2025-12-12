@@ -10,7 +10,6 @@
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
-@inject Comment_vm comment_vm
 @inject Warning_VM warningVM
 @inject LocalizationService Loc
 
@@ -27,7 +26,7 @@
                     {
                         
                     <div class="card-tools">
-                        <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
+                        <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
                     </div>
                     }
                 </div>
@@ -215,6 +214,12 @@
     </EditForm>
 }
 
+
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="Question"
+              Block="4.1" />
+
 @code {
     private CommonConfig commonConfig = new CommonConfig();
     CommonList commonList = new();
@@ -228,6 +233,9 @@
     Tbl_Sch_0_0_Block_7 hhd = new();
     Tbl_Block_3 block_3 = new();
     Tbl_Block_4? block_4;
+
+    CommentModal commentModal = default!;
+    List<string> Question = [];
 
     bool Q4Needed = false;
     EditContext editContext;
@@ -399,6 +407,9 @@
         }
         editContext = new EditContext(block_4);
 
+        Question = [];
+        Question.AddRange("1","2","3","4","4.1","4.2","4.3","4.4","4.5","4.6");
+
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
             block_uri = "/dashboard/his/block_4_1",
@@ -407,13 +418,6 @@
         };
         await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
-    }
-
-
-    async void Close()
-    {
-        await comment_vm.AddModal.HideAsync();
-
     }
 
     async void GoBack()

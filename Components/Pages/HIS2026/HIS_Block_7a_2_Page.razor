@@ -26,14 +26,19 @@
             <FluentValidationValidator />
             <div class="card custom-card">
                 <div class="card-body p-0">
-                    @* add comment *@
-                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-                    {
+                    <div class="d-flex justify-content-between align-items-center p-2">
+                        <h5 class="card-title m-0">
+                            <span class="text-primary me-2">Block 7.1</span>
+                            Income from Self-employment - Crop cultivation
+                        </h5>
 
-                        <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
-                        </div>
-                    }
+                        @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                        {
+                            <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())">
+                                <i class="fi fi-rr-comment-alt me-2"></i>Comment
+                            </NavLink>
+                        }
+                    </div>
                     <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center mb-0">
@@ -327,6 +332,11 @@
 
 </div>
 
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"7.2.1","7.2.2","7.2.3","7.2.4","7.2.5","7.2.6","7.2.7","7.2.8","7.2.9","7.2.10","7.2.11","7.2.12","7.3","7.4","7.5","7a.9"})"
+              Block="7.1b" />
+
 
 @code {
     private Modal modal = default!;
@@ -344,7 +354,7 @@
     DateTime survey_date = DateTime.Now;
     string remarks = string.Empty;
     string item_6_warning = string.Empty;
-
+    CommentModal commentModal = default!;
 
     async void GoBack()
     {

@@ -27,7 +27,7 @@
             <div class="card custom-card">
                 <div class="card-header">
                     <h5 class="card-title">
-                        <span class="text-primary me-1">Block 7b:</span>
+                        <span class="text-primary me-1">Block 7.2:</span>
                         Income from Self-employment - Allied Activity in Agriculture
                     </h5>
                     @* add comment *@
@@ -35,7 +35,7 @@
                     {
 
                         <div class="card-tools">
-                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                            <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                         </div>
                     }
                 </div>
@@ -488,8 +488,14 @@
     </div>
 </div>
 
-@code {
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"7.6.1","7.6.2","7.6.3","7.6.4","7.6.5","7.6.6","7.6.7","7.6.8","7.6.9","7.6.10","7.6.11","7.6.12",
+              "7.7.1","7.7.2","7.7.3","7.7.4","7.7.5","7.7.6","7.7.7","7.7.8","7.7.9","7.7.10","7.7.11","7.7.12", "7.8", "7b.9"})"
+              Block="7.2" />
 
+@code {
+    CommentModal commentModal = default!;
     private Tbl_Block_4? block_4 = null;
     private Tbl_Block_7b? block_7B = new();
     private Tbl_Block_1? block_1 = new();
@@ -522,6 +528,10 @@
         {
             block_7B = new();
             block_7B.id = Guid.NewGuid();
+        }
+        if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_date = block_7B.survey_timestamp.GetValueOrDefault();
         }
         editContext = new EditContext(block_7B);
         messageStore = new ValidationMessageStore(editContext);

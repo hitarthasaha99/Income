@@ -247,6 +247,10 @@
                                 }
                             }
                         </select>
+                        @if (comment_vm.ShowItemError)
+                        {
+                            <div class="text-danger mt-2">Please make a selection</div>
+                        }
                     </div>
                 </div>
                 <div class="col-sm-12">
@@ -278,11 +282,11 @@
                         @foreach (var item in CommentList)
                         {
                             <tr>
-                                <td>@item.comment</td>
+                                <td>@item.warning_message</td>
                                 <td class="text-center">@item.item_no</td>
                                 <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
                                 <td class="text-center">
-                                    <button class="btn btn-link me-2" @onclick="@(() => Update(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-pencil"></i></button>
+                                    <button class="btn btn-link me-2" @onclick="@(() => Edit(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-pencil"></i></button>
                                     <button class="btn btn-link text-danger" @onclick="@(() => Delete(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-trash"></i></button>
                                 </td>
                             </tr>
@@ -306,7 +310,7 @@
     CommonQueries commonQueries = new();
     Tbl_Comments comments = new();
     List<string> Question = new List<string>();
-    List<Tbl_Comments> CommentList = new List<Tbl_Comments>();
+    List<Tbl_Warning> CommentList = [];
     //hhd_status_manager current_status = new();
     List<int> RowList = [];
     Tbl_Block_1 block_1 = new();
@@ -317,6 +321,7 @@
     ConfirmDialog dialog = default!;
     private bool show_substitution_reason => (block_1.survey_code == 3 || block_1.survey_code == 9);
     private bool is_substitute = false;
+    bool isAdd = false;
 
     public void SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
@@ -349,11 +354,34 @@
 
     async void Comment()
     {
+        isAdd = true;
         await comment_vm.AddModal.ShowAsync();
     }
-    async Task Submit()
+    async Task Submit(bool update = false)
     {
-        var data = await comment_vm.Save("1");
+        comment_vm.ShowError = false;
+        comment_vm.ShowItemError = false;
+        if(comment_vm.item_no == "Select")
+        {
+            comment_vm.ShowItemError = true;
+            return;
+        }
+        if(string.IsNullOrWhiteSpace(comment_vm.comment))
+        {
+            toastService.ShowError("Please enter a comment before saving");
+            comment_vm.ShowError = true;
+            return;
+        }
+        int data = 0;
+        update = !isAdd;
+        if(update)
+        {
+            data = await comment_vm.Save("1", true);
+        }
+        else
+        {
+            data = await comment_vm.Save("1");
+        }
         // Reset fields
         comment_vm.Serialnumber = null;
         comment_vm.item_no = string.Empty;
@@ -362,28 +390,25 @@
         {
             CommentList = await comment_vm.LoadData("1");
         }
+        isAdd = true;
         StateHasChanged();
     }
 
     async void Close()
     {
         await comment_vm.AddModal.HideAsync();
-
+        isAdd = false;
     }
-    async void Delete(Tbl_Comments data)
+    void Edit(Tbl_Warning data)
     {
-        var DeleteResult = await comment_vm.Delete(data);
-        if (DeleteResult > 0)
-        {
-            CommentList = await comment_vm.LoadData("1");
-        }
+        comment_vm.LoadDataById(data);
+        isAdd = false;
+    }
+    async void Delete(Tbl_Warning data)
+    {
+        await comment_vm.Delete(data);
+        CommentList = await comment_vm.LoadData("1");
         StateHasChanged();
-
-    }
-
-    async void Update(Tbl_Comments data)
-    {
-        //comment_vm.LoadDataById(data);
     }
 
     async void GoBack()
@@ -403,7 +428,7 @@
                 is_substitute = true;
             }
         }
-        for (var i = 13; i <= 14; i++)
+        for (var i = 12; i <= 13; i++)
         {
             Question.Add(i.ToString());
         }

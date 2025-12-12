@@ -342,6 +342,7 @@
 				return;
 			}
 
+
 			var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
 			var confirmation = await dialog.ShowAsync(
 				title: "Alert",
@@ -351,6 +352,7 @@
 			{
 				return;
 			}
+
 
 			//Need to branch off submission logic for ENM, SSO and DS here
 			if (currentRole == SessionStorage.UserRole.JSO)
@@ -411,12 +413,14 @@
 							created_on = DateTime.Now
 						};
 
+						preloadService.Show(SpinnerColor.Info, "Submitting data");
 						var response = await networkService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
 						if (response != null && response.IsSuccessStatusCode)
 						{
 							toastService.ShowSuccess("Data submitted successfully");
 							foreach (var hhd in hhd_list)
 							{
+								hhd.needDownload = 1;
 								await dQ.SaveUpdateSCH0Block7(hhd);
 							}
 							SessionStorage.FSU_Submitted = true;
@@ -444,6 +448,8 @@
 					}
 					else
 					{
+						preloadService.Show(SpinnerColor.Info, "Submitting data");
+
 						Submission_Model data = new();
 						data.IncomeSchHISDto = [];
 
@@ -505,6 +511,7 @@
 					}
 					else
 					{
+						preloadService.Show(SpinnerColor.Info, "Submitting data");
 						Submission_Model data = new();
 						data.IncomeSchHISDto = [];
 
@@ -553,6 +560,7 @@
 		finally
 		{
 			await LoadData();
+			preloadService.Hide();
 		}
 	}
 
@@ -1145,7 +1153,7 @@
 		{
 			if (data.hhdStatus == 0 || data.hhdStatus == 11 || data.hhdStatus == 15)
 			{
-				
+
 				preloadService.Show(SpinnerColor.Light, "Fetching location details...");
 				SessionStorage.location = await funcs.fetchGeoLocation();
 				preloadService.Show(SpinnerColor.Light, "Updating location details...");
@@ -1156,10 +1164,19 @@
 			}
 			else
 			{
-				if (data.hhdStatus == 12 && data.needDownload != 12)
+				if (data.hhdStatus == 12 && data.needDownload != 0)
 				{
 					toastService.ShowError("Supervisor Comments need to be downloaded before editing the Household");
 					return;
+				}
+				else if (data.hhdStatus == 12 && data.needDownload == 0)
+				{
+					preloadService.Show(SpinnerColor.Light, "Fetching location details...");
+					SessionStorage.location = await funcs.fetchGeoLocation();
+					preloadService.Show(SpinnerColor.Light, "Updating location details...");
+					preloadService.Hide();
+					SessionStorage.FSU_Submitted = false;
+					NavigationManager.NavigateTo("/dashboard/his/block0_1");
 				}
 				else
 				{

@@ -31,7 +31,7 @@
                     {
                         
                 <div class="card-tools">
-                    <NavLink class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" @onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
                     }
             </div>
@@ -305,75 +305,11 @@
     </div>
 </EditForm>
 }
-<Modal @ref="comment_vm.AddModal" Title="Comment" CloseOnEscape="true" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
-    <BodyTemplate>
-        <div class="mb-3">
-            <div class="row mb-2">    
-                <div class="col-sm-12">
-                    <label class="form-label">
-                        <span class="form-badge">2</span>Question Number
-                    </label>
-                    <select class="form-select" @bind="comment_vm.item_no">
-                        <option value="">Select</option>
-                        @if (Question != null)
-                        {
-                            @foreach (var item in Question)
-                            {
-                                <option value="@item">@item</option>
-                            }
-                        }
-                    </select>
-                </div>
-                <div class="col-sm-12">
-                    <label for="commentBox" class="form-label">Enter your comment</label>
-                    <textarea class="form-control" id="commentBox" rows="2" @bind="comment_vm.comment" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
-                    @if (comment_vm.ShowError)
-                    {
-                        <div class="form-text text-danger">Comment cannot be empty.</div>
-                    }
-                </div>
-            </div>
-        </div>
 
-        @if (CommentList != null)
-        {
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th style="min-width: 200px;">Comment</th>
-                            <th style="min-width: 100px;">Item Number</th>
-                            <th style="min-width: 50px;">Member Srl.</th>
-                            <th style="min-width: 20px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in CommentList)
-                        {
-                            <tr>
-                                <td>@item.comment</td>
-                                <td class="text-center">@item.item_no</td>
-                                <td class="text-center">@((item.serial_number == 0) ? "" : item.serial_number.ToString())</td>
-                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                {
-                                    
-                                <td class="text-center">
-                                    <button class="btn btn-link fs-6 me-2" @onclick="@(() => Update(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-pencil"></i></button>
-                                    <button class="btn btn-link fs-6 text-danger" @onclick="@(() => Delete(item))" disabled="@((SessionStorage.user_role != item.role_code))"><i class="fi fi-rr-trash"></i></button>
-                                </td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-    </BodyTemplate>
-    <FooterTemplate>
-        <Button class="btn btn-outline-secondary" @onclick="@(() => Close())">Close</Button>
-        <Button class="btn btn-primary" @onclick="@(() => Submit())">Submit</Button>
-    </FooterTemplate>
-</Modal>
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="Question"
+              Block="4.3" />
 
 
 @code {
@@ -389,11 +325,9 @@
     List<Tbl_Block_4_Q5> block_4_nic_list = [];
     DBQueries dQ = new();
 
-    Tbl_Comments comments = new();
     List<string> Question = new List<string>();
-    List<Tbl_Comments> CommentList = new List<Tbl_Comments>();
-    List<int> RowList = [];
     CommonList commonList = new();
+    CommentModal commentModal = default!;
 
 
     // Stores selected land use codes
@@ -421,13 +355,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        for (var i = 1; i <= 17; i++)
+        for (var i = 6; i <= 16; i++)
         {
             Question.Add(i.ToString());
         }
 
-        CommentList = await comment_vm.LoadData("1");
-        comment_vm.NotifyUiUpdate += StateHasChanged;
+        
         if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
         {
             await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
@@ -730,45 +663,6 @@
             editContext?.NotifyFieldChanged(
             FieldIdentifier.Create(() => block_4.item_17));
         }
-    }
-
-    async void Comment()
-    {
-        await comment_vm.AddModal.ShowAsync();
-    }
-    async Task Submit()
-    {
-        var data = await comment_vm.Save("1");
-        // Reset fields
-        comment_vm.Serialnumber = null;
-        comment_vm.item_no = string.Empty;
-        comment_vm.comment = string.Empty;
-        if (data > 0)
-        {
-            CommentList = await comment_vm.LoadData("1");
-        }
-        StateHasChanged();
-    }
-
-    async void Close()
-    {
-        await comment_vm.AddModal.HideAsync();
-    }
-
-    async void Delete(Tbl_Comments data)
-    {
-        var DeleteResult = await comment_vm.Delete(data);
-        if (DeleteResult > 0)
-        {
-            CommentList = await comment_vm.LoadData("1");
-        }
-        StateHasChanged();
-
-    }
-
-    void Update(Tbl_Comments data)
-    {
-        //comment_vm.LoadDataById(data);
     }
 
     async void GoBack()

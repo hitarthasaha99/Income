@@ -38,7 +38,7 @@
             {
 
                 <div class="card-tools">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -126,7 +126,7 @@
         </div>
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
         <div class="card-body">
-                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here.." @bind="@block_1.block_4_remark" rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here.." @bind="@block_1.block_5_remark" rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
         </div>
         </fieldset>
     </div>
@@ -436,6 +436,11 @@
 
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList=RowList
+              QuestionList="Question"
+              Block="5" />
+
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
@@ -451,6 +456,9 @@
     string remarks = string.Empty;
     Modal AddModal = default!;
     bool isAdd = false;
+    CommentModal commentModal = default!;
+    List<string> Question = [];
+    List<int> RowList = [];
 
     EditContext editContext;
     private Block_5_Validator validator = new();
@@ -502,38 +510,40 @@
         var applicableMembers = block3Members?.Where(x => x.item_8 == 4 || x.item_9 == 4|| x.item_10 == 4 || x.item_11 == 4).ToList();
 
         await LoadData();
-        if (block5Members == null || block5Members.Count == 0)
+        if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
         {
-            int i = 1;
-            foreach (var member in applicableMembers)
+            if (block5Members == null || block5Members.Count == 0)
             {
-                Tbl_Block_5 obj = new();
-                obj.id = Guid.NewGuid();
-                obj.serial_member = member.serial_no;
-                obj.serial_number = i++;
-                obj.fk_block_3 = member.id;
-                await dbq.Save_SCH_HIS_Block5(obj);
+                int i = 1;
+                foreach (var member in applicableMembers)
+                {
+                    Tbl_Block_5 obj = new();
+                    obj.id = Guid.NewGuid();
+                    obj.serial_member = member.serial_no;
+                    obj.serial_number = i++;
+                    obj.fk_block_3 = member.id;
+                    await dbq.Save_SCH_HIS_Block5(obj);
+                }
+                await LoadData();
             }
-            await LoadData();
-        }
-        else if(block5Members != null && block5Members.Count != applicableMembers?.Count)
-        {
-            int currentSerialNumber = block5Members.Count();
-            var missingMembers = applicableMembers?
-                        .Where(am => !block5Members.Any(b5 => b5.fk_block_3 == am.id))
-                        .ToList();
-            foreach (var member in missingMembers)
+            else if (block5Members != null && block5Members.Count != applicableMembers?.Count)
             {
-                Tbl_Block_5 obj = new();
-                obj.id = Guid.NewGuid();
-                obj.serial_member = member.serial_no;
-                obj.fk_block_3 = member.id;
-                obj.serial_number = currentSerialNumber++;
-                await dbq.Save_SCH_HIS_Block5(obj);
+                int currentSerialNumber = block5Members.Count();
+                var missingMembers = applicableMembers?
+                            .Where(am => !block5Members.Any(b5 => b5.fk_block_3 == am.id))
+                            .ToList();
+                foreach (var member in missingMembers)
+                {
+                    Tbl_Block_5 obj = new();
+                    obj.id = Guid.NewGuid();
+                    obj.serial_member = member.serial_no;
+                    obj.fk_block_3 = member.id;
+                    obj.serial_number = currentSerialNumber++;
+                    await dbq.Save_SCH_HIS_Block5(obj);
+                }
+
             }
-
         }
-
         StateHasChanged();
     }
 
@@ -542,7 +552,7 @@
         // Convert input value
         if (int.TryParse(e.Value?.ToString(), out int value))
         {
-            
+
             if (value > 12)
                 newMember.item_1 = 12;
             else if (value < 1)
@@ -647,6 +657,8 @@
     private async Task LoadData()
     {
         block5Members = await dbq.Fetch_SCH_HIS_Block5(SessionStorage.selected_hhd_id);
+        Question.AddRange(new List<string>() { "1","2","3i","3ii","4i","4ii","5","6","7","8","9"});
+        RowList = block5Members.Select(x => x.serial_member.GetValueOrDefault()).Distinct().ToList();    
         StateHasChanged();
     }
 

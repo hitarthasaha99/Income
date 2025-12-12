@@ -42,7 +42,7 @@
                 {
 
                     <div class="card-tools">
-                        <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        <NavLink class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                     </div>
                 }
             </div>
@@ -590,6 +590,11 @@
     </FooterTemplate>
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList="memberList"
+              QuestionList="Question"
+              Block="3"/>
+
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
@@ -631,9 +636,19 @@
     CommonQueries commonQueries = new();
     bool isAdd = false;
     private string? remarks = string.Empty;
-
+    List<string> Question = new List<string>();
+    List<int> memberList = [];
     EditContext editContext;
     ValidationMessageStore messageStore;
+    CommentModal commentModal = default!;
+
+    async void Comment()
+    {
+        isAdd = true;
+        await commentModal.Open();
+    }
+
+    
 
     async void GoBack()
     {
@@ -652,6 +667,7 @@
         hhd = await DBQueries.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
         block_1 = await DBQueries.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? new();
         await commonQueries.InsertVisitedBlock(vb);
+        
         await LoadData();
         StateHasChanged();
     }
@@ -659,6 +675,14 @@
     private async Task LoadData()
     {
         block3Members = await DBQueries.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        for(int i=1; i<=block3Members.Count; i++)
+        {
+            memberList.Add(i);
+        }
+        for (var i = 1; i <= 12; i++)
+        {
+            Question.Add(i.ToString());
+        }
         StateHasChanged();
     }
 
