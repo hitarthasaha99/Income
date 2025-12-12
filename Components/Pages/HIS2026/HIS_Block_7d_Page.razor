@@ -39,7 +39,7 @@
                     <div class="table-responsive">
                         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-                            <table class="table table-bordered align-middle text-center mb-0">
+                            <table class="table table-bordered align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th colspan="4" class="text-start">
@@ -50,16 +50,16 @@
                                     </th>
                                 </tr>
                                 <tr>
-                                    <th style="width: 50px;">S. no. of activity</th>
-                                    <th>Description of activity</th>
-                                    <th>Mode of operation (individually operated -1, jointly operated with other household(s) -2)</th>
-                                    <th>% shareholding(in case of code 2 in col. 3)</th>
+                                    <th style="width: 50px;" class="text-center">S. no. of activity</th>
+                                    <th class="text-center">Description of activity</th>
+                                    <th class="text-center">Mode of operation (individually operated -1, jointly operated with other household(s) -2)</th>
+                                    <th class="text-center">% shareholding(in case of code 2 in col. 3)</th>
                                 </tr>
                                 <tr>
-                                    <th>(1)</th>
-                                    <th>(2)</th>
-                                    <th>(3)</th>
-                                    <th>(4)</th>
+                                    <th class="text-center">(1)</th>
+                                    <th class="text-center">(2)</th>
+                                    <th class="text-center">(3)</th>
+                                    <th class="text-center">(4)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,7 +89,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="4">No activities yet.</td>
+                                        <td colspan="4"><div class="alert custom-alert alert-danger">No activities yet.</div></td>
                                     </tr>
                                 }
                             </tbody>
