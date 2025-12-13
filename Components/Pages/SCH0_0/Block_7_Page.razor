@@ -301,6 +301,7 @@
                                                     @bind-Value="fields.Block_7_8"
                                                     step="any"
                                                     Disabled="@(sector == 2)"
+                                                    oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10)"
                                                     onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(event.target.value + event.key)" />
                                     <ValidationMessage For="@(() => fields.Block_7_8)" />
                                 </div>

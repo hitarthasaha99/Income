@@ -77,16 +77,22 @@
                         }
                     </tbody>
                 </table>
-                <div class="mb-3 px-2">
-                    <label for="remarksTextarea" class="form-label">Remarks</label>
-                    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-                        <textarea maxlength="500" class="form-control" id="remarksTextarea" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
-                    </fieldset>
-                </div>
             </div>
         </div>
     </div> 
+</div>
+<div class="footer">
+    <!-- Remarks textarea -->
+    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+        <div class="card custom-card">
+            <div class="card-header">
+                <h3 class="card-title">Remarks</h3>
+            </div>
+            <div class="card-body">
+                <textarea maxlength="500" class="form-control" id="remarksTextarea" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+            </div>
+        </div>
+    </fieldset>
     <div class="row">
         <div class="col-sm-6">
             <button class="btn btn-outline-primary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
@@ -109,14 +115,16 @@
         @if (editContext != null)
         {
             <EditForm EditContext="editContext">
-                    <div class="row">
+                <div class="row">
+                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
                                 <span class="form-badge">1</span>S.no.of the member
                             </label>
                             <input type="number" readonly class="form-control" value="@table11B.item_1" disabled />
                         </div>
-
+                    </div> 
+                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
                                 <span class="form-badge">2</span>Name of Member
@@ -124,7 +132,8 @@
                             <input value="@table11B.item_2" readonly class="form-control"/>
 
                         </div>
-
+                    </div> 
+                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
                                 <span class="form-badge">3</span>Whether paid any direct tax during last financial year? (yes-1, no-2)
@@ -135,23 +144,26 @@
                                         UpdateFieldAndValidate(() => table11B.item_3, e);
                                         item_3Condition(e);
                                     }"
-                                      class="form-select">
-                                  <option value="">-Select-</option>
-                                  <option value="1">1-yes</option>
-                                  <option value="2">2-no</option>
+                                        class="form-select">
+                                    <option value="">-Select-</option>
+                                    <option value="1">1-yes</option>
+                                    <option value="2">2-no</option>
 
                             </select>
                             <ValidationMessage For="@(() => table11B.item_3)" />
                         </div>
-                        <div class="mb-3">
+                    </div>
+                    <div class="col-sm-12">
+                        <div>
                             <label class="form-label">
                                 <span class="form-badge">4</span>Amount of direct tax paid (net of refunds) in last financial year (in Rs.)
                             </label>
                             <input type="number" class="form-control no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@table11B.item_4" disabled="@(!is11B_4Enable)"
-                                   @oninput="e => UpdateFieldAndValidate(() => table11B.item_4, e)" />
+                                    @oninput="e => UpdateFieldAndValidate(() => table11B.item_4, e)" />
                             <ValidationMessage For="@(() => table11B.item_4)" />
                         </div>
                     </div>
+                </div>
             </EditForm>
         }
     </BodyTemplate>

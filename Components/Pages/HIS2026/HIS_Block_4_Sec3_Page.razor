@@ -80,12 +80,48 @@
                     </div>
                     <!--4.8-->
                     <div class="col-sm-12">
-                        <div hidden="@(block_4?.item_6 != 1)">
-                            <label class="form-label">
+                        <div hidden="@(block_4?.item_6 != 1)" class="mb-3">
+                            <label class="form-label mb-3">
                                 <span class="form-badge">8</span>
                                 Use of land owned <small class="text-muted">(multiple select)</small>
                             </label>
-                            <div class="d-flex flex-wrap mt-3">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        @if (Block_4_Constants.Q4_8 != null && Block_4_Constants.Q4_8.Count > 0)
+                                        {
+                                            @foreach (var item in Block_4_Constants.Q4_8)
+                                            {
+                                                <tr>
+                                                    <td style="width: 10px;">
+                                                        <label class="siteCustomCheckbox">
+                                                            <input class="is_sso"
+                                                            type="checkbox"
+                                                            value="@item.id"
+                                                            checked="@SelectedLandUses.Contains(item.id)"
+                                                            @onchange="() => ToggleLandUse(item.id)"
+                                                            disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label class="siteCustomCheckbox justify-content-start">
+                                                            <span class="label-text">@item.title</span>
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <ValidationMessage For="@(() => block_4.item_8)" />
+                                @if (!string.IsNullOrEmpty(Item8WarningMessage))
+                                {
+                                    <div class="form-text text-success">
+                                        @Item8WarningMessage
+                                    </div>
+                                }
+                            </div>
+                            @* <div class="d-flex flex-wrap mt-3">
                                 @if (Block_4_Constants.Q4_8 != null && Block_4_Constants.Q4_8.Count > 0)
                                 {
                                     @foreach (var item in Block_4_Constants.Q4_8)
@@ -101,15 +137,8 @@
                                         </label>
                                     }
                                 }
-                                <ValidationMessage For="@(() => block_4.item_8)" />
-                                @if (!string.IsNullOrEmpty(Item8WarningMessage))
-                                {
-                                    <div class="form-text text-success mb-3">
-                                        @Item8WarningMessage
-                                    </div>
-                                }
-                            </div>
-                            
+                                
+                            </div> *@
                         </div>
                     </div>
 
@@ -136,12 +165,46 @@
                     </div>
                     <div class="col-sm-12">
                         <!--4.10-->
-                        <div hidden="@(block_4?.item_9 != 1 && block_4?.item_9 != 2 && block_4?.item_9 != 3)">
-                            <label class="form-label">
+                        <div hidden="@(block_4?.item_9 != 1 && block_4?.item_9 != 2 && block_4?.item_9 != 3)" class="mb-3">
+                            <label class="form-label mb-3">
                                 <span class="form-badge">10</span>
                                 If codes 1–3 in Q4.9, type of economic activity(ies) household performed during last 365 days
                             </label>
-                            <div class="d-flex flex-wrap mt-3">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        @foreach (var item in Block_4_Constants.Q4_10)
+                                        {
+                                            <tr>
+                                                <td style="width: 10px;">
+                                                    <label class="siteCustomCheckbox">
+                                                        <input class="is_sso"
+                                                                type="checkbox"
+                                                                value="@item.id"
+                                                                checked="@SelectedEconomicActivities.Contains(item.id)"
+                                                                @onchange="() => ToggleEconomicActivity(item.id)"
+                                                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <label class="siteCustomCheckbox justify-content-start">
+                                                        <span class="label-text">@item.title</span>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <ValidationMessage For="@(() => block_4.item_10)" />
+                                @if (!string.IsNullOrEmpty(Item10WarningMessage))
+                                {
+                                    <div class="form-text text-success">
+                                        @Item10WarningMessage
+                                    </div>
+                                }
+                            </div>
+
+                            @* <div class="d-flex flex-wrap mt-3">
                                 @foreach (var item in Block_4_Constants.Q4_10)
                                 {
                                     <label class="siteCustomCheckbox me-5 mb-3">
@@ -161,8 +224,7 @@
                                         @Item10WarningMessage
                                     </div>
                                 }
-                            </div>
-                           
+                            </div> *@
                         </div>
                     </div>
                     <div class="col-sm-12">

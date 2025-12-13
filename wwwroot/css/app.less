@@ -234,6 +234,9 @@ input[type="radio"] {
 .bg-light-blue {
   background-color: @background_color_6;
 }
+.bg-light-pink {
+  background-color: @background_color_7;
+}
 
 
 .btn-success {
@@ -1265,6 +1268,7 @@ input[type="radio"] {
 .siteCustomCheckbox {
     display: flex;
     align-items: center;
+    justify-content: center;
     label {
         display: flex;
         flex-direction: row;
@@ -1629,4 +1633,12 @@ background-color: @warningLightColor;
   }
   
 }
-
+.alert{
+  &.custom-alert{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    padding:0.5rem 1rem;
+  }
+}
