@@ -17,24 +17,24 @@
 @if (editContext != null)
 {
     <EditForm EditContext="editContext">
-            <div class="main-content">
-                <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
-                <div class="card custom-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <span class="text-primary me-1">Block 8:</span>Income from Transfer receipts
-                        </h3>
-                    @* add comment *@
-                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-                    {
+        <div class="main-content">
+            <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+            <div class="card custom-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <span class="text-primary me-1">Block 8:</span>Income from Transfer receipts
+                    </h3>
+                @* add comment *@
+                @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                {
 
-                        <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
-                        </div>
-                    }
+                    <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                        <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
+                }
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
                         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
                             <table class="table table-bordered table-striped mb-0">
                                 <thead>
@@ -100,7 +100,7 @@
                                         <td>
                                             <label class="form-label"><span class="form-badge">Q8.5</span></label>
                                         </td>
-                                        <td>retirement benefits including gratuity, social security benefits, CGEGIS etc. (excluding maturity value of PF, lump sum leave encashment received at the time of retirement)</td>
+                                        <td>Retirement benefits including gratuity, social security benefits, CGEGIS etc. (excluding maturity value of PF, lump sum leave encashment received at the time of retirement)</td>
                                         <td>Last 365 days</td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
@@ -113,40 +113,45 @@
                     
                     </table>
                         </fieldset>
-
-                    <div class="mb-3 px-2">
-                        <label for="remarksTextarea" class="form-label">Remarks</label>
-                            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-                                <textarea maxlength="500" class="form-control" @bind="block_1.block_8a_remark" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
-                        </fieldset>
-                    </div>
-                </div>
-                </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="d-flex">
-                                <NavLink class="btn btn-outline-secondary" @onclick="GoBack">
-                                <i class="fi fi-rr-angle-left me-1"></i>Back
-                            </NavLink>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="d-flex align-items-center justify-content-end">
-                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                            {
-                                <button @onclick="() => ValidateAndSave(false)" class="btn btn-outline-primary me-2 is_sso action">
-                                    <i class="fi fi-rr-disk me-1"></i>Save
-                                </button>
-                            }
-                            <button @onclick="(() => ValidateAndSave(true))" class="btn btn-primary">
-                                Next<i class="fi fi-rr-angle-right ms-1"></i>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="footer">
+            <!-- Remarks textarea -->
+            <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Remarks</h3>
+                    </div>
+                    <div class="card-body">
+                        <textarea maxlength="500" class="form-control" @bind="block_1.block_8a_remark" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="d-flex">
+                        <NavLink class="btn btn-outline-secondary" @onclick="GoBack">
+                            <i class="fi fi-rr-angle-left me-1"></i>Back
+                        </NavLink>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex align-items-center justify-content-end">
+                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                        {
+                            <button @onclick="() => ValidateAndSave(false)" class="btn btn-outline-primary me-2 is_sso action">
+                                <i class="fi fi-rr-disk me-1"></i>Save
+                            </button>
+                        }
+                        <button @onclick="(() => ValidateAndSave(true))" class="btn btn-primary">
+                            Next<i class="fi fi-rr-angle-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </EditForm>    
 } 
 
