@@ -212,46 +212,11 @@
         </div>
     </EditForm>
 }
-                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." @bind="block_1.block_11a_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
-                </fieldset>
-            </div>
-        </div>
-    </div>
-            </EditForm>
-        }
                 
-
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="d-flex">
-                <NavLink class="btn btn-outline-primary" @onclick="GoBack">
-                    <i class="fi fi-rr-angle-left me-1" ></i>Back
-                </NavLink>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="d-flex align-items-center justify-content-end">
-                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                {
-                    <button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => SaveAsync(false))">
-                        <i class="fi fi-rr-disk me-1"></i>
-                        Save
-                    </button>
-                }
-                <NavLink class="btn btn-primary" @onclick="@(() => SaveAsync(true))">
-                    Next
-                    <i class="fi fi-rr-angle-right ms-1"></i>
-                </NavLink>
-            </div>
-        </div>
-    </div>
-    <CommentModal @ref="commentModal"
-              MemberList=null
-              QuestionList="@(new List<string>(){"11.1","11.2","11.3","11.4","11.5","11.6"})"
-              Block="11A" />
-</div>
-
+<CommentModal @ref="commentModal"
+            MemberList=null
+            QuestionList="@(new List<string>(){"11.1","11.2","11.3","11.4","11.5","11.6"})"
+            Block="11A" />
 
 
 @code {
