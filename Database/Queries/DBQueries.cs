@@ -1631,7 +1631,7 @@ namespace Income.Database.Queries
 
                     //await _logger.LogInfo($"Deleted member - \n{json}");
                     await ReserializeMemberList(exists);
-                    await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                    //await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
                     return 1;
                 }
                 return 0;
@@ -1643,36 +1643,117 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task UpdateOrDeleteDependentBlocks_HIS_Block_3(Tbl_Block_3 block_3)
+
+
+        public async Task UpdateOrDeleteDependentBlocks_HIS_Block_3(
+    Tbl_Block_3 oldBlock3,
+    Tbl_Block_3 newBlock3)
         {
             try
             {
-                //HIS_Block_4
-                //HIS_Block_5 - if entry having 04 in items 8 - 11 gets deleted, delete the entry from block-5 too
-                if(block_3.item_8 != 4 && block_3.item_9 != 4 && block_3.item_10 != 4 && block_3.item_11 != 4)
+                if (!HasDependencyFieldsChanged(oldBlock3, newBlock3))
+                    return;
+
+                // ================= BLOCK 4 =================
+                bool hasCode1 = await HasAnyBlock3WithCode(1);
+
+                if (!hasCode1)
                 {
-                    var existingEntryBlock5 = await _database.Table<Tbl_Block_5>().Where(x => x.fk_block_3 == block_3.id).FirstOrDefaultAsync();
-                    if (existingEntryBlock5 != null)
-                    {
-                        await Delete_HIS_Block_5(existingEntryBlock5.id);
-                    }
+                    await ResetBlock4ActivitiesAsync();
                 }
-                //HIS_Block_6 - if entry having 05 in items 8 - 9 gets deleted
-                if (block_3.item_8 != 5 && block_3.item_9 != 5)
+                // NOTE:
+                // If hasCode1 == true and Block 4 has no selection,
+                // validation should happen at save/submit time (not auto-set)
+
+                // ================= BLOCK 5 (code = 4) =================
+                bool hasCode4 = await HasAnyBlock3WithCode(4);
+
+                if (!hasCode4)
                 {
-                    var existingEntryBlock6 = await _database.Table<Tbl_Block_6>().Where(x => x.fk_block_3 == block_3.id).FirstOrDefaultAsync();
-                    if (existingEntryBlock6 != null)
+                    var block5Entries = await _database.Table<Tbl_Block_5>()
+                        .Where(x => x.fk_block_3 == oldBlock3.id)
+                        .ToListAsync();
+
+                    foreach (var entry in block5Entries)
                     {
-                        await Delete_HIS_Block_6(existingEntryBlock6.id);
+                        await Delete_HIS_Block_5(entry.id);
                     }
                 }
 
+                // ================= BLOCK 6 (code = 5) =================
+                bool hasCode5 = await HasAnyBlock3WithCode(5);
+
+                if (!hasCode5)
+                {
+                    var block6Entries = await _database.Table<Tbl_Block_6>()
+                        .Where(x => x.fk_block_3 == oldBlock3.id)
+                        .ToListAsync();
+
+                    foreach (var entry in block6Entries)
+                    {
+                        await Delete_HIS_Block_6(entry.id);
+                    }
+                }
             }
             catch (Exception ex)
             {
-
+                await _logger.LogError("UpdateBlock3", ex);
             }
         }
+        private async Task<bool> HasAnyBlock3WithCode(params int[] codes)
+        {
+            var result = await _database.Table<Tbl_Block_3>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false))
+                .ToListAsync();
+            return result.Any(x =>
+                    codes.Contains(x.item_8 ?? -1) ||
+                    codes.Contains(x.item_9 ?? -1) ||
+                    codes.Contains(x.item_10 ?? -1) ||
+                    codes.Contains(x.item_11 ?? -1));
+        }
+
+
+        private bool IsAnyBlock4ActivitySelected(Tbl_Block_4 block4)
+        {
+            return block4.item_4_1 == true ||
+                   block4.item_4_2 == true ||
+                   block4.item_4_3 == true ||
+                   block4.item_4_4 == true ||
+                   block4.item_4_5 == true ||
+                   block4.item_4_6 == true;
+        }
+
+        private async Task ResetBlock4ActivitiesAsync()
+        {
+            var block4 = await _database.Table<Tbl_Block_4>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false))
+                .FirstOrDefaultAsync();
+
+            if (block4 == null)
+                return;
+
+            if (!IsAnyBlock4ActivitySelected(block4))
+                return;
+
+            block4.item_4_1 = false;
+            block4.item_4_2 = false;
+            block4.item_4_3 = false;
+            block4.item_4_4 = false;
+            block4.item_4_5 = false;
+            block4.item_4_6 = false;
+
+            await _database.UpdateAsync(block4);
+        }
+
+        private bool HasDependencyFieldsChanged(Tbl_Block_3 oldB, Tbl_Block_3 newB)
+        {
+            return oldB.item_8 != newB.item_8 ||
+                   oldB.item_9 != newB.item_9 ||
+                   oldB.item_10 != newB.item_10 ||
+                   oldB.item_11 != newB.item_11;
+        }
+
+
 
         private async Task ReserializeMemberList(Tbl_Block_3 deleted)
         {
