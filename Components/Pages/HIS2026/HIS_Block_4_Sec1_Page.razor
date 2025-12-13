@@ -383,7 +383,7 @@
         var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         if (block3 != null && block3.Count > 0)
         {
-            Q4Needed = block3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1);
+            Q4Needed = block3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1 || x.item_11 == 1);
         }
         block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
         int block_4_1 = block3?.Count ?? 0;

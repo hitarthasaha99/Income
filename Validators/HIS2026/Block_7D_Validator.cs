@@ -19,11 +19,15 @@ namespace Income.Validators.HIS2026
 
             RuleFor(x => x.item_4)
                 .NotEmpty().When(x => x.item_3 == 2)
-                .WithMessage("Please enter share (%).");
+                .WithMessage("H055: Invalid entry, please check the entry");
 
             RuleFor(x => x.item_4)
-                .GreaterThanOrEqualTo(0).When(x => x.item_3 == 2)
-                .WithMessage("Share cannot be negative.");
+                .NotNull()
+                .GreaterThan(0)
+                .LessThanOrEqualTo(100)
+                .When(x => x.item_3 == 2)
+                .WithMessage("H055: Invalid entry, please check the entry");
+
         }
     }
 }

@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject Warning_VM warning_VM
 @inject LocalizationService Loc
 
 <div class="main-content">
@@ -352,7 +353,7 @@
     void CheckWarning()
     {
         item_9_6_warning = string.Empty;
-        if (MemberList.Any(x => x.item_8 == 10 || x.item_9 == 10 || x.item_10 == 10 || x.item_11 == 10) && (block_9b?.item_6.GetValueOrDefault() <= 0 && block_9b?.item_7.GetValueOrDefault() <= 0))
+        if (MemberList.Any(x => x.item_8 == 10 || x.item_9 == 10 || x.item_10 == 10 || x.item_11 == 10) && (block_9b?.item_6.GetValueOrDefault() <= 0 || block_9b?.item_7.GetValueOrDefault() <= 0))
         {
             item_9_6_warning = "W067: Please check the entry recorded against cols. 8-11";
         }
@@ -397,6 +398,12 @@
                 }
             }
 
+            if (!string.IsNullOrEmpty(item_9_6_warning))
+            {
+                warning_VM.AddWarning(item_9_6_warning, "HIS", "9B", "9.6", SessionStorage.selected_hhd_id);
+            }
+            await warning_VM.SaveWarningAsync("HIS", "9B");
+
             if (!is_go_next)
             {
                 return;
@@ -405,7 +412,7 @@
             {
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
-                NavigationManager.NavigateTo("/dashboard/his/block_10");
+            NavigationManager.NavigateTo("/dashboard/his/block_10");
             
         }
         catch (Exception ex)

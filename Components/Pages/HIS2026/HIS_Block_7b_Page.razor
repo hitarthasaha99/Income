@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject Warning_VM warningVM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7b> Validator
 
@@ -621,7 +622,12 @@
             item_9_warning = string.Empty;
             if (block_7B != null && block_7B.item_9 < 0)
             {
-                item_9_warning = $"W047(ii): ii) Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications";
+                item_9_warning = @"Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes:
+a. Produces are damaged
+b. Product is not harvested
+c. Production is not started
+d. Others (specify in text box)";
+
             }
         }
         catch (Exception ex)
@@ -673,6 +679,13 @@
                     toastService.ShowSuccess("Data could not be saved");
                 }
             }
+
+            CheckItem6Warning();
+            if (!string.IsNullOrEmpty(item_9_warning))
+            {
+                warningVM.AddWarning(item_9_warning, "HIS", "7B", "7B.9", SessionStorage.selected_hhd_id);
+            }
+            await warningVM.SaveWarningAsync("HIS", "7B");
 
             if (!is_go_next)
             {
