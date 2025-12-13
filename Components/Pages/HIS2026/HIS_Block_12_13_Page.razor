@@ -18,14 +18,6 @@
             <h3 class="card-title">
                 <span class="text-primary fw-bolder me-2">[Block 12]</span> Remarks by Field Enumerator (FE)/Junior Statistical Officer (JSO)
             </h3>
-            @* add comment *@
-            @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-
-                <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
-                </div>
-            }
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">

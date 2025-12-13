@@ -40,7 +40,7 @@
             {
 
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -79,7 +79,7 @@
                         {
                             <tr>
                                 <td>@item.serial_number</td>
-                                <td>@item.item_2</td>
+                                <td>@(Block_8_Constants.Q8_6_Schemes.First(x => x.id == item.item_2).title)</td>
                                 <td>@item.item_3</td>
                                 <td>@item.item_4</td>
                                 <td>@item.item_5</td>
@@ -224,6 +224,11 @@
     </FooterTemplate>
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList=RowList
+              QuestionList="@(new List<string>(){"2","3","4","5"})"
+              Block="8B" />
+
 
 @code {
     private Modal modal = default!;
@@ -238,6 +243,8 @@
     readonly DBQueries dB = new();
     bool isAdd;
     private string remarks = string.Empty;
+    CommentModal commentModal = default!;
+    List<int> RowList = [];
 
     async Task GoBack()
     {
@@ -364,6 +371,7 @@
     private async Task LoadData()
     {
         SchemeList = await dB.Fetch_SCH_HIS_Block8_6(SessionStorage.selected_hhd_id);
+        RowList = SchemeList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
         StateHasChanged();
     }
 

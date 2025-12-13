@@ -13,191 +13,205 @@
 @inject ILoggingService loggingService
 @inject IValidator<Tbl_Block_11a> Validator
 
-@if (editContext !=null)
-{
-    <EditForm EditContext="editContext">
-        <div class="main-content">
-            <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+<div class="main-content">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
         
-            <div class="card custom-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <span class="text-primary me-1">Block 11a:</span>Particulars of transfers paid on regularly / periodic basis to non-household member
-                    </h3>
-                     @* add comment *@
-                     @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-                     {
-
-                         <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                             <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
-                         </div>
-                     }
-                </div>
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="text-primary me-1">Block 11a:</span>Particulars of transfers paid on regularly / periodic basis to non-household member
+            </h3>
+                @* add comment *@
+                @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                {
+                    <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                        <button class="btn btn-primary" @onclick="async () => await OpenModal()"><i class="fi fi-rr-comment-alt me-2"></i>Comment</button>
+                    </div>
+                }
+        </div>
+        @if (editContext != null)
+        {
+            <EditForm EditContext="editContext">
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                            <table class="table table-bordered table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Q.no.</th>
-                                        <th>Question description</th>
-                                        <th>Entry</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge">Q11.1</span>
-                                            </label> 
-                                        </td>
-                                        <td>Whether transfers paid to other households in the form of family support payments (such as alimony, child and parental support) during last month?</td>
-                                        <td>
-                                            <select class="form-select form-select-sm"
-                                                    value="@selectBlock11A.item_1"
-                                                    @onchange="e =>
-                                                    {
-                                                        UpdateFieldAndValidate(() => selectBlock11A.item_1, e);
-                                                        q11_1Condition(e);
-                                                    }">
-                                                    <option value="">-Select-</option>
-                                                    <option value="1">1-yes</option>
-                                                    <option value="2">2-no</option>
-                                            </select>
+            <div class="table-responsive">
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Q.no.</th>
+                                <th>Question description</th>
+                                <th>Entry</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <label class="form-label mb-0">
+                                        <span class="form-badge">Q11.1</span>
+                                    </label> 
+                                </td>
+                                <td>Whether transfers paid to other households in the form of family support payments (such as alimony, child and parental support) during last month?</td>
+                                <td>
+                                    <select class="form-select form-select-sm"
+                                            value="@selectBlock11A.item_1"
+                                            @onchange="e =>
+                                            {
+                                                UpdateFieldAndValidate(() => selectBlock11A.item_1, e);
+                                                q11_1Condition(e);
+                                            }">
+                                            <option value="">-Select-</option>
+                                            <option value="1">1-yes</option>
+                                            <option value="2">2-no</option>
+                                    </select>
 
-                                            <ValidationMessage For="@(() => selectBlock11A.item_1)" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge">Q11.2</span>
-                                            </label> 
-                                        </td>
-                                        <td>
-                                            If code 1 in 11.1,<br />
-                                            Amount of such transfer paid during last month (yes - 1, no – 2)
-                                        </td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    disabled="@(!isQ11_2Enable)"
-                                                    value="@selectBlock11A.item_2"
-                                                    @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_2, e)" />
+                                    <ValidationMessage For="@(() => selectBlock11A.item_1)" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form-label mb-0">
+                                        <span class="form-badge">Q11.2</span>
+                                    </label> 
+                                </td>
+                                <td>
+                                    If code 1 in 11.1,<br />
+                                    Amount of such transfer paid during last month (yes - 1, no – 2)
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm no-spinner"
+                                            onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                            disabled="@(!isQ11_2Enable)"
+                                            value="@selectBlock11A.item_2"
+                                            @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_2, e)" />
 
-                                            <ValidationMessage For="@(() => selectBlock11A.item_2)" />
-                                        </td>
+                                    <ValidationMessage For="@(() => selectBlock11A.item_2)" />
+                                </td>
 
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge">Q11.3</span>
-                                            </label> 
-                                        </td>
-                                        <td>
-                                            If code 2 in 11.1, <br />
-                                            Whether transfers paid to other households in the form of family support payments (such as alimony, child and parental support) during last 365 days? (yes - 1, no – 2)
-                                        </td>
-                                        <td>
-                                                <select class="form-select form-select-sm" value="@selectBlock11A.item_3" disabled="@(!isQ11_3Enable)"
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form-label mb-0">
+                                        <span class="form-badge">Q11.3</span>
+                                    </label> 
+                                </td>
+                                <td>
+                                    If code 2 in 11.1, <br />
+                                    Whether transfers paid to other households in the form of family support payments (such as alimony, child and parental support) during last 365 days? (yes - 1, no – 2)
+                                </td>
+                                <td>
+                                        <select class="form-select form-select-sm" value="@selectBlock11A.item_3" disabled="@(!isQ11_3Enable)"
                                         
-                                                @onchange="e =>
-                                                {UpdateFieldAndValidate(() => selectBlock11A.item_3, e);
-                                                        q11_3Condition(e);
-                                                }">                                                                                                                                                     
-                                                <option value="">-Select-</option>
-                                                <option value="1">1-yes</option>
-                                                <option value="2">2-no</option>
-                                            </select>
-                                            <ValidationMessage For="@(() => selectBlock11A.item_3)" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge">Q11.4</span>
-                                            </label> 
-                                        </td>
-                                        <td>
-                                            If code 1 in 11.3,<br />
-                                            Number of times such transfer paid during the last 365 days
-                                        </td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    disabled="@(!isQ11_4_5Enable)"
-                                                    value="@selectBlock11A.item_4"
-                                                    @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_4, e)" />
+                                        @onchange="e =>
+                                        {UpdateFieldAndValidate(() => selectBlock11A.item_3, e);
+                                                q11_3Condition(e);
+                                        }">                                                                                                                                                     
+                                        <option value="">-Select-</option>
+                                        <option value="1">1-yes</option>
+                                        <option value="2">2-no</option>
+                                    </select>
+                                    <ValidationMessage For="@(() => selectBlock11A.item_3)" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="form-label mb-0">
+                                        <span class="form-badge">Q11.4</span>
+                                    </label> 
+                                </td>
+                                <td>
+                                    If code 1 in 11.3,<br />
+                                    Number of times such transfer paid during the last 365 days
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm no-spinner"
+                                            onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                            disabled="@(!isQ11_4_5Enable)"
+                                            value="@selectBlock11A.item_4"
+                                            @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_4, e)" />
 
-                                            <ValidationMessage For="@(() => selectBlock11A.item_4)" />
-                                        </td>
-                                </tr>
-                                <tr>
-                                    <td>Q11.5</td>
-                                    <td>
-                                        If code 1 in 11.3,<br />
-                                        Total amount (in Rs.) transferred during the last 365 days
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled="@(!isQ11_4_5Enable)"
-                                        value="@selectBlock11A.item_5"
-                                            @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_5, e)"
-                                        />
-                                            <ValidationMessage For="@(() => selectBlock11A.item_5)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Q11.6</td>
-                                    <td>Total amount (in Rs.) of regular transfer made to Non-profit organization(s) for charitable purposes during the last 365 days </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                        value="@selectBlock11A.item_6"
-                                        @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_6, e)"
-                                        />
-                                        <ValidationMessage For="@(() => selectBlock11A.item_6)" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </fieldset>
-                    <div class="mb-3 px-2">
-                        <label for="remarksTextarea" class="form-label">Remarks</label>
-                        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                                    <ValidationMessage For="@(() => selectBlock11A.item_4)" />
+                                </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="form-label mb-0">
+                                        <span class="form-badge">Q11.5</span>
+                                </label> </td>
+                            <td>
+                                If code 1 in 11.3,<br />
+                                Total amount (in Rs.) transferred during the last 365 days
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled="@(!isQ11_4_5Enable)"
+                                value="@selectBlock11A.item_5"
+                                    @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_5, e)"
+                                />
+                                    <ValidationMessage For="@(() => selectBlock11A.item_5)" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="form-label mb-0">
+                                        <span class="form-badge">Q11.6</span>
+                                </label> 
+                            </td>
+                            <td>Total amount (in Rs.) of regular transfer made to Non-profit organization(s) for charitable purposes during the last 365 days </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                value="@selectBlock11A.item_6"
+                                @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_6, e)"
+                                />
+                                <ValidationMessage For="@(() => selectBlock11A.item_6)" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                </fieldset>
+            <div class="mb-3 px-2">
+                <label for="remarksTextarea" class="form-label">Remarks</label>
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." @bind="block_1.block_11a_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
-                        </fieldset>
-                    </div>
-                </div>
-            </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="d-flex">
-                        <NavLink class="btn btn-outline-primary" @onclick="GoBack">
-                            <i class="fi fi-rr-angle-left me-1" ></i>Back
-                        </NavLink>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="d-flex align-items-center justify-content-end">
-                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                        {
-                            <button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => SaveAsync(false))">
-                                <i class="fi fi-rr-disk me-1"></i>
-                                Save
-                            </button>
-                        }
-                        <NavLink class="btn btn-primary" @onclick="@(() => SaveAsync(true))">
-                            Next
-                            <i class="fi fi-rr-angle-right ms-1"></i>
-                        </NavLink>
-                    </div>
-                </div>
+                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." @bind="block_1.block_11a_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                </fieldset>
             </div>
         </div>
-    </EditForm>
-}
+    </div>
+            </EditForm>
+        }
+                
+
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <NavLink class="btn btn-outline-primary" @onclick="GoBack">
+                    <i class="fi fi-rr-angle-left me-1" ></i>Back
+                </NavLink>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => SaveAsync(false))">
+                        <i class="fi fi-rr-disk me-1"></i>
+                        Save
+                    </button>
+                }
+                <NavLink class="btn btn-primary" @onclick="@(() => SaveAsync(true))">
+                    Next
+                    <i class="fi fi-rr-angle-right ms-1"></i>
+                </NavLink>
+            </div>
+        </div>
+    </div>
+    <CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"11.1","11.2","11.3","11.4","11.5","11.6"})"
+              Block="11A" />
+</div>
+
+
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
@@ -205,26 +219,39 @@
     DateTime survey_time = DateTime.Now;
 
     private Tbl_Block_11a? selectBlock11A = new Tbl_Block_11a();
-        private Tbl_Block_1? block_1 = new();
+    private Tbl_Block_1? block_1 = new();
 
     EditContext editContext;
     ValidationMessageStore messageStore;
     DBQueries dQ = new DBQueries();
     private Block_11a_Validator validator = new();
-        CommonQueries commonQueries = new();
+    CommonQueries commonQueries = new();
     private bool isQ11_2Enable = false;
     private bool isQ11_3Enable = false;
     private bool isQ11_4_5Enable = false;
+    CommentModal commentModal = default!;
 
-     async Task GoBack()
- {
-     await JSRuntime.InvokeVoidAsync("__handleGoBack");
- }
+    async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+    }
+
+    async Task OpenModal()
+    {
+        await commentModal.Open();
+    }
 
     protected async override Task OnInitializedAsync()
     {
         try
         {
+            Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+            {
+              block_uri = "/dashboard/his/block_11a",
+              block_title = "HIS Block 11a",
+              block_code = CommonEnum.his_block_11a.ToString(),
+            };
+            await commonQueries.InsertVisitedBlock(vb);
             selectBlock11A = await dQ.Fetch_SCH_HIS_Block11(SessionStorage.selected_hhd_id);
             if (selectBlock11A == null)
             {
@@ -235,8 +262,8 @@
             }
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
-                    block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
-
+            block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+            
             StateHasChanged();
 
         }
@@ -244,14 +271,7 @@
         {
             await loggingService.LogError("HIS_Block_11a_Page", ex);
         }
-        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
-        {
-          block_uri = "/dashboard/his/block_11a",
-          block_title = "HIS Block 11a",
-          block_code = CommonEnum.his_block_11a.ToString(),
-        };
-      await commonQueries.InsertVisitedBlock(vb);
-     StateHasChanged();
+        
     }
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)

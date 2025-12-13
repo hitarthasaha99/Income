@@ -18,9 +18,8 @@
             @* add comment *@
             @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
-
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -97,10 +96,17 @@
         </div>
     </div>
 </div>
+
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"B1","B2","B3","B4"})"
+              Block="B" />
+
 @code {
     private DateTime survey_date = DateTime.Now;
     private Tbl_Block_1? block_1 = new();
     CommonQueries commonQueries = new();
+    CommentModal commentModal = default!;
 
     private double B1;
     private double B2;
@@ -117,6 +123,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_B",
+            block_title = "HIS Block B",
+            block_code = CommonEnum.his_block_B.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
         // Initialization logic can be added here
         var block_10 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_10>();
         var block_11a = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_11a>();
@@ -156,14 +169,7 @@
                 await dB.SaveAsync<Tbl_Block_B>(block_B);
             }
         }
-        
-        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
-        {
-            block_uri = "/dashboard/his/block_B",
-            block_title = "HIS Block B",
-            block_code = CommonEnum.his_block_B.ToString(),
-        };
-        await commonQueries.InsertVisitedBlock(vb);
+     
         StateHasChanged();
     }
 
@@ -184,7 +190,7 @@
         }
         catch (Exception ex)
         {
-            loggingService.LogError("Block B", ex);
+            await loggingService.LogError("Block B", ex);
         }
     }
 }

@@ -24,7 +24,7 @@
             {
 
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
             @* <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
@@ -161,6 +161,11 @@
     </FooterTemplate>
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList=RowList
+              QuestionList="@(new List<string>(){"2","3","4"})"
+              Block="11B" />
+
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     private CommonConfig commonConfig = new CommonConfig();
@@ -178,6 +183,8 @@
     private bool is11B_4Enable = false;
     CommonQueries commonQueries = new();
     DBQueries dB = new();
+    CommentModal commentModal = default!;
+    List<int> RowList = [];
 
     EditContext editContext;
     ValidationMessageStore messageStore;
@@ -213,6 +220,7 @@
     private async Task LoadData()
     {
         showDataTable11B = await dB.Fetch_SCH_HIS_Block11b(SessionStorage.selected_hhd_id);
+        RowList = showDataTable11B.Select(x => x.item_1.GetValueOrDefault()).Distinct().ToList();
     }
 
     public async Task SyncBlock11b()

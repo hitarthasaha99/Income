@@ -23,7 +23,7 @@
     <div class="card custom-card">
         <div class="card-header">
             <h5 class="card-title">
-                <span class="text-primary me-1">Block 7.3:</span>
+                <span class="text-primary me-1">Block 7c:</span>
                 Income from Self-employment - Non-agriculture Activity
             </h5>
             @* add comment *@
@@ -31,7 +31,7 @@
             {
 
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -48,7 +48,7 @@
                         <tr>
                             <th colspan="13" class="bg-transparent text-start">
                                 <label class="form-label fw-bold m-0">
-                                    <span class="badge bg-primary me-1">Q7.9</span>
+                                    <span class="badge bg-primary me-1">Q7.10</span>
                                     Operating Cost (expenses incurred by the household on inputs used for production activity) during last month
                                 </label>
                             </th>
@@ -276,6 +276,11 @@
     </FooterTemplate>
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList=RowList
+              QuestionList="@(new List<string>(){"1","2","3","4","5","6","7","8","9","10","11"})"
+              Block="7C_2" />
+
 @code {
     DateTime survey_date = DateTime.Now;
     Modal AddModal = default!;
@@ -289,6 +294,8 @@
     DBQueries dQ = new();
     bool Q9Needed = false;
     ValidationMessageStore messageStore;
+    CommentModal commentModal = default!;
+    List<int> RowList = [];
 
     async void GoBack()
     {
@@ -309,37 +316,42 @@
         {
             Q9Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2);
         }
-        NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
-        ActivityList = await dQ.Fetch_SCH_HIS_Block7_Q10_List();
 
-        if(NICFields.Count > 0 && ActivityList.Count == 0)
+        if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
         {
-            int sl = 1;
-            foreach (var item in NICFields)
+            NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
+            ActivityList = await dQ.Fetch_SCH_HIS_Block7_Q10_List();
+            if (NICFields.Count > 0 && ActivityList.Count == 0)
             {
-                //create one entry each for NICFields entry
-                Tbl_Block_7c_Q10 obj = new();
-                obj.id = Guid.NewGuid();
-                obj.parent_id = item.id;
-                obj.serial_number = sl++;
-                await dQ.Save_SCH_HIS_Block7_Q10_List(obj);
-            }
-        }
-        else if (NICFields.Count > 0 && ActivityList.Count > 0 && NICFields.Count != ActivityList.Count)
-        {
-            foreach(var item in NICFields)
-            {
-                var itemExists = ActivityList.Any(x => x.parent_id == item.id);
-                if (!itemExists)
+                int sl = 1;
+                foreach (var item in NICFields)
                 {
+                    //create one entry each for NICFields entry
                     Tbl_Block_7c_Q10 obj = new();
                     obj.id = Guid.NewGuid();
                     obj.parent_id = item.id;
-                    obj.serial_number = ActivityList.Count + 1;
+                    obj.serial_number = sl++;
                     await dQ.Save_SCH_HIS_Block7_Q10_List(obj);
                 }
             }
+            else if (NICFields.Count > 0 && ActivityList.Count > 0 && NICFields.Count != ActivityList.Count)
+            {
+                foreach (var item in NICFields)
+                {
+                    var itemExists = ActivityList.Any(x => x.parent_id == item.id);
+                    if (!itemExists)
+                    {
+                        Tbl_Block_7c_Q10 obj = new();
+                        obj.id = Guid.NewGuid();
+                        obj.parent_id = item.id;
+                        obj.serial_number = ActivityList.Count + 1;
+                        await dQ.Save_SCH_HIS_Block7_Q10_List(obj);
+                    }
+                }
+            }
         }
+
+        
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
             block_uri = "/dashboard/his/block_7c_2",
@@ -355,6 +367,7 @@
     {
         // Block_4_5_ErrorMessage = string.Empty;
         ActivityList = await dQ.Fetch_SCH_HIS_Block7_Q10_List();
+        RowList = ActivityList.Select(x => x.serial_number).Distinct().ToList();
         StateHasChanged();
     }
 

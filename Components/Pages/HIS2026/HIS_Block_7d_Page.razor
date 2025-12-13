@@ -28,7 +28,7 @@
             {
 
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -135,6 +135,11 @@
     </div>
 </div>
 
+<CommentModal @ref="commentModal"
+              MemberList=RowList
+              QuestionList="@(new List<string>(){"1","2","3","4"})"
+              Block="7D" />
+
 @code {
     readonly DateTime survey_date = DateTime.Now;
     List<Tbl_Block_7a_1> CropCodeList = new();
@@ -143,7 +148,8 @@
     List<Tbl_Block_7d> Block7DList = new();
     private Tbl_Block_1 block_1 = new();
     CommonQueries commonQueries = new();
-
+    CommentModal commentModal = default!;
+    List<int> RowList = [];
 
     EditContext? editContext;
     string remarks = string.Empty;
@@ -249,6 +255,7 @@
             else
             {
                 Block7DList = await dQ.Fetch_SCH_HIS_Block7D();
+                RowList = Block7DList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
             }
 
 
