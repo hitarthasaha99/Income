@@ -233,6 +233,23 @@
                     id = Guid.NewGuid(),
                 };
             }
+            // --- ADD THIS LOGIC TO RESTORE FIELD Desable Proublem ---
+        if (selectBlock11A.item_1 == 1)
+        {
+            isQ11_2Enable = true;
+            isQ11_3Enable = false;
+        }
+        else if (selectBlock11A.item_1 == 2)
+        {
+            isQ11_2Enable = false;
+            isQ11_3Enable = true;
+        }
+
+        if (selectBlock11A.item_3 == 1)
+        {
+            isQ11_4_5Enable = true;
+        }
+        // ---------------------------------------------
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
                     block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;

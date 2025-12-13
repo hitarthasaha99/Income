@@ -23,7 +23,7 @@
             <h3 class="card-title">
                 <span class="text-primary me-2">[Block 3]</span>Demographic and other particulars of household members
             </h3>
-            
+
             <div class="card-tools">
                 <div class="d-flex align-items-center" hidden="@SessionStorage.FSU_Submitted">
                     @*  <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
@@ -31,10 +31,10 @@
                     </button> *@
                     @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                     {
-                    <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
-                        <i class="fi fi-rr-plus me-1"></i>Add
-                    </button>
-                        
+                        <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
+                            <i class="fi fi-rr-plus me-1"></i>Add
+                        </button>
+
                     }
                 </div>
                 @* add comment *@
@@ -156,7 +156,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </div>
         </div>
     </fieldset>
@@ -188,50 +188,51 @@
         {
             <EditForm EditContext="editContext">
 
-                    <div class="row">
+                <div class="row">
 
-                        <!-- 1. Serial Number -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">1</span> Sl no.
-                                </label>
-                                <input type="text" class="form-control" value="@newMember.serial_no" disabled />
-                            </div>
+                    <!-- 1. Serial Number -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">1</span> Sl no.
+                            </label>
+                            <input type="text" class="form-control" value="@newMember.serial_no" disabled />
                         </div>
+                    </div>
 
-                        <!-- 2. Name of Member input -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">2</span> Name of Member
-                                </label>
+                    <!-- 2. Name of Member input -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">2</span> Name of Member
+                            </label>
 
-                                <InputText class="form-control"
-                                           @bind-Value="newMember.item_2"
-                                           placeholder="Enter Name of member"
-                                           @oninput="ClearNameError"
-                                           autocomplete="off"
-                                           onkeypress="return /^[A-Za-z ]$/.test(event.key)"
-                                           maxlength="50"
-                                           autocorrect="off"
-                                           autocapitalize="off"
-                                           spellcheck="false" />
-                                        <ValidationMessage For="@(() => newMember.item_2)" />
-                            
-                            </div>
+                            <InputText class="form-control"
+                                       @bind-Value="newMember.item_2"
+                                       placeholder="Enter Name of member"
+                                       @oninput="ClearNameError"
+                                       autocomplete="off"
+                                       onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+                                       onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) { event.preventDefault(); }"
+                                       maxlength="50"
+                                       autocorrect="off"
+                                       autocapitalize="off"
+                                       spellcheck="false" />
+                            <ValidationMessage For="@(() => newMember.item_2)" />
+
                         </div>
+                    </div>
 
-                        <!-- 3. Relation to head -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">3.</span> Relation to head (code)
-                                </label>
+                    <!-- 3. Relation to head -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">3.</span> Relation to head (code)
+                            </label>
 
-                                <select class="form-select"
-                                        value="@newMember.item_3"
-                                        @onchange="item_3_changed">
+                            <select class="form-select"
+                                    value="@newMember.item_3"
+                                    @onchange="item_3_changed">
 
                                 <option value="">-Select-</option>
                                 <option value="1">self - 1</option>
@@ -244,45 +245,45 @@
                                 <option value="8">brother/sister/brother-in-law/sister-in-law/other relatives - 8</option>
                                 <option value="9">servants/employees/other non-relatives - 9</option>
 
-                                </select>
+                            </select>
 
-                                <ValidationMessage For="@(() => newMember.item_3)" />
-                            </div>
+                            <ValidationMessage For="@(() => newMember.item_3)" />
                         </div>
+                    </div>
 
-                        <!-- 4. Gender -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">4.</span> Gender (code)
-                                </label>
+                    <!-- 4. Gender -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">4.</span> Gender (code)
+                            </label>
 
-                                <select class="form-select"
-                                        value="@newMember.gender"
-                                        @onchange="genderClear">
+                            <select class="form-select"
+                                    value="@newMember.gender"
+                                    @onchange="genderClear">
 
                                 <option value="">-Select-</option>
                                 <option value="1">male - 1</option>
                                 <option value="2">female - 2</option>
                                 <option value="3">transgender - 3</option>
 
-                                </select>
+                            </select>
 
-                                <ValidationMessage For="@(() => newMember.gender)" />
+                            <ValidationMessage For="@(() => newMember.gender)" />
 
-                                @if (!string.IsNullOrEmpty(genderWarning))
-                                {
-                                    <div class="form-text text-success">@genderWarning</div>
-                                }
-                            </div>
+                            @if (!string.IsNullOrEmpty(genderWarning))
+                            {
+                                <div class="form-text text-success">@genderWarning</div>
+                            }
                         </div>
+                    </div>
 
-                        <!-- 5. Age -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">5</span> Age (years)
-                                </label>
+                    <!-- 5. Age -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">5</span> Age (years)
+                            </label>
 
                             <InputNumber class="form-control no-spinner"
                                          @bind-Value="newMember.age"
@@ -290,10 +291,10 @@
                                          onkeypress="if(this.value.length >= 3) return false; return /^[0-9]$/.test(event.key);" />
                             <ValidationMessage For="@(() => newMember.age)" />
 
-                                @if (!string.IsNullOrEmpty(ageWarning))
-                                {
-                                    <div class="text-success">@ageWarning</div>
-                                }
+                            @if (!string.IsNullOrEmpty(ageWarning))
+                            {
+                                <div class="text-success">@ageWarning</div>
+                            }
 
                             @if (!string.IsNullOrEmpty(ageRelationWarning))
                             {
@@ -306,16 +307,16 @@
                         </div>
                     </div>
 
-                        <!-- 6. Marital status -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">6</span> Marital status (code)
-                                </label>
+                    <!-- 6. Marital status -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">6</span> Marital status (code)
+                            </label>
 
-                                <select class="form-select"
-                                        value="@newMember.item_6"
-                                        @onchange="clearItem_6">
+                            <select class="form-select"
+                                    value="@newMember.item_6"
+                                    @onchange="clearItem_6">
 
                                 <option value="">-Select-</option>
                                 <option value="1">never married – 1</option>
@@ -323,27 +324,27 @@
                                 <option value="3">widowed – 3</option>
                                 <option value="4">divorced/separated – 4</option>
 
-                                </select>
+                            </select>
 
-                                <ValidationMessage For="@(() => newMember.item_6)" />
+                            <ValidationMessage For="@(() => newMember.item_6)" />
 
-                                @if (!string.IsNullOrEmpty(maritalStatusWarning))
-                                {
-                                    <div class="form-text text-success">@maritalStatusWarning</div>
-                                }
-                            </div>
+                            @if (!string.IsNullOrEmpty(maritalStatusWarning))
+                            {
+                                <div class="form-text text-success">@maritalStatusWarning</div>
+                            }
                         </div>
+                    </div>
 
-                        <!-- 7. Education -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">7</span> Highest level of education
-                                </label>
+                    <!-- 7. Education -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">7</span> Highest level of education
+                            </label>
 
-                                <select class="form-select"
-                                        value="@newMember.item_7"
-                                        @onchange="ClearItem7">
+                            <select class="form-select"
+                                    value="@newMember.item_7"
+                                    @onchange="ClearItem7">
 
                                 <option value="">-Select-</option>
                                 <option value="1">not literate (i.e. not able to read or write a simple message with understanding in any language) - 01 </option>
@@ -357,30 +358,30 @@
                                 <option value="10">graduate - 10</option>
                                 <option value="11">postgraduate and above - 11</option>
 
-                                </select>
+                            </select>
 
-                                <ValidationMessage For="@(() => newMember.item_7)" />
+                            <ValidationMessage For="@(() => newMember.item_7)" />
 
-                                @if (!string.IsNullOrEmpty(item_7Warning))
-                                {
-                                    <div class="form-text text-success">@item_7Warning</div>
-                                }
-                            </div>
+                            @if (!string.IsNullOrEmpty(item_7Warning))
+                            {
+                                <div class="form-text text-success">@item_7Warning</div>
+                            }
                         </div>
+                    </div>
 
-                        <!-- Activity Status 30 days -->
-                        <div class="col-sm-12">
-                            <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
-                                <div class="card-body">
-                                    <h6 class="fw-bold">Activity status (During 30 days)</h6>
-                                    <div class="row">
-                                        <!-- Item 8 -->
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">
-                                                    <span class="form-badge">8</span> Primary
-                                                </label>
-                                                <CustomDropdown Value="@newMember.item_8"
+                    <!-- Activity Status 30 days -->
+                    <div class="col-sm-12">
+                        <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Activity status (During 30 days)</h6>
+                                <div class="row">
+                                    <!-- Item 8 -->
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <span class="form-badge">8</span> Primary
+                                            </label>
+                                            <CustomDropdown Value="@newMember.item_8"
                                                             ValueChanged="@(v => OnItem8Changed(v))"
                                                             Options="@ItemOptions" />
 
@@ -407,25 +408,25 @@
                                                 <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                             </select> *@
 
-                                                <ValidationMessage For="@(() => newMember.item_8)" />
+                                            <ValidationMessage For="@(() => newMember.item_8)" />
 
-                                                @if (!string.IsNullOrEmpty(item_8Warning))
-                                                {
-                                                    <div class="form-text text-success">@item_8Warning</div>
-                                                }
-                                            </div>
+                                            @if (!string.IsNullOrEmpty(item_8Warning))
+                                            {
+                                                <div class="form-text text-success">@item_8Warning</div>
+                                            }
                                         </div>
+                                    </div>
 
-                                        <!-- Item 9 -->
-                                        <div class="col-sm-12">
-                                            <div>
-                                                <label class="form-label">
-                                                    <span class="form-badge">9</span> Secondary
-                                                </label>
-                                                <CustomDropdown Value="@newMember.item_9"
+                                    <!-- Item 9 -->
+                                    <div class="col-sm-12">
+                                        <div>
+                                            <label class="form-label">
+                                                <span class="form-badge">9</span> Secondary
+                                            </label>
+                                            <CustomDropdown Value="@newMember.item_9"
                                                             ValueChanged="@(v => OnItem9Changed(v))"
                                                             Options="@ItemOptions" />
-                                                @* <select class="form-select"
+                                            @* <select class="form-select"
                                                         value="@newMember.item_9"
                                                         @onchange="ClearItem9">
 
@@ -448,34 +449,34 @@
                                                     <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                                 </select> *@
 
-                                                <ValidationMessage For="@(() => newMember.item_9)" />
+                                            <ValidationMessage For="@(() => newMember.item_9)" />
 
-                                                @if (!string.IsNullOrEmpty(item_9Warning))
-                                                {
-                                                    <div class="form-text text-success">@item_9Warning</div>
-                                                }
-                                            </div>
+                                            @if (!string.IsNullOrEmpty(item_9Warning))
+                                            {
+                                                <div class="form-text text-success">@item_9Warning</div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Activity Status 365 days -->
-                        <div class="col-sm-12">
-                            <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
-                                <div class="card-body">
-                                    <h6 class="fw-bold">Activity status (During 365 days)</h6>
-                                    <div class="row">
-                                        <!-- Item 10 -->
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">
-                                                    <span class="form-badge">10</span> Primary
-                                                </label>
-                                                <CustomDropdown Value="@newMember.item_10"
-                                                                ValueChanged="@(v => OnItem10Changed(v))"
-                                                                Options="@ItemOptions" />
-                                                @* <select class="form-select"
+                    </div>
+                    <!-- Activity Status 365 days -->
+                    <div class="col-sm-12">
+                        <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Activity status (During 365 days)</h6>
+                                <div class="row">
+                                    <!-- Item 10 -->
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <span class="form-badge">10</span> Primary
+                                            </label>
+                                            <CustomDropdown Value="@newMember.item_10"
+                                                            ValueChanged="@(v => OnItem10Changed(v))"
+                                                            Options="@ItemOptions" />
+                                            @* <select class="form-select"
                                                         value="@newMember.item_10"
                                                         @onchange="ClearItem10">
 
@@ -499,25 +500,25 @@
                                                     <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                                 </select> *@
 
-                                                <ValidationMessage For="@(() => newMember.item_10)" />
+                                            <ValidationMessage For="@(() => newMember.item_10)" />
 
-                                                @if (!string.IsNullOrEmpty(item_10Warning))
-                                                {
-                                                    <div class="form-text text-success">@item_10Warning</div>
-                                                }
-                                            </div>
+                                            @if (!string.IsNullOrEmpty(item_10Warning))
+                                            {
+                                                <div class="form-text text-success">@item_10Warning</div>
+                                            }
                                         </div>
+                                    </div>
 
-                                        <!-- Item 11 -->
-                                        <div class="col-sm-12">
-                                            <div>
-                                                <label class="form-label">
-                                                    <span class="form-badge">11</span> Secondary
-                                                </label>
-                                                <CustomDropdown Value="@newMember.item_11"
+                                    <!-- Item 11 -->
+                                    <div class="col-sm-12">
+                                        <div>
+                                            <label class="form-label">
+                                                <span class="form-badge">11</span> Secondary
+                                            </label>
+                                            <CustomDropdown Value="@newMember.item_11"
                                                             ValueChanged="@(v => OnItem11Changed(v))"
                                                             Options="@ItemOptions" />
-                                                @* <select class="form-select"
+                                            @* <select class="form-select"
                                                         value="@newMember.item_11"
                                                         @onchange="ClearItem11">
 
@@ -540,45 +541,45 @@
                                                     <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
                                                 </select> *@
 
-                                                <ValidationMessage For="@(() => newMember.item_11)" />
+                                            <ValidationMessage For="@(() => newMember.item_11)" />
 
-                                                @if (!string.IsNullOrEmpty(item_11Warning))
-                                                {
-                                                    <div class="form-text text-success">@item_11Warning</div>
-                                                }
+                                            @if (!string.IsNullOrEmpty(item_11Warning))
+                                            {
+                                                <div class="form-text text-success">@item_11Warning</div>
+                                            }
 
-                                                @if (!string.IsNullOrEmpty(singleUserWarning))
-                                                {
-                                                    <div class="form-text text-success">@singleUserWarning</div>
-                                                }
-                                            </div>
+                                            @if (!string.IsNullOrEmpty(singleUserWarning))
+                                            {
+                                                <div class="form-text text-success">@singleUserWarning</div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Item 12 -->
-                        <div class="col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <span class="form-badge">12</span> Beneficiary of govt scheme (yes-1 / no-2)
-                                </label>
+                    </div>
+                    <!-- Item 12 -->
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">12</span> Beneficiary of govt scheme (yes-1 / no-2)
+                            </label>
 
                             <InputSelect class="form-select"
                                          @bind-value="newMember.item_12"
                                          @onchange="ClearItem12">
 
-                                    <option value="">-Select-</option>
-                                    <option value="1">yes</option>
-                                    <option value="2">no</option>
+                                <option value="">-Select-</option>
+                                <option value="1">yes</option>
+                                <option value="2">no</option>
 
-                                </InputSelect>
+                            </InputSelect>
 
-                                <ValidationMessage For="@(() => newMember.item_12)" />
-                            </div>
+                            <ValidationMessage For="@(() => newMember.item_12)" />
                         </div>
-              
                     </div>
+
+                </div>
 
             </EditForm>
         }
@@ -1067,7 +1068,7 @@
         if (!age.HasValue || !edu.HasValue)
             return;
 
-        if(age<=3 && edu > 1)
+        if (age <= 3 && edu > 1)
         {
             item_7Warning = "W008(ii): Please check the entries recorded against cols. 7 & 5";
             return;
@@ -1437,7 +1438,7 @@
         CheckItem11Warning();
 
 
-        if(!string.IsNullOrEmpty(genderWarning))
+        if (!string.IsNullOrEmpty(genderWarning))
         {
             warningVM.AddWarning(genderWarning, "HIS", "3", "4", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
@@ -1516,7 +1517,7 @@
             return;
         }
 
-        if(block3Members.Count == 0)
+        if (block3Members.Count == 0)
         {
             toastService.ShowError("Please add a member before proceeding");
             return;

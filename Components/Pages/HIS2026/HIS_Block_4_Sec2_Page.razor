@@ -202,10 +202,13 @@
                             <label class="form-label">
                                 <span class="form-badge">5</span> Number of months of operation during last 365 days
                             </label>
-                            <input class="form-control"
+                            <input type="number" class="form-control no-spinner"
                                    @bind="fields.NumberOfMonths"
                                    @oninput="OnMonthsInput"
-                                   disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+
+                                   disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)"
+                                   onkeypress="if(this.value.length >= 2) return false; return /^[0-9]$/.test(event.key);"
+                                   />
                             <ValidationMessage For="@(() => fields.NumberOfMonths)" />
                         </div>
                     </div>
