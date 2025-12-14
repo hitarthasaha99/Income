@@ -12,7 +12,7 @@
 @inject ILoggingService loggingService
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
     <div class="card custom-card">
         <div class="card-header p-2">
             <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - B]</span>Monthly Household Expenditure</h3>
@@ -115,7 +115,7 @@
               Block="B" />
 
 @code {
-    private DateTime survey_date = DateTime.Now;
+    private DateTime survey_time = DateTime.Now;
     private Tbl_Block_1? block_1 = new();
     CommonQueries commonQueries = new();
     CommentModal commentModal = default!;
@@ -187,6 +187,12 @@
 
                 await dB.SaveAsync<Tbl_Block_B>(block_B);
             }
+        }
+
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            var block_B = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
+            survey_time = block_B?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
         }
 
         StateHasChanged();

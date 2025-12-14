@@ -771,23 +771,23 @@
 				}
 				else
 				{
-					var block_3_condition = block_3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1);
+					var block_3_condition = block_3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1 || x.item_11 == 1);
 					if (block_3_condition)
 					{
 						var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
 						if (!items.Any(x => x == true))
 						{
-							errors.Add($"H016: Please check the entry recorded against col.s 8-10 , block 3 for HHD Serial {hhd.Block_7_3}");
+							errors.Add($"H016: Please check the entry recorded against col.s 8-11 , block 3 for HHD Serial {hhd.Block_7_3}");
 						}
 					}
 				}
 
 				if (block_3.Count > 0)
 				{
-					var block_3_condition = block_3.Any(x => x.item_8 == 2 || x.item_9 == 2 || x.item_10 == 2);
+					var block_3_condition = block_3.Any(x => x.item_8 == 2 || x.item_9 == 2 || x.item_10 == 2 || x.item_11 == 2);
 					if (block_3_condition && block_4_nic.Count == 0)
 					{
-						errors.Add($"H017(i): Please check the entry recorded against col.s 8-10 , block 3");
+						errors.Add($"H017(i): Please check the entry recorded against col.s 8-11 , block 3");
 					}
 
 					var block_3_condition_for_block_5 = block_3.Any(x => x.item_8 == 4 || x.item_9 == 4 || x.item_10 == 4 || x.item_11 == 4);
@@ -803,11 +803,11 @@
 					}
 
 					var block_3_condition_for_block_7c = block_3.Any(x => x.item_8 == 2 || x.item_9 == 2);
-					if (!block_3_condition_for_block_7c && (block_7c != null || block_7c_1.Count > 0 || block_7c_Q10.Count > 0))
+					if (!block_3_condition_for_block_7c && (block_7c_1.Count > 0 || block_7c_Q10.Count > 0))
 					{
 						errors.Add($"H048: Block 7C is applicable only when col 8 and/or col 9 = 2 for atleast one member");
 					}
-					else if(block_3_condition_for_block_7c && (block_7c == null || block_7c_1.Count == 0 || block_7c_Q10.Count == 0))
+					else if(block_3_condition_for_block_7c && (block_7c_1.Count == 0 || block_7c_Q10.Count == 0))
 					{
 						errors.Add($"H048: No Block 7C entry found even though col 8 and/or col 9 = 2 for atleast one member");
 					}
@@ -1188,7 +1188,7 @@
 		}
 		else if (name == CommonConstants.ROLE_NAME_SSO)
 		{
-			if (data.hhdStatus == 21 || data.hhdStatus == 22 || data.hhdStatus == 15)
+			if (data.hhdStatus == 21 || data.hhdStatus == 22)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
 				//SessionStorage.selected_hhd_seq = data.seq_no;

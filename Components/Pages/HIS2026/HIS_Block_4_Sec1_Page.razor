@@ -302,7 +302,7 @@
             var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
             if (!items.Any(x => x == true))
             {
-                Block_4_4_ErrorMessage = $"H016: Please check the entry recorded against col.s 8-10 , block 3";
+                Block_4_4_ErrorMessage = $"H016: Please check the entry recorded against col.s 8-11 , block 3";
             }
         }
         return string.IsNullOrEmpty(Block_4_2_ErrorMessage) && string.IsNullOrEmpty(Block_4_3_ErrorMessage) && string.IsNullOrEmpty(Block_4_4_ErrorMessage);
@@ -417,6 +417,10 @@
             block_code = CommonEnum.his_block_4_1.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_4.survey_timestamp.GetValueOrDefault();
+        }
         StateHasChanged();
     }
 

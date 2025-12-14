@@ -356,6 +356,11 @@
             block_title = "HIS Block 1",
             block_code = CommonEnum.his_block_1.ToString(),
         };
+
+        if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_1.survey_timestamp.GetValueOrDefault();
+        }
         await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }

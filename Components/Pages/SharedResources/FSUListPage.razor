@@ -272,6 +272,12 @@
                     toastService.ShowError("Please ensure the selection is done and the data is downloaded Sucessfully.");
                     return;
                 }
+                var sch00block2 = await dB.FetchBlock2();
+                if (sch00block2 == null)
+                {
+                    toastService.ShowError("Block 2 of Schedule 0.0 needs to be saved before proceeding");
+                    return;
+                }
 
             }
             if (SessionStorage.user_role == CommonConstants.USER_CODE_JSO || SessionStorage.user_role == CommonConstants.USER_CODE_JSO2)

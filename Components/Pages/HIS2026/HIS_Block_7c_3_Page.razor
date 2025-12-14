@@ -18,7 +18,7 @@
 @inject IValidator<Tbl_Block_7c> Validator
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
     
     @if (editContext != null)
     {
@@ -160,9 +160,9 @@
     private Tbl_Block_1 block_1 = new();
     CommonQueries commonQueries = new();
     CommentModal commentModal = default!;
-
+    bool Q9Needed = false;
     bool isAdd;
-    DateTime survey_date = DateTime.Now;
+    DateTime survey_time = DateTime.Now;
     string remarks = string.Empty;
     string item_9_warning = string.Empty;
 
@@ -181,6 +181,11 @@
         Q10 = await dB.Fetch_SCH_HIS_Block7_Q10_List();
         NICSUM = NICBlock7.Sum(x => x.GrossValue).GetValueOrDefault();
         ActivitySum = Q10.Sum(x => x.item_10_11).GetValueOrDefault();
+        var block3 = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3 != null && block3.Count > 0)
+        {
+            Q9Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2);
+        }
         editContext = new EditContext(fields);
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
@@ -192,6 +197,10 @@
         };
         await commonQueries.InsertVisitedBlock(vb);
         CheckItem9Warning();
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = fields.survey_timestamp.GetValueOrDefault();
+        }
         StateHasChanged();
     }
 

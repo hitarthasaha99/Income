@@ -280,7 +280,7 @@
                                           <ValidationMessage For="@(() => block_7A.item_6)" />
                                         @if (!string.IsNullOrEmpty(item_6_warning))
                                         {
-                                            <div class="text-success mt-1 fw-bold">
+                                            <div class="form-text text-danger" style="white-space: pre-line;">
                                                 @item_6_warning
                                             </div>
                                         }
@@ -355,6 +355,7 @@
     string remarks = string.Empty;
     string item_6_warning = string.Empty;
     CommentModal commentModal = default!;
+    string errorMessage = string.Empty;
 
     async void GoBack()
     {
@@ -391,6 +392,11 @@
             block_code = CommonEnum.his_block_7a_2.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_date = block_7A.survey_timestamp.GetValueOrDefault();
+        }
+        CheckItem6Warning();
         StateHasChanged();
     }
 
@@ -454,7 +460,13 @@
             item_6_warning = string.Empty;
             if (block_7A != null && block_7A.item_6 < 0)
             {
-                item_6_warning = $"W044(ii): Please recheck the value";
+                item_6_warning =
+                    "Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes:\n" +
+                    "e. Crop damage / failure\n" +
+                    "f. Crop not harvested\n" +
+                    "g. Crop production is not started\n" +
+                    "h. Crop left at field due to low market price\n" +
+                    "i. Others (specify in text box)";
             }
         }
         catch (Exception ex)
@@ -497,10 +509,10 @@
             else
             {
                 CheckItem6Warning();
-                if(!string.IsNullOrEmpty(item_6_warning))
+                if(!string.IsNullOrEmpty(item_6_warning) && string.IsNullOrEmpty(block_1.block_7a_remark))
                 {
-                    warningVM.AddWarning(item_6_warning, "HIS", "7A", "7A.9", SessionStorage.selected_hhd_id);
-                    await warningVM.SaveWarningAsync("HIS", "7A");
+                    toastService.ShowError("Please provide a remarks before proceeding");
+                    return;
                 }
                 int saved = await dB.Save_SCH_HIS_Block7A(block_7A);
                 if (saved > 0)

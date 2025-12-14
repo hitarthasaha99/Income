@@ -226,6 +226,16 @@
             await SyncBlock11b();
         }
         await LoadData();
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            if (showDataTable11B != null)
+            {
+                survey_time = showDataTable11B
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
+            }
+        }
         StateHasChanged();
     }
 

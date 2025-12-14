@@ -288,6 +288,11 @@
 
             remarks_block_11 = !string.IsNullOrEmpty(block_1?.remarks_block_11);
 
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = tbl_Sch_0_0_FieldOperation.survey_timestamp.GetValueOrDefault();
+            }
+
             StateHasChanged();
             return;
         }

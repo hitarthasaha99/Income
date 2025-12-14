@@ -401,6 +401,14 @@
             ListItems = new();
             ListItems = response.OrderBy(x => x.Block_7_1).ToList();
             HideInsertBtn = ListItems.Any(x => x.SSS != 0);
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = ListItems
+                                .OrderByDescending(x => x.survey_timestamp)
+                                .Select(x => (DateTime?)x.survey_timestamp)
+                                .FirstOrDefault().GetValueOrDefault();
+
+            }
             StateHasChanged();
         }
     }

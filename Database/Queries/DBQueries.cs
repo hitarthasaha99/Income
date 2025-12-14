@@ -9,6 +9,7 @@ using Income.Database.Models.Common;
 using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
 using Income.Services;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1596,7 +1597,10 @@ namespace Income.Database.Queries
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(tbl_block_3);
-                    await UpdateOrDeleteDependentBlocks_HIS_Block_3(tbl_block_3);
+                    if (status > 0)
+                    {
+                        await UpdateOrDeleteDependentBlocks_HIS_Block_3(check_existence, tbl_block_3);
+                    }
                 }
                 else
                 {
@@ -1621,11 +1625,19 @@ namespace Income.Database.Queries
                     if (SessionStorage.FSU_Submitted)
                     {
                         exists.is_deleted = true;
-                        await _database.UpdateAsync(exists);
+                        int status = await _database.UpdateAsync(exists);
+                        if (status > 0)
+                        {
+                            await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                        }
                     }
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
+                        if (deleted > 0)
+                        {
+                            await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                        }
                     }
                     var json = System.Text.Json.JsonSerializer.Serialize(exists);
 
@@ -1645,14 +1657,15 @@ namespace Income.Database.Queries
 
 
 
-        public async Task UpdateOrDeleteDependentBlocks_HIS_Block_3(
-    Tbl_Block_3 oldBlock3,
-    Tbl_Block_3 newBlock3)
+        public async Task UpdateOrDeleteDependentBlocks_HIS_Block_3(Tbl_Block_3 oldBlock3, Tbl_Block_3? newBlock3 = null)
         {
             try
             {
-                if (!HasDependencyFieldsChanged(oldBlock3, newBlock3))
-                    return;
+                if(newBlock3 != null)
+                {
+                    if (!HasDependencyFieldsChanged(oldBlock3, newBlock3))
+                        return;
+                }
 
                 // ================= BLOCK 4 =================
                 bool hasCode1 = await HasAnyBlock3WithCode(1);
@@ -1676,7 +1689,7 @@ namespace Income.Database.Queries
 
                     foreach (var entry in block5Entries)
                     {
-                        await Delete_HIS_Block_5(entry.id);
+                        await DeleteEntryAsync<Tbl_Block_5>(entry.id);
                     }
                 }
 
@@ -1691,8 +1704,17 @@ namespace Income.Database.Queries
 
                     foreach (var entry in block6Entries)
                     {
-                        await Delete_HIS_Block_6(entry.id);
+                        await DeleteEntryAsync<Tbl_Block_6>(entry.id);
                     }
+                }
+
+                var block11bEntries = await _database.Table<Tbl_Block_11b>()
+                        .Where(x => x.fk_block_3 == oldBlock3.id)
+                        .ToListAsync();
+
+                foreach (var entry in block11bEntries)
+                {
+                    await DeleteEntryAsync<Tbl_Block_11b>(entry.id);
                 }
             }
             catch (Exception ex)
@@ -1783,12 +1805,97 @@ namespace Income.Database.Queries
                         await _database.UpdateAsync(member);
                     }
                 }
+                await UpdateDependentBlockSerialNumber_Block_3();
             }
             catch (Exception ex)
             {
 
             }
         }
+
+        public async Task<int> UpdateDependentBlockSerialNumber_Block_3()
+        {
+            int totalUpdated = 0;
+
+            try
+            {
+                var block3 = await FetchListAsync<Tbl_Block_3>(DeleteFilter.ExcludeDeleted);
+                var block5 = await FetchListAsync<Tbl_Block_5>(DeleteFilter.ExcludeDeleted);
+                var block6 = await FetchListAsync<Tbl_Block_6>(DeleteFilter.ExcludeDeleted);
+                var block11b = await FetchListAsync<Tbl_Block_11b>(DeleteFilter.ExcludeDeleted);
+
+                await _database.RunInTransactionAsync(tran =>
+                {
+                    // NOTE:
+                    // Inside transaction, we MUST use the synchronous connection APIs
+
+                    // 1. Build Block-3 ID → serial_no map
+                    var serialMap = block3
+                        .Where(x => x.serial_no.HasValue)
+                        .ToDictionary(x => x.id, x => x.serial_no!.Value);
+
+                    // 2. Update Block 5
+                    totalUpdated += UpdateDependentSerial(
+                        tran,
+                        block5,
+                        serialMap,
+                        x => x.fk_block_3,
+                        (x, s) => x.serial_member = s
+                    );
+
+                    // 3. Update Block 6
+                    totalUpdated += UpdateDependentSerial(
+                        tran,
+                        block6,
+                        serialMap,
+                        x => x.fk_block_3,
+                        (x, s) => x.serial_member = s
+                    );
+
+                    // 4. Update Block 11b
+                    totalUpdated += UpdateDependentSerial(
+                        tran,
+                        block11b,
+                        serialMap,
+                        x => x.fk_block_3,
+                        (x, s) => x.item_1 = s
+                    );
+                });
+
+                return totalUpdated;
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("SQLite transaction failed while updating dependent serial numbers", ex);
+                throw;
+            }
+        }
+
+
+        private int UpdateDependentSerial<T>(
+        SQLiteConnection tran,
+        IEnumerable<T> rows,
+        Dictionary<Guid, int> serialMap,
+        Func<T, Guid?> getFk,
+        Action<T, int> setSerial)
+        {
+            int updated = 0;
+
+            foreach (var row in rows)
+            {
+                var fk = getFk(row);
+
+                if (fk == null || !serialMap.TryGetValue(fk.Value, out int newSerial))
+                    continue;
+
+                setSerial(row, newSerial);
+                tran.Update(row);
+                updated++;
+            }
+
+            return updated;
+        }
+
 
         //HIS Block 4
 
@@ -2107,7 +2214,6 @@ namespace Income.Database.Queries
                 else
                 {
                     // insert new row
-                    tbl_block_5.isUpdated = false;
                     status = await _database.InsertAsync(tbl_block_5);
                 }
 
@@ -2194,7 +2300,6 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                    tbl_block_6.isUpdated = false;
                     status = await _database.InsertAsync(tbl_block_6);
                 }
                 return status;

@@ -18,7 +18,7 @@
 @inject IValidator<Tbl_Block_9a> Validator
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
 
     @if (editContext != null)
     {
@@ -278,7 +278,7 @@
 
     DBQueries dB = new();
     bool isAdd;
-    DateTime survey_date = DateTime.Now;
+    DateTime survey_time = DateTime.Now;
     string remarks = string.Empty;
     string item_9_1_warning = string.Empty;
 
@@ -321,6 +321,10 @@
         };
 
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_9a.survey_timestamp.GetValueOrDefault();
+        }
         StateHasChanged();
     }
 

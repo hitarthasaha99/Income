@@ -116,7 +116,7 @@
                                 <ValidationMessage For="@(() => block_4.item_8)" />
                                 @if (!string.IsNullOrEmpty(Item8WarningMessage))
                                 {
-                                    <div class="form-text text-success">
+                                    <div class="form-text text-success" style="white-space: pre-line;">
                                         @Item8WarningMessage
                                     </div>
                                 }
@@ -196,12 +196,13 @@
                                     </tbody>
                                 </table>
                                 <ValidationMessage For="@(() => block_4.item_10)" />
-                                @if (!string.IsNullOrEmpty(Item10WarningMessage))
-                                {
-                                    <div class="form-text text-success">
-                                        @Item10WarningMessage
-                                    </div>
-                                }
+                                        @if (!string.IsNullOrEmpty(Item10WarningMessage))
+                                        {
+                                            <div class="form-text text-success" style="white-space: pre-line;">
+                                                @Item10WarningMessage
+                                            </div>
+                                        }
+
                             </div>
 
                             @* <div class="d-flex flex-wrap mt-3">
@@ -422,7 +423,7 @@
             Question.Add(i.ToString());
         }
 
-        
+
         if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
         {
             await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
@@ -453,6 +454,11 @@
             messageStore = new ValidationMessageStore(editContext);
             editContext.OnFieldChanged += EditContext_OnFieldChanged;
 
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = block_4.survey_timestamp.GetValueOrDefault();
+            }
+
         }
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
@@ -463,6 +469,7 @@
         block_4_nic_list = await dQ.Fetch_SCH_HIS_Block4_NICList();
         block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         await commonQueries.InsertVisitedBlock(vb);
+        
         StateHasChanged();
     }
 
@@ -530,15 +537,22 @@
         try
         {
             Item8WarningMessage = string.Empty;
-            bool block_4_4_any_checked = block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() || block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault();
-            if ((SelectedLandUses.Contains(1) || SelectedLandUses.Contains(2) || SelectedLandUses.Contains(3)) && !block_4_4_any_checked)
+            var warnings = new List<string>();
+
+            if (SelectedLandUses.Count != 0)
             {
-                Item8WarningMessage = $"W020(ii): Please check the entry against Q4.4";
+                bool block_4_4_any_checked = block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() || block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault();
+                if ((SelectedLandUses.Contains(1) || SelectedLandUses.Contains(2) || SelectedLandUses.Contains(3)) && !block_4_4_any_checked)
+                {
+                    warnings.Add($"W020(ii): Please check the entry against Q4.4");
+                }
+                if (SelectedLandUses.Contains(4) && block_4_nic_list.Count == 0)
+                {
+                    warnings.Add($"W020(iii): Please check the entry against Q4.5");
+                }
             }
-            if (SelectedLandUses.Contains(4) && block_4_nic_list.Count == 0)
-            {
-                Item8WarningMessage = $"W020(iii): Please check the entry against Q4.5";
-            }
+            Item8WarningMessage = string.Join(Environment.NewLine, warnings);
+
         }
         catch (Exception ex)
         {
@@ -584,22 +598,41 @@
     {
         try
         {
-            Item8WarningMessage = string.Empty;
-            bool block_4_4_any_checked = block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() || block_4.item_4_3.GetValueOrDefault() || block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault();
-            if ((SelectedLandUses.Contains(1) || SelectedLandUses.Contains(2) || SelectedLandUses.Contains(3)) && !block_4_4_any_checked)
+            var warnings = new List<string>();
+
+            if (SelectedEconomicActivities.Count != 0)
             {
-                Item10WarningMessage = $"W022(ii): Please check the entry against Q4.4";
+                bool block_4_4_any_checked =
+                    block_4.item_4_1.GetValueOrDefault() ||
+                    block_4.item_4_2.GetValueOrDefault() ||
+                    block_4.item_4_3.GetValueOrDefault() ||
+                    block_4.item_4_4.GetValueOrDefault() ||
+                    block_4.item_4_5.GetValueOrDefault() ||
+                    block_4.item_4_6.GetValueOrDefault();
+
+                if ((SelectedEconomicActivities.Contains(1) ||
+                     SelectedEconomicActivities.Contains(2) ||
+                     SelectedEconomicActivities.Contains(3)) &&
+                     !block_4_4_any_checked)
+                {
+                    warnings.Add("W022(ii): Please check the entry against Q4.4");
+                }
+
+                if (SelectedEconomicActivities.Contains(4) &&
+                    block_4_nic_list.Count == 0)
+                {
+                    warnings.Add("W022(iii): Please check the entry against Q4.5");
+                }
             }
-            if (SelectedLandUses.Contains(4) && block_4_nic_list.Count == 0)
-            {
-                Item10WarningMessage = $"W022(iii): Please check the entry against Q4.5";
-            }
+
+            Item10WarningMessage = string.Join(Environment.NewLine, warnings);
         }
         catch (Exception ex)
         {
-
+            
         }
     }
+
 
     private void item_11_changed(ChangeEventArgs e)
     {
@@ -759,14 +792,40 @@
                 CheckWarningForItem10();
                 CheckWarningForItem16();
 
-                if(!string.IsNullOrEmpty(Item8WarningMessage))
+                if (!string.IsNullOrEmpty(Item8WarningMessage))
                 {
-                    warningVM.AddWarning(Item8WarningMessage, "HIS", "4", "8", SessionStorage.selected_hhd_id);
+                    var warnings = Item8WarningMessage
+                        .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var warning in warnings)
+                    {
+                        warningVM.AddWarning(
+                            warning.Trim(),
+                            "HIS",
+                            "4",
+                            "8",
+                            SessionStorage.selected_hhd_id
+                        );
+                    }
                 }
+
                 if (!string.IsNullOrEmpty(Item10WarningMessage))
                 {
-                    warningVM.AddWarning(Item10WarningMessage, "HIS", "4", "10", SessionStorage.selected_hhd_id);
+                    var warnings = Item10WarningMessage
+                        .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var warning in warnings)
+                    {
+                        warningVM.AddWarning(
+                            warning.Trim(),
+                            "HIS",
+                            "4",
+                            "10",
+                            SessionStorage.selected_hhd_id
+                        );
+                    }
                 }
+
                 if (!string.IsNullOrEmpty(Item16WarningMessage))
                 {
                     warningVM.AddWarning(Item16WarningMessage, "HIS", "4", "16", SessionStorage.selected_hhd_id);

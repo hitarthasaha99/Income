@@ -162,9 +162,14 @@
                             <div class="col-sm-12">
                                 <div class="mb-3">
                                     <label class="form-label"><span class="form-badge">14</span>Approx. present population</label>
-                                    <input type="number" maxlength="6" class="form-control" value="@block_0_1_VM.block_0_1.Block_1_14" @oninput="ValidatePopulation" disabled="@(block_0_1_VM.DisablePopulation)" />
+                                    <input type="text"
+                                           class="form-control"
+                                           maxlength="6"
+                                           @bind="Block114Text"
+                                           @bind:event="oninput"
+                                           disabled="@(block_0_1_VM.DisablePopulation)" />
                                     <ValidationMessage For="@(() => block_0_1_VM.block_0_1.Block_1_14)" />
-                                    @if (IsBlock_1_14_ErrorMessageVisible)
+                                    @if (!string.IsNullOrEmpty(Block_1_14_ErrorMessage))
                                     {
                                         <div class="text-success mt-1 fw-bold">
                                             @Block_1_14_ErrorMessage
@@ -262,98 +267,62 @@
     string Block_1_17_ErrorMessage = string.Empty;
     private FluentValidationValidator? validator;
     DBQueries DBQueries = new();
-    private void ValidatePopulation(ChangeEventArgs e)
+
+    private string Block114Text
     {
-        try
+        get => block_0_1_VM.block_0_1?.Block_1_14?.ToString() ?? string.Empty;
+        set
         {
-            IsBlock_1_14_ErrorMessageVisible = false;
-            Block_1_14_ErrorMessage = string.Empty;
+            // keep only digits
+            var digits = new string(value.Where(char.IsDigit).ToArray());
 
-            var raw = e.Value?.ToString() ?? "";
+            // max 6 chars
+            if (digits.Length > 6)
+                digits = digits.Substring(0, 6);
 
-            // ❌ Block scientific notation and decimal characters
-            raw = raw.Replace("e", "")
-                     .Replace("E", "")
-                     .Replace("+", "")
-                     .Replace("-", "")
-                     .Replace(".", "");
-
-            // Keep only digits
-            var numericOnly = new string(raw.Where(char.IsDigit).ToArray());
-            // if (numericOnly.Length > 6)
-            // {
-            //     numericOnly = numericOnly.Substring(0, 5);
-            // }
-            // If empty → treat as null
-            if (string.IsNullOrWhiteSpace(numericOnly))
-            {
-                block_0_1_VM.block_0_1.Block_1_14 = 0;
-                return;
-            }
-
-            // TryParse for safety
-            if (!int.TryParse(numericOnly, out int value))
-            {
-                block_0_1_VM.block_0_1.Block_1_14 = null;
-                return;
-            }
-
-            block_0_1_VM.block_0_1.Block_1_14 = value;
+            block_0_1_VM.block_0_1.Block_1_14 =
+                string.IsNullOrEmpty(digits) ? null : int.Parse(digits);
 
             editContext?.NotifyFieldChanged(
                 editContext.Field(nameof(block_0_1_VM.block_0_1.Block_1_14))
             );
 
-            // Your existing logic
-            int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
-            int framePop = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
-
-            if (sector == 1)
-            {
-                if (framePop > 0)
-                {
-                    double change = ((double)(value - framePop) / framePop) * 100;
-                    if (Math.Abs(change) >= 20)
-                    {
-                        IsBlock_1_14_ErrorMessageVisible = true;
-                        Block_1_14_ErrorMessage =
-                            "W006: Wide variation in approximate population and frame population";
-                    }
-                }
-            }
-            else if (sector == 2)
-            {
-                int maxValue = (int)(framePop * 4 * 1.2);
-                int minValue = (int)(framePop * 4 * 0.80);
-
-                if (value < minValue || value > maxValue)
-                {
-                    IsBlock_1_14_ErrorMessageVisible = true;
-                    Block_1_14_ErrorMessage =
-                        "W006: Wide variation in approximate population and frame population";
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error in ValidatePopulation: " + ex.Message);
+            CheckWarning();
         }
     }
+
 
     void CheckWarning()
     {
         try
         {
-            // Your existing logic
-            int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
-            int framePop = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
-            int value = block_0_1_VM.block_0_1.Block_1_14.GetValueOrDefault();
-            if (sector == 1)
+
+            Block_1_14_ErrorMessage = string.Empty;
+            if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_14.HasValue)
             {
-                if (framePop > 0)
+                // Your existing logic
+                int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
+                int framePop = block_0_1_VM.block_0_1.Block_1_13 ?? 0;
+                int value = block_0_1_VM.block_0_1.Block_1_14.GetValueOrDefault();
+                if (sector == 1)
                 {
-                    double change = ((double)(value - framePop) / framePop) * 100;
-                    if (Math.Abs(change) >= 20)
+                    if (framePop > 0)
+                    {
+                        double change = ((double)(value - framePop) / framePop) * 100;
+                        if (Math.Abs(change) >= 20)
+                        {
+                            IsBlock_1_14_ErrorMessageVisible = true;
+                            Block_1_14_ErrorMessage =
+                                "W006: Wide variation in approximate population and frame population";
+                        }
+                    }
+                }
+                else if (sector == 2)
+                {
+                    int maxValue = (int)(framePop * 4 * 1.2);
+                    int minValue = (int)(framePop * 4 * 0.80);
+
+                    if (value < minValue || value > maxValue)
                     {
                         IsBlock_1_14_ErrorMessageVisible = true;
                         Block_1_14_ErrorMessage =
@@ -361,18 +330,7 @@
                     }
                 }
             }
-            else if (sector == 2)
-            {
-                int maxValue = (int)(framePop * 4 * 1.2);
-                int minValue = (int)(framePop * 4 * 0.80);
-
-                if (value < minValue || value > maxValue)
-                {
-                    IsBlock_1_14_ErrorMessageVisible = true;
-                    Block_1_14_ErrorMessage =
-                        "W006: Wide variation in approximate population and frame population";
-                }
-            }
+            
         }
         catch (Exception ex)
         {
@@ -397,6 +355,10 @@
         if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_14.HasValue)
         {
             CheckWarning();
+        }
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && block_0_1_VM.block_0_1 != null)
+        {
+            survey_time = block_0_1_VM.block_0_1.survey_timestamp.GetValueOrDefault();
         }
         editContext = new EditContext(block_0_1_VM.block_0_1);
     }

@@ -17,7 +17,7 @@
 @inject ILoggingService loggingService
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="DateTime.Now" />
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
     @* 7.1 *@
     <div class="card custom-card">
         <div class="card-header">
@@ -245,6 +245,7 @@
     private string remarks = string.Empty;
     CommentModal commentModal = default!;
     List<int> RowList = [];
+    DateTime survey_time = DateTime.Now;
 
     async Task GoBack()
     {
@@ -263,6 +264,14 @@
         };
         await LoadData();
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = SchemeList
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
+
+        }
         StateHasChanged();
     }
 

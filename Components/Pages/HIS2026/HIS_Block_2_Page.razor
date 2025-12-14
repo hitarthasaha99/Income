@@ -486,6 +486,10 @@
             warningVM._tempWarnings.Clear();
             var data = await dB.GetWarningTableDataForSerial(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, "2", 0);
             warningVM.WarningList.AddRange(data);
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = block_2.survey_timestamp.GetValueOrDefault();
+            }
         }
         catch (Exception ex)
         {

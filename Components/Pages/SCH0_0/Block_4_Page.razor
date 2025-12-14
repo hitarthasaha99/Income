@@ -185,7 +185,10 @@
 
         remarks = block_0_1?.remarks_block_4;
 
-
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_4?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+        }
         StateHasChanged();
         return;
     }

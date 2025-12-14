@@ -17,7 +17,7 @@
 @inject IValidator<Tbl_Block_7a_1> Validator
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="DateTime.Now"/>
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time"/>
      @* 7.1 *@
     <div class="card custom-card">
         <div class="card-header">
@@ -93,7 +93,7 @@
                             <tr>
                                 <td>@item.serial_number</td>
                                 <td>@item.code</td>
-                                <td>@item.unit</td>
+                                <td>@(item.unit == 1 ? "Kg" : "No.")</td>
                                 <td>@item.item_4</td>
                                 <td>@item.item_5</td>
                                 <td>@item.item_6</td>
@@ -182,11 +182,15 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">3</span> unit (Kg./no.)
                             </label>
-                            <input type="number" disabled="@SessionStorage.FSU_Submitted" value="@block_7_1?.unit" class="form-control no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                    @oninput="e =>
+                            <select disabled="@SessionStorage.FSU_Submitted" value="@block_7_1?.unit" class="form-select"
+                                    @onchange="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.unit, e);
                                     }">
+                                  <option>Select</option>
+                                  <option value="1">Kg</option>
+                                  <option value="2">No.</option>
+                            </select>
                             <ValidationMessage For="@(() => block_7_1.unit)" />
 
                         </div>
@@ -223,7 +227,7 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">6</span> Total sale value(in Rs.)
                             </label>
-                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input disabled="@isItem7UserEntered" type="number" class="form-control no-spinner" value="@block_7_1?.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_6, e);
@@ -236,7 +240,7 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">7</span> Average per unit sale value (in Rs.)
                             </label>
-                                <input disabled="@(block_7_1.item_6.HasValue)" type="number" class="form-control no-spinner" value="@block_7_1?.item_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input disabled="@((block_7_1.item_6.HasValue && !isItem7UserEntered))" type="number" class="form-control no-spinner" value="@block_7_1?.item_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_7, e);
@@ -300,7 +304,7 @@
     bool isAdd;
     CommentModal commentModal = default!;
     List<int> RowList = [];
-
+    DateTime survey_time = DateTime.Now;
     async void GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -320,14 +324,27 @@
         };
         await LoadData();
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            if (ActivityList != null)
+            {
+                survey_time = ActivityList
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
+            }
+        }
         StateHasChanged();
     }
+
+    private bool isItem7UserEntered = false;
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
     {
         var identifier = FieldIdentifier.Create(field);
+        var fieldName = ((MemberExpression)field.Body).Member.Name;
 
-        // Try parse
+        // Parse value
         int? value = null;
         if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
             int.TryParse(e.Value?.ToString(), out var v))
@@ -335,29 +352,57 @@
             value = v;
         }
 
-        // 1️⃣ Update the actual model field
-        var memberExpr = (MemberExpression)field.Body;
-        var prop = (PropertyInfo)memberExpr.Member;
+        // Set value
+        var prop = (PropertyInfo)((MemberExpression)field.Body).Member;
         prop.SetValue(block_7_1, value);
 
-        // Auto-calc item_7 when possible
-        if (block_7_1.item_6.GetValueOrDefault() > 0 &&
-            block_7_1.item_5.GetValueOrDefault() > 0)
+        if (fieldName == nameof(block_7_1.item_7))
         {
-            block_7_1.item_7 = block_7_1.item_6 / block_7_1.item_5;
+            isItem7UserEntered = value.HasValue;
 
-            // Notify Blazor that item_7 changed
-            editContext?.NotifyFieldChanged(
-                new FieldIdentifier(block_7_1, nameof(block_7_1.item_7))
-            );
+            if (value.HasValue && block_7_1.item_5.GetValueOrDefault() > 0)
+            {
+                block_7_1.item_6 = block_7_1.item_5 * value;
+
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_6))
+                );
+            }
+            else
+            {
+                block_7_1.item_6 = null;
+            }
         }
 
-        // 2️⃣ Clear previous errors
-        messageStore?.Clear(identifier);
+        if (fieldName == nameof(block_7_1.item_6))
+        {
+            isItem7UserEntered = false;
 
-        // 3️⃣ Notify Blazor validation system
+            if (block_7_1.item_6.GetValueOrDefault() > 0 &&
+                block_7_1.item_5.GetValueOrDefault() > 0)
+            {
+                block_7_1.item_7 = block_7_1.item_6 / block_7_1.item_5;
+
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_7))
+                );
+            }
+            else
+            {
+                block_7_1.item_7 = null;
+            }
+        }
+
+        if (block_7_1.item_5.GetValueOrDefault() == 0 && block_7_1.item_6.GetValueOrDefault() == 0)
+        {
+            block_7_1.item_7 = 0;
+        }
+
+        // Validation updates
+        messageStore?.Clear(identifier);
         editContext?.NotifyFieldChanged(identifier);
     }
+
 
     private async Task OnShowModalClick(string mode = "", Tbl_Block_7a_1? data = null)
     {

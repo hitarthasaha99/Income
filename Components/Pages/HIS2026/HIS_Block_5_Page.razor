@@ -17,8 +17,6 @@
 @inject Warning_VM warningVM
 @inject IValidator<Tbl_Block_5> Validator
 
-@* @inject DBQueries DBQueries *@
-
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
     <div class="card custom-card">
@@ -29,7 +27,12 @@
            
             <div class="card-tools">
                 <div class="d-flex align-items-center" hidden="@SessionStorage.FSU_Submitted">
-
+                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                    {
+                        <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
+                            <i class="fi fi-rr-plus me-1"></i>Add
+                        </button>
+                    }
                 </div>
 
             </div>
@@ -49,6 +52,7 @@
                     <thead>
                         <tr>
                             <th style="min-width:20px;" rowspan="2">sl.no. of member</th>
+                            <th style="min-width:20px;" rowspan="2">name of member</th>
                             <th class="text-center" colspan="1">Last 365 days</th>
                             <th class="text-center" colspan="3">Last month</th>
                             <th class="text-center" colspan="6">Last 365 days</th>
@@ -69,6 +73,7 @@
                         </tr>
                         <tr>
                             <th></th>
+                            <th></th>
                             <th>(1)</th>
                             <th>(2)</th>
                             <th>(3(i))</th>
@@ -88,6 +93,7 @@
                         {
                             <tr>
                                 <td>@member.serial_member</td>
+                                <td>@(block3Members.FirstOrDefault(x => x.id == member.fk_block_3)?.item_2 ?? "")</td>
                                 <td>@member.item_1</td>
                                 <td>@member.item_2</td>
                                 <td>@member.item_3_i</td>
@@ -101,15 +107,24 @@
                                 <td>@member.item_9</td>
                                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                                 {
-                                    
-                                <td class="d-flex align-items-center">
-                                    <button class="btn btn-link me-3 fs-6"
-                                            hidden="@SessionStorage.FSU_Submitted"
-                                            @onclick="@(() => HandleModal("UPDATE", member))">
-                                        <i class="fi fi-rr-pencil"></i>
-                                    </button>
-                                </td>
+                                    <td class="d-flex align-items-center">
+                                        <button class="btn btn-link me-3 fs-6"
+                                                hidden="@SessionStorage.FSU_Submitted"
+                                                @onclick="@(() => HandleModal("UPDATE", member))">
+                                            <i class="fi fi-rr-pencil"></i>
+                                        </button>
+
+                                        @if (CanDeleteEntry(member))
+                                        {
+                                            <button class="btn btn-link fs-6 text-danger"
+                                                    hidden="@SessionStorage.FSU_Submitted"
+                                                    @onclick="@(() => HandleDelete(member))">
+                                                <i class="fi fi-rr-trash"></i>
+                                            </button>
+                                        }
+                                    </td>
                                 }
+
                             </tr>
                         }
                     </tbody>
@@ -164,6 +179,45 @@
             <EditForm EditContext="editContext">
                 <FluentValidationValidator />
                 <div class="row">
+
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                serial number of the member
+                            </label>
+                            <select class="form-select"
+                                    value="@newMember?.fk_block_3"
+                                    @onchange="@SetSerialNumber"
+                                    disabled="@( !isAdd )">
+                                <option value="">Select Member</option>
+                                @foreach (var member in block3Members)
+                                {
+                                    <option value="@member.id">
+                                        @member.serial_no - @member.item_2
+                                    </option>
+                                }
+                            </select>
+                            @if (!string.IsNullOrEmpty(SerialMemberError))
+                            {
+                                <div class="form-text text-danger" style="white-space: pre-line;">
+                                    @SerialMemberError
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                name of the member
+                            </label>
+                            <input value="@(block3Members.FirstOrDefault(x => x.id == newMember?.fk_block_3)?.item_2 ?? "")"
+                                   class="form-control no-spinner"
+                                   disabled>
+                        </div>
+                    </div>
+
+                    <!--No of months worked-->
                     <div class="col-sm-12">
                        <div class="mb-3">
                             <label class="form-label">
@@ -459,7 +513,7 @@
     CommentModal commentModal = default!;
     List<string> Question = [];
     List<int> RowList = [];
-
+    string SerialMemberError = string.Empty;
     EditContext editContext;
     private Block_5_Validator validator = new();
     private ValidationMessageStore messageStore;
@@ -508,8 +562,8 @@
         block3Members = await dbq.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         block_1 = await dbq.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         var applicableMembers = block3Members?.Where(x => x.item_8 == 4 || x.item_9 == 4|| x.item_10 == 4 || x.item_11 == 4).ToList();
-
         await LoadData();
+
         if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
         {
             if (block5Members == null || block5Members.Count == 0)
@@ -541,10 +595,44 @@
                     obj.serial_number = currentSerialNumber++;
                     await dbq.Save_SCH_HIS_Block5(obj);
                 }
-
+                await LoadData();
+            }
+        }
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            if(block5Members != null)
+            {
+                survey_time = block5Members
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
             }
         }
         StateHasChanged();
+    }
+
+    bool CanDeleteEntry(Tbl_Block_5 obj)
+    {
+        var linkedMember = block3Members.FirstOrDefault(x => x.id == obj.fk_block_3);
+        if (linkedMember != null && (linkedMember.item_8 == 4 || linkedMember.item_9 == 4 || linkedMember.item_10 == 4 || linkedMember.item_11 == 4))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private void SetSerialNumber(ChangeEventArgs e)
+    {
+        SerialMemberError = string.Empty;
+        // Convert input value
+        if (Guid.TryParse(e.Value?.ToString(), out Guid value))
+        {
+            newMember.fk_block_3 = value;
+            newMember.serial_member = block3Members.FirstOrDefault(x => x.id == newMember?.fk_block_3)?.serial_no ?? 0;
+        }
     }
 
     private void item1OnInput(ChangeEventArgs e)
@@ -596,19 +684,22 @@
     {
         try
         {
-            // if (action == "ADD")
-            // {
-            //     isAdd = true;
+            if (action == "ADD")
+            {
+                isAdd = true;
 
-            //     newMember = new Tbl_Block_5
-            //     {
-            //         id = Guid.NewGuid(),
-            //         item_1 = ReturnCurrentMemberSerialNumber()
-            //     };
+                newMember = new Tbl_Block_5
+                {
+                    id = Guid.NewGuid(),
+                    serial_number = block5Members.Max(x => x.serial_number) + 1
+                };
+                editContext = new EditContext(newMember);
+                messageStore = new ValidationMessageStore(editContext);
+                editContext.OnFieldChanged += EditContext_OnFieldChanged;
 
-            //     await AddModal.ShowAsync();
-            // }
-            if (action == "UPDATE")
+                await AddModal.ShowAsync();
+            }
+            else if (action == "UPDATE")
             {
                 isAdd = false;
 
@@ -664,7 +755,13 @@
 
     private async Task HandleAddMember()
     {
-
+        SerialMemberError = string.Empty;
+        if (isAdd && block5Members.Any(x => x.fk_block_3 == newMember?.fk_block_3))
+        {
+            SerialMemberError = "Data for this member has already been added";
+            toastService.ShowError("Data for this member has already been added");
+            return;
+        }
         messageStore.Clear();
         var result = await Validator.ValidateAsync(newMember);
         foreach (var error in result.Errors)
@@ -681,7 +778,8 @@
             return;
         }
 
-        await dbq.Save_SCH_HIS_Block5(newMember);
+        newMember.isUpdated = true;
+        await dbq.SaveAsync<Tbl_Block_5>(newMember);
         toastService.ShowSuccess("Member added successfully!");
         await AddModal.HideAsync();
         await LoadData();
@@ -699,13 +797,19 @@
         {
             await dbq.SaveAsync<Tbl_Block_1>(block_1);
         }
-        
-            if(block5Members.Any(x => !x.isUpdated))
-            {
-                toastService.ShowError("Please save/update details for all entries before proceeding");
-                return;
-            }
-            NavigationManager.NavigateTo("/dashboard/his/block_6");
-       
+
+        if(block5Members.Any(x => !x.isUpdated))
+        {
+            toastService.ShowError("Please save/update details for all entries before proceeding");
+            return;
+        }
+        NavigationManager.NavigateTo("/dashboard/his/block_6");
+
+    }
+
+    async Task HandleDelete(Tbl_Block_5 obj)
+    {
+        await dbq.DeleteEntryAsync<Tbl_Block_5>(obj.id);
+        await LoadData();
     }
 }

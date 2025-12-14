@@ -18,7 +18,7 @@
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
-                         survey_time="@survey_date" />
+                         survey_time="@survey_time" />
     @* 7.9 *@
     <div class="card custom-card">
         <div class="card-header">
@@ -282,7 +282,7 @@
               Block="7C_2" />
 
 @code {
-    DateTime survey_date = DateTime.Now;
+    DateTime survey_time = DateTime.Now;
     Modal AddModal = default!;
     Tbl_Block_7c_Q10 fields = new();
     CommonQueries commonQueries = new();
@@ -360,6 +360,14 @@
         };
         await LoadData();
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = ActivityList
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
+
+        }
         StateHasChanged();
     }
 
