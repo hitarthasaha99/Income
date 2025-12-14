@@ -138,9 +138,13 @@
                     }
                     else
                     {
-                        <tr>
-                            <td class="text-center" colspan="12"><div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i> No Data Found</div></td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" colspan="13">
+                                    <div class="alert alert-danger"><i class="fi fi-rr-triangle-warning me-2"></i> No Data Found</div>
+                                </td>
+                            </tr>
+                        </tbody>
                     }
                 </table>
             </div>
@@ -451,32 +455,32 @@
 
                                             <ValidationMessage For="@(() => newMember.item_9)" />
 
-                                            @if (!string.IsNullOrEmpty(item_9Warning))
-                                            {
-                                                <div class="form-text text-success">@item_9Warning</div>
-                                            }
+                                                @if (!string.IsNullOrEmpty(item_9Warning))
+                                                {
+                                                    <div class="form-text text-success">@item_9Warning</div>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Activity Status 365 days -->
-                    <div class="col-sm-12">
-                        <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
-                            <div class="card-body">
-                                <h6 class="fw-bold">Activity status (During 365 days)</h6>
-                                <div class="row">
-                                    <!-- Item 10 -->
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                <span class="form-badge">10</span> Primary
-                                            </label>
-                                            <CustomDropdown Value="@newMember.item_10"
-                                                            ValueChanged="@(v => OnItem10Changed(v))"
-                                                            Options="@ItemOptions" />
-                                            @* <select class="form-select"
+                        <!-- Activity Status 365 days -->
+                        <div class="col-sm-12">
+                        <div class="card rounded-3 shadow-none border bg-light-pink mb-3">
+                                <div class="card-body">
+                                    <h6 class="fw-bold">Activity status (During 365 days)</h6>
+                                    <div class="row">
+                                        <!-- Item 10 -->
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    <span class="form-badge">10</span> Primary
+                                                </label>
+                                                <CustomDropdown Value="@newMember.item_10"
+                                                                ValueChanged="@(v => OnItem10Changed(v))"
+                                                                Options="@ItemOptions" />
+                                                @* <select class="form-select"
                                                         value="@newMember.item_10"
                                                         @onchange="ClearItem10">
 
