@@ -697,30 +697,74 @@
 
     }
 
+    // private void ageClear(ChangeEventArgs e)
+    // {
+    //     ClearAgeError();
+
+    //     var value = e.Value?.ToString();
+
+    //     if (string.IsNullOrEmpty(value))
+    //         newMember.age = null;
+    //     else
+    //         newMember.age = int.Parse(value);
+    //     if (string.IsNullOrEmpty(value))
+    //     {
+    //         newMember.age = null;
+    //         return;
+    //     }
+    //     if (value.Length > 3)
+    //     {
+    //         value = value.Substring(0, 3);
+    //     }
+    //     newMember.age = int.Parse(value);
+
+
+    //     checkAgeWarning();           Check age >= 120
+    //     checkAgeReletionWarning();   Check relation rule (age < head age)
+    //     checkSingleUser();
+    //     checkItem_6Warning();
+    //     CheckItem7Warning();
+    //     CheckItem8Warning();
+    //     CheckItem9Warning();
+    //     CheckItem10Warning();
+    //     CheckItem11Warning();
+    //     ClearItem12Error();
+    // }
+
     private void ageClear(ChangeEventArgs e)
     {
         ClearAgeError();
 
         var value = e.Value?.ToString();
 
-        // if (string.IsNullOrEmpty(value))
-        //     newMember.age = null;
-        // else
-        //     newMember.age = int.Parse(value);
         if (string.IsNullOrEmpty(value))
         {
             newMember.age = null;
+
+            // --- CLEAR WARNINGS if age field is blank ---
+            checkAgeWarning();
+            checkAgeReletionWarning();
+            checkSingleUser();
+            checkItem_6Warning();
+            CheckItem7Warning();
+            CheckItem8Warning();
+            CheckItem9Warning();
+            CheckItem10Warning();
+            CheckItem11Warning();
+            ClearItem12Error();
+            
+
             return;
         }
+
         if (value.Length > 3)
         {
             value = value.Substring(0, 3);
         }
+
         newMember.age = int.Parse(value);
-
-
-        checkAgeWarning();           // Check age >= 120
-        checkAgeReletionWarning();   // Check relation rule (age < head age)
+        checkAgeWarning();
+        checkAgeReletionWarning();
         checkSingleUser();
         checkItem_6Warning();
         CheckItem7Warning();
