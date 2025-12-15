@@ -192,7 +192,7 @@
                     var received_data = JsonConvert.DeserializeObject<Submission_Model>(deserialized.submitted_json_data);
                     if (received_data != null && received_data.IncomeSch00block0 != null)
                     {
-                        if (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                        if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
                         {
                             await dB.HardDeleteDataForFSUID(fsu.fsu_id);
                         }
@@ -819,42 +819,44 @@
     }
 
     private async Task UpdateFsu(List<fsu_houses>? FsuHouseList = null)
+    {
+        try
         {
-            try
+            if (FsuHouseList != null && FsuHouseList.Count>0)
             {
-                if (FsuHouseList != null && FsuHouseList.Count>0)
+                foreach (var item in FsuHouseList)
                 {
-                    foreach (var item in FsuHouseList)
-                    {
-                       await dB.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
-                    }
+                    await dB.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
                 }
-                return;
             }
-            catch (Exception ex)
-            {
-                // await AppShell.Current.DisplayAlert("Error", ex.Message, "ok");
-                return;
-            }
+            return;
         }
+        catch (Exception ex)
+        {
+            // await AppShell.Current.DisplayAlert("Error", ex.Message, "ok");
+            return;
+        }
+    }
 
 
-   private void CheckDownloadNeed( Tbl_Fsu_List FsuData , List<Tbl_Sch_0_0_Block_7>? oldData , List<fsu_houses>? FsuHouseData )
-   {
-     try
-     {  
+    private void CheckDownloadNeed( Tbl_Fsu_List FsuData , List<Tbl_Sch_0_0_Block_7>? oldData , List<fsu_houses>? FsuHouseData )
+    {
+        try
+        {  
             FsuData.NeedDownload = true;
-         if(FsuHouseData == null || FsuHouseData.Count == 0 || oldData == null || oldData.Count == 0)
-         {
-             return;
-         }
-         //if change any thing fsuhousehold ten need downlode
+            if(FsuHouseData == null || FsuHouseData.Count == 0 || oldData == null || oldData.Count == 0)
+            {
+                return;
+            }
+            //if change any thing fsuhousehold ten need downlode
             if (oldData.Count != FsuHouseData.Count)
             {
                 FsuData.NeedDownload = false;
                 return;
             }
-         foreach(var Item in FsuHouseData)
+
+
+            foreach(var Item in FsuHouseData)
          {
            var  RefinedData = oldData.FirstOrDefault(x=> x.fsu_id == Item.fsu_id && x.Block_7_3 == Item.hhd_id);
             if(RefinedData != null)
