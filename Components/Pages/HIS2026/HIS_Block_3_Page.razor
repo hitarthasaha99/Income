@@ -217,6 +217,7 @@
                                        @oninput="ClearNameError"
                                        autocomplete="off"
                                        onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+
                                        onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) { event.preventDefault(); }"
                                        maxlength="50"
                                        autocorrect="off"
