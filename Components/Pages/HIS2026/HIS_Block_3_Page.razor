@@ -692,15 +692,19 @@
         }
         catch
         {
-            
+
         }
-        
+
         StateHasChanged();
     }
 
     private async Task LoadData()
     {
         block3Members = await DBQueries.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3Members != null && block3Members.Count > 0)
+        {
+            block3Members = block3Members.OrderBy(x => x.serial_no).ToList();
+        }
         for(int i=1; i<=block3Members.Count; i++)
         {
             memberList.Add(i);

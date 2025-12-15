@@ -83,8 +83,9 @@
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
-                                            <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-download ms-1"></i></NavLink>
-                                        </div>
+
+@*                                          <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-download ms-1"></i></NavLink>
+ *@                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -174,6 +175,7 @@
             preloadService.Show(SpinnerColor.Light, "Fetching data from central database for offline access. Please wait...");
 
             var response = await commonService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{fsu.fsu_id}/{fsu.lookupFsuSubmitStatus}");
+            int[] fsuHouseStatusArray = [12,21,22,31,32,80];
 
 
             if (string.IsNullOrEmpty(response))
@@ -189,10 +191,8 @@
                     var received_data = JsonConvert.DeserializeObject<Submission_Model>(deserialized.submitted_json_data);
                     if (received_data != null && received_data.IncomeSch00block0 != null)
                     {
-                        if (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
-                        {
-                            await dB.HardDeleteDataForFSUID(fsu.fsu_id);
-                        }
+                        await dB.HardDeleteDataForFSUID(fsu.fsu_id);
+
                         var success = await dB.SaveReceivedDataAsync(received_data);
                         if (success > 0)
                         {

@@ -275,8 +275,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        hhdStatus = await dQ.GetCurrentHHDStatus(SessionStorage.SelectedFSUId,SessionStorage.selected_hhd_id);
         var hhd = await dQ.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+        hhdStatus = hhd?.hhdStatus ?? 0;
         if (hhd != null)
         {
             if(hhd.status == "SUBSTITUTE")

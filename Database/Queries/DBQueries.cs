@@ -375,7 +375,7 @@ namespace Income.Database.Queries
 
                 return 1;
             }
-            catch
+            catch (Exception ex)
             {
                 return 0;
             }

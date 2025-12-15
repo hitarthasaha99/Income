@@ -44,8 +44,7 @@ namespace Income
 
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             //builder.Services.AddFluentValidationAutoValidation();
-            builder.Services.Configure<EnvironmentConfig>(
-    builder.Configuration.GetSection("EnvironmentConfig"));
+            
 
             builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
             builder.Services.AddSingleton<ILoggingService, LoggingService>();
