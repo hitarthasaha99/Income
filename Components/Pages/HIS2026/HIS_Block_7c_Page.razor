@@ -263,16 +263,29 @@
     {
         NICFields = await dQ.Fetch_SCH_HIS_Block7_NICList();
         preFilledNIC = await dQ.Fetch_SCH_HIS_Block4_NICList();
+        bool hasNullNic = preFilledNIC.Any(x => x.NicCode == null);
+
+        // Get distinct non-null NIC codes
         var usedNicCodes = preFilledNIC
-                            .Where(x => x.NicCode.HasValue)
-                            .Select(x => x.NicCode!.Value)
-                            .Distinct()
-                            .ToHashSet();
+            .Where(x => x.NicCode.HasValue)
+            .Select(x => x.NicCode!.Value)
+            .Distinct()
+            .ToHashSet();
 
+        // Filter NIC master list
         NICCodes = Block_4_Constants.NIC_CODES
-                            .Where(n => usedNicCodes.Contains(n.id.GetValueOrDefault()))
-                            .ToList();
+            .Where(n => usedNicCodes.Contains(n.id.GetValueOrDefault()))
+            .ToList();
 
+        // Add "Others" if null NIC exists
+        if (hasNullNic)
+        {
+            NICCodes.Add(new Tbl_Lookup_NIC
+            {
+                id = null,
+                title = "Others"
+            });
+        }
 
         RowList = NICFields.Select(x => x.SerialNumber.GetValueOrDefault()).Distinct().ToList();
         StateHasChanged();

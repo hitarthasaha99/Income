@@ -36,7 +36,8 @@ namespace Income.Common.SCH0_0
         [
             new Tbl_Lookup() { title = "01- self-employed", id = 1 },
             new Tbl_Lookup() { title = "02- regular wage/salary earning", id = 2 },
-            new Tbl_Lookup() { title = "04- casual labour", id = 4 },
+            new Tbl_Lookup() { title = "03- casual labour", id = 3 },
+            new Tbl_Lookup() { title = "04- interest, pensioner, remittances earner", id = 4 },
             new Tbl_Lookup() { title = "09- others", id = 9 },
         ];
     }

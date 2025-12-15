@@ -344,6 +344,11 @@
     {
         try
         {
+            if (SchemeList != null && SchemeList.Count > 0 && SchemeList.Any(x => x.item_2 == fields.item_2 && x.id != fields.id && x.is_deleted != true))
+            {
+                toastService.ShowError("Cannot add the same scheme again");
+                return;
+            }
             int applicableMembers = MemberList.Count(x => x.item_12 == 1);
             var validator = new Block_8_6_Validator(applicableMembers);
             messageStore.Clear();

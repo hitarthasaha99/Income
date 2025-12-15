@@ -763,24 +763,38 @@
 					{
 						errors.Add($"No Block 3 entries found for HHD Serial {hhd.Block_7_3}");
 					}
-				}
 
-				if (block_4 == null)
-				{
-					errors.Add($"Block 4 data not found for HHD Serial {hhd.Block_7_3}");
-				}
-				else
-				{
-					var block_3_condition = block_3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1 || x.item_11 == 1);
-					if (block_3_condition)
+					if (block_4 == null)
 					{
-						var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
-						if (!items.Any(x => x == true))
+						errors.Add($"Block 4 data not found for HHD Serial {hhd.Block_7_3}");
+					}
+					else
+					{
+						var block_3_condition = block_3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1 || x.item_11 == 1);
+						if (block_3_condition)
 						{
-							errors.Add($"H016: Please check the entry recorded against col.s 8-11 , block 3 for HHD Serial {hhd.Block_7_3}");
+							var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
+							if (!items.Any(x => x == true))
+							{
+								errors.Add($"H016: Please check the entry recorded against col.s 8-11 , block 3 for HHD Serial {hhd.Block_7_3}");
+							}
+						}
+					}
+
+					if (block_4 != null)
+					{
+						if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
+						{
+							errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
+						}
+
+						if (!block_4.item_4_3.GetValueOrDefault() && !block_4.item_4_4.GetValueOrDefault() && !block_4.item_4_5.GetValueOrDefault() && !block_4.item_4_6.GetValueOrDefault() && (block_7b != null))
+						{
+							errors.Add($"H045: Block 7b is applicable only when atleast one of Block 4.4 Sl. no. 3 - 6 are checked");
 						}
 					}
 				}
+				
 
 				if (block_3.Count > 0)
 				{
@@ -869,18 +883,7 @@
 					}
 				}
 
-				if (block_4 != null)
-				{
-					if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
-					{
-						errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
-					}
-
-					if (!block_4.item_4_3.GetValueOrDefault() && !block_4.item_4_4.GetValueOrDefault() && !block_4.item_4_5.GetValueOrDefault() && !block_4.item_4_6.GetValueOrDefault() && (block_7b != null))
-					{
-						errors.Add($"H045: Block 7b is applicable only when atleast one of Block 4.4 Sl. no. 3 - 6 are checked");
-					}
-				}
+				
 
 				if (warnings.Count > 0 && warnings.Any(x => x.warning_status == 1))
 				{

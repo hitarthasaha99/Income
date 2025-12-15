@@ -310,7 +310,7 @@
         {
             toastService.ShowError("Unexpected error: Block 4 data not found");
         }
-        
+
 
         StateHasChanged();
     }
@@ -350,6 +350,7 @@
     {
         try
         {
+            DisableNICInput = false;
             if (action == "ADD")
             {
                 if(NICfields.Count >= 4)
@@ -376,6 +377,10 @@
             else if (action == "UPDATE")
             {
                 fields = ObjectCloneHelper.ShallowCopy(data);
+                if (fields?.SerialNumber >= 4)
+                {
+                    DisableNICInput = true;
+                }
                 editContext = new EditContext(fields);
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;

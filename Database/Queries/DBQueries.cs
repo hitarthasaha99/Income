@@ -2775,7 +2775,7 @@ namespace Income.Database.Queries
             }
         }
 
-        private async Task ReserializeBlock7_Q10_List()
+        public async Task ReserializeBlock7_Q10_List()
         {
             try
             {

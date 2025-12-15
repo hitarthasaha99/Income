@@ -441,7 +441,7 @@
                     serial_number = GetCurrentSerialNumber(),
                     code = code.NicCode,
                     item_1 = code.SerialNumber,
-                    item_2 = Block_4_Constants.NIC_CODES.FirstOrDefault(x => x.id == code.NicCode)?.title ?? ""
+                    item_2 = Block_4_Constants.NIC_CODES.FirstOrDefault(x => x.id == code.NicCode)?.title ?? "Others"
 
                 };
                 toAdd.Add(newEntry);

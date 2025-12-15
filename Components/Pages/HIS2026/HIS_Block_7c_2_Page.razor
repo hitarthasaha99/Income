@@ -348,6 +348,17 @@
                         await dQ.Save_SCH_HIS_Block7_Q10_List(obj);
                     }
                 }
+
+                var orphanActivities = ActivityList
+                                .Where(a => !NICFields.Any(n => n.id == a.parent_id))
+                                .ToList();
+
+                foreach (var item in orphanActivities)
+                {
+                    await dQ.DeleteEntryAsync<Tbl_Block_7c_Q10>(item.id);
+                    await dQ.ReserializeBlock7_Q10_List();
+                }
+
             }
         }
 

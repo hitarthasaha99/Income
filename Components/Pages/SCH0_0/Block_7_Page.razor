@@ -221,9 +221,9 @@
                             </div>
 
                             <!-- Head of Household Name -->
-                            <div class="col-sm-12" hidden="@(fields.is_household == 1)"> 
+                            <div class="col-sm-12"> 
                                 <div class="mb-3">
-                                    <label class="form-label"><span class="form-badge">4</span>Name of Head of Household</label>
+                                    <label class="form-label"><span class="form-badge">4</span>@(fields.is_household == 1 ? "Name of Head of Household/Structure" : "Name of Head of Household")</label>
                                     <InputText class="form-control"
                                                maxlength="50"
                                                 onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
