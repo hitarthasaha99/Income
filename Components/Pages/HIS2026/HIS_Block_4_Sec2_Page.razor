@@ -38,7 +38,7 @@
             {
 
                 <div class="card-tools">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
             </div>
@@ -165,7 +165,7 @@
                             <select class="form-select is_sso"
                                     value="@fields.NicCode"
                                     @onchange="OnNicCodeChanged"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    disabled="@(DisableNICInput)">
                                 <option value="">Select</option>
                                 @foreach (var item in Block_4_Constants.NIC_CODES)
                                 {
@@ -203,6 +203,7 @@
                                 <span class="form-badge">5</span> Number of months of operation during last 365 days
                             </label>
                             <input class="form-control"
+                            type="number"
                                    @bind="fields.NumberOfMonths"
                                    @oninput="OnMonthsInput"
                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
@@ -222,6 +223,11 @@
     </FooterTemplate>
 </Modal>
 
+<CommentModal @ref="commentModal"
+              MemberList=Rows
+              QuestionList="@(new List<string>(){"5"})"
+              Block="4.2" />
+
 
 @code {
     EditContext editContext = default!;
@@ -240,6 +246,9 @@
     List<Tbl_Block_4_Q5> NICfields = new();
     bool Q5Needed = false;
     private string Block_4_5_ErrorMessage = string.Empty;
+    CommentModal commentModal = default!;
+    List<int> Rows = [];
+    private bool DisableNICInput = true;
 
     async void Validate()
     {
@@ -265,7 +274,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_4_2",
+            block_title = "HIS Block 4_2",
+            block_code = CommonEnum.his_block_4_2.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
+        Rows = [];
         if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
         {
             await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
@@ -274,26 +290,28 @@
         var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         if (block3 != null && block3.Count > 0)
         {
-            Q5Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2 || x.item_10 == 2);
+            Q5Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2 || x.item_10 == 2 || x.item_11 == 2);
         }
         block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
 
         if (block_4 != null)
         {
             NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
+            for(int i=1; i<=NICfields.Count; i++)
+            {
+                Rows.Add(i);
+            }
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = block_4.survey_timestamp.GetValueOrDefault();
+            }
         }
         else
         {
             toastService.ShowError("Unexpected error: Block 4 data not found");
         }
+        
 
-        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
-        {
-            block_uri = "/dashboard/his/block_4_2",
-            block_title = "HIS Block 4_2",
-            block_code = CommonEnum.his_block_4_2.ToString(),
-        };
-        await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
 
@@ -334,11 +352,22 @@
         {
             if (action == "ADD")
             {
+                if(NICfields.Count >= 4)
+                {
+                    toastService.ShowInfo("Cannot add more than 4 entries");
+                    return;
+                }
                 fields = new Tbl_Block_4_Q5();
                 fields.id = Guid.NewGuid();
                 fields.hhd_id = SessionStorage.selected_hhd_id;
                 fields.Block4Id = block_4.id;
                 fields.SerialNumber = NICfields.Count == 0 ? 1 : NICfields.Count + 1;
+                if (fields.SerialNumber >= 4)
+                {
+                    DisableNICInput = true;
+                    fields.NicCode = null;
+                    fields.ActivityName = "Others";
+                }
                 editContext = new EditContext(fields);
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;
@@ -470,7 +499,7 @@
         {
             if (NICfields != null && NICfields.Count == 0)
             {
-                Block_4_5_ErrorMessage = $"H017(i): Please check the entry recorded against col.s 8-10 , block 3";
+                Block_4_5_ErrorMessage = $"H017(i): Please check the entry recorded against col.s 8-11 , block 3";
                 toastService.ShowError("Please resolve pending errors");
                 return;
             }

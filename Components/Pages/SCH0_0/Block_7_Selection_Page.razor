@@ -308,7 +308,14 @@
                 InputCounts[sss] = 0;
         }
         await LoadData();
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = ListItems
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
 
+        }
         StateHasChanged();
         await Logger.LogInfo($"Block 7 Loaded for {SessionStorage.SelectedFSUId}");
     }

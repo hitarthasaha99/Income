@@ -10,7 +10,6 @@
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
-@inject Comment_vm comment_vm
 @inject Warning_VM warningVM
 @inject LocalizationService Loc
 
@@ -27,7 +26,7 @@
                     {
                         
                     <div class="card-tools">
-                        <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
+                        <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-1"></i>Comment</NavLink>
                     </div>
                     }
                 </div>
@@ -215,6 +214,12 @@
     </EditForm>
 }
 
+
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="Question"
+              Block="4.1" />
+
 @code {
     private CommonConfig commonConfig = new CommonConfig();
     CommonList commonList = new();
@@ -228,6 +233,9 @@
     Tbl_Sch_0_0_Block_7 hhd = new();
     Tbl_Block_3 block_3 = new();
     Tbl_Block_4? block_4;
+
+    CommentModal commentModal = default!;
+    List<string> Question = [];
 
     bool Q4Needed = false;
     EditContext editContext;
@@ -294,7 +302,7 @@
             var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
             if (!items.Any(x => x == true))
             {
-                Block_4_4_ErrorMessage = $"H016: Please check the entry recorded against col.s 8-10 , block 3";
+                Block_4_4_ErrorMessage = $"H016: Please check the entry recorded against col.s 8-11 , block 3";
             }
         }
         return string.IsNullOrEmpty(Block_4_2_ErrorMessage) && string.IsNullOrEmpty(Block_4_3_ErrorMessage) && string.IsNullOrEmpty(Block_4_4_ErrorMessage);
@@ -375,7 +383,7 @@
         var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         if (block3 != null && block3.Count > 0)
         {
-            Q4Needed = block3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1);
+            Q4Needed = block3.Any(x => x.item_8 == 1 || x.item_9 == 1 || x.item_10 == 1 || x.item_11 == 1);
         }
         block_4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id) ?? null;
         int block_4_1 = block3?.Count ?? 0;
@@ -399,6 +407,9 @@
         }
         editContext = new EditContext(block_4);
 
+        Question = [];
+        Question.AddRange("1","2","3","4","4.1","4.2","4.3","4.4","4.5","4.6");
+
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
             block_uri = "/dashboard/his/block_4_1",
@@ -406,14 +417,11 @@
             block_code = CommonEnum.his_block_4_1.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_4.survey_timestamp.GetValueOrDefault();
+        }
         StateHasChanged();
-    }
-
-
-    async void Close()
-    {
-        await comment_vm.AddModal.HideAsync();
-
     }
 
     async void GoBack()

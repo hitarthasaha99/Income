@@ -125,6 +125,10 @@
             file.file_image_source = $"data:{file.file_type};base64,{base64string}"; //Provide a fresh MemoryStream each time
             StateHasChanged();
         }
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = response?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+        }
         return;
     }
     async Task FileHandler(string type)

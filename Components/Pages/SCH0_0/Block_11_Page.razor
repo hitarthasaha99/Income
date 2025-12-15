@@ -288,6 +288,11 @@
 
             remarks_block_11 = !string.IsNullOrEmpty(block_1?.remarks_block_11);
 
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = tbl_Sch_0_0_FieldOperation.survey_timestamp.GetValueOrDefault();
+            }
+
             StateHasChanged();
             return;
         }
@@ -337,6 +342,12 @@
         try
         {
             StatusMessage = string.Empty;
+            //(iii) surveycode = 1 or 4 -> time should be zero
+            if (tbl_Sch_0_0_FieldOperation.time_taken == null || tbl_Sch_0_0_FieldOperation.time_taken <= 0)
+            {
+                StatusMessage = "H011 (iii): Time taken cannot be blank or zero";
+                StatusClass = "text-danger";
+            }
             if (surveyCode == 1 || surveyCode == 4)
             {
                 //(iii) surveycode = 1 or 4 -> time should be zero

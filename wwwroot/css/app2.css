@@ -998,7 +998,9 @@ th.vertical, td.vertical {
     }
 }
 
-
+.blazored-toast-container {
+    z-index: 99999 !important;
+}
 
 /* .card.warningWrap {
     border: 1px solid #D89F35 !important;

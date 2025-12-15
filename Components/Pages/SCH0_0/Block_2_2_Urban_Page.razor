@@ -160,6 +160,10 @@
         await block_2_2_VM.Init();
         block_0_1 = await SCH_0_0_Queries.FetchBlock1();
         remarks = block_0_1?.remarks_block_2_2;
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_2_2_VM.tbl_Sch_0_0_Block_2_2?.FirstOrDefault()?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+        }
 
     }
 
