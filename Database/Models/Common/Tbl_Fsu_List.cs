@@ -51,7 +51,7 @@ namespace Income.Database.Models.Common
         public int? isSubstituteDone { get; set; } = 0;
         public int? updatelistingcount { get; set; } = 0;
         [JsonIgnore]
-        public bool NeedDownload { get; set; } = false;
+        public bool NeedDownload { get; set; } = true;
 
     }
 
