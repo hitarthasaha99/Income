@@ -9,6 +9,7 @@ using Income.Database.Models.Common;
 using Income.Database.Models.HIS_2026;
 using Income.Database.Models.SCH0_0;
 using Income.Services;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,6 +72,7 @@ namespace Income.Database.Queries
                     {
                         foreach (var item in sch00_block_7)
                         {
+                            item.needDownload = 0;
                             await SaveUpdateSCH0Block7(item);
                         }
                     }
@@ -373,7 +375,7 @@ namespace Income.Database.Queries
 
                 return 1;
             }
-            catch
+            catch (Exception ex)
             {
                 return 0;
             }
@@ -1466,11 +1468,11 @@ namespace Income.Database.Queries
             return await _database.UpdateAllAsync(rows);
         }
 
-        public async Task<List<Tbl_Comments>> GetItemsAsync(string block)
+        public async Task<List<Tbl_Warning>> GetCommentsAsync(string block)
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Comments>("SELECT * FROM Tbl_Comments WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND survey_id = ? AND block = ? AND (parent_comment_id IS NULL OR parent_comment_id == ?)", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, SessionStorage.surveyId, block, Guid.Empty.ToString());
+                var response = await _database.QueryAsync<Tbl_Warning>("SELECT * FROM Tbl_Warning WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND block = ? AND warning_type = ? AND (is_deleted = null OR is_deleted = 0)", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, block, "99");
                 if (response != null && response.Count > 0)
                 {
                     return response;
@@ -1483,62 +1485,6 @@ namespace Income.Database.Queries
             catch (Exception ex)
             {
                 return null;
-            }
-        }
-
-        public async Task<Tbl_Comments> GetItemsAsyncById(Tbl_Comments data)
-        {
-            try
-            {
-                var response = await _database.QueryAsync<Tbl_Comments>("SELECT * FROM Tbl_Comments WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ? AND survey_id = ? AND block = ? AND id = ?", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, SessionStorage.tenant_id, SessionStorage.surveyId, data.block, data.id);
-                if (response != null && response.Count > 0)
-                {
-                    return response.FirstOrDefault();
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        public async Task<int> SaveBlockTbl_Comments(Tbl_Comments Comments)
-        {
-            try
-            {
-                int status = 0;
-                var check_existance = await _database.Table<Tbl_Comments>().Where(x => x.id == Comments.id).ToListAsync();
-                if (check_existance != null && check_existance.Count > 0)
-                {
-                    status = await _database.UpdateAsync(Comments);
-                }
-                else
-                {
-                    status = await _database.InsertAsync(Comments);
-                }
-                return status;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
-
-
-        public async Task<int> DeleteComments(Tbl_Comments Comments)
-        {
-            try
-            {
-                var data = await _database.DeleteAsync(Comments);
-                return data;
-            }
-            catch (Exception ex)
-            {
-                return 0;
             }
         }
 
@@ -1651,7 +1597,10 @@ namespace Income.Database.Queries
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(tbl_block_3);
-                    await UpdateOrDeleteDependentBlocks_HIS_Block_3(tbl_block_3);
+                    if (status > 0)
+                    {
+                        await UpdateOrDeleteDependentBlocks_HIS_Block_3(check_existence, tbl_block_3);
+                    }
                 }
                 else
                 {
@@ -1676,17 +1625,25 @@ namespace Income.Database.Queries
                     if (SessionStorage.FSU_Submitted)
                     {
                         exists.is_deleted = true;
-                        await _database.UpdateAsync(exists);
+                        int status = await _database.UpdateAsync(exists);
+                        if (status > 0)
+                        {
+                            await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                        }
                     }
                     else
                     {
                         int deleted = await _database.DeleteAsync(exists);
+                        if (deleted > 0)
+                        {
+                            await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                        }
                     }
                     var json = System.Text.Json.JsonSerializer.Serialize(exists);
 
                     //await _logger.LogInfo($"Deleted member - \n{json}");
                     await ReserializeMemberList(exists);
-                    await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                    //await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
                     return 1;
                 }
                 return 0;
@@ -1698,36 +1655,127 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task UpdateOrDeleteDependentBlocks_HIS_Block_3(Tbl_Block_3 block_3)
+
+
+        public async Task UpdateOrDeleteDependentBlocks_HIS_Block_3(Tbl_Block_3 oldBlock3, Tbl_Block_3? newBlock3 = null)
         {
             try
             {
-                //HIS_Block_4
-                //HIS_Block_5 - if entry having 04 in items 8 - 11 gets deleted, delete the entry from block-5 too
-                if(block_3.item_8 != 4 && block_3.item_9 != 4 && block_3.item_10 != 4 && block_3.item_11 != 4)
+                if(newBlock3 != null)
                 {
-                    var existingEntryBlock5 = await _database.Table<Tbl_Block_5>().Where(x => x.fk_block_3 == block_3.id).FirstOrDefaultAsync();
-                    if (existingEntryBlock5 != null)
-                    {
-                        await Delete_HIS_Block_5(existingEntryBlock5.id);
-                    }
+                    if (!HasDependencyFieldsChanged(oldBlock3, newBlock3))
+                        return;
                 }
-                //HIS_Block_6 - if entry having 05 in items 8 - 9 gets deleted
-                if (block_3.item_8 != 5 && block_3.item_9 != 5)
+
+                // ================= BLOCK 4 =================
+                bool hasCode1 = await HasAnyBlock3WithCode(1);
+
+                if (!hasCode1)
                 {
-                    var existingEntryBlock6 = await _database.Table<Tbl_Block_6>().Where(x => x.fk_block_3 == block_3.id).FirstOrDefaultAsync();
-                    if (existingEntryBlock6 != null)
+                    await ResetBlock4ActivitiesAsync();
+                }
+                // NOTE:
+                // If hasCode1 == true and Block 4 has no selection,
+                // validation should happen at save/submit time (not auto-set)
+
+                // ================= BLOCK 5 (code = 4) =================
+                bool hasCode4 = await HasAnyBlock3WithCode(4);
+
+                if (!hasCode4)
+                {
+                    var block5Entries = await _database.Table<Tbl_Block_5>()
+                        .Where(x => x.fk_block_3 == oldBlock3.id)
+                        .ToListAsync();
+
+                    foreach (var entry in block5Entries)
                     {
-                        await Delete_HIS_Block_6(existingEntryBlock6.id);
+                        await DeleteEntryAsync<Tbl_Block_5>(entry.id);
                     }
                 }
 
+                // ================= BLOCK 6 (code = 5) =================
+                bool hasCode5 = await HasAnyBlock3WithCode(5);
+
+                if (!hasCode5)
+                {
+                    var block6Entries = await _database.Table<Tbl_Block_6>()
+                        .Where(x => x.fk_block_3 == oldBlock3.id)
+                        .ToListAsync();
+
+                    foreach (var entry in block6Entries)
+                    {
+                        await DeleteEntryAsync<Tbl_Block_6>(entry.id);
+                    }
+                }
+
+                var block11bEntries = await _database.Table<Tbl_Block_11b>()
+                        .Where(x => x.fk_block_3 == oldBlock3.id)
+                        .ToListAsync();
+
+                foreach (var entry in block11bEntries)
+                {
+                    await DeleteEntryAsync<Tbl_Block_11b>(entry.id);
+                }
             }
             catch (Exception ex)
             {
-
+                await _logger.LogError("UpdateBlock3", ex);
             }
         }
+        private async Task<bool> HasAnyBlock3WithCode(params int[] codes)
+        {
+            var result = await _database.Table<Tbl_Block_3>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false))
+                .ToListAsync();
+            return result.Any(x =>
+                    codes.Contains(x.item_8 ?? -1) ||
+                    codes.Contains(x.item_9 ?? -1) ||
+                    codes.Contains(x.item_10 ?? -1) ||
+                    codes.Contains(x.item_11 ?? -1));
+        }
+
+
+        private bool IsAnyBlock4ActivitySelected(Tbl_Block_4 block4)
+        {
+            return block4.item_4_1 == true ||
+                   block4.item_4_2 == true ||
+                   block4.item_4_3 == true ||
+                   block4.item_4_4 == true ||
+                   block4.item_4_5 == true ||
+                   block4.item_4_6 == true;
+        }
+
+        private async Task ResetBlock4ActivitiesAsync()
+        {
+            var block4 = await _database.Table<Tbl_Block_4>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false))
+                .FirstOrDefaultAsync();
+
+            if (block4 == null)
+                return;
+
+            if (!IsAnyBlock4ActivitySelected(block4))
+                return;
+
+            block4.item_4_1 = false;
+            block4.item_4_2 = false;
+            block4.item_4_3 = false;
+            block4.item_4_4 = false;
+            block4.item_4_5 = false;
+            block4.item_4_6 = false;
+
+            await _database.UpdateAsync(block4);
+        }
+
+        private bool HasDependencyFieldsChanged(Tbl_Block_3 oldB, Tbl_Block_3 newB)
+        {
+            return oldB.item_8 != newB.item_8 ||
+                   oldB.item_9 != newB.item_9 ||
+                   oldB.item_10 != newB.item_10 ||
+                   oldB.item_11 != newB.item_11;
+        }
+
+
 
         private async Task ReserializeMemberList(Tbl_Block_3 deleted)
         {
@@ -1757,12 +1805,97 @@ namespace Income.Database.Queries
                         await _database.UpdateAsync(member);
                     }
                 }
+                await UpdateDependentBlockSerialNumber_Block_3();
             }
             catch (Exception ex)
             {
 
             }
         }
+
+        public async Task<int> UpdateDependentBlockSerialNumber_Block_3()
+        {
+            int totalUpdated = 0;
+
+            try
+            {
+                var block3 = await FetchListAsync<Tbl_Block_3>(DeleteFilter.ExcludeDeleted);
+                var block5 = await FetchListAsync<Tbl_Block_5>(DeleteFilter.ExcludeDeleted);
+                var block6 = await FetchListAsync<Tbl_Block_6>(DeleteFilter.ExcludeDeleted);
+                var block11b = await FetchListAsync<Tbl_Block_11b>(DeleteFilter.ExcludeDeleted);
+
+                await _database.RunInTransactionAsync(tran =>
+                {
+                    // NOTE:
+                    // Inside transaction, we MUST use the synchronous connection APIs
+
+                    // 1. Build Block-3 ID → serial_no map
+                    var serialMap = block3
+                        .Where(x => x.serial_no.HasValue)
+                        .ToDictionary(x => x.id, x => x.serial_no!.Value);
+
+                    // 2. Update Block 5
+                    totalUpdated += UpdateDependentSerial(
+                        tran,
+                        block5,
+                        serialMap,
+                        x => x.fk_block_3,
+                        (x, s) => x.serial_member = s
+                    );
+
+                    // 3. Update Block 6
+                    totalUpdated += UpdateDependentSerial(
+                        tran,
+                        block6,
+                        serialMap,
+                        x => x.fk_block_3,
+                        (x, s) => x.serial_member = s
+                    );
+
+                    // 4. Update Block 11b
+                    totalUpdated += UpdateDependentSerial(
+                        tran,
+                        block11b,
+                        serialMap,
+                        x => x.fk_block_3,
+                        (x, s) => x.item_1 = s
+                    );
+                });
+
+                return totalUpdated;
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("SQLite transaction failed while updating dependent serial numbers", ex);
+                throw;
+            }
+        }
+
+
+        private int UpdateDependentSerial<T>(
+        SQLiteConnection tran,
+        IEnumerable<T> rows,
+        Dictionary<Guid, int> serialMap,
+        Func<T, Guid?> getFk,
+        Action<T, int> setSerial)
+        {
+            int updated = 0;
+
+            foreach (var row in rows)
+            {
+                var fk = getFk(row);
+
+                if (fk == null || !serialMap.TryGetValue(fk.Value, out int newSerial))
+                    continue;
+
+                setSerial(row, newSerial);
+                tran.Update(row);
+                updated++;
+            }
+
+            return updated;
+        }
+
 
         //HIS Block 4
 
@@ -2081,7 +2214,6 @@ namespace Income.Database.Queries
                 else
                 {
                     // insert new row
-                    tbl_block_5.isUpdated = false;
                     status = await _database.InsertAsync(tbl_block_5);
                 }
 
@@ -2168,7 +2300,6 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                    tbl_block_6.isUpdated = false;
                     status = await _database.InsertAsync(tbl_block_6);
                 }
                 return status;
@@ -2644,7 +2775,7 @@ namespace Income.Database.Queries
             }
         }
 
-        private async Task ReserializeBlock7_Q10_List()
+        public async Task ReserializeBlock7_Q10_List()
         {
             try
             {
@@ -3107,6 +3238,14 @@ namespace Income.Database.Queries
             ExcludeDeleted,   // default: SAME behaviour as now
             IncludeAll,       // return everything
             OnlyDeleted       // return only deleted rows
+        }
+
+
+        public async Task<T> FetchByIdAsync<T>(Guid id) where T : Tbl_Base, new()
+        {
+            return await _database.Table<T>()
+                .Where(x => x.id == id && (x.is_deleted == null || x.is_deleted == false))
+                .FirstOrDefaultAsync();
         }
 
 

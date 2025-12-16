@@ -28,7 +28,7 @@
             {
 
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -249,7 +249,13 @@
     </div>
 </div>
 
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"1","2","3","4","5","6","7","8"})"
+              Block="2" />
+
 @code {
+
     int SelectedFsuId = SessionStorage.SelectedFSUId;
     DateTime survey_time = DateTime.Now;
     Tbl_Block_1? block_1;
@@ -262,6 +268,7 @@
     EditContext? editContext;
     ValidationMessageStore? messageStore;
     string dateofsurvey = "";
+    CommentModal commentModal = default!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -479,6 +486,10 @@
             warningVM._tempWarnings.Clear();
             var data = await dB.GetWarningTableDataForSerial(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, "2", 0);
             warningVM.WarningList.AddRange(data);
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = block_2.survey_timestamp.GetValueOrDefault();
+            }
         }
         catch (Exception ex)
         {

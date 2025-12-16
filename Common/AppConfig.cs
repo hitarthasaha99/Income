@@ -8,33 +8,9 @@ namespace Income.Common
 {
     public class AppConfig
     {
-        public string AppVersion { get; set; }
-        public string PostAddress { get; set; }
-        public string CommonAPIPostAddress { get; set; }
-        public string APIIncomeURL { get; set; }
+        public string AppVersion { get; set; } = string.Empty;
+        public string PostAddress { get; set; } = string.Empty;
+        public string CommonAPIPostAddress { get; set; } = string.Empty;
+        public string APIIncomeURL { get; set; } = string.Empty;
     }
-
-    public class EnvironmentUrls
-    {
-        public string PostAddress { get; set; }
-        public string CommonAPIPostAddress { get; set; }
-        public string APIIncomeURL { get; set; }
-    }
-
-    public class EnvironmentConfig
-    {
-        public EnvironmentUrls Development { get; set; }
-        public EnvironmentUrls Staging { get; set; }
-        public EnvironmentUrls Production { get; set; }
-    }
-
-
-    public enum AppEnvironment
-    {
-        Development,
-        Staging,
-        Production
-    }
-
-
 }

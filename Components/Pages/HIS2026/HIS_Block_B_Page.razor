@@ -8,19 +8,19 @@
 @inject IToastService toastService
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
+@inject Warning_VM warning_VM
 @inject ILoggingService loggingService
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
     <div class="card custom-card">
         <div class="card-header p-2">
             <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - B]</span>Monthly Household Expenditure</h3>
             @* add comment *@
             @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
-
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -66,6 +66,19 @@
                             </td>
                         </tr>
                     </tbody>
+                        @if (!string.IsNullOrEmpty(warning))
+                        {
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="alert alert-success fw-bold text-success mb-0" role="alert">
+                                            @warning
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        }
+                    
                 </table>
                 </fieldset>
             </div>
@@ -95,10 +108,18 @@
         </div>
     </div>
 </div>
+
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"B1","B2","B3","B4"})"
+              Block="B" />
+
 @code {
-    private DateTime survey_date = DateTime.Now;
+    private DateTime survey_time = DateTime.Now;
     private Tbl_Block_1? block_1 = new();
     CommonQueries commonQueries = new();
+    CommentModal commentModal = default!;
+    string warning = string.Empty;
 
     private double B1;
     private double B2;
@@ -115,11 +136,20 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_B",
+            block_title = "HIS Block B",
+            block_code = CommonEnum.his_block_B.ToString(),
+        };
+        warning = string.Empty;
+        await commonQueries.InsertVisitedBlock(vb);
         // Initialization logic can be added here
         var block_10 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_10>();
         var block_11a = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_11a>();
         var block_11b = await dB.FetchListAsync<Tbl_Block_11b>();
         block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+        var block_A = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>() ?? null;
 
 
         B1 = block_10 != null ? block_10.item_23.GetValueOrDefault() : 0;
@@ -127,6 +157,10 @@
         B3 = block_11b != null && block_11b.Count > 0 ? block_11b.Sum(x => x.item_4.GetValueOrDefault())/12 : 0;
 
         B4 = B1 + B2 + B3;
+        if(block_A != null && block_A.item_8 >= (1.1 * B4))
+        {
+            warning = $"W085: Household's monthly income is less than monthly expenditure. Please check the entries and provide suitable clarifications";
+        }
 
         if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
         {
@@ -154,14 +188,13 @@
                 await dB.SaveAsync<Tbl_Block_B>(block_B);
             }
         }
-        
-        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            block_uri = "/dashboard/his/block_B",
-            block_title = "HIS Block B",
-            block_code = CommonEnum.his_block_B.ToString(),
-        };
-        await commonQueries.InsertVisitedBlock(vb);
+            var block_B = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
+            survey_time = block_B?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+        }
+
         StateHasChanged();
     }
 
@@ -178,11 +211,16 @@
             {
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
+            if (!string.IsNullOrEmpty(warning))
+            {
+                warning_VM.AddWarning(warning, "HIS", "B", "B4", SessionStorage.selected_hhd_id);
+            }
+            await warning_VM.SaveWarningAsync("HIS", "B");
             NavigationManager.NavigateTo("dashboard/his/block_12");
         }
         catch (Exception ex)
         {
-            loggingService.LogError("Block B", ex);
+            await loggingService.LogError("Block B", ex);
         }
     }
 }

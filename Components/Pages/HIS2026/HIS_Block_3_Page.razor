@@ -42,7 +42,7 @@
                 {
 
                     <div class="card-tools">
-                        <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        <NavLink class="btn btn-primary" @onclick="@(() => Comment())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                     </div>
                 }
             </div>
@@ -218,6 +218,7 @@
                                            @oninput="ClearNameError"
                                            autocomplete="off"
                                            onkeypress="return /^[A-Za-z ]$/.test(event.key)"
+                                           onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) { event.preventDefault(); }"
                                            maxlength="50"
                                            autocorrect="off"
                                            autocapitalize="off"
@@ -569,17 +570,21 @@
                                     <span class="form-badge">12</span> Beneficiary of govt scheme (yes-1 / no-2)
                                 </label>
 
-                            <InputSelect class="form-select"
-                                         @bind-value="newMember.item_12"
+                            <select class="form-select"
+                                         value="@newMember.item_12"
                                          @onchange="ClearItem12">
 
                                     <option value="">-Select-</option>
-                                    <option value="1">yes</option>
-                                    <option value="2">no</option>
+                                    <option value="1">Yes - 01</option>
+                                    <option value="2">No - 02</option>
 
-                                </InputSelect>
+                                </select>
 
                                 <ValidationMessage For="@(() => newMember.item_12)" />
+                            @if (!string.IsNullOrEmpty(item_12Warning))
+                            {
+                                <div class="form-text text-success">@item_12Warning</div>
+                            }
                             </div>
                         </div>
               
@@ -594,6 +599,11 @@
         <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
     </FooterTemplate>
 </Modal>
+
+<CommentModal @ref="commentModal"
+              MemberList="memberList"
+              QuestionList="Question"
+              Block="3"/>
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
@@ -630,15 +640,26 @@
     private string? singleUserWarning = null;
     private string? item_10Warning = null;
     private string? item_11Warning = null;
+    private string item_12Warning = string.Empty;
     // Age flag
     // private bool isItem12Disabled = true;
     DBQueries DBQueries = new();
     CommonQueries commonQueries = new();
     bool isAdd = false;
     private string? remarks = string.Empty;
-
+    List<string> Question = new List<string>();
+    List<int> memberList = [];
     EditContext editContext;
     ValidationMessageStore messageStore;
+    CommentModal commentModal = default!;
+
+    async void Comment()
+    {
+        isAdd = true;
+        await commentModal.Open();
+    }
+
+
 
     async void GoBack()
     {
@@ -657,13 +678,42 @@
         hhd = await DBQueries.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
         block_1 = await DBQueries.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? new();
         await commonQueries.InsertVisitedBlock(vb);
+
         await LoadData();
+        try
+        {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = block3Members
+                                .OrderByDescending(x => x.survey_timestamp)
+                                .Select(x => (DateTime?)x.survey_timestamp)
+                                .FirstOrDefault().GetValueOrDefault();
+
+            }
+        }
+        catch
+        {
+
+        }
+
         StateHasChanged();
     }
 
     private async Task LoadData()
     {
         block3Members = await DBQueries.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3Members != null && block3Members.Count > 0)
+        {
+            block3Members = block3Members.OrderBy(x => x.serial_no).ToList();
+        }
+        for(int i=1; i<=block3Members.Count; i++)
+        {
+            memberList.Add(i);
+        }
+        for (var i = 1; i <= 12; i++)
+        {
+            Question.Add(i.ToString());
+        }
         StateHasChanged();
     }
 
@@ -733,6 +783,7 @@
         CheckItem10Warning();
         CheckItem11Warning();
         ClearItem12Error();
+        CheckItem12Warning();
     }
 
 
@@ -860,10 +911,10 @@
         else
             newMember.item_12 = null;
 
+        CheckItem12Warning();
         // Refresh UI
         StateHasChanged();
     }
-
 
     //Gender Warning..............................................
 
@@ -1213,6 +1264,15 @@
         StateHasChanged();
     }
 
+    private void CheckItem12Warning()
+    {
+        item_12Warning = string.Empty;
+        if (newMember.age < 15 && newMember.item_12.GetValueOrDefault() is 1 or 2)
+        {
+            item_12Warning = $"W012(ii): Invalid entry, please recheck the entry";
+        }
+    }
+
 
 
     // Clear All Errors After Input Anything.................................
@@ -1440,7 +1500,7 @@
         CheckItem9Warning();
         CheckItem10Warning();
         CheckItem11Warning();
-
+        CheckItem12Warning();
 
         if(!string.IsNullOrEmpty(genderWarning))
         {
@@ -1482,7 +1542,10 @@
         {
             warningVM.AddWarning(item_11Warning, "HIS", "3", "11", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
-
+        if (!string.IsNullOrEmpty(item_12Warning))
+        {
+            warningVM.AddWarning(item_12Warning, "HIS", "3", "12", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        }
         await warningVM.SaveWarningAsync("HIS", "3", newMember.serial_no.GetValueOrDefault());
 
         await DBQueries.Save_SCH_HIS_Block3(newMember);

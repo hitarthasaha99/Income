@@ -45,7 +45,8 @@ namespace Income.Validators.HIS2026
                 {
                     RuleFor(x => x.item_7)
                         .NotNull()
-                        .GreaterThan(0)
+                        .WithMessage("H019: Invalid Entry, Please check the entry")
+                        .GreaterThanOrEqualTo(0)
                         .WithMessage("H019: Invalid Entry, Please check the entry")
                         .DependentRules(() =>
                         {
@@ -53,19 +54,17 @@ namespace Income.Validators.HIS2026
                                 .Must(HaveMaxThreeDecimals)
                                 .WithMessage("H019: Invalid Entry, Please check the entry");
                         });
-                });
 
-
-                RuleFor(x => x.item_8)
+                    RuleFor(x => x.item_8)
                     .NotEmpty()
-                    .When(x => x.item_6 == 1)
                     .WithMessage("H020(i): Please check the entry")
                     .DependentRules(() =>
                     {
                         RuleFor(x => x.item_8)
                             .Must(IsValidCommaSeparatedList)
-                            .WithMessage("Item 8 must contain only values 1,2,3,4,9.");
+                            .WithMessage("H020(i): Please check the entry");
                     });
+                });           
 
                 RuleFor(x => x.item_9).NotEmpty().WithMessage("H021: Invalid Entry, Please check the entry");
 
@@ -139,7 +138,7 @@ namespace Income.Validators.HIS2026
         {
             if (string.IsNullOrWhiteSpace(value)) return false;
 
-            var allowed = new HashSet<string> { "1", "2", "3", "4", "9" };
+            var allowed = new HashSet<string> { "1", "2", "3", "4", "5", "9" };
 
             return value
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)

@@ -19,7 +19,9 @@ namespace Income.Viewmodels
         public Modal AddModal = default;
         public string? comment { get; set; }
         public bool ShowError = false;
-        private readonly IToastService toastService = DependencyService.Get<IToastService>();
+        public bool ShowMemberError = false;
+        public bool ShowItemError = false;
+        private readonly IToastService toastService;
         public int? Serialnumber { get; set; }
         public int? trip_serial_number { get; set; }
         public Guid ID { get; set; } = Guid.Empty;
@@ -27,18 +29,24 @@ namespace Income.Viewmodels
         DBQueries dQ = new();
         public event PropertyChangedEventHandler? PropertyChanged;
         public event Action NotifyUiUpdate;
+        public Tbl_Warning? editObject;
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             NotifyUiUpdate?.Invoke();
         }
 
-        public async Task<List<Tbl_Comments>> LoadData(string block)
+        public Comment_vm()
         {
-            List<Tbl_Comments> CommentList;
+            toastService = DependencyService.Get<IToastService>();
+        }
+
+        public async Task<List<Tbl_Warning>> LoadData(string block)
+        {
+            List<Tbl_Warning> CommentList;
             try
             {
-                CommentList = await dQ.GetItemsAsync(block);
+                CommentList = await dQ.GetCommentsAsync(block);
                 return CommentList;
             }
             catch (Exception)
@@ -48,72 +56,93 @@ namespace Income.Viewmodels
         }
         public async void LoadDataById(Tbl_Warning data)
         {
-            //Tbl_Warning CommentList = new();
-            //try
-            //{
-            //    CommentList = await dQ.GetItemsAsyncById(data);
-            //    comment = CommentList.comment;
-            //    Serialnumber = CommentList.serial_number;
-            //    trip_serial_number = CommentList.trip_serial_number;
-            //    item_no = CommentList.item_no ?? string.Empty;
-            //    ID = CommentList.id;
-            //    OnPropertyChanged(nameof(comment));
-            //    OnPropertyChanged(nameof(Serialnumber));
-            //    OnPropertyChanged(nameof(trip_serial_number));
-            //    OnPropertyChanged(nameof(item_no));
-            //    OnPropertyChanged(nameof(ID));
-            //    return;
+            editObject = new();
+            try
+            {
+                editObject = await dQ.FetchByIdAsync<Tbl_Warning>(data.id);
+                comment = editObject.warning_message;
+                Serialnumber = editObject.serial_number;
+                item_no = editObject.item_no ?? string.Empty;
+                ID = editObject.id;
+                OnPropertyChanged(nameof(comment));
+                OnPropertyChanged(nameof(Serialnumber));
+                OnPropertyChanged(nameof(trip_serial_number));
+                OnPropertyChanged(nameof(item_no));
+                OnPropertyChanged(nameof(ID));
+                return;
 
-            //}
-            //catch (Exception)
-            //{
-            //    return;
-            //}
+            }
+            catch (Exception)
+            {
+                return;
+            }
         }
 
-        public async Task<int> Save(string block, string? item_no = null)
+        public async Task<int> Save(string block, bool update = false)
         {
             try
-            {   
-                Tbl_Warning Dto = new();
-                Dto.warning_type = 99;
-                Dto.warning_message = comment;
-                Dto.item_no = item_no;
-                Dto.serial_number = Serialnumber ?? 0;
-                Dto.block = block;
-                Dto.user_id = SessionStorage.__user_id;
-                Dto.user_name = SessionStorage.user_name;
-                Dto.created_on = DateTime.Now;
-                Dto.role_code = SessionStorage.user_role;
-                Dto.warning_status = 3;
-
-                if (!string.IsNullOrEmpty(comment) && !string.IsNullOrWhiteSpace(comment))
+            {
+                if(update)
                 {
-                    var data = await dQ.SaveAsync<Tbl_Warning>(Dto);
-                    return data;
+                    if (editObject != null)
+                    {
+                        editObject.warning_message = comment;
+                        editObject.item_no = item_no;
+                        editObject.serial_number = Serialnumber ?? 0;
+                        var data = await dQ.SaveAsync<Tbl_Warning>(editObject);
+                        return data;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
                 }
                 else
                 {
-                    toastService?.ShowError("Please enter some comment to save!");
-                    return 0;
+                    Tbl_Warning Dto = new();
+                    Dto.warning_type = 99;
+                    Dto.warning_message = comment;
+                    Dto.item_no = item_no;
+                    Dto.serial_number = Serialnumber ?? 0;
+                    Dto.block = block;
+                    Dto.user_id = SessionStorage.__user_id;
+                    Dto.user_name = SessionStorage.user_name;
+                    Dto.created_on = DateTime.Now;
+                    Dto.role_code = SessionStorage.user_role;
+                    Dto.warning_status = 3;
+
+                    if (!string.IsNullOrEmpty(comment) && !string.IsNullOrWhiteSpace(comment))
+                    {
+                        var data = await dQ.SaveAsync<Tbl_Warning>(Dto);
+                        return data;
+                    }
+                    else
+                    {
+                        toastService?.ShowError("Please enter some comment to save!");
+                        return 0;
+                    }
                 }
+                    
             }
             catch (Exception)
             {
                 return 0;
+            }
+            finally
+            {
+                editObject = null;
             }
         }
 
-        public async Task<int> Delete(Tbl_Comments data)
+        public async Task Delete(Tbl_Warning data)
         {
             try
             {
-                var Result = await dQ.DeleteComments(data);
-                return Result;
+                await dQ.DeleteEntryAsync<Tbl_Warning>(data.id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return 0;
+                toastService.ShowError("Could not delete comment");
             }
         }
 

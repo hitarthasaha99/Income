@@ -25,31 +25,31 @@ namespace Income.Validators.HIS2026
             // Basic numeric validations (> 0 and not null)
             RuleFor(x => x.unit)
                 .NotNull().WithMessage("H039: Invalid entry, please check the entry")
-                .GreaterThan(0).WithMessage("H039: Invalid entry, please check the entry");
+                .InclusiveBetween(1,2).WithMessage("H039: Invalid entry, please check the entry");
 
             RuleFor(x => x.item_4)
                 .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                .GreaterThan(0).WithMessage("H040: Invalid entry, please check the entry");
+                .GreaterThanOrEqualTo(0).WithMessage("H040: Invalid entry, please check the entry");
 
             RuleFor(x => x.item_5)
                 .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                .GreaterThan(0).WithMessage("H040: Invalid entry, please check the entry");
+                .GreaterThanOrEqualTo(0).WithMessage("H040: Invalid entry, please check the entry");
 
             RuleFor(x => x.item_6)
                 .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                .GreaterThan(0).WithMessage("H040: Invalid entry, please check the entry");
+                .GreaterThanOrEqualTo(0).WithMessage("H040: Invalid entry, please check the entry");
 
             RuleFor(x => x.item_7)
                 .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                .GreaterThan(0).WithMessage("H040: Invalid entry, please check the entry");
+                .GreaterThanOrEqualTo(0).WithMessage("H040: Invalid entry, please check the entry");
 
             RuleFor(x => x.item_8)
                 .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                .GreaterThan(0).WithMessage("H040: Invalid entry, please check the entry");
+                .GreaterThanOrEqualTo(0).WithMessage("H040: Invalid entry, please check the entry");
 
             RuleFor(x => x.item_9)
                 .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                .GreaterThan(0).WithMessage("H040: Invalid entry, please check the entry");
+                .GreaterThanOrEqualTo(0).WithMessage("H040: Invalid entry, please check the entry");
 
             // ---------------------------------------------------------
             // Cross-field validation rules

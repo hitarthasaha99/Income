@@ -11,7 +11,7 @@
 @inject ILoggingService loggingService
 
 <div class="main-content">
-     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date"/>
+     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time"/>
     <div class="card custom-card">
         <div class="card-header p-2">
             <h3 class="card-title"><span class="text-primary fw-bolder me-2">[Block - A]</span>Monthly Household Income from different sources</h3>
@@ -20,7 +20,7 @@
             {
 
                 <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                    <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                    <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
         </div>
@@ -124,8 +124,13 @@
     </div>
 </div>
 
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"A1","A2","A3","A4","A5","A6","A7","A8"})"
+              Block="A" />
+
 @code {
-    private DateTime survey_date = DateTime.Now;
+    private DateTime survey_time = DateTime.Now;
     private Tbl_Block_1? block_1 = new();
     CommonQueries commonQueries = new();
     private double A1;
@@ -137,6 +142,7 @@
     private double A7;
     private double A8;
     DBQueries dB = new();
+    CommentModal commentModal = default!;
 
     async void GoBack()
     {
@@ -221,6 +227,11 @@
             block_code = CommonEnum.his_block_A.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            var block_A = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
+            survey_time = block_A?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+        }
         StateHasChanged();
     }
 
@@ -241,7 +252,7 @@
         }
         catch (Exception ex)
         {
-            loggingService.LogError("Block A", ex);
+            await loggingService.LogError("Block A", ex);
         }
     }
 }

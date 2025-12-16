@@ -18,21 +18,34 @@
 @inject IValidator<Tbl_Block_7c> Validator
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
-    @* add comment *@
-    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-    {
-
-        <div class="card-tools d-flex justify-content-end align-items-end p-2">
-            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
-        </div>
-    }
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
+    
     @if (editContext != null)
     {
         <EditForm EditContext="editContext">
             <FluentValidationValidator />
             
             <div class="card custom-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <span class="text-primary me-1">Block 7c:</span>
+                        Income from Self-employment - Non-agriculture Activity
+                    </h5>
+                    @* add comment *@
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+
+                        <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                            <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        </div>
+                    }
+                    
+                </div>
+                <div class="row px-3 py-2">
+                    <div class="col">
+                        For Non-Agricultural Establishment <span class="text-primary">(entry against col. 8 or col. 9 is code 2 for at least one member of the household) </span>
+                    </div>
+                </div>
                 <div class="card-body p-0">
                     <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
                     <div class="table-responsive">
@@ -129,6 +142,11 @@
 
 </div>
 
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"7.11", "7c.9"})"
+              Block="7C_3" />
+
 
 @code {
     Tbl_Block_7c fields = new();
@@ -141,9 +159,10 @@
     DBQueries dB = new();
     private Tbl_Block_1 block_1 = new();
     CommonQueries commonQueries = new();
-
+    CommentModal commentModal = default!;
+    bool Q9Needed = false;
     bool isAdd;
-    DateTime survey_date = DateTime.Now;
+    DateTime survey_time = DateTime.Now;
     string remarks = string.Empty;
     string item_9_warning = string.Empty;
 
@@ -162,6 +181,11 @@
         Q10 = await dB.Fetch_SCH_HIS_Block7_Q10_List();
         NICSUM = NICBlock7.Sum(x => x.GrossValue).GetValueOrDefault();
         ActivitySum = Q10.Sum(x => x.item_10_11).GetValueOrDefault();
+        var block3 = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3 != null && block3.Count > 0)
+        {
+            Q9Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2);
+        }
         editContext = new EditContext(fields);
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
@@ -172,6 +196,11 @@
             block_code = CommonEnum.his_block_7c_3.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
+        CheckItem9Warning();
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = fields.survey_timestamp.GetValueOrDefault();
+        }
         StateHasChanged();
     }
 
@@ -229,8 +258,14 @@
             item_9_warning = string.Empty;
             if(fields.item_7_12.GetValueOrDefault() < 0)
             {
-                item_9_warning = $"W052: Cost of input is more than gross value of receipts, please check the entries and provide suitable clarifications";
+                item_9_warning = "W052: Cost of input is more than gross value of receipts, please check the entries and provide suitable clarifications in following codes:\n" +
+    "a. Production not yet started\n" +
+    "b. Seasonal activity\n" +
+    "c. No operation is carried out during the reference period\n" +
+    "d. Others (specify in text box)";
+
             }
+            
         }
         catch (Exception ex)
         {
@@ -275,8 +310,8 @@
                 if (!string.IsNullOrEmpty(item_9_warning))
                 {
                     warningVM.AddWarning(item_9_warning, "HIS", "7C", "7C.9", SessionStorage.selected_hhd_id);
-                    await warningVM.SaveWarningAsync("HIS", "7C");
                 }
+                await warningVM.SaveWarningAsync("HIS", "7C");
                 int saved = await dB.Save_SCH_HIS_Block7C(fields);
                 if (saved > 0)
                 {

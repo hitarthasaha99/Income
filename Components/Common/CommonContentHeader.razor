@@ -67,7 +67,7 @@
     [Parameter]
     public int SelectedFsuId { get; set; }
     [Parameter]
-    public DateTime? survey_time { get; set; } = SessionStorage.survey_timestamp;
+    public DateTime? survey_time { get; set; }
     [Parameter]
     public string? page_name { get; set; } = string.Empty;
     [Parameter]
@@ -87,6 +87,10 @@
     protected override async Task OnParametersSetAsync()
     {
         // No change needed here for this problem
+        Time = survey_time.HasValue
+        ? survey_time.Value.ToString("dd-MM-yyyy HH:mm:ss")
+        : string.Empty;
+
         StateHasChanged();
         return;
     }
@@ -113,7 +117,7 @@
         {
             visited_Blocks = result;
         }
-        Time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+        //Time = survey_time != null ? survey_time.GetValueOrDefault().ToString("dd-MM-yyyy HH:mm:ss") : DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
 
         // **Part 2: Asynchronous Location Load**
         if (string.IsNullOrEmpty(SessionStorage.location) && ShowVisitedBlock == true)

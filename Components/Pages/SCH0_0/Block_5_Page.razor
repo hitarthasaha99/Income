@@ -163,6 +163,10 @@
             StateHasChanged();
             return;
         }
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_5.FirstOrDefault()?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+        }
         return;
     }
     const double EPSILON = 0.000001;

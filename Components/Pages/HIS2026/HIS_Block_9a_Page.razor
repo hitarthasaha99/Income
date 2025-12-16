@@ -13,11 +13,12 @@
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject Comment_vm comment_vm
+@inject Warning_VM warning_VM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_9a> Validator
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_date" />
+    <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
 
     @if (editContext != null)
     {
@@ -33,7 +34,7 @@
                     {
 
                         <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                            <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                            <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                         </div>
                     }
                 </div>
@@ -134,6 +135,18 @@
                                       </td>
                                   </tr>
                             </tbody>
+                            @if (!string.IsNullOrEmpty(item_9_1_warning))
+                            {
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="alert alert-success fw-bold text-success mb-0" role="alert">
+                                                @item_9_1_warning
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            }
                         </table>
                         </fieldset>
 
@@ -173,7 +186,7 @@
                                     <td>
                                         <label class="form-label mb-0">
                                             <span class="form-badge">Q9.3</span>
-                                            Interest received in last financial year from
+                                            Interest received in last month from
                                         </label>
                                     </td>
                                     <td>Annuities received from insurance schemes, superannuation funds etc.</td>
@@ -191,7 +204,7 @@
                                       <td>
                                           <label class="form-label mb-0">
                                               <span class="form-badge">Q9.4</span>
-                                              Interest received in last financial year from
+                                              Interest received in last month from
                                           </label>
                                       </td>
                                       <td>Other regular receipts from financial assets</td>
@@ -248,10 +261,16 @@
     </div>
 </div>
 
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"9.1.1","9.1.2","9.1.3","9.1.4","9.1.5","9.1.6","9.2","9.3","9.4"})"
+              Block="9A" />
 
 @code {
     private Modal modal = default!;
     private Tbl_Block_9a? block_9a = new();
+    private List<Tbl_Block_3> MemberList = [];
+
     EditContext editContext;
     ValidationMessageStore messageStore;
     private Tbl_Block_1? block_1 = new();
@@ -259,18 +278,31 @@
 
     DBQueries dB = new();
     bool isAdd;
-    DateTime survey_date = DateTime.Now;
+    DateTime survey_time = DateTime.Now;
     string remarks = string.Empty;
     string item_9_1_warning = string.Empty;
+
+    CommentModal commentModal = default!;
 
     async Task GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
+
+    void CheckWarning()
+    {
+        item_9_1_warning = string.Empty;
+        if (MemberList.Any(x => x.item_8 == 13 || x.item_9 == 13 || x.item_10 == 13 || x.item_11 == 13) && (block_9a?.item_1_1.GetValueOrDefault() <= 0 && block_9a?.item_1_2.GetValueOrDefault() <= 0 && block_9a?.item_1_3.GetValueOrDefault() <= 0 && block_9a?.item_1_4.GetValueOrDefault() <= 0 && block_9a?.item_1_5.GetValueOrDefault() <= 0 && block_9a?.item_1_6.GetValueOrDefault() <= 0))
+        {
+            item_9_1_warning = "W063: Invalid Entry, please check the entry recorded in Q9.1";
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        block_9a = await dB.Fetch_SCH_HIS_Block9a(SessionStorage.selected_hhd_id);
         block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+        MemberList = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        block_9a = await dB.Fetch_SCH_HIS_Block9a(SessionStorage.selected_hhd_id);
 
         if (block_9a == null)
         {
@@ -280,6 +312,7 @@
         editContext = new EditContext(block_9a);
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
+        CheckWarning();
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
             block_uri = "/dashboard/his/block_9a",
@@ -288,6 +321,10 @@
         };
 
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = block_9a.survey_timestamp.GetValueOrDefault();
+        }
         StateHasChanged();
     }
 
@@ -367,6 +404,12 @@
                     toastService.ShowSuccess("Data could not be saved");
                 }
             }
+
+            if (!string.IsNullOrEmpty(item_9_1_warning))
+            {
+                warning_VM.AddWarning(item_9_1_warning, "HIS", "9A", "9.1", SessionStorage.selected_hhd_id);
+            }
+            await warning_VM.SaveWarningAsync("HIS", "9A");
 
             if (!is_go_next)
             {

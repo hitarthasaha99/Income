@@ -17,7 +17,6 @@
 @if (editContext != null)
 {
     <EditForm EditContext="editContext">
-        <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
             <div class="main-content">
                 <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
                 <div class="card custom-card">
@@ -29,20 +28,20 @@
                         @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
                         {
                             <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                                <NavLink class="btn btn-primary"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                                <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                             </div>
                         }
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-bordered mb-0 align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Q.no.</th>
-                                        <th>Question description</th>
-                                        <th>Reference Period </th>
-                                        <th>Expenditure (in whole no. of Rs.)</th>
-                                    </tr>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped mb-0 align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Q.no.</th>
+                                            <th>Question description</th>
+                                            <th>Reference Period </th>
+                                            <th>Expenditure (in whole no. of Rs.)</th>
+                                        </tr>
 
                                 </thead>
                                 <tbody>
@@ -455,10 +454,11 @@
                                 </tbody>
                             </table>
                         </div>
+                    </fieldset>
+
                     </div>
                 </div>
             </div>
-        </fieldset>
         <div class="footer">
             <!-- Remarks textarea -->
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
@@ -499,6 +499,11 @@
       </EditForm>
 }
 
+<CommentModal @ref="commentModal"
+              MemberList=null
+              QuestionList="@(new List<string>(){"10.1","10.2","10.3","10.4","10.5","10.6","10.7","10.8","10.9","10.10","10.11","10.12","10.13","10.14","10.15","10.16","10.17","10.18","10.19","10.20","10.21","10.22","10.23"})"
+              Block="10A" />
+
 
 @code {
     int SelectedFsuId = SessionStorage.SelectedFSUId;
@@ -512,6 +517,7 @@
     ValidationMessageStore messageStore;
     DBQueries dQ = new DBQueries();
     private Tbl_Block_1? block_1 = new();
+    CommentModal commentModal = default!;
     async Task GoBack()
     {
         await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -545,6 +551,10 @@
             block_code = CommonEnum.his_block_10.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && model != null)
+        {
+            survey_time = model.survey_timestamp.GetValueOrDefault();
+        }
        
         StateHasChanged();
     }

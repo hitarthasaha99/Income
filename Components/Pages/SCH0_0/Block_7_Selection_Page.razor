@@ -308,7 +308,14 @@
                 InputCounts[sss] = 0;
         }
         await LoadData();
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            survey_time = ListItems
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
 
+        }
         StateHasChanged();
         await Logger.LogInfo($"Block 7 Loaded for {SessionStorage.SelectedFSUId}");
     }
@@ -618,9 +625,14 @@
                                 item.SSS = 0;
                             break;
 
-                        case 4:
+                        case 3:
                             item.Stratum = 40;
-                            item.SSS = 40;   // Rule: all type-3 are SSS = 40
+                            item.SSS = 40;
+                            break;
+
+                        case 4:
+                            item.Stratum = 90;
+                            item.SSS = 90;   // Rule: all type-3 are SSS = 40
                             break;
                         case 9:
                             item.Stratum = 90;
