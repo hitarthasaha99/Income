@@ -35,16 +35,16 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                            <table class="table table-bordered table-striped mb-0">
+                            <table class="table table-bordered align-middle mb-0">
                                 <thead>
-                                    <tr>
+                                    <tr style="border-bottom:1px solid #2471DD;">
                                         <th class="text-center">Q.no.</th>
                                         <th class="text-center">Question description</th>
                                         <th class="text-center">Entry</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q11.1</span>
@@ -64,110 +64,110 @@
                                                     <option value="2">2-no</option>
                                             </select>
 
-                                    <ValidationMessage For="@(() => selectBlock11A.item_1)" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label class="form-label mb-0">
-                                        <span class="form-badge">Q11.2</span>
-                                    </label> 
-                                </td>
-                                <td>
-                                    If code 1 in 11.1,<br />
-                                    Amount of such transfer paid during last month (yes - 1, no – 2)
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm no-spinner"
-                                            onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                            disabled="@(!isQ11_2Enable)"
-                                            value="@selectBlock11A.item_2"
-                                            @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_2, e)" />
-
-                                    <ValidationMessage For="@(() => selectBlock11A.item_2)" />
-                                </td>
-
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label class="form-label mb-0">
-                                        <span class="form-badge">Q11.3</span>
-                                    </label> 
-                                </td>
-                                <td>
-                                    If code 2 in 11.1, <br />
-                                    Whether transfers paid to other households in the form of family support payments (such as alimony, child and parental support) during last 365 days? (yes - 1, no – 2)
-                                </td>
-                                <td>
-                                        <select class="form-select form-select-sm" value="@selectBlock11A.item_3" disabled="@(!isQ11_3Enable)"
-                                        
-                                        @onchange="e =>
-                                        {UpdateFieldAndValidate(() => selectBlock11A.item_3, e);
-                                                q11_3Condition(e);
-                                        }">                                                                                                                                                     
-                                        <option value="">-Select-</option>
-                                        <option value="1">1-yes</option>
-                                        <option value="2">2-no</option>
-                                    </select>
-                                    <ValidationMessage For="@(() => selectBlock11A.item_3)" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label class="form-label mb-0">
-                                        <span class="form-badge">Q11.4</span>
-                                    </label> 
-                                </td>
-                                <td>
-                                    If code 1 in 11.3,<br />
-                                    Number of times such transfer paid during the last 365 days
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm no-spinner"
-                                            onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                            disabled="@(!isQ11_4_5Enable)"
-                                            value="@selectBlock11A.item_4"
-                                            @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_4, e)" />
-
-                                            <ValidationMessage For="@(() => selectBlock11A.item_4)" />
+                                            <ValidationMessage For="@(() => selectBlock11A.item_1)" />
                                         </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                         <label class="form-label mb-0">
-                                                <span class="form-badge">Q11.5</span>
-                                        </label> 
-                                    </td>
-                                    <td>
-                                        If code 1 in 11.3,<br />
-                                        Total amount (in Rs.) transferred during the last 365 days
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled="@(!isQ11_4_5Enable)"
-                                        value="@selectBlock11A.item_5"
-                                            @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_5, e)"
-                                        />
-                                            <ValidationMessage For="@(() => selectBlock11A.item_5)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td> 
-                                        <label class="form-label mb-0">
-                                            <span class="form-badge">Q11.6</span>
-                                        </label> 
-                                    </td>
-                                    <td>Total amount (in Rs.) of regular transfer made to Non-profit organization(s) for charitable purposes during the last 365 days </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                        value="@selectBlock11A.item_6"
-                                        @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_6, e)"
-                                        />
-                                        <ValidationMessage For="@(() => selectBlock11A.item_6)" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                            </fieldset>
+                                    </tr>
+                                    <tr class="row-light-blue">
+                                        <td>
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q11.2</span>
+                                            </label> 
+                                        </td>
+                                        <td>
+                                            If code 1 in 11.1,<br />
+                                            Amount of such transfer paid during last month (yes - 1, no – 2)
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner"
+                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    disabled="@(!isQ11_2Enable)"
+                                                    value="@selectBlock11A.item_2"
+                                                    @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_2, e)" />
+
+                                            <ValidationMessage For="@(() => selectBlock11A.item_2)" />
+                                        </td>
+
+                                    </tr>
+                                    <tr class="row-light-pink">
+                                        <td>
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q11.3</span>
+                                            </label> 
+                                        </td>
+                                        <td>
+                                            If code 2 in 11.1, <br />
+                                            Whether transfers paid to other households in the form of family support payments (such as alimony, child and parental support) during last 365 days? (yes - 1, no – 2)
+                                        </td>
+                                        <td>
+                                                <select class="form-select form-select-sm" value="@selectBlock11A.item_3" disabled="@(!isQ11_3Enable)"
+                                        
+                                                @onchange="e =>
+                                                {UpdateFieldAndValidate(() => selectBlock11A.item_3, e);
+                                                        q11_3Condition(e);
+                                                }">                                                                                                                                                     
+                                                <option value="">-Select-</option>
+                                                <option value="1">1-yes</option>
+                                                <option value="2">2-no</option>
+                                            </select>
+                                            <ValidationMessage For="@(() => selectBlock11A.item_3)" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row-light-pink">
+                                        <td>
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q11.4</span>
+                                            </label> 
+                                        </td>
+                                        <td>
+                                            If code 1 in 11.3,<br />
+                                            Number of times such transfer paid during the last 365 days
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner"
+                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    disabled="@(!isQ11_4_5Enable)"
+                                                    value="@selectBlock11A.item_4"
+                                                    @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_4, e)" />
+
+                                                    <ValidationMessage For="@(() => selectBlock11A.item_4)" />
+                                                </td>
+                                        </tr>
+                                    <tr class="row-light-pink">
+                                        <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge">Q11.5</span>
+                                            </label> 
+                                        </td>
+                                        <td>
+                                            If code 1 in 11.3,<br />
+                                            Total amount (in Rs.) transferred during the last 365 days
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled="@(!isQ11_4_5Enable)"
+                                            value="@selectBlock11A.item_5"
+                                                @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_5, e)"
+                                            />
+                                                <ValidationMessage For="@(() => selectBlock11A.item_5)" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row-light-pink">
+                                        <td> 
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q11.6</span>
+                                            </label> 
+                                        </td>
+                                        <td>Total amount (in Rs.) of regular transfer made to Non-profit organization(s) for charitable purposes during the last 365 days </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                            value="@selectBlock11A.item_6"
+                                            @oninput="e => UpdateFieldAndValidate(() => selectBlock11A.item_6, e)"
+                                            />
+                                            <ValidationMessage For="@(() => selectBlock11A.item_6)" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
                     </div>
                 </div>
             </div>

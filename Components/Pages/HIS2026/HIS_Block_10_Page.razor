@@ -17,6 +17,7 @@
 @if (editContext != null)
 {
     <EditForm EditContext="editContext">
+        <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
             <div class="main-content">
                 <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
                 <div class="card custom-card">
@@ -33,10 +34,8 @@
                         }
                     </div>
                     <div class="card-body p-0">
-                                <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
-
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped mb-0 align-middle">
+                                <table class="table table-bordered mb-0 align-middle">
                                     <thead>
                                         <tr>
                                             <th>Q.no.</th>
@@ -45,73 +44,74 @@
                                             <th>Expenditure (in whole no. of Rs.)</th>
                                         </tr>
 
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="8"class="text-center">
-                                                <label class="fw-bold fs-6">Food items</label>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label class="form-label mb-0">
-                                                    <span class="form-badge">Q10.1</span>
-                                                </label> 
-                                            </td>
-                                            <td>Vegetables including ginger, garlic & fruits (fresh)</td>
-                                            <td>Last 7 days</td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm no-spinner"
-                                                        value="@model.item_1"
-                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_1, e); handleCalculate(); }" />
+                                </thead>
+                                <tbody>
+                                    @* Food items *@
+                                    <tr style="border-bottom:1px solid #20ba43;">
+                                        <td colspan="8"class="text-center">
+                                            <label class="fw-bold fs-6">Food items</label>
+                                        </td>
+                                    </tr>
+                                    <tr class="row-light-success">
+                                        <td>
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q10.1</span>
+                                            </label> 
+                                        </td>
+                                        <td>Vegetables including ginger, garlic & fruits (fresh)</td>
+                                        <td>Last 7 days</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner"
+                                                    value="@model.item_1"
+                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_1, e); handleCalculate(); }" />
 
-                                                <ValidationMessage For="@(() => model.item_1)" />
-                                            </td>
+                                            <ValidationMessage For="@(() => model.item_1)" />
+                                        </td>
 
 
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label class="form-label mb-0">
-                                                    <span class="form-badge">Q10.2</span>
-                                                </label>
-                                            </td>
-                                            <td>Egg, fish & meat </td>
-                                            <td>Last 7 days</td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm no-spinner"
-                                                        value="@model.item_2"
-                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_2, e); handleCalculate(); }" />
+                                    </tr>
+                                    <tr class="row-light-success">
+                                        <td>
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q10.2</span>
+                                            </label>
+                                        </td>
+                                        <td>Egg, fish & meat </td>
+                                        <td>Last 7 days</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner"
+                                                    value="@model.item_2"
+                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_2, e); handleCalculate(); }" />
 
-                                                <ValidationMessage For="@(() => model.item_2)" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label class="form-label mb-0">
-                                                    <span class="form-badge">Q10.3</span>
-                                                </label>
-                                            </td>
-                                            <td>Cereals & cereal products, pulses & pulse products, salt & sugar, edible oil, spices, dry fruits & nuts</td>
-                                            <td>Last 30 days</td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm no-spinner"
-                                                        value="@model.item_3"
-                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_3, e); handleCalculate(); }" />
+                                            <ValidationMessage For="@(() => model.item_2)" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row-light-blue">
+                                        <td>
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q10.3</span>
+                                            </label>
+                                        </td>
+                                        <td>Cereals & cereal products, pulses & pulse products, salt & sugar, edible oil, spices, dry fruits & nuts</td>
+                                        <td>Last 30 days</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner"
+                                                    value="@model.item_3"
+                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_3, e); handleCalculate(); }" />
 
-                                                <ValidationMessage For="@(() => model.item_3)" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label class="form-label mb-0">
-                                                    <span class="form-badge">Q10.4</span>
-                                                </label>
-                                            </td>
-                                            <td>Milk & milk products</td>
+                                            <ValidationMessage For="@(() => model.item_3)" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row-light-blue">
+                                        <td>
+                                            <label class="form-label mb-0">
+                                                <span class="form-badge">Q10.4</span>
+                                            </label>
+                                        </td>
+                                        <td>Milk & milk products</td>
                                             <td>Last 30 days</td>
                                             <td>
                                                 <input type="number" class="form-control form-control-sm no-spinner"
@@ -122,7 +122,7 @@
                                             <ValidationMessage For="@(() => model.item_4)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.5</span>
@@ -139,12 +139,13 @@
                                             <ValidationMessage For="@(() => model.item_5)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    @* Non - Food Items – Consumable Services *@
+                                    <tr style="border-bottom:1px solid #2471DD;">
                                         <td colspan="8" class="text-center">
                                             <label class="fw-bold fs-6">Non - Food Items – Consumable Services</label>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.6</span>
@@ -161,7 +162,7 @@
                                             <ValidationMessage For="@(() => model.item_6)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.7</span>
@@ -178,7 +179,7 @@
                                             <ValidationMessage For="@(() => model.item_7)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.8</span>
@@ -195,7 +196,7 @@
                                             <ValidationMessage For="@(() => model.item_8)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.9</span>
@@ -212,7 +213,7 @@
                                             <ValidationMessage For="@(() => model.item_9)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.10</span>
@@ -229,7 +230,7 @@
                                             <ValidationMessage For="@(() => model.item_10)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.11</span>
@@ -246,7 +247,7 @@
                                             <ValidationMessage For="@(() => model.item_11)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.12</span>
@@ -263,7 +264,7 @@
                                             <ValidationMessage For="@(() => model.item_12)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.13</span>
@@ -280,7 +281,7 @@
                                             <ValidationMessage For="@(() => model.item_13)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.14</span>
@@ -297,12 +298,13 @@
                                             <ValidationMessage For="@(() => model.item_14)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    @* Non-Food Items – Durable Goods *@
+                                    <tr style="border-bottom:1px solid #bc1ed6;">
                                         <td colspan="8" class="text-center">
                                             <label class="fw-bold fs-6">Non-Food Items – Durable Goods</label>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.15</span>
@@ -319,7 +321,7 @@
                                             <ValidationMessage For="@(() => model.item_15)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.16</span>
@@ -336,7 +338,7 @@
                                             <ValidationMessage For="@(() => model.item_16)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.17</span>
@@ -353,7 +355,7 @@
                                             <ValidationMessage For="@(() => model.item_17)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.18</span>
@@ -370,7 +372,7 @@
                                             <ValidationMessage For="@(() => model.item_18)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.19</span>
@@ -387,7 +389,7 @@
                                             <ValidationMessage For="@(() => model.item_19)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.20</span>
@@ -404,7 +406,7 @@
                                             <ValidationMessage For="@(() => model.item_20)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.21</span>
@@ -421,7 +423,7 @@
                                             <ValidationMessage For="@(() => model.item_21)" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label mb-0">
                                                 <span class="form-badge">Q10.22</span>
@@ -447,17 +449,16 @@
                                         <td>Total expenditure = sum (Q10.1: 10.2) /7×30 + sum (Q10.3: Q10.12) + sum (Q10.13: Q10.22)/365×30</td>
                                         <td class="text-center">-</td>
                                         <td>
-                                            <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly />
+                                            <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly />
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                    </fieldset>
-
                     </div>
                 </div>
             </div>
+        </fieldset>
         <div class="footer">
             <!-- Remarks textarea -->
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
