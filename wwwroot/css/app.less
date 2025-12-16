@@ -771,7 +771,7 @@ input[type="radio"] {
       left: -1px;
       background: #fff;
       z-index: 3;
-      box-shadow: inset -1px 0 6px -4px rgba(0,0,0,0.20);
+      box-shadow: inset -6px 0 0px -5px rgba(0,0,0,0.1);
     }
 
     thead .fixed-col {
@@ -1679,5 +1679,16 @@ background-color: @warningLightColor;
     justify-content: center;
     margin-bottom: 0;
     padding:0.5rem 1rem;
+    font-weight: 500;
+    &.alert-success {
+      color: #28A745;
+      background-color: #E9FFF0;
+      border-color: #50B769;
+    }
+    &.alert-danger {
+      color: #F30000;
+      background-color: #FFEAEA;
+      border-color: #E85656;
+    }
   }
 }

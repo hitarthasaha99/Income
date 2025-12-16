@@ -453,7 +453,7 @@ namespace Income.Common
         {
             try
             {
-                if (status.ToString().ToLower().Contains("submitted") || status.ToString().ToLower().Contains("accepted"))
+                if (status.ToString().ToLower().Contains("submitted") || status.ToString().ToLower().Contains("accepted") || (status.ToString().ToLower().Contains("surveyed") && !status.ToString().ToLower().Contains("not surveyed")))
                     return "success";
                 else if (status.ToString().ToLower().Contains("referred"))
                     return "danger";

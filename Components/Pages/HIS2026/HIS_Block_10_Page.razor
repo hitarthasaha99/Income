@@ -17,6 +17,7 @@
 @if (editContext != null)
 {
     <EditForm EditContext="editContext">
+        <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
             <div class="main-content">
                 <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
                 <div class="card custom-card">
@@ -34,7 +35,7 @@
                     </div>
                     <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped mb-0 align-middle">
+                                <table class="table table-bordered mb-0 align-middle">
                                     <thead>
                                         <tr>
                                             <th>Q.no.</th>
@@ -448,17 +449,16 @@
                                         <td>Total expenditure = sum (Q10.1: 10.2) /7×30 + sum (Q10.3: Q10.12) + sum (Q10.13: Q10.22)/365×30</td>
                                         <td class="text-center">-</td>
                                         <td>
-                                            <input class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly />
+                                            <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly />
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                    </fieldset>
-
                     </div>
                 </div>
             </div>
+        </fieldset>
         <div class="footer">
             <!-- Remarks textarea -->
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
