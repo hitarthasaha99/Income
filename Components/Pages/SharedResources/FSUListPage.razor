@@ -65,7 +65,6 @@
                                     </td>
                                     <td>@item.framepop</td>
                                     <td>
-                                    <td>
                                         @{
                                             bool noTotal = item.total_hhd == 0;
                                             bool noCompleted = item.completed_hhd == 0;
@@ -77,15 +76,14 @@
                                         </div>
                                     </td>
                                         
-                                    </td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
 
-@*                                          <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-download ms-1"></i></NavLink>
- *@                                        </div>
+                                          <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-download ms-1"></i></NavLink>
+                                         </div>
                                     </td>
                                 </tr>
                             }
@@ -144,28 +142,16 @@
     {
         try
         {
-            if (SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
-            {
-                bool confirmation = await dialog.ShowAsync(
+            bool confirmation = await dialog.ShowAsync(
                                     title: "Confirmation Required",
                                     message1: "Downloading Fsu data may overwrite existing records and impact Local information.",
                                     message2: "Are you sure you want to continue with the download?"
                                     );
-                if (confirmation)
-                {
-                    canProceed = true;
-                }
-
-            }
-            else if (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO || SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
-            {
-                canProceed = true;
-            }
-
-            if (!canProceed)
+            if (!confirmation)
             {
                 return;
             }
+
             if (!funcs.checkHasInternet())
             {
                 toastService.ShowWarning("No Internet Connection. Please try again when you're back online!");
@@ -174,9 +160,7 @@
 
             preloadService.Show(SpinnerColor.Light, "Fetching data from central database for offline access. Please wait...");
 
-            var response = await commonService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{fsu.fsu_id}/{fsu.lookupFsuSubmitStatus}");
-            int[] fsuHouseStatusArray = [12,21,22,31,32,80];
-
+            var response = await commonService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
 
             if (string.IsNullOrEmpty(response))
             {
@@ -185,38 +169,112 @@
             }
             else
             {
-                var deserialized = JsonConvert.DeserializeObject<Upsert_Model>(response);
-                if (deserialized != null)
+                var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(response);
+                var currentFSU = fsu_list?.FirstOrDefault(x => x.fsu_id == fsu.fsu_id);
+                if (currentFSU != null)
                 {
-                    var received_data = JsonConvert.DeserializeObject<Submission_Model>(deserialized.submitted_json_data);
-                    if (received_data != null && received_data.IncomeSch00block0 != null)
-                    {
-                        await dB.HardDeleteDataForFSUID(fsu.fsu_id);
 
-                        var success = await dB.SaveReceivedDataAsync(received_data);
-                        if (success > 0)
+                    var fsuHouses = currentFSU.fsuHouses;
+                    var validStatuses = new HashSet<int> { 12, 21, 22, 31, 32 };
+
+                    var hhdIdsToDelete = fsuHouses?
+                                        .Where(h => validStatuses.Contains(h.lookup_submit_status))
+                                        .Select(h => h.hhd_id)
+                                        .Distinct()
+                                        .ToList();
+
+                    
+
+                    
+
+                    var statusFlags = new Dictionary<int, bool>
+                                {
+                                    { 21, fsuHouses?.Any(x => x.lookup_submit_status == 21) ?? false },
+                                    { 22, fsuHouses?.Any(x => x.lookup_submit_status == 22) ?? false },
+                                    { 12, fsuHouses?.Any(x => x.lookup_submit_status == 12) ?? false },
+                                    { 31, fsuHouses?.Any(x => x.lookup_submit_status == 31) ?? false },
+                                    { 32, fsuHouses?.Any(x => x.lookup_submit_status == 32) ?? false },
+                                    { 80, currentFSU.lookupFsuSubmitStatus == 80 }
+                                };
+
+                    var downloadTasks = statusFlags
+                                .Where(kv => kv.Value) // only statuses that exist
+                                .ToDictionary(
+                                    kv => kv.Key,
+                                    kv => commonService.GetAsync(
+                                        CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{currentFSU.fsu_id}/{kv.Key}"
+                                    )
+                                );
+
+                    // Fire all calls in parallel
+                    await Task.WhenAll(downloadTasks.Values);
+
+                    var sch00data = await downloadTasks.Values.FirstOrDefault(x => !string.IsNullOrEmpty(x.Result)) ?? string.Empty;
+                    if (!string.IsNullOrEmpty(sch00data))
+                    {
+                        var received_data = JsonConvert.DeserializeObject<Upsert_Model>(sch00data);
+                        if (received_data != null)
                         {
-                            toastService.ShowSuccess($"FSU data download completed successfully");
-                        }
-                        else
-                        {
-                            toastService.ShowError($"FSU data download failed");
+                            var deserialized = JsonConvert.DeserializeObject<Submission_Model>(received_data.submitted_json_data);
+                            if (deserialized != null && deserialized.IncomeSch00block0 != null)
+                            {
+                                await dB.HardDeleteSCH00DataForFSUID(fsu.fsu_id);
+                                var saved = await dB.SaveReceivedSCH00DataAsync(deserialized);
+                            }
+                            else
+                            {
+                                toastService.ShowError("SCH00 data not received");
+                                return;
+                            }
                         }
                     }
-                    else
+
+                    foreach (var kv in downloadTasks)
                     {
-                        await loggingService.LogError($"Data received for {fsu.fsu_id} was null");
-                        toastService.ShowError($"No data received from server");
+                        int hhdStatus = kv.Key;
+                        string status_response = kv.Value.Result ?? string.Empty;
+
+                        if (string.IsNullOrEmpty(status_response))
+                            continue;
+
+                        var list = JsonConvert.DeserializeObject<Upsert_Model>(status_response);
+                        if (list?.submitted_json_data == null)
+                            continue;
+                        else
+                        {
+                            //Delete household data only for households already submitted
+                            if (hhdIdsToDelete?.Count > 0)
+                            {
+                                foreach (var hhdId in hhdIdsToDelete)
+                                {
+                                    await dB.HardDeleteHISDataForFSUID(
+                                        currentFSU.fsu_id,
+                                        hhdId
+                                    );
+                                }
+                            }
+                            var received_data = JsonConvert.DeserializeObject<Submission_Model>(list.submitted_json_data);
+                            if (received_data != null && received_data.IncomeSch00block0 != null)
+                            {
+
+                                var success = await dB.SaveReceivedHISDataAsync(received_data);
+                                if (success > 0)
+                                {
+                                    toastService.ShowSuccess($"FSU data download completed successfully");
+                                }
+                                else
+                                {
+                                    toastService.ShowError($"FSU data download failed");
+                                }
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    await loggingService.LogError($"Data received for {fsu.fsu_id} was null");
-                    toastService.ShowError($"No data received from server");
+                    toastService.ShowError("FSU data not found");
                 }
             }
-
-
         }
         catch (Exception ex)
         {

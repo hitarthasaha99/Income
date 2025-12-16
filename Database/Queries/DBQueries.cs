@@ -24,7 +24,7 @@ namespace Income.Database.Queries
     {
         ToastService toastService = new();
 
-        public async Task<int> SaveReceivedDataAsync(Submission_Model data)
+        public async Task<int> SaveReceivedSCH00DataAsync(Submission_Model data)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace Income.Database.Queries
                     var sch00_block_0_1 = data.IncomeSch00block0;
                     if (sch00_block_0_1 != null)
                     {
-                        await SaveBlock1(sch00_block_0_1);
+                        await SaveAsync<Tbl_Sch_0_0_Block_0_1>(sch00_block_0_1);
                     }
 
                     var sch00_block_2_1 = data.IncomeSch00block2_1;
@@ -100,6 +100,24 @@ namespace Income.Database.Queries
                         }
                     }
 
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+        public async Task<int> SaveReceivedHISDataAsync(Submission_Model data)
+        {
+            try
+            {
+                if (data != null)
+                {
                     /*SCH HIS*/
                     var sch_his_object_list = data.IncomeSchHISDto;
                     if (sch_his_object_list != null && sch_his_object_list.Count > 0)
@@ -370,6 +388,96 @@ namespace Income.Database.Queries
                     await _database.ExecuteAsync(
                         $"DELETE FROM {table} WHERE fsu_id = ? AND tenant_id = ?",
                         fsuID, tenantId
+                    );
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> HardDeleteSCH00DataForFSUID(int fsuID)
+        {
+            try
+            {
+                var tenantId = SessionStorage.tenant_id;
+
+                // List of all tables to delete from
+                var tables = new List<string>
+                {
+                    // Existing tables
+                    "Tbl_Sch_0_0_Block_0_1",
+                    "Tbl_Sch_0_0_Block_2_1",
+                    "Tbl_Sch_0_0_Block_2_2",
+                    "Tbl_Sch_0_0_Block_3",
+                    "Tbl_Sch_0_0_Block_4",
+                    "Tbl_Sch_0_0_Block_5",
+                    "Tbl_Sch_0_0_Block_7",
+                    "Tbl_Sch_0_0_FieldOperation",
+                    "Tbl_Warning"
+                };
+
+                // Execute delete for each table
+                foreach (var table in tables)
+                {
+                    await _database.ExecuteAsync(
+                        $"DELETE FROM {table} WHERE fsu_id = ? AND tenant_id = ?",
+                        fsuID, tenantId
+                    );
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> HardDeleteHISDataForFSUID(int fsuID, int hhd_id)
+        {
+            try
+            {
+                var tenantId = SessionStorage.tenant_id;
+
+                // List of all tables to delete from
+                var tables = new List<string>
+                {
+                    // New HIS tables
+                    "Tbl_Block_1",
+                    "Tbl_Block_3",
+                    "Tbl_Block_4",
+                    "Tbl_Block_4_Q5",
+                    "Tbl_Block_5",
+                    "Tbl_Block_6",
+                    "Tbl_Block_7a",
+                    "Tbl_Block_7a_1",
+                    "Tbl_Block_7b",
+                    "Tbl_Block_7c",
+                    "Tbl_Block_7c_NIC",
+                    "Tbl_Block_7c_Q10",
+                    "Tbl_Block_7d",
+                    "Tbl_Block_8",
+                    "Tbl_Block_8_Q6",
+                    "Tbl_Block_9a",
+                    "Tbl_Block_9b",
+                    "Tbl_Block_10",
+                    "Tbl_Block_11a",
+                    "Tbl_Block_11b",
+                    "Tbl_Block_A",
+                    "Tbl_Block_B",
+                    "Tbl_Block_FieldOperation"
+                };
+
+                // Execute delete for each table
+                foreach (var table in tables)
+                {
+                    await _database.ExecuteAsync(
+                        $"DELETE FROM {table} WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ?",
+                        fsuID, hhd_id, tenantId
                     );
                 }
 
@@ -695,7 +803,7 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                    tbl_Sch_0_0_Block_4.id = Guid.NewGuid();
+                    tbl_Sch_0_0_Block_4.id = tbl_Sch_0_0_Block_4.id == Guid.Empty ? Guid.NewGuid() : tbl_Sch_0_0_Block_4.id;
                     status = await _database.InsertAsync(tbl_Sch_0_0_Block_4);
                 }
                 return status;
@@ -958,7 +1066,7 @@ namespace Income.Database.Queries
                     {
                         file.block_name = file.is_sub_unit == true ? CommonEnum.sch_0_0_block_3.ToString() : CommonEnum.sch_0_0_block_3_1.ToString();
                         await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("DELETE FROM Tbl_Sch_0_0_Block_3 WHERE block_name = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", file.block_name, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
-                        file.id = Guid.NewGuid();
+                        file.id = file.id == Guid.Empty ?  Guid.NewGuid() : file.id;
                         file.is_deleted = false;
                         status = await _database.InsertAsync(file);
                     }
@@ -3316,13 +3424,12 @@ namespace Income.Database.Queries
             var existing = await _database.Table<T>()
                 .FirstOrDefaultAsync(x => x.id == entity.id);
 
-            entity.survey_timestamp = DateTime.Now;
-
             if (existing == null)
             {
                 // INSERT
-                entity.id = Guid.NewGuid();
-                entity.survey_coordinates = SessionStorage.location;
+                entity.id = entity.id == Guid.Empty ? Guid.NewGuid() : entity.id;
+                entity.survey_timestamp = entity.survey_timestamp == null ? DateTime.Now : entity.survey_timestamp;
+                entity.survey_coordinates = string.IsNullOrEmpty(entity.survey_coordinates) ? SessionStorage.location : entity.survey_coordinates;
                 await _database.InsertAsync(entity);
                 return 1;
             }

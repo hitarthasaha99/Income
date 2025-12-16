@@ -469,7 +469,7 @@
             {
                 lookup_submit_status = fsu.lookupFsuSubmitStatus.GetValueOrDefault();
             }
-            if (new int [] {21,12,22,31,32, 80 }.Contains(lookup_submit_status))
+            if (new int [] {21,12,22,31,32,80}.Contains(lookup_submit_status))
             {
                 toastService.ShowInfo("FSU has already been submitted");
                 return;
