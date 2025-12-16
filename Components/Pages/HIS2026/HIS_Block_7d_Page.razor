@@ -211,7 +211,7 @@
                     "H055: Invalid entry, please check the entry"
                 );
             }
-            else if (row.item_4 < 0)
+            else if (row.item_4 < 0 || row.item_4 > 100)
             {
                 messageStore.Add(
                     new FieldIdentifier(row, nameof(row.item_4)),

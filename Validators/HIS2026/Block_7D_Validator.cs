@@ -17,17 +17,14 @@ namespace Income.Validators.HIS2026
             .Must(x => x == 1 || x == 2)
             .WithMessage("H054: Invalid entry, please check the entry");
 
-            RuleFor(x => x.item_4)
-                .NotEmpty().When(x => x.item_3 == 2)
-                .WithMessage("H055: Invalid entry, please check the entry");
-
-            RuleFor(x => x.item_4)
+            When(x => x.item_3 == 2, () =>
+            {
+                RuleFor(x => x.item_4)
                 .NotNull()
                 .GreaterThan(0)
                 .LessThanOrEqualTo(100)
-                .When(x => x.item_3 == 2)
                 .WithMessage("H055: Invalid entry, please check the entry");
-
+            });
         }
     }
 }
