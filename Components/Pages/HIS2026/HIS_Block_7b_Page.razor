@@ -430,7 +430,7 @@
                                       </td>
                                       <td>Gross Profit / Loss before tax realized by the establishment during last 365 days (in whole no. of Rs.)</td>
                                       <td>
-                                              <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7B.item_9" onkeypress="return /^(\d*)$/.test(this.value + event.key)"
+                                              <input type="number" readonly disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7B.item_9" onkeypress="return /^(\d*)$/.test(this.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7B.item_9, e);
