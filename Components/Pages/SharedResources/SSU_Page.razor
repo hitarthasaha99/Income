@@ -146,8 +146,8 @@
 										<td>
 											@if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && item.hhdStatus == 12)
 											{
-												<button class="btn btn-outline-primary d-flex align-items-center py-1 px-2" onclick="@(() => Sync(item))">
-													<i class="fi fi-rr-rotate-right me-1 @(isSyncing ? "spin" : "")"></i>
+												<button class="btn btn-outline-primary d-flex align-items-center btn-sm" onclick="@(() => Sync(item))">
+													<i class="fi fi-rr-refresh me-1 fs-6 @(isSyncing ? "spin" : "")"></i>
 													@((isSyncing ? "Syncing..." : "Sync"))
 												</button>
 											}

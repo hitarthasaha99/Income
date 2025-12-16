@@ -54,7 +54,8 @@
                 <table class="table table-striped table-bordered mb-0 fixed-first-column">
                     <thead>
                         <tr>
-                            <th rowspan="3" class="fixed-col">S.no.</th>
+                            <th class="text-center fixed-col" rowspan="3">Action</th>
+                            <th rowspan="3">S.no.</th>
                             <th rowspan="3">Name of member</th>
                             <th rowspan="3">Relation to head(code)</th>
                             <th rowspan="3">Gender(code)</th>
@@ -63,7 +64,6 @@
                             <th rowspan="3">Highest educational level attained(code)</th>
                             <th class="text-center" colspan="4">Activity status</th>
                             <th rowspan="3" style="min-width:200px">Whether a beneficiary of any Central/State Government social assistance scheme as on date of survey(<i>yes-1/no-2</i>)</th>
-                            <th class="text-center" rowspan="3">Action</th>
                         </tr>
                         <tr>
                             <th class="text-center" colspan="2">During 30 days</th>
@@ -76,7 +76,8 @@
                             <th>Secondary(code)</th>
                         </tr>
                         <tr>
-                            <th class="fixed-col">(1)</th>
+                            <th class="fixed-col"></th>
+                            <th>(1)</th>
                             <th>(2)</th>
                             <th>(3)</th>
                             <th>(4)</th>
@@ -88,7 +89,6 @@
                             <th>(10)</th>
                             <th>(11)</th>
                             <th>(12)</th>
-                            <th></th>
                         </tr>
                     </thead>
                     @if (block3Members.Count != 0)
@@ -97,24 +97,10 @@
                             @foreach (var member in block3Members)
                             {
                                 <tr>
-                                    <td class="fixed-col">@member.serial_no</td>
-                                    <td>@member.item_2</td>
-                                    <td>@member.item_3</td>
-                                    <td>@member.gender</td>
-                                    <td>@member.age</td>
-                                    <td>@member.item_6</td>
-                                    <td>@member.item_7</td>
-                                    <td>@member.item_8</td>
-                                    <td>@member.item_9</td>
-                                    <td>@member.item_10</td>
-                                    <td>@member.item_11</td>
-                                    <td>
-                                        @(member.item_12 == 1 ? "yes" : member.item_12 == 2 ? "no" : "")
-                                    </td>
                                     @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                                     {
 
-                                        <td class="d-flex align-items-center">
+                                        <td class="d-flex align-items-center fixed-col">
                                             <button class="btn btn-link me-3 fs-6"
                                                     hidden="@SessionStorage.FSU_Submitted"
                                                     @onclick="@(() => HandleModal("UPDATE", member))">
@@ -131,6 +117,21 @@
                                             }
                                         </td>
                                     }
+                                    <td>@member.serial_no</td>
+                                    <td>@member.item_2</td>
+                                    <td>@member.item_3</td>
+                                    <td>@member.gender</td>
+                                    <td>@member.age</td>
+                                    <td>@member.item_6</td>
+                                    <td>@member.item_7</td>
+                                    <td>@member.item_8</td>
+                                    <td>@member.item_9</td>
+                                    <td>@member.item_10</td>
+                                    <td>@member.item_11</td>
+                                    <td>
+                                        @(member.item_12 == 1 ? "yes" : member.item_12 == 2 ? "no" : "")
+                                    </td>
+                                    
                                 </tr>
                             }
                         </tbody>
