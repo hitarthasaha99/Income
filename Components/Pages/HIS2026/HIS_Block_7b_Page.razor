@@ -387,7 +387,7 @@
                                       <td>13</td>
                                       <td class="fw-bold">Total (sum of entries at s. nos. 01-12)  </td>
                                       <td>
-                                          <input disabled class="form-control form-control-sm no-spinner" value="@block_7B.item_7_13" onkeypress="return /^(\d*)$/.test(this.value + event.key)"
+                                          <input type="number" disabled class="form-control form-control-sm no-spinner" value="@block_7B.item_7_13" onkeypress="return /^(\d*)$/.test(this.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_7B.item_7_13, e);

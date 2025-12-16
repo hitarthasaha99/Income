@@ -65,7 +65,6 @@
                                     </td>
                                     <td>@item.framepop</td>
                                     <td>
-                                    <td>
                                         @{
                                             bool noTotal = item.total_hhd == 0;
                                             bool noCompleted = item.completed_hhd == 0;
@@ -75,8 +74,6 @@
                                         <div class="badge @badgeClass">
                                             @(noTotal ? "-" : $"{item.completed_hhd}/{item.total_hhd}")
                                         </div>
-                                    </td>
-                                        
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
