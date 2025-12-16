@@ -50,7 +50,7 @@
                                         Imputed value of goods / services (out of total production through the activity as mentioned in Q 7.9) bartered to other households during last month (in whole no. of Rs.)
                                     </td>
                                     <td>
-                                        <input disabled="@(SessionStorage.FSU_Submitted)" class="form-control form-control-sm no-spinner" value="@fields.item_7_11" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        <input type="number" disabled="@(SessionStorage.FSU_Submitted)" class="form-control form-control-sm no-spinner" value="@fields.item_7_11" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => fields.item_7_11, e);
@@ -68,7 +68,7 @@
                                     </td>
                                     <td>Gross Profit / Loss before tax realized by the establishment during last month (in whole no. of Rs.)</td>
                                     <td>
-                                        <input disabled class="form-control form-control-sm no-spinner" value="@fields.item_7_12" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        <input type="number" disabled class="form-control form-control-sm no-spinner" value="@fields.item_7_12" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => fields.item_7_12, e);

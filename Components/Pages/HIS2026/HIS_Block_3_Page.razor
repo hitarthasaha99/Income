@@ -51,10 +51,10 @@
         <div class="card-body p-0">
             <div class="table-responsive table-wrapper">
                 <!-- Table displaying household members -->
-                <table class="table table-striped table-bordered mb-0">
+                <table class="table table-striped table-bordered mb-0 fixed-first-column">
                     <thead>
                         <tr>
-                            <th rowspan="3">S.no.</th>
+                            <th rowspan="3" class="fixed-col">S.no.</th>
                             <th rowspan="3">Name of member</th>
                             <th rowspan="3">Relation to head(code)</th>
                             <th rowspan="3">Gender(code)</th>
@@ -76,7 +76,7 @@
                             <th>Secondary(code)</th>
                         </tr>
                         <tr>
-                            <th>(1)</th>
+                            <th class="fixed-col">(1)</th>
                             <th>(2)</th>
                             <th>(3)</th>
                             <th>(4)</th>
@@ -97,7 +97,7 @@
                             @foreach (var member in block3Members)
                             {
                                 <tr>
-                                    <td>@member.serial_no</td>
+                                    <td class="fixed-col">@member.serial_no</td>
                                     <td>@member.item_2</td>
                                     <td>@member.item_3</td>
                                     <td>@member.gender</td>
@@ -374,7 +374,7 @@
 
                         <!-- Activity Status 30 days -->
                         <div class="col-sm-12">
-                            <div class="card rounded-3 shadow-none border bg-light-blue mb-3">
+                            <div class="card rounded-3 shadow-none border card-light-blue mb-3">
                                 <div class="card-body">
                                     <h6 class="fw-bold">Activity status (During 30 days)</h6>
                                     <div class="row">
@@ -466,7 +466,7 @@
                         </div>
                         <!-- Activity Status 365 days -->
                         <div class="col-sm-12">
-                        <div class="card rounded-3 shadow-none border bg-light-pink mb-3">
+                        <div class="card rounded-3 shadow-none border card-light-pink mb-3">
                                 <div class="card-body">
                                     <h6 class="fw-bold">Activity status (During 365 days)</h6>
                                     <div class="row">

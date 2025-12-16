@@ -195,7 +195,7 @@
                         </div>
                     </div>
                     <div class="col-sm-12">
-                        <div class="mb-3">
+                        <div>
                             <label for="" class="form-label">
                                 <span class="form-badge">5</span> Total amount received in last 365 days (in Rs.)
                             </label>
@@ -215,12 +215,12 @@
 
     </BodyTemplate>
     <FooterTemplate>
+        <Button class="btn btn-outline-secondary me-auto" @onclick="OnHideModalClick">Close</Button>
         @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
         {
-            
-        <Button class="btn btn-primary" @onclick="Save">Save</Button>
+
+            <Button class="btn btn-primary" @onclick="Save">Save</Button>
         }
-        <Button class="btn btn-outline-secondary me-auto" @onclick="OnHideModalClick">Close</Button>
     </FooterTemplate>
 </Modal>
 

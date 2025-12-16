@@ -68,7 +68,7 @@
                                     <td>1</td>
                                     <td>Saving / deposit accounts with banks/post office/non-banking financial companies</td>
                                     <td>
-                                        <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_1" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_1_1" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_1_1, e);
@@ -80,7 +80,7 @@
                                       <td>2</td>
                                       <td>Certificates of deposit (Fixed/Recurring Deposits etc.), government bonds/securities, co-operative credit societies/micro-finance institutions/self-help groups</td>
                                       <td>
-                                          <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_1_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_1_2, e);
@@ -92,7 +92,7 @@
                                       <td>3</td>
                                       <td>Provident funds (government, public, etc.) and other financial institutions</td>
                                       <td>
-                                          <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_1_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_1_3, e);
@@ -104,7 +104,7 @@
                                       <td>4</td>
                                       <td>Loans to non-household members</td>
                                       <td>
-                                          <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_1_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_1_4, e);
@@ -116,7 +116,7 @@
                                       <td>5</td>
                                       <td>Other (interest on security deposits, sovereign gold bonds, debentures etc.)</td>
                                       <td>
-                                          <input class="form-control form-control-sm no-spinner" value="@block_9a.item_1_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_1_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_1_5, e);
@@ -128,7 +128,7 @@
                                       <td>6</td>
                                       <td>Total interest (sum of entries recorded in s. no. 1-5)</td>
                                       <td>
-                                          <input disabled class="form-control form-control-sm no-spinner" value="@block_9a.item_1_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                          <input type="number" disabled class="form-control form-control-sm no-spinner" value="@block_9a.item_1_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  />
                                           <ValidationMessage For="@(() => block_9a.item_1_6)" />
                                       </td>
@@ -159,7 +159,7 @@
                                     <td>Dividend received (receipts from investment in an enterprise in which the investor does not work)</td>
                                     <td>Last financial year</td>
                                     <td>
-                                        <input class="form-control form-control-sm no-spinner" value="@block_9a.item_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_2, e);
@@ -169,7 +169,7 @@
                                 </tr>
 
 
-                                <tr>
+                                <tr class="row-light-blue">
                                     <td>
                                         <label class="form-label mb-0">
                                             <span class="form-badge">Q9.3</span>
@@ -179,7 +179,7 @@
                                     <td>Annuities received from insurance schemes, superannuation funds etc.</td>
                                     <td>Last month</td>
                                     <td>
-                                        <input class="form-control form-control-sm no-spinner" value="@block_9a.item_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_3, e);
@@ -187,7 +187,7 @@
                                           <ValidationMessage For="@(() => block_9a.item_3)" />
                                       </td>
                                   </tr>
-                                  <tr>
+                                  <tr class="row-light-blue">
                                       <td>
                                           <label class="form-label mb-0">
                                               <span class="form-badge">Q9.4</span>
@@ -197,7 +197,7 @@
                                       <td>Other regular receipts from financial assets</td>
                                       <td>Last month</td>
                                       <td>
-                                          <input class="form-control form-control-sm no-spinner" value="@block_9a.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_9a.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                                  @oninput="e =>
                                                {
                                                    UpdateFieldAndValidate(() => block_9a.item_4, e);

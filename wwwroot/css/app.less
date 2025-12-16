@@ -162,7 +162,6 @@ a,
 input[type="radio"] {
     touch-action: manipulation;
 }
-
 /* Remove spin buttons in Chrome/Edge */
 .no-spinner::-webkit-outer-spin-button,
 .no-spinner::-webkit-inner-spin-button {
@@ -231,10 +230,18 @@ input[type="radio"] {
 .bg-success{
   background-color:@successLightColor !important;
 }
-.bg-light-blue {
+// .bg-light-blue {
+//   background-color: @background_color_9;
+// }
+// .bg-light-pink {
+//   background-color: @background_color_7;
+// }
+.card-light-blue {
+  border: 1px solid #2471DD !important;
   background-color: @background_color_6;
 }
-.bg-light-pink {
+.card-light-pink {
+  border:1px solid #bc1ed6 !important;
   background-color: @background_color_7;
 }
 
@@ -629,7 +636,7 @@ input[type="radio"] {
     }
   }
 }
-
+//general table
 .table {
   thead {
     tr {
@@ -644,12 +651,27 @@ input[type="radio"] {
 
   tbody {
     tr {
+      &.row-light-blue {
+        border: 1px solid #2471DD;
+        background-color: @background_color_6;
+        }
+        &.row-light-pink {
+          border:1px solid #bc1ed6;
+          background-color: @background_color_7;
+        }
+        &.row-light-success{
+          border: 1px solid #20ba43 !important;
+          background-color: #e9ffee !important;
+        }
       td {
         font-size: 15px;
         color: @siteBlack;
         font-weight: 400 !important;
         i{
           font-size: 20px;
+        }
+        input[type="number"]{
+          text-align:right;
         }
       }
       &:last-child {
@@ -742,7 +764,24 @@ input[type="radio"] {
     }
     }
   }
+  //Fixed column
+  .fixed-first-column {
+    .fixed-col {
+      position: sticky;
+      left: -1px;
+      background: #fff;
+      z-index: 3;
+      box-shadow: inset -4px 0 6px -4px rgba(0,0,0,.25);
+    }
+
+    thead .fixed-col {
+      z-index: 4; 
+    }
+  }
 }
+
+
+
 
 /* scrollbar */
 ::-webkit-scrollbar {

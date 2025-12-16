@@ -65,7 +65,6 @@
                                     </td>
                                     <td>@item.framepop</td>
                                     <td>
-                                    <td>
                                         @{
                                             bool noTotal = item.total_hhd == 0;
                                             bool noCompleted = item.completed_hhd == 0;
@@ -76,14 +75,16 @@
                                             @(noTotal ? "-" : $"{item.completed_hhd}/{item.total_hhd}")
                                         </div>
                                     </td>
-                                        
-                                    </td>
                                     <td>
-                                        <div class="btn-group" role="group" aria-label="Basic outlined example">
-                                            <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
-                                            <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
-                                            <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
-                                            <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-download ms-1"></i></NavLink>
+                                        <div class="d-flex align-items-center">
+                                            <div class="btn-group me-3" role="group">
+                                                <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
+                                                <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
+                                            </div>
+                                             <div class="btn-group" role="group">
+                                                <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download</NavLink>
+                                                <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-primary">Clear Data</NavLink>
+                                             </div>
                                         </div>
                                     </td>
                                 </tr>

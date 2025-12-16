@@ -36,9 +36,9 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                            <table class="table table-bordered table-striped mb-0">
+                            <table class="table table-bordered mb-0">
                                 <thead>
-                                    <tr>
+                                    <tr style="border-bottom:1px solid #2471DD;">
                                         <th>Q.no.</th>
                                         <th>Question description</th>
                                         <th>Reference Period </th>
@@ -47,7 +47,7 @@
 
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label"><span class="form-badge">Q8.1</span></label>
                                         </td>
@@ -60,7 +60,7 @@
                                         </td>
                                     </tr>
 
-                                    <tr>
+                                    <tr class="row-light-blue">
                                         <td>
                                             <label class="form-label"><span class="form-badge">Q8.2</span></label>
                                         </td>
@@ -72,7 +72,7 @@
                                             <ValidationMessage For="() => model.item_2" />                                                                                                                                    
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label"><span class="form-badge">Q8.3</span></label>
                                         </td>
@@ -84,7 +84,7 @@
                                             <ValidationMessage For="() => model.item_3" />   
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label"><span class="form-badge">Q8.4</span></label>
                                         </td>
@@ -96,7 +96,7 @@
                                             <ValidationMessage For="() => model.item_4" />   
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="row-light-pink">
                                         <td>
                                             <label class="form-label"><span class="form-badge">Q8.5</span></label>
                                         </td>
@@ -111,7 +111,7 @@
 
                                 </tbody>
                     
-                    </table>
+                        </table>
                         </fieldset>
                     </div>
                 </div>
