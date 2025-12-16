@@ -100,21 +100,23 @@
                                     @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                                     {
 
-                                        <td class="d-flex align-items-center fixed-col">
-                                            <button class="btn btn-link me-3 fs-6"
-                                                    hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleModal("UPDATE", member))">
-                                                <i class="fi fi-rr-pencil"></i>
-                                            </button>
-                                            @if (!(member.serial_no == 1 && member.item_3 == 1))
-                                            {
-
-                                                <button class="btn btn-link fs-6 text-danger"
+                                        <td class="fixed-col">
+                                            <div class="d-flex align-items-center">
+                                                <button class="btn btn-link me-3 fs-6"
                                                         hidden="@SessionStorage.FSU_Submitted"
-                                                        @onclick="@(() => HandleDelete(member.id))">
-                                                    <i class="fi fi-rr-trash"></i>
+                                                        @onclick="@(() => HandleModal("UPDATE", member))">
+                                                    <i class="fi fi-rr-pencil"></i>
                                                 </button>
-                                            }
+                                                @if (!(member.serial_no == 1 && member.item_3 == 1))
+                                                {
+
+                                                    <button class="btn btn-link fs-6 text-danger"
+                                                            hidden="@SessionStorage.FSU_Submitted"
+                                                            @onclick="@(() => HandleDelete(member.id))">
+                                                        <i class="fi fi-rr-trash"></i>
+                                                    </button>
+                                                }
+                                            </div>
                                         </td>
                                     }
                                     <td>@member.serial_no</td>
