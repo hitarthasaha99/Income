@@ -183,9 +183,9 @@
                                         .Distinct()
                                         .ToList();
 
-                    
 
-                    
+
+
 
                     var statusFlags = new Dictionary<int, bool>
                                 {
@@ -206,10 +206,12 @@
                                     )
                                 );
 
+                    var res = await commonService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{currentFSU.fsu_id}/{21}");
                     // Fire all calls in parallel
-                    await Task.WhenAll(downloadTasks.Values);
+                    var results = await Task.WhenAll(downloadTasks.Values);
 
-                    var sch00data = await downloadTasks.Values.FirstOrDefault(x => !string.IsNullOrEmpty(x.Result)) ?? string.Empty;
+                    var sch00data = results.FirstOrDefault(r => !string.IsNullOrEmpty(r)) ?? string.Empty;
+
                     if (!string.IsNullOrEmpty(sch00data))
                     {
                         var received_data = JsonConvert.DeserializeObject<Upsert_Model>(sch00data);
