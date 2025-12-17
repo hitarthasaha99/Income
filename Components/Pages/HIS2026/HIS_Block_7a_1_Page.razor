@@ -440,7 +440,7 @@
 
             if (data != null)
             {
-                block_7_1 = data;
+                block_7_1 = data.ShallowCopy();
                 editContext = new EditContext(block_7_1);
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;
