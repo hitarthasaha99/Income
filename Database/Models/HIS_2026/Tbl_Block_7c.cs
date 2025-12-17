@@ -15,5 +15,10 @@ namespace Income.Database.Models.HIS_2026
         public int? item_7_11 { get; set; }
         //7c.9
         public int? item_7_12 { get; set; }
+        //Q7c Droupdown
+
+        public int? item_7_13 { get; set; }
+        public string? remarks { get; set; }
+
     }
 }

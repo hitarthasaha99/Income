@@ -39,5 +39,9 @@ namespace Income.Database.Models.HIS_2026
         public int? item_7_13 { get; set; }
         public int? item_8 { get; set; }
         public int? item_9 { get; set; }
+        //7b.9 condition droup down 
+        public int? item_10 { get; set; }
+
+        public string? remarks { get; set; }
     }
 }

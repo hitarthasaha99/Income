@@ -25,6 +25,10 @@ namespace Income.Database.Models.HIS_2026
         public int? item_3 { get; set; }
         //Q6.4
         public int? item_4 { get; set; }
+        //please check the entries and provide suitable clarifications in following codes
+        public int? item_5 { get; set; }
+        public int? remarks { get; set; }
+
         public bool isUpdated { get; set; } = false;
     }
 }

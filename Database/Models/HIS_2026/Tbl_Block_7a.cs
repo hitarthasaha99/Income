@@ -30,6 +30,10 @@ namespace Income.Database.Models.HIS_2026
         public int? item_5 { get; set; }
         //7a.9
         public int? item_6 { get; set; }
+        //Q7a.9.1 field droupdown
+        public int? item_7 { get; set; }
+        //others Remarks field
+        public string? remarks { get; set; }
 
     }
 }
