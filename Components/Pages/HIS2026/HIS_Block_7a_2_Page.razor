@@ -541,8 +541,8 @@
                 // "i. Others (specify in text box)";
                 //Enable Droupdown field
                 isCostOfInput = true;
+                CheckItem7Warning();
             }
-
         }
         catch (Exception ex)
         {
@@ -599,7 +599,7 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_7b");
                 return;
             }
-            // CheckItem7Warning();
+            
             messageStore.Clear();
             var validation = Validator.Validate(block_7A);
 
