@@ -58,7 +58,7 @@
             <h3 class="card-title">Remarks</h3>
         </div>
         <div class="card-body">
-            <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.selection_done)">
+            <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
                 <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </fieldset>
         </div>

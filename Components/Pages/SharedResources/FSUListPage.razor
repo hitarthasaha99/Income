@@ -206,7 +206,6 @@
                                     )
                                 );
 
-                    var res = await commonService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_SAVED_RESPONSES_BY_FSU_ID}{currentFSU.fsu_id}/{21}");
                     // Fire all calls in parallel
                     var results = await Task.WhenAll(downloadTasks.Values);
 

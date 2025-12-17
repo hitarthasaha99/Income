@@ -596,7 +596,7 @@
         toastService.ShowSuccess("Member added successfully!");
         await AddModal.HideAsync();
         await LoadData();
-
+        SerialMemberError = string.Empty;
     }
 
    async void Next()
