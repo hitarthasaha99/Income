@@ -44,119 +44,118 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-
-                        <table class="table table-bordered align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th colspan="5" class="bg-transparent text-start">
-                                        <label class="form-label fw-bold mb-0">
-                                            <span class="form-badge">Q9.5</span>
-                                            Income from Produced Non-Financial Items
-                                        </label>
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <th style="width: 50px;" class="text-center">S. No.</th>
-                                    <th class="text-center">Item description</th>
-                                    <th class="text-center">Number of months rented during last 365 days</th>
-                                    <th class="text-center">Average monthly rent received (in Rs.)</th>
-                                    <th class="text-center">Expenses incurred on repair and maintenance, insurance cost etc. (in Rs.) during 'last 365 days'</th>
-                                </tr>
-                                <tr>
-                                    <th class="text-center">(1)</th>
-                                    <th class="text-center">(2)</th>
-                                    <th class="text-center">(3)</th>
-                                    <th class="text-center">(4)</th>
-                                    <th class="text-center">(5)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Dwelling</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                               @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_9b.item_5_1_3, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_9b.item_5_1_3)" />
-                                      </td>
-                                      <td>
-                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_9b.item_5_1_4, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_9b.item_5_1_4)" />
-                                      </td>
-                                      <td>
-                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_9b.item_5_1_5, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_9b.item_5_1_5)" />
-                                      </td>
-                                  </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Building and other structure (excluding dwelling)</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                @oninput="e =>
-                                            {
-                                                UpdateFieldAndValidate(() => block_9b.item_5_2_3, e);
-                                            }" />
-                                        <ValidationMessage For="@(() => block_9b.item_5_2_3)" />
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                @oninput="e =>
-                                            {
-                                                UpdateFieldAndValidate(() => block_9b.item_5_2_4, e);
-                                            }" />
-                                        <ValidationMessage For="@(() => block_9b.item_5_2_4)" />
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                @oninput="e =>
-                                            {
-                                                UpdateFieldAndValidate(() => block_9b.item_5_2_5, e);
-                                            }" />
-                                        <ValidationMessage For="@(() => block_9b.item_5_2_5)" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Hired-out machinery and equipment</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                @oninput="e =>
-                                            {
-                                                UpdateFieldAndValidate(() => block_9b.item_5_3_3, e);
-                                            }" />
-                                        <ValidationMessage For="@(() => block_9b.item_5_3_3)" />
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                @oninput="e =>
-                                            {
-                                                UpdateFieldAndValidate(() => block_9b.item_5_3_4, e);
-                                            }" />
-                                        <ValidationMessage For="@(() => block_9b.item_5_3_4)" />
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                @oninput="e =>
-                                            {
-                                                UpdateFieldAndValidate(() => block_9b.item_5_3_5, e);
-                                            }" />
-                                        <ValidationMessage For="@(() => block_9b.item_5_3_5)" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <table class="table table-bordered align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th colspan="5" class="bg-transparent text-start">
+                                            <label class="form-label fw-bold mb-0">
+                                                <span class="form-badge">Q9.5</span>
+                                                Income from Produced Non-Financial Items
+                                            </label>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 50px;" class="text-center">S. No.</th>
+                                        <th class="text-center">Item description</th>
+                                        <th class="text-center">Number of months rented during last 365 days</th>
+                                        <th class="text-center">Average monthly rent received (in Rs.)</th>
+                                        <th class="text-center">Expenses incurred on repair and maintenance, insurance cost etc. (in Rs.) during 'last 365 days'</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">(1)</th>
+                                        <th class="text-center">(2)</th>
+                                        <th class="text-center">(3)</th>
+                                        <th class="text-center">(4)</th>
+                                        <th class="text-center">(5)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center">1</td>
+                                        <td>Dwelling</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_9b.item_5_1_3, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_9b.item_5_1_3)" />
+                                          </td>
+                                          <td>
+                                              <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_9b.item_5_1_4, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_9b.item_5_1_4)" />
+                                          </td>
+                                          <td>
+                                              <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_1_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_9b.item_5_1_5, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_9b.item_5_1_5)" />
+                                          </td>
+                                      </tr>
+                                    <tr>
+                                        <td class="text-center">2</td>
+                                        <td>Building and other structure (excluding dwelling)</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => block_9b.item_5_2_3, e);
+                                                }" />
+                                            <ValidationMessage For="@(() => block_9b.item_5_2_3)" />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => block_9b.item_5_2_4, e);
+                                                }" />
+                                            <ValidationMessage For="@(() => block_9b.item_5_2_4)" />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_2_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => block_9b.item_5_2_5, e);
+                                                }" />
+                                            <ValidationMessage For="@(() => block_9b.item_5_2_5)" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">3</td>
+                                        <td>Hired-out machinery and equipment</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => block_9b.item_5_3_3, e);
+                                                }" />
+                                            <ValidationMessage For="@(() => block_9b.item_5_3_3)" />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => block_9b.item_5_3_4, e);
+                                                }" />
+                                            <ValidationMessage For="@(() => block_9b.item_5_3_4)" />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm no-spinner" value="@block_9b?.item_5_3_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                    @oninput="e =>
+                                                {
+                                                    UpdateFieldAndValidate(() => block_9b.item_5_3_5, e);
+                                                }" />
+                                            <ValidationMessage For="@(() => block_9b.item_5_3_5)" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </fieldset>
 
                     </div>
@@ -173,7 +172,7 @@
                             <tbody>
                                 <tr class="row-light-pink">
                                     <td>
-                                        <label class="form-label mb-0"><span class="form-badge">Q9.6</span></label>
+                                        <label class="form-label mb-0"><span class="form-badge me-0">Q9.6</span></label>
                                     </td>
                                     <td>Income earned from leasing out land (including agricultural land, gazing land, lawn etc.) and other natural resources like ponds, orchards, plantations etc.</td>
                                     <td rowspan="2">Last 365 days</td>
@@ -188,7 +187,7 @@
                                 </tr>
                                 <tr class="row-light-pink">
                                     <td>
-                                        <label class="form-label mb-0"><span class="form-badge">Q9.7</span></label>
+                                        <label class="form-label mb-0"><span class="form-badge me-0">Q9.7</span></label>
                                     </td>
                                     <td>Income earned from licensing the use of intellectual property (includes the return for services of patented or copyright material, e.g. receipts from writings, right to make use of inventions, etc.)</td>
                                     
