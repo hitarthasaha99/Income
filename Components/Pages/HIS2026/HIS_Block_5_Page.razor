@@ -456,7 +456,7 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
-                                Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)
+                            <span class="form-badge">Q5.9 </span>  Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)
                             </label>
                             <InputNumber @bind-Value="newMember.item_9"
                                          class="form-control no-spinner"
@@ -467,8 +467,58 @@
                                          spellcheck="false"
                                          readonly>
                             </InputNumber>
+                        @if (!string.IsNullOrEmpty(item_9_warning))
+                        {
+                            <div class="form-text text-danger" style="white-space: pre-line;">
+                                @item_9_warning
+                            </div>
+                        }
                         </div>
                     </div>
+                    @* new Field enable only when item9 = 0 *@
+                @if (isItemEnable)
+                    {
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span class="form-badge">Q5.9.1 </span> please check the entries and provide suitable clarifications in following codes
+                            </label>
+                            <select class="form-select" value="@newMember.item_10" @onchange="OnItem10Changed">
+                            <option value="">-Select-</option>
+                                <option value="1">a. Retired recently but pension is not started</option>
+                                <option value="2">b. Recently joined the service and salary not received</option>
+                                <option value="3">c. Recently resigned / terminated from the service / job </option>
+                                <option value="4">d. Leave without pay </option>
+                                <option value="5">e. Others (please specify)</option>
+                        </select>
+                            @if (!string.IsNullOrEmpty(droupdown_warning))
+                            {
+                                <div class="form-text text-danger" style="white-space: pre-line;">
+                                    @droupdown_warning
+                                </div>
+                            }
+
+                            @if (isselectOther)
+                                {
+                                    
+                                <div>
+                                <textarea class="form-control mt-2"
+                                          rows="2"
+                                          maxlength="50"
+                                              placeholder="Please specify here..." @bind="newMember.remarks" @oninput="OnRemarksClear">
+      </textarea>
+                                    @if (!string.IsNullOrEmpty(droupdown_remarks))
+                                    {
+                                        <div class="form-text text-danger" style="white-space: pre-line;">
+                                            @droupdown_remarks
+                                        </div>
+                                    }
+                            </div>
+                                }          
+                               
+                        </div>
+                    </div>                    
+                    }
                 </div>
             </EditForm>
         }
@@ -504,9 +554,14 @@
     private List<Tbl_Block_3> block3Members = new();
     private List<Tbl_Block_5> block5Members = new();
     private Tbl_Block_1 block_1= new();
+    bool isItemEnable = false;
+    bool isselectOther = false;
     bool error = false;
     DBQueries dbq = new();
     CommonQueries commonQueries = new();
+    string item_9_warning = string.Empty;
+    string droupdown_warning = string.Empty;
+    string droupdown_remarks = string.Empty;
     string remarks = string.Empty;
     Modal AddModal = default!;
     bool isAdd = false;
@@ -548,6 +603,42 @@
         editContext?.NotifyFieldChanged(identifier);
     }
 
+    void CheckItem9Warning()
+    {
+        try
+        {
+            item_9_warning = string.Empty;
+            // isCostOfInput = false;
+            isItemEnable = false;
+            if (newMember != null && newMember.item_9 == 0)
+            {
+                item_9_warning = "Improper data reported in Q. 5.9. Please Choose an option.";
+                isItemEnable = true;
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
+    private void OnItem10Changed(ChangeEventArgs e)
+    {
+        // Update bound value
+        if (int.TryParse(e.Value?.ToString(), out var v))
+            newMember.item_10 = v;
+        else
+            newMember.item_10 = null;
+
+        // Clear warnings
+        droupdown_warning = string.Empty;
+        item_9_warning = string.Empty;
+
+        // Show remarks only when "Others" (5) is selected
+        isselectOther = newMember?.item_10 == 5;
+
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -659,6 +750,15 @@
     }
 
 
+    //Remarks field clear after enter anything 
+    private void OnRemarksClear(ChangeEventArgs e)
+    {
+        newMember.remarks = e.Value?.ToString();
+        droupdown_remarks = string.Empty;
+
+        StateHasChanged();
+    }
+
 
 
     //Handle CalculateIncome
@@ -677,6 +777,7 @@
 
         int ans = item_2 + (item_3_i + item_3_ii + item_4_i + item_4_ii + item_5 + item_6 + item_7 + item_8) / 12;
         newMember.item_9 = ans;
+        CheckItem9Warning();
         StateHasChanged();
     }
 
@@ -753,17 +854,76 @@
         StateHasChanged();
     }
 
+    // private async Task HandleAddMember()
+    // {
+    //     SerialMemberError = string.Empty;
+    //     if (isAdd && block5Members.Any(x => x.fk_block_3 == newMember?.fk_block_3))
+    //     {
+    //         SerialMemberError = "Data for this member has already been added";
+    //         toastService.ShowError("Data for this member has already been added");
+    //         return;
+    //     }
+    //     messageStore.Clear();
+    //     var result = await Validator.ValidateAsync(newMember);
+    //     foreach (var error in result.Errors)
+    //     {
+    //         var fieldIdentifier = new FieldIdentifier(newMember, error.PropertyName);
+    //         messageStore.Add(fieldIdentifier, error.ErrorMessage);
+    //     }
+
+    //     editContext.NotifyValidationStateChanged();
+
+    //     if (!result.IsValid)
+    //     {
+    //         toastService.ShowError("Please resolve pending errors");
+    //         return;
+    //     }
+
+    //     newMember.isUpdated = true;
+       
+    //     await dbq.SaveAsync<Tbl_Block_5>(newMember);
+    //     toastService.ShowSuccess("Member added successfully!");
+    //     await AddModal.HideAsync();
+    //     await LoadData();
+
+    // }
     private async Task HandleAddMember()
     {
         SerialMemberError = string.Empty;
+        droupdown_warning = string.Empty;
+        droupdown_remarks = string.Empty;
+
+        // 🔴 1. Check dropdown validation FIRST
+        if (isItemEnable) // means item_9 == 0
+        {
+            if (newMember.item_10 == null)
+            {
+                droupdown_warning = "Please choose an option for Q5.9.1";
+                toastService.ShowError("Please select clarification for Q5.9.1");
+                return;
+            }
+
+            // If "Others" selected but remarks empty
+            if (newMember.item_10 == 5 && string.IsNullOrWhiteSpace(newMember.remarks))
+            {
+                droupdown_remarks = "Please specify remarks for 'Others'";
+                toastService.ShowError("Please specify remarks for 'Others'");
+                return;
+            }
+        }
+
+        // 🔴 2. Existing duplicate member check
         if (isAdd && block5Members.Any(x => x.fk_block_3 == newMember?.fk_block_3))
         {
             SerialMemberError = "Data for this member has already been added";
             toastService.ShowError("Data for this member has already been added");
             return;
         }
+
+        // 🔴 3. FluentValidation
         messageStore.Clear();
         var result = await Validator.ValidateAsync(newMember);
+
         foreach (var error in result.Errors)
         {
             var fieldIdentifier = new FieldIdentifier(newMember, error.PropertyName);
@@ -778,13 +938,15 @@
             return;
         }
 
+        // 🔴 4. Save
         newMember.isUpdated = true;
         await dbq.SaveAsync<Tbl_Block_5>(newMember);
+
         toastService.ShowSuccess("Member added successfully!");
         await AddModal.HideAsync();
         await LoadData();
-
     }
+
 
     async void Next()
     {

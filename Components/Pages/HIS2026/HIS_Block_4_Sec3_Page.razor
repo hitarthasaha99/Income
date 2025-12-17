@@ -787,30 +787,34 @@
     {
         var value = e.Value?.ToString() ?? string.Empty;
 
-        // If length is 10, clear the input/model
-        if (value.Length > 10)
+        // Empty input → clear model
+        if (string.IsNullOrWhiteSpace(value))
         {
             block_4.item_17 = null;
-            editContext?.NotifyFieldChanged(
-                FieldIdentifier.Create(() => block_4.item_17));
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_17));
             return;
         }
 
-        if (string.IsNullOrEmpty(value))
+        // Length check (max 10 digits)
+        if (value.Length > 10)
         {
             block_4.item_17 = null;
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_17));
+            return;
+        }
+
+        // Safe parse with bounds check
+        if (int.TryParse(value, out var result) && result >= 0 && result <= int.MaxValue)
+        {
+            block_4.item_17 = result;
         }
         else
         {
-            // Optionally keep only digits
-            if (value.All(char.IsDigit))
-                block_4.item_17 = int.Parse(value);
-            else
-                block_4.item_17 = null;
+            // Non-numeric, overflow, or negative → clear
+            block_4.item_17 = null;
         }
 
-        editContext?.NotifyFieldChanged(
-            FieldIdentifier.Create(() => block_4.item_17));
+        editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_17));
     }
 
     async void GoBack()
