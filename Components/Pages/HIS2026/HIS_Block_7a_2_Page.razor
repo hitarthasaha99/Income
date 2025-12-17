@@ -40,257 +40,317 @@
                         }
                     </div>
                     <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th colspan="3" class="bg-transparent text-start">
-                                        <label class="form-label fw-bold m-0">
-                                            <span class="badge bg-primary me-1">Q7.2</span>
-                                            Expenses incurred by the household during ‘last 365 days’ on inputs used for production of crops (including imputed expenses)
-                                        </label>
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <th style="width: 50px;" class="text-center">S. No.</th>
-                                    <th class="text-center">Description of Item</th>
-                                    <th class="text-center">Cost of Input (in Rs.)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td >1</td>
-                                    <td>Seeds </td>
-                                    <td>
-                                        <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_1" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                               @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_1, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_1)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>2</td>
-                                      <td>Manures, chemicals, bio-fertilizers, plant protection materials (chemicals/bio-pesticides) </td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_2, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_2)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>3</td>
-                                      <td>Feed and fodder</td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_3, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_3)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>4</td>
-                                      <td>Diesel, electricity and other fuel charges</td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_4, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_4)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>5</td>
-                                      <td>Irrigation / water charges</td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_5, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_5)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>6</td>
-                                      <td>Cost of hiring, repair and maintenance of machinery and equipment used for crop production </td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_6, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_6)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>7</td>
-                                      <td>Labour cost (human and animal)</td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_7, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_7)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>8</td>
-                                      <td>Lease rent for land used for crop production</td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_8, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_8)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>9</td>
-                                      <td>Interest paid on loans utilized for the purpose of crop production and cost of crop insurance / premium </td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_9, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_9)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>10</td>
-                                      <td>Transportation & packaging charges  </td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_10" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_10, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_10)" />
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="bg-transparent text-start">
+                                            <label class="form-label fw-bold m-0">
+                                                <span class="badge bg-primary me-1">Q7.2</span>
+                                                Expenses incurred by the household during ‘last 365 days’ on inputs used for production of crops (including imputed expenses)
+                                            </label>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 50px;" class="text-center">S. No.</th>
+                                        <th class="text-center">Description of Item</th>
+                                        <th class="text-center">Cost of Input (in Rs.)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Seeds </td>
+                                        <td>
+                                            <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_1" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_1, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_1)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>2</td>
+                                          <td>Manures, chemicals, bio-fertilizers, plant protection materials (chemicals/bio-pesticides) </td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_2" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_2, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_2)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>3</td>
+                                          <td>Feed and fodder</td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_3, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_3)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>4</td>
+                                          <td>Diesel, electricity and other fuel charges</td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_4, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_4)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>5</td>
+                                          <td>Irrigation / water charges</td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_5, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_5)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>6</td>
+                                          <td>Cost of hiring, repair and maintenance of machinery and equipment used for crop production </td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_6, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_6)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>7</td>
+                                          <td>Labour cost (human and animal)</td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_7, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_7)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>8</td>
+                                          <td>Lease rent for land used for crop production</td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_8, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_8)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>9</td>
+                                          <td>Interest paid on loans utilized for the purpose of crop production and cost of crop insurance / premium </td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_9, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_9)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>10</td>
+                                          <td>Transportation & packaging charges  </td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_10" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_10, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_10)" />
 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>11</td>
-                                    <td>Storage charges (includes cold storage charges)</td>
-                                    <td>
-                                        <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_11" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                               @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_11, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_11)" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>Storage charges (includes cold storage charges)</td>
+                                        <td>
+                                            <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_11" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_11, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_11)" />
 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>12</td>
-                                    <td>Others (include veterinary services etc.)</td>
-                                    <td>
-                                        <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_12" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                               @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_2_12, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_2_12)" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>12</td>
+                                        <td>Others (include veterinary services etc.)</td>
+                                        <td>
+                                            <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_12" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_2_12, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_2_12)" />
 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>13</td>
-                                    <td class="fw-bold">Total (sum of entries at s. nos. 01-12)</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm no-spinner" value="@block_7A.item_2_13" disabled />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>13</td>
+                                        <td class="fw-bold">Total (sum of entries at s. nos. 01-12)</td>
+                                        <td>
+                                            <input class="form-control form-control-sm no-spinner" value="@block_7A.item_2_13" disabled />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </fieldset>
                 </div>
             </div>
 
             @* 7.3, 7.4 .... *@
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-            <div class="card custom-card">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle mb-0">
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="badge bg-primary me-1">Q7.3</div>
-                                    </td>
-                                    <td>Receipts from Sale of seeds/ manure / bio-fertilizer / saplings etc. during last 365 days (in whole no. of Rs.) </td>
-                                    <td>
-                                        <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                               @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_3, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_3)" />
-                                      </td>
-                                  </tr>
+                <div class="card custom-card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="badge bg-primary me-1">Q7.3</div>
+                                        </td>
+                                        <td>Receipts from Sale of seeds/ manure / bio-fertilizer / saplings etc. during last 365 days (in whole no. of Rs.) </td>
+                                        <td>
+                                            <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_3" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_3, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_3)" />
+                                          </td>
+                                      </tr>
 
 
-                                <tr>
-                                    <td>
-                                        <div class="badge bg-primary me-1">Q7.4</div>
-                                    </td>
-                                    <td>Sale value of produces which were cultivated beyond last 365 days but sold during last 365 days (in whole no. of Rs.) </td>
-                                    <td>
-                                        <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                               @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_4, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_4)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          <div class="badge bg-primary me-1">Q7.5</div>
-                                      </td>
-                                      <td>Imputed value of crops consumed by the household or bartered to other households out of total production during last 365 days (in whole no. of Rs.) </td>
-                                      <td>
-                                          <input type="number" disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                 @oninput="e =>
-                                               {
-                                                   UpdateFieldAndValidate(() => block_7A.item_5, e);
-                                               }" />
-                                          <ValidationMessage For="@(() => block_7A.item_5)" />
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                      <td>
-                                          <div class="badge bg-primary me-1">Q7a.9</div>
-                                      </td>
-                                      <td>Gross Profit / Loss before tax realized by the establishment during last 365 days (in whole no. of Rs.) </td>
-                                      <td>
-                                          <input type="number" class="form-control form-control-sm no-spinner" value="@block_7A.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled />
-                                          <ValidationMessage For="@(() => block_7A.item_6)" />
-                                        @if (!string.IsNullOrEmpty(item_6_warning))
-                                        {
-                                            <div class="form-text text-danger" style="white-space: pre-line;">
-                                                @item_6_warning
-                                            </div>
-                                        }
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    <tr>
+                                        <td>
+                                            <div class="badge bg-primary me-1">Q7.4</div>
+                                        </td>
+                                        <td>Sale value of produces which were cultivated beyond last 365 days but sold during last 365 days (in whole no. of Rs.) </td>
+                                        <td>
+                                            <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                   @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_4, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_4)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>
+                                              <div class="badge bg-primary me-1">Q7.5</div>
+                                          </td>
+                                          <td>Imputed value of crops consumed by the household or bartered to other households out of total production during last 365 days (in whole no. of Rs.) </td>
+                                          <td>
+                                              <input disabled="@(!codeListEntryNeeded)" class="form-control form-control-sm no-spinner" value="@block_7A.item_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                     @oninput="e =>
+                                                   {
+                                                       UpdateFieldAndValidate(() => block_7A.item_5, e);
+                                                   }" />
+                                              <ValidationMessage For="@(() => block_7A.item_5)" />
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>
+                                              <div class="badge bg-primary me-1">Q7a.9</div>
+                                          </td>
+                                          <td>Gross Profit / Loss before tax realized by the establishment during last 365 days (in whole no. of Rs.) </td>
+                                          <td>
+                                              <input class="form-control form-control-sm no-spinner" value="@block_7A.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" disabled />
+                                              <ValidationMessage For="@(() => block_7A.item_6)" />
+                                            @if (!string.IsNullOrEmpty(item_6_warning))
+                                            {
+                                                <div class="form-text text-danger" style="white-space: pre-line;">
+                                                    @item_6_warning
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    @if (isCostOfInput)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="badge bg-primary me-1">Q7a.9.1</div>
+                                            </td>
+                                            <td>Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes</td>
+                                            <td>
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        @*     <label class="form-label">
+                                                            Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes
+                                                    </label> *@
+
+                                                        <select class="form-select" value ="@block_7A.item_7" @onchange = "clearItem6">
+                                                            <option value="">-Select-</option>
+                                                            <option value="1">a. Crop damage / failure</option>
+                                                            <option value="2">b. Crop not harvested</option>
+                                                            <option value="3">c. Crop production is not started </option>
+                                                            <option value="4">d. Crop left at field due to low market price </option>
+                                                            <option value="5">e. Others (specify in text box) </option>
+                                                        </select>
+                                                        @* @if (showDropdownWarning && string.IsNullOrEmpty(selectedOther))
+                                                        {
+                                                            <div class="form-text text-danger mt-1">
+                                                                Please select an option to proceed.
+                                                            </div>
+                                                        } *@
+                                                        @if (!string.IsNullOrEmpty(item_7_warning))
+                                                        {
+                                                            <div class="form-text text-danger" style="white-space: pre-line;">
+                                                                @item_7_warning
+                                                            </div>
+                                                        }
+
+
+                                                        @* if choose others then showing one text field *@
+                                                        @if (selectedOther == "5")
+                                                        {
+                                                            <div>
+                                                                <textarea class="form-control mt-2"
+                                                              rows="2"
+                                                              maxlength="50"
+                                                                          placeholder="Please specify here..." @bind="block_7A.remarks" @oninput="clearOther">
+                                                             </textarea>
+                                                                @if (!string.IsNullOrEmpty(remarks_warning))
+                                                                {
+                                                                    <div class="form-text text-danger">
+                                                                        @remarks_warning
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
             </fieldset>
         </EditForm>
 
@@ -321,8 +381,8 @@
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                {         
-                <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => Save(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                {
+                    <NavLink class="btn btn-outline-primary me-2" @onclick="@(() => Save(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
@@ -344,6 +404,14 @@
     private Tbl_Block_7a? block_7A = new();
     private Tbl_Block_1? block_1 = new();
     CommonQueries commonQueries = new();
+    //Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes
+    bool isCostOfInput = false;
+    //if choose the other in Cost of input droupdown
+
+    bool showDroupdownWarning = false;
+
+    string selectedOther = string.Empty;
+    bool showDropdownWarning = false;
     private List<Tbl_Block_7a_1> CropIncomeList = [];
     EditContext editContext;
     ValidationMessageStore messageStore;
@@ -354,6 +422,9 @@
     DateTime survey_date = DateTime.Now;
     string remarks = string.Empty;
     string item_6_warning = string.Empty;
+    string item_7_warning = string.Empty;
+
+    string remarks_warning = string.Empty;
     CommentModal commentModal = default!;
     string errorMessage = string.Empty;
 
@@ -458,15 +529,19 @@
         try
         {
             item_6_warning = string.Empty;
+            isCostOfInput = false;
             if (block_7A != null && block_7A.item_6 < 0)
             {
-                item_6_warning =
-                    "Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes:\n" +
-                    "e. Crop damage / failure\n" +
-                    "f. Crop not harvested\n" +
-                    "g. Crop production is not started\n" +
-                    "h. Crop left at field due to low market price\n" +
-                    "i. Others (specify in text box)";
+                // item_6_warning = "Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes";
+                item_6_warning = "Loss reported in Q. 7a.9. Please Choose an option.";
+                // "e. Crop damage / failure\n" +
+                // "f. Crop not harvested\n" +
+                // "g. Crop production is not started\n" +
+                // "h. Crop left at field due to low market price\n" +
+                // "i. Others (specify in text box)";
+                //Enable Droupdown field
+                isCostOfInput = true;
+                CheckItem7Warning();
             }
         }
         catch (Exception ex)
@@ -475,6 +550,40 @@
         }
 
     }
+
+    private void CheckItem7Warning()
+    {
+        item_7_warning = string.Empty;
+
+        if (isCostOfInput && !block_7A.item_7.HasValue)
+        {
+            item_7_warning = "Please select a reason for the loss reported.";
+        }
+    }
+
+    //if choose any droupdown value then clear item6 warning
+    private void clearItem6(ChangeEventArgs e)
+    {
+        selectedOther = e.Value?.ToString() ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(selectedOther))
+        {
+            // Clear warning immediately when user selects anything
+            item_6_warning = string.Empty;
+            item_7_warning = string.Empty;
+            // showDropdownWarning = false;
+
+        }
+
+        StateHasChanged();
+    }
+
+    private void clearOther(ChangeEventArgs e)
+    {
+        remarks_warning = null;
+    }
+
+
 
     private async Task Save(bool is_go_next = false)
     {
@@ -490,7 +599,7 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_7b");
                 return;
             }
-
+            
             messageStore.Clear();
             var validation = Validator.Validate(block_7A);
 
@@ -506,12 +615,15 @@
                 toastService.ShowError("Please resolve all the errors");
                 return;
             }
+           
             else
             {
-                CheckItem6Warning();
-                if(!string.IsNullOrEmpty(item_6_warning) && string.IsNullOrEmpty(block_1.block_7a_remark))
+                // CheckItem7Warning();
+
+                // CheckItem6Warning();
+                if (!string.IsNullOrEmpty(item_6_warning) && string.IsNullOrEmpty(block_1.block_7a_remark))
                 {
-                    toastService.ShowError("Please provide a remarks before proceeding");
+                    toastService.ShowError("Please provide a remark before proceeding");
                     return;
                 }
                 int saved = await dB.Save_SCH_HIS_Block7A(block_7A);
@@ -534,6 +646,8 @@
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
             NavigationManager.NavigateTo("/dashboard/his/block_7b");
+
+          
         }
         catch (Exception ex)
         {

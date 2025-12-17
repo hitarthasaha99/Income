@@ -73,7 +73,7 @@
                                     class="form-control is_sso"
                                     value="@block_4.item_7"
                                     @oninput="OnItem7Changed"
-                                    onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(this.value + event.key)"
+                                           onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
                                     disabled="@(block_4?.item_6 != 1 || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12))" />
                             <ValidationMessage For="@(() => block_4.item_7)" />
                         </div>
@@ -254,9 +254,10 @@
                                 <span class="form-badge">12</span>Carpet area of dwelling unit (in square feet) of the household
                             </label>
                             <input type="number"
-                                    class="form-control is_sso"
+                                    class="form-control is_sso no-spinner"
                                     value="@block_4.item_12"
                                     @oninput="OnItem12Changed"
+                                           onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
                                     disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
                             <ValidationMessage For="@(() => block_4.item_12)" />
                         </div>
@@ -287,9 +288,10 @@
                                 <span class="form-badge">14</span>Number of rooms in the dwelling unit of the household
                             </label>
                             <input type="number"
-                                    class="form-control is_sso"
+                                    class="form-control is_sso no-spinner"
                                     value="@block_4.item_14"
                                     @oninput="OnItem14Changed"
+                                     onkeypress="if (this.value.length >= 2) return false; return /^[0-9]$/.test(event.key);"
                                     disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
                             <ValidationMessage For="@(() => block_4.item_14)" />
                         </div>
@@ -323,9 +325,10 @@
 
                             </label>
                             <input type="number"
-                                    class="form-control is_sso"
+                                    class="form-control is_sso no-spinner"
+                                    onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
                                     value="@block_4.item_17"
-                                    @oninput="OnItem17Changed"
+                                    @oninput="OnItem17Changed"                                   
                                     disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
                             <ValidationMessage For="@(() => block_4.item_17)" />
                         </div>
@@ -680,17 +683,37 @@
         }
     }
 
+    // private void OnItem14Changed(ChangeEventArgs e)
+    // {
+    //     var value = e.Value?.ToString();
+
+    //     if (string.IsNullOrEmpty(value))
+    //         block_4.item_14 = null;
+    //     else
+    //     {
+    //         block_4.item_14 = int.Parse(value);
+    //         editContext?.NotifyFieldChanged(
+    //         FieldIdentifier.Create(() => block_4.item_14));
+    //     }
+    // }
     private void OnItem14Changed(ChangeEventArgs e)
     {
         var value = e.Value?.ToString();
 
         if (string.IsNullOrEmpty(value))
+        {
             block_4.item_14 = null;
+        }
+        else if (int.TryParse(value, out int parsedValue))
+        {
+            block_4.item_14 = parsedValue;
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_14));
+        }
         else
         {
-            block_4.item_14 = int.Parse(value);
-            editContext?.NotifyFieldChanged(
-            FieldIdentifier.Create(() => block_4.item_14));
+            // Auto-clear invalid input (10-digit numbers > Int32.MaxValue)
+            block_4.item_14 = null;
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_14));
         }
     }
 
@@ -746,18 +769,48 @@
         }
     }
 
+    // private void OnItem17Changed(ChangeEventArgs e)
+    // {
+    //     var value = e.Value?.ToString();
+
+    //     if (string.IsNullOrEmpty(value))
+    //         block_4.item_17 = null;
+    //     else
+    //     {
+    //         block_4.item_17 = int.Parse(value);
+    //         editContext?.NotifyFieldChanged(
+    //         FieldIdentifier.Create(() => block_4.item_17));
+    //     }
+    // }
+
     private void OnItem17Changed(ChangeEventArgs e)
     {
-        var value = e.Value?.ToString();
+        var value = e.Value?.ToString() ?? string.Empty;
+
+        // If length is 10, clear the input/model
+        if (value.Length > 10)
+        {
+            block_4.item_17 = null;
+            editContext?.NotifyFieldChanged(
+                FieldIdentifier.Create(() => block_4.item_17));
+            return;
+        }
 
         if (string.IsNullOrEmpty(value))
+        {
             block_4.item_17 = null;
+        }
         else
         {
-            block_4.item_17 = int.Parse(value);
-            editContext?.NotifyFieldChanged(
-            FieldIdentifier.Create(() => block_4.item_17));
+            // Optionally keep only digits
+            if (value.All(char.IsDigit))
+                block_4.item_17 = int.Parse(value);
+            else
+                block_4.item_17 = null;
         }
+
+        editContext?.NotifyFieldChanged(
+            FieldIdentifier.Create(() => block_4.item_17));
     }
 
     async void GoBack()

@@ -181,6 +181,7 @@
                             </label>
                             <input type="number" class="form-control no-spinner"
                                     value="@fields.GrossValue"
+                                   onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
                                     disabled="@(SessionStorage.FSU_Submitted)"
                                     @oninput="OnGrossValueInput">
                             </input>
