@@ -393,6 +393,24 @@
             }
         }
 
+        if (fieldName == nameof(block_7_1.item_5))
+        {
+
+            if (block_7_1.item_6.GetValueOrDefault() > 0 &&
+                block_7_1.item_5.GetValueOrDefault() > 0)
+            {
+                block_7_1.item_7 = block_7_1.item_6 / block_7_1.item_5;
+
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_7))
+                );
+            }
+            else
+            {
+                block_7_1.item_7 = null;
+            }
+        }
+
         if (block_7_1.item_5.GetValueOrDefault() == 0 && block_7_1.item_6.GetValueOrDefault() == 0)
         {
             block_7_1.item_7 = 0;
@@ -422,7 +440,7 @@
 
             if (data != null)
             {
-                block_7_1 = data;
+                block_7_1 = data.ShallowCopy();
                 editContext = new EditContext(block_7_1);
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;

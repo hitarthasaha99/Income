@@ -93,7 +93,7 @@
                                 if (item.is_deleted != true)
                                 {
                                     <tr>
-                                        <td class="text-center">@item.serial_number</td>
+                                        <td class="text-center">@($"A{item.serial_number}")</td>
                                         <td>@item.item_10_1</td>
                                         <td>@item.item_10_2</td>
                                         <td>@item.item_10_3</td>
@@ -514,7 +514,7 @@
             NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
             return;
         }
-        if (Q9Needed && ActivityList.Any(x => !x.isUpdated))
+        if (ActivityList.Any(x => !x.isUpdated))
         {
             toastService.ShowError("Please save all entries before proceeding");
             return;

@@ -53,7 +53,7 @@
                             <label class="form-label">
                                 <span class="form-badge">2</span>Social Group
                             </label>
-                            <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_2" @onchange="item_2_changed">
+                            <select class="form-select is_sso" disabled="@(SessionStorage.FSU_Submitted)" value="@block_4?.item_2" @onchange="item_2_changed">
                                 <option value="">Select</option>
                                 @if (commonList.LOOKUP_CONST_CASTE != null && commonList.LOOKUP_CONST_CASTE.Count > 0)
                                 {
@@ -75,7 +75,7 @@
                             <label class="form-label">
                                 <span class="form-badge">3</span>Religion
                             </label>
-                            <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_4?.item_3" @onchange="item_3_changed">
+                            <select class="form-select is_sso" disabled="@(SessionStorage.FSU_Submitted)" value="@block_4?.item_3" @onchange="item_3_changed">
                                 <option value="">Select</option>
                                 @if (commonList.LOOKUP_CONST_RELIGION != null && commonList.LOOKUP_CONST_RELIGION.Count > 0)
                                 {

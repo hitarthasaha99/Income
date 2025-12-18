@@ -258,9 +258,57 @@
                                          spellcheck="false"
                                          readonly>
                             </InputNumber>
-                            <ValidationMessage For="@(() => newMember.item_4)" />
+                            @* <ValidationMessage For="@(() => newMember.item_4)" /> *@
+                            @if (!string.IsNullOrEmpty(item_4_warning))
+                            {
+                                <div class="form-text text-danger" style="white-space: pre-line;">
+                                    @item_4_warning
+                                </div>
+                            }
                         </div>
                     </div>
+                    @* new after value 0 *@
+                    @if (isItemEnable)
+                    {                       
+                    <div class="col-sm-12">
+                        <div>
+                            <label class="form-label">
+                                <span class="form-badge">Q6.4.1 </span> please check the entries and provide suitable clarifications in following codes.
+                            </label>
+                                <select class="form-select" value="@newMember.item_5" @onchange="OnDroupdownChanged">
+                                <option value="">-Select-</option>
+                                <option value="1">a. Did not work in the reference period due to illness</option>
+                                <option value="2">b. Did not get work during the reference period</option>
+                                <option value="3">c. Did not work in the reference period due to personal work  </option>                               
+                                <option value="4">e. Others (please specify)</option>
+                            </select>
+                                @if (!string.IsNullOrEmpty(droupdown_warning))
+                                {
+                                    <div class="form-text text-danger" style="white-space: pre-line;">
+                                        @droupdown_warning
+                                    </div>
+                                }
+                                @if (isselectOther)
+                                {
+
+                                    <div>
+                                        <textarea class="form-control mt-2"
+                                                  rows="2"
+                                                  maxlength="50"
+                                                  placeholder="Please specify here..." @bind="newMember.remarks" @oninput="OnRemarksClear">
+            </textarea>
+                                        @if (!string.IsNullOrEmpty(droupdown_remarks))
+                                        {
+                                            <div class="form-text text-danger" style="white-space: pre-line;">
+                                                @droupdown_remarks
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            @* <ValidationMessage For="@(() => newMember.item_4)" /> *@
+                        </div>
+                    </div>
+                    }
                 </div>
             </EditForm>
         }      
@@ -286,6 +334,11 @@
     private List<Tbl_Block_6> block6Members = new();
     private Tbl_Block_1? block_1 = new();
     private Tbl_Block_6 newMember = new();
+    bool isItemEnable = false;
+    bool isselectOther = false;
+    string item_4_warning = string.Empty;
+    string droupdown_warning = string.Empty;
+    string droupdown_remarks = string.Empty;
     bool isAdd = false;
     bool error = false;
     DBQueries dbq = new();
@@ -329,7 +382,7 @@
                 }
                 await LoadData();
             }
-            else if (block6Members != null && block6Members.Count != applicableMembers?.Count)
+            else if (block6Members != null && block6Members.Count != 0)
             {
                 int currentSerialNumber = block6Members.Count();
                 var missingMembers = applicableMembers?
@@ -474,8 +527,47 @@
 
         handleCalculateIncome();
     }
+    //add validation condition if == 0 then enable
+    void CheckItem4Warning()
+    {
+        try
+        {
+            item_4_warning = string.Empty;
+            // isCostOfInput = false;
+            isItemEnable = false;
+            if (newMember != null && newMember.item_4 == 0)
+            {
+                item_4_warning = "Improper data reported in Q. 5.9. Please Choose an option.";
+                isItemEnable = true;
+            }
+        }
+        catch (Exception ex)
+        {
 
+        }
 
+    }
+    // after choose any droupdown
+    private void OnDroupdownChanged(ChangeEventArgs e)
+    {
+        // update bound value
+        if (int.TryParse(e.Value?.ToString(), out var v))
+            newMember.item_5 = v;
+        else
+            newMember.item_5 = null;
+        droupdown_warning = string.Empty;
+        item_4_warning = string.Empty;
+        // show only when 5 (Others) is selected, hide otherwise
+        isselectOther = newMember?.item_5 == 4;
+    }
+    //Remarks field clear after enter anything
+    private void OnRemarksClear(ChangeEventArgs e)
+    {
+        newMember.remarks = e.Value?.ToString();
+        droupdown_remarks = string.Empty;
+
+        StateHasChanged();
+    }
 
     //Handle CalculateIncome
     private void handleCalculateIncome()
@@ -486,6 +578,7 @@
 
         int ans = (item_1 * item_2) + item_3 / 12;
         newMember.item_4 = ans;
+        CheckItem4Warning();
         StateHasChanged();
     }
 
@@ -493,6 +586,7 @@
     {
         try
         {
+            SerialMemberError = string.Empty;
             if (action == "ADD")
             {
                 isAdd = true;
@@ -513,7 +607,7 @@
                 isAdd = false;
                 if (data != null)
                 {
-                    newMember = ObjectCloneHelper.CloneTblHISBlock6(data);
+                    newMember = data.ShallowCopy();
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
@@ -570,6 +664,25 @@
     private async Task HandleAddMember()
     {
         SerialMemberError = string.Empty;
+        droupdown_warning = string.Empty;
+        droupdown_remarks = string.Empty;
+        if (isItemEnable)
+        {
+            if (newMember.item_5 == null)
+            {
+                droupdown_warning = "Please choose an option for Q5.9.1";
+                toastService.ShowError("Please select clarification for Q5.9.1");
+                return;
+            }
+
+            // If "Others" selected but remarks empty
+            if (newMember.item_5 == 4 && string.IsNullOrWhiteSpace(newMember.remarks))
+            {
+                droupdown_remarks = "Please specify remarks for 'Others'";
+                toastService.ShowError("Please specify remarks for 'Others'");
+                return;
+            }
+        }
         if (isAdd && block6Members.Any(x => x.fk_block_3 == newMember?.fk_block_3))
         {
             SerialMemberError = "Data for this member has already been added";
@@ -596,7 +709,7 @@
         toastService.ShowSuccess("Member added successfully!");
         await AddModal.HideAsync();
         await LoadData();
-
+        SerialMemberError = string.Empty;
     }
 
    async void Next()

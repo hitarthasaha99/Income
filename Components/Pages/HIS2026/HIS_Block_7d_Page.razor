@@ -68,7 +68,7 @@
                                     foreach (var d in Block7DList)
                                     {
                                         <tr>
-                                            <td class="text-center">@d.item_1</td>
+                                            <td class="text-center">@d.display_serial_number</td>
                                             <td>@d.item_2</td>
                                             <td>
                                                 <select class="form-select" @onchange="(e) => UpdateModeOfOperation(d, e)">
@@ -211,7 +211,7 @@
                     "H055: Invalid entry, please check the entry"
                 );
             }
-            else if (row.item_4 < 0)
+            else if (row.item_4 < 1 || row.item_4 > 100)
             {
                 messageStore.Add(
                     new FieldIdentifier(row, nameof(row.item_4)),
@@ -307,6 +307,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4003,
                         item_1 = 2,
+                        display_serial_number = "2",
                         item_2 = "Animal husbandry"
                     };
                     toAdd.Add(newEntry);
@@ -323,6 +324,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4004,
                         item_1 = 3,
+                        display_serial_number = "3",
                         item_2 = "Fisheries"
                     };
                     toAdd.Add(newEntry);
@@ -339,6 +341,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4005,
                         item_1 = 4,
+                        display_serial_number = "4",
                         item_2 = "Agroforestry activity"
                     };
                     toAdd.Add(newEntry);
@@ -355,6 +358,7 @@
                         serial_number = GetCurrentSerialNumber(),
                         code = 4006,
                         item_1 = 5,
+                        display_serial_number = "5",
                         item_2 = "Others (bee keeping, sericulture, lac culture, ancillary etc.)"
                     };
                     toAdd.Add(newEntry);
@@ -397,6 +401,7 @@
                     id = Guid.NewGuid(),
                     block_7a_id = code.id,
                     serial_number = GetCurrentSerialNumber(),
+                    display_serial_number = $"1.{code.serial_number}",
                     code = code.code,
                     item_1 = code.serial_number,
                     item_2 = Block_7_1_Constants.CropCodes.FirstOrDefault(x => x.id == code.code)?.title ?? ""
@@ -439,6 +444,7 @@
                     id = Guid.NewGuid(),
                     block_7c_id = code.id,
                     serial_number = GetCurrentSerialNumber(),
+                    display_serial_number = $"6.{code.SerialNumber}",
                     code = code.NicCode,
                     item_1 = code.SerialNumber,
                     item_2 = Block_4_Constants.NIC_CODES.FirstOrDefault(x => x.id == code.NicCode)?.title ?? "Others"

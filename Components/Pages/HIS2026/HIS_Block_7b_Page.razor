@@ -445,6 +445,51 @@
                                         }
                                       </td>
                                   </tr>
+                                  @* new  field add acoding to condition <0*@
+                                    @if (isItemEnable)
+                                    {
+                                        
+                                    <tr>
+                                      <td>
+                                          <div class="badge bg-primary me-1">Q7b.9.1</div>
+                                      </td>
+                                        <td>Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes</td>
+                                      <td>
+                                                <select class="form-select" value="@block_7B.item_10" @onchange="OnDroupdownChanged">
+                                                <option value="">-Select-</option>
+                                                <option value="1">a. Did not work in the reference period due to illness</option>
+                                                <option value="2">b. Did not get work during the reference period</option>
+                                                <option value="3">c. Did not work in the reference period due to personal work  </option>
+                                                <option value="4">e. Others (please specify)</option>
+                                            </select>
+                                                @if (!string.IsNullOrEmpty(droupdown_warning))
+                                                {
+                                                    <div class="form-text text-danger" style="white-space: pre-line;">
+                                                        @droupdown_warning
+                                                    </div>
+                                                }
+                                            @if (isselectOther)
+                                            {
+
+                                                <div>
+                                                    <textarea class="form-control mt-2"
+                                                              rows="2"
+                                                              maxlength="50"
+                                                                  @oninput="OnRemarksClear"
+                                                              placeholder="Please specify here..." @bind="block_7B.remarks" >
+        </textarea>
+                                                        @if (!string.IsNullOrEmpty(droupdown_remarks))
+                                                        {
+                                                            <div class="form-text text-danger" style="white-space: pre-line;">
+                                                                @droupdown_remarks
+                                                            </div>
+                                                        }
+
+                                                </div>
+                                            }
+                                      </td>
+                                  </tr>
+                                    }
                               </tbody>
                           </table>
                       </div>
@@ -500,6 +545,10 @@
     private Tbl_Block_4? block_4 = null;
     private Tbl_Block_7b? block_7B = new();
     private Tbl_Block_1? block_1 = new();
+    bool isItemEnable = false;
+    bool isselectOther = false;
+    string droupdown_warning = string.Empty;
+    string droupdown_remarks = string.Empty;
     CommonQueries commonQueries = new();
     EditContext editContext;
     ValidationMessageStore messageStore;
@@ -563,6 +612,7 @@
     private async Task LoadData()
     {
         block_7B = await dB.Fetch_SCH_HIS_Block7B(SessionStorage.selected_hhd_id);
+        CheckItem6Warning();
     }
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
@@ -626,12 +676,26 @@
             item_9_warning = string.Empty;
             if (block_7B != null && block_7B.item_9 < 0)
             {
-                item_9_warning = @"Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes:
-a. Produces are damaged
-b. Product is not harvested
-c. Production is not started
-d. Others (specify in text box)";
+                item_9_warning = "Loss reported in Q. 7b.9. Please Choose an option";
+                isItemEnable = true;
+                isselectOther = block_7B.item_10 == 4;
 
+            }
+            else
+            {
+                // If value is Positive (or 0), hide the section
+                isItemEnable = false;
+
+               
+                block_7B.item_10 = null;
+                block_7B.remarks = string.Empty;
+
+                
+                isselectOther = false;
+
+                
+                droupdown_warning = string.Empty;
+                droupdown_remarks = string.Empty;
             }
         }
         catch (Exception ex)
@@ -640,11 +704,50 @@ d. Others (specify in text box)";
         }
 
     }
+    private void OnDroupdownChanged(ChangeEventArgs e)
+    {
+        // update bound value
+        if (int.TryParse(e.Value?.ToString(), out var v))
+            block_7B.item_10 = v;
+        else
+            block_7B.item_10 = null;
 
+        droupdown_warning = string.Empty;
+        droupdown_remarks = string.Empty;
+        // show only when 5 (Others) is selected, hide otherwise
+        isselectOther = block_7B?.item_10 == 4;
+    }
+    //Remarks field clear after enter anything
+    private void OnRemarksClear(ChangeEventArgs e)
+    {
+        block_7B.remarks = e.Value?.ToString();
+        droupdown_remarks = string.Empty;
+
+        StateHasChanged();
+    }
     private async Task Save(bool is_go_next = false)
     {
         try
         {
+            droupdown_warning = string.Empty;
+            droupdown_remarks = string.Empty;
+            if (isItemEnable)
+            {
+                if (block_7B.item_10 == null)
+                {
+                    droupdown_warning = "Please choose an option for Q5.9.1";
+                    toastService.ShowError("Please select clarification for Q5.9.1");
+                    return;
+                }
+
+                // If "Others" selected but remarks empty
+                if (block_7B.item_10 == 4 && string.IsNullOrWhiteSpace(block_7B.remarks))
+                {
+                    droupdown_remarks = "Please specify remarks for 'Others'";
+                    toastService.ShowError("Please specify remarks for 'Others'");
+                    return;
+                }
+            }
             if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
                 NavigationManager.NavigateTo("/dashboard/his/block_7c");

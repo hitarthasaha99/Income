@@ -132,7 +132,11 @@ namespace Income.Common.HIS2026
             // Other non-food crops
             new() { id = 1601, title = "canes - 1601" },
             new() { id = 1602, title = "bamboos - 1602" },
-            new() { id = 1699, title = "other non-food crops - 1699" }
+            new() { id = 1699, title = "other non-food crops - 1699" },
+
+            //other food crop
+            new() {id = 0999, title = "other food crop - 0999"}
+
         ];
 
     }

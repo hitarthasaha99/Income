@@ -218,7 +218,7 @@
         {
             item_3_warning = "W058: Invalid Entry, please check the entry recorded in Q8.3";
         }
-        
+
     }
 
 
@@ -291,7 +291,7 @@
         var memberExpr = (MemberExpression)field.Body;
         var prop = (PropertyInfo)memberExpr.Member;
         prop.SetValue(model, value);
-
+        CheckWarning();
         messageStore.Clear(identifier);
         editContext.NotifyFieldChanged(identifier);
 

@@ -1,4 +1,5 @@
 ﻿using Blazored.Toast.Services;
+using BootstrapBlazor.Components;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.EMMA;
@@ -17,14 +18,15 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Console = System.Console;
 
 namespace Income.Database.Queries
 {
     public class DBQueries : Database
     {
-        ToastService toastService = new();
+        Blazored.Toast.Services.ToastService toastService = new();
 
-        public async Task<int> SaveReceivedDataAsync(Submission_Model data)
+        public async Task<int> SaveReceivedSCH00DataAsync(Submission_Model data)
         {
             try
             {
@@ -34,7 +36,7 @@ namespace Income.Database.Queries
                     var sch00_block_0_1 = data.IncomeSch00block0;
                     if (sch00_block_0_1 != null)
                     {
-                        await SaveBlock1(sch00_block_0_1);
+                        await SaveAsync<Tbl_Sch_0_0_Block_0_1>(sch00_block_0_1);
                     }
 
                     var sch00_block_2_1 = data.IncomeSch00block2_1;
@@ -100,6 +102,24 @@ namespace Income.Database.Queries
                         }
                     }
 
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+        public async Task<int> SaveReceivedHISDataAsync(Submission_Model data)
+        {
+            try
+            {
+                if (data != null)
+                {
                     /*SCH HIS*/
                     var sch_his_object_list = data.IncomeSchHISDto;
                     if (sch_his_object_list != null && sch_his_object_list.Count > 0)
@@ -370,6 +390,96 @@ namespace Income.Database.Queries
                     await _database.ExecuteAsync(
                         $"DELETE FROM {table} WHERE fsu_id = ? AND tenant_id = ?",
                         fsuID, tenantId
+                    );
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> HardDeleteSCH00DataForFSUID(int fsuID)
+        {
+            try
+            {
+                var tenantId = SessionStorage.tenant_id;
+
+                // List of all tables to delete from
+                var tables = new List<string>
+                {
+                    // Existing tables
+                    "Tbl_Sch_0_0_Block_0_1",
+                    "Tbl_Sch_0_0_Block_2_1",
+                    "Tbl_Sch_0_0_Block_2_2",
+                    "Tbl_Sch_0_0_Block_3",
+                    "Tbl_Sch_0_0_Block_4",
+                    "Tbl_Sch_0_0_Block_5",
+                    "Tbl_Sch_0_0_Block_7",
+                    "Tbl_Sch_0_0_FieldOperation",
+                    "Tbl_Warning"
+                };
+
+                // Execute delete for each table
+                foreach (var table in tables)
+                {
+                    await _database.ExecuteAsync(
+                        $"DELETE FROM {table} WHERE fsu_id = ? AND tenant_id = ?",
+                        fsuID, tenantId
+                    );
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> HardDeleteHISDataForFSUID(int fsuID, int hhd_id)
+        {
+            try
+            {
+                var tenantId = SessionStorage.tenant_id;
+
+                // List of all tables to delete from
+                var tables = new List<string>
+                {
+                    // New HIS tables
+                    "Tbl_Block_1",
+                    "Tbl_Block_3",
+                    "Tbl_Block_4",
+                    "Tbl_Block_4_Q5",
+                    "Tbl_Block_5",
+                    "Tbl_Block_6",
+                    "Tbl_Block_7a",
+                    "Tbl_Block_7a_1",
+                    "Tbl_Block_7b",
+                    "Tbl_Block_7c",
+                    "Tbl_Block_7c_NIC",
+                    "Tbl_Block_7c_Q10",
+                    "Tbl_Block_7d",
+                    "Tbl_Block_8",
+                    "Tbl_Block_8_Q6",
+                    "Tbl_Block_9a",
+                    "Tbl_Block_9b",
+                    "Tbl_Block_10",
+                    "Tbl_Block_11a",
+                    "Tbl_Block_11b",
+                    "Tbl_Block_A",
+                    "Tbl_Block_B",
+                    "Tbl_Block_FieldOperation"
+                };
+
+                // Execute delete for each table
+                foreach (var table in tables)
+                {
+                    await _database.ExecuteAsync(
+                        $"DELETE FROM {table} WHERE fsu_id = ? AND hhd_id = ? AND tenant_id = ?",
+                        fsuID, hhd_id, tenantId
                     );
                 }
 
@@ -695,7 +805,7 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                    tbl_Sch_0_0_Block_4.id = Guid.NewGuid();
+                    tbl_Sch_0_0_Block_4.id = tbl_Sch_0_0_Block_4.id == Guid.Empty ? Guid.NewGuid() : tbl_Sch_0_0_Block_4.id;
                     status = await _database.InsertAsync(tbl_Sch_0_0_Block_4);
                 }
                 return status;
@@ -958,7 +1068,7 @@ namespace Income.Database.Queries
                     {
                         file.block_name = file.is_sub_unit == true ? CommonEnum.sch_0_0_block_3.ToString() : CommonEnum.sch_0_0_block_3_1.ToString();
                         await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("DELETE FROM Tbl_Sch_0_0_Block_3 WHERE block_name = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", file.block_name, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
-                        file.id = Guid.NewGuid();
+                        file.id = file.id == Guid.Empty ?  Guid.NewGuid() : file.id;
                         file.is_deleted = false;
                         status = await _database.InsertAsync(file);
                     }
@@ -1629,6 +1739,7 @@ namespace Income.Database.Queries
                         if (status > 0)
                         {
                             await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                            await DeleteBlocksDependentOnBlock3(exists);
                         }
                     }
                     else
@@ -1637,6 +1748,7 @@ namespace Income.Database.Queries
                         if (deleted > 0)
                         {
                             await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
+                            await DeleteBlocksDependentOnBlock3(exists);
                         }
                     }
                     var json = System.Text.Json.JsonSerializer.Serialize(exists);
@@ -1674,6 +1786,13 @@ namespace Income.Database.Queries
                 {
                     await ResetBlock4ActivitiesAsync();
                 }
+
+                bool hasCode2 = await HasAnyBlock3WithCode(2);
+
+                if (!hasCode2)
+                {
+                    await ResetBlock4Q5ActivitiesAsync();
+                }
                 // NOTE:
                 // If hasCode1 == true and Block 4 has no selection,
                 // validation should happen at save/submit time (not auto-set)
@@ -1683,9 +1802,7 @@ namespace Income.Database.Queries
 
                 if (!hasCode4)
                 {
-                    var block5Entries = await _database.Table<Tbl_Block_5>()
-                        .Where(x => x.fk_block_3 == oldBlock3.id)
-                        .ToListAsync();
+                    var block5Entries = await FetchListAsync<Tbl_Block_5>();
 
                     foreach (var entry in block5Entries)
                     {
@@ -1693,14 +1810,23 @@ namespace Income.Database.Queries
                     }
                 }
 
+                if (newBlock3 != null && newBlock3.item_8 != 4 && newBlock3.item_9 != 4 && newBlock3.item_10 != 4 && newBlock3.item_11 != 4)
+                {
+                    var linkedBlock5Entries = await _database.Table<Tbl_Block_5>()
+                        .Where(x => x.fk_block_3 == newBlock3.id)
+                        .ToListAsync();
+                    foreach (var item in linkedBlock5Entries)
+                    {
+                        await DeleteEntryAsync<Tbl_Block_5>(item.id);
+                    }
+                }
+
                 // ================= BLOCK 6 (code = 5) =================
-                bool hasCode5 = await HasAnyBlock3WithCode(5);
+                bool hasCode5 = await HasAnyBlock3Item8_9WithCode(5);
 
                 if (!hasCode5)
                 {
-                    var block6Entries = await _database.Table<Tbl_Block_6>()
-                        .Where(x => x.fk_block_3 == oldBlock3.id)
-                        .ToListAsync();
+                    var block6Entries = await FetchListAsync<Tbl_Block_6>();
 
                     foreach (var entry in block6Entries)
                     {
@@ -1708,8 +1834,63 @@ namespace Income.Database.Queries
                     }
                 }
 
+                if (newBlock3 != null && newBlock3.item_8 != 5 && newBlock3.item_9 != 5)
+                {
+                    var linkedBlock6Entries = await _database.Table<Tbl_Block_6>()
+                        .Where(x => x.fk_block_3 == newBlock3.id)
+                        .ToListAsync();
+                    foreach (var item in linkedBlock6Entries)
+                    {
+                        await DeleteEntryAsync<Tbl_Block_6>(item.id);
+                    }
+                }
+
+                //bool hasCode2_item_8_9 = await HasAnyBlock3Item8_9WithCode(2);
+
+                //if (!hasCode2_item_8_9)
+                //{
+                //    var block7cEntries = await FetchListAsync<Tbl_Block_7c_NIC>();
+
+                //    foreach (var entry in block7cEntries)
+                //    {
+                //        await DeleteEntryAsync<Tbl_Block_7c_NIC>(entry.id);
+                //    }
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("UpdateBlock3", ex);
+            }
+        }
+
+        private async Task DeleteBlocksDependentOnBlock3(Tbl_Block_3 block_3)
+        {
+            try
+            {
+                //block 5
+                var block5Entries = await _database.Table<Tbl_Block_5>()
+                        .Where(x => x.fk_block_3 == block_3.id)
+                        .ToListAsync();
+
+                foreach (var entry in block5Entries)
+                {
+                    await DeleteEntryAsync<Tbl_Block_5>(entry.id);
+                }
+
+                //block 6
+                var block6Entries = await _database.Table<Tbl_Block_6>()
+                        .Where(x => x.fk_block_3 == block_3.id)
+                        .ToListAsync();
+
+                foreach (var entry in block6Entries)
+                {
+                    await DeleteEntryAsync<Tbl_Block_6>(entry.id);
+                }
+
+                //11b
                 var block11bEntries = await _database.Table<Tbl_Block_11b>()
-                        .Where(x => x.fk_block_3 == oldBlock3.id)
+                        .Where(x => x.fk_block_3 == block_3.id)
                         .ToListAsync();
 
                 foreach (var entry in block11bEntries)
@@ -1719,7 +1900,11 @@ namespace Income.Database.Queries
             }
             catch (Exception ex)
             {
-                await _logger.LogError("UpdateBlock3", ex);
+
+            }
+            finally
+            {
+
             }
         }
         private async Task<bool> HasAnyBlock3WithCode(params int[] codes)
@@ -1734,6 +1919,15 @@ namespace Income.Database.Queries
                     codes.Contains(x.item_11 ?? -1));
         }
 
+        private async Task<bool> HasAnyBlock3Item8_9WithCode(params int[] codes)
+        {
+            var result = await _database.Table<Tbl_Block_3>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false))
+                .ToListAsync();
+            return result.Any(x =>
+                    codes.Contains(x.item_8 ?? -1) ||
+                    codes.Contains(x.item_9 ?? -1));
+        }
 
         private bool IsAnyBlock4ActivitySelected(Tbl_Block_4 block4)
         {
@@ -1765,6 +1959,23 @@ namespace Income.Database.Queries
             block4.item_4_6 = false;
 
             await _database.UpdateAsync(block4);
+        }
+
+        private async Task ResetBlock4Q5ActivitiesAsync()
+        {
+            var block4 = await _database.Table<Tbl_Block_4_Q5>()
+                .Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false))
+                .ToListAsync();
+
+            if (block4 == null || (block4 != null && block4.Count == 0))
+                return;
+            if (block4 != null && block4.Count > 0)
+            {
+                foreach (var item in block4)
+                {
+                    await DeleteEntryAsync<Tbl_Block_4_Q5>(item.id);
+                }
+            }
         }
 
         private bool HasDependencyFieldsChanged(Tbl_Block_3 oldB, Tbl_Block_3 newB)
@@ -3316,13 +3527,12 @@ namespace Income.Database.Queries
             var existing = await _database.Table<T>()
                 .FirstOrDefaultAsync(x => x.id == entity.id);
 
-            entity.survey_timestamp = DateTime.Now;
-
             if (existing == null)
             {
                 // INSERT
-                entity.id = Guid.NewGuid();
-                entity.survey_coordinates = SessionStorage.location;
+                entity.id = entity.id == Guid.Empty ? Guid.NewGuid() : entity.id;
+                entity.survey_timestamp = entity.survey_timestamp == null ? DateTime.Now : entity.survey_timestamp;
+                entity.survey_coordinates = string.IsNullOrEmpty(entity.survey_coordinates) ? SessionStorage.location : entity.survey_coordinates;
                 await _database.InsertAsync(entity);
                 return 1;
             }

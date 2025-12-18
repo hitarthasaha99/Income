@@ -49,7 +49,7 @@
                             <select class="form-select is_sso"
                                     value="@block_4?.item_6"
                                     @onchange="item_6_changed"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    disabled="@(SessionStorage.FSU_Submitted)">
                                 <option value="">Select</option>
                                 @if (commonList.LOOKUP_CONST_YES_NO != null)
                                 {
@@ -74,7 +74,7 @@
                                     value="@block_4.item_7"
                                     @oninput="OnItem7Changed"
                                            onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
-                                    disabled="@(block_4?.item_6 != 1 || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12))" />
+                                    disabled="@(block_4?.item_6 != 1 || (SessionStorage.FSU_Submitted))" />
                             <ValidationMessage For="@(() => block_4.item_7)" />
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                                                             value="@item.id"
                                                             checked="@SelectedLandUses.Contains(item.id)"
                                                             @onchange="() => ToggleLandUse(item.id)"
-                                                            disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                                            disabled="@(SessionStorage.FSU_Submitted)" />
                                                         </label>
                                                     </td>
                                                     <td>
@@ -132,7 +132,7 @@
                                                     value="@item.id"
                                                     checked="@SelectedLandUses.Contains(item.id)"
                                                     @onchange="() => ToggleLandUse(item.id)"
-                                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                                    disabled="@(SessionStorage.FSU_Submitted)" />
                                             <span class="label-text">@item.title</span>
                                         </label>
                                     }
@@ -153,7 +153,7 @@
                             <select class="form-select is_sso"
                                     value="@block_4.item_9"
                                     @onchange="item_9_changed"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    disabled="@(SessionStorage.FSU_Submitted)">
                                 <option value="">Select</option>
                                 @foreach (var item in Block_4_Constants.Q4_9)
                                 {
@@ -183,7 +183,7 @@
                                                                 value="@item.id"
                                                                 checked="@SelectedEconomicActivities.Contains(item.id)"
                                                                 @onchange="() => ToggleEconomicActivity(item.id)"
-                                                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                                                disabled="@(SessionStorage.FSU_Submitted)" />
                                                     </label>
                                                 </td>
                                                 <td>
@@ -214,7 +214,7 @@
                                                 value="@item.id"
                                                 checked="@SelectedEconomicActivities.Contains(item.id)"
                                                 @onchange="() => ToggleEconomicActivity(item.id)"
-                                                disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                                disabled="@(SessionStorage.FSU_Submitted)" />
                                         <span class="label-text">@item.title</span>
                                     </label>
                                 }
@@ -237,7 +237,7 @@
                             <select class="form-select is_sso"
                                     value="@block_4.item_11"
                                     @onchange="item_11_changed"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    disabled="@(SessionStorage.FSU_Submitted)">
                                 <option value="">Select</option>
                                 @foreach (var item in Block_4_Constants.Q4_11)
                                 {
@@ -258,7 +258,7 @@
                                     value="@block_4.item_12"
                                     @oninput="OnItem12Changed"
                                            onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                    disabled="@(SessionStorage.FSU_Submitted)" />
                             <ValidationMessage For="@(() => block_4.item_12)" />
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                             <select class="form-select is_sso"
                                     value="@block_4.item_13"
                                     @oninput="OnItem13Changed"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    disabled="@(SessionStorage.FSU_Submitted)">
                                 <option value="">Select</option>
                                 @foreach (var item in Block_4_Constants.Q4_13)
                                 {
@@ -292,8 +292,14 @@
                                     value="@block_4.item_14"
                                     @oninput="OnItem14Changed"
                                      onkeypress="if (this.value.length >= 2) return false; return /^[0-9]$/.test(event.key);"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                    disabled="@(SessionStorage.FSU_Submitted)" />
                             <ValidationMessage For="@(() => block_4.item_14)" />
+                                    @if (!string.IsNullOrEmpty(Item14WarningMessage))
+                                    {
+                                        <div class="form-text text-success">
+                                            @Item14WarningMessage
+                                        </div>
+                                    }
                         </div>
                     </div>
                     <div class="col-sm-12">
@@ -305,7 +311,7 @@
                             <select class="form-select is_sso"
                                     value="@block_4.item_15"
                                     @oninput="OnItem15Changed"
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)">
+                                    disabled="@(SessionStorage.FSU_Submitted)">
                                 <option value="">Select</option>
                                 @foreach (var item in Block_4_Constants.Q4_15)
                                 {
@@ -329,7 +335,7 @@
                                     onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
                                     value="@block_4.item_17"
                                     @oninput="OnItem17Changed"                                   
-                                    disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" />
+                                    disabled="@(SessionStorage.FSU_Submitted)" />
                             <ValidationMessage For="@(() => block_4.item_17)" />
                         </div>
                     </div>
@@ -348,7 +354,7 @@
                 <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
             <div class="card-body">
-                <textarea type="text" class="form-control is_sso w-100" disabled="@(SessionStorage.FSU_Submitted))" placeholder="Enter your text here..." rows="2" @bind="block_1.block_4_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea type="text" class="form-control is_sso w-100" maxlength="500" placeholder="Enter your text here..." rows="2" @bind="block_1.block_4_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
             </div>
             </fieldset>
         </div>
@@ -412,6 +418,7 @@
 
     private string Item8WarningMessage = string.Empty;
     private string Item10WarningMessage = string.Empty;
+    private string Item14WarningMessage = string.Empty;
     private string Item16WarningMessage = string.Empty;
 
     EditContext editContext;
@@ -472,7 +479,7 @@
         block_4_nic_list = await dQ.Fetch_SCH_HIS_Block4_NICList();
         block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         await commonQueries.InsertVisitedBlock(vb);
-        
+        CheckItem14Warning();
         StateHasChanged();
     }
 
@@ -632,7 +639,7 @@
         }
         catch (Exception ex)
         {
-            
+
         }
     }
 
@@ -707,6 +714,7 @@
         else if (int.TryParse(value, out int parsedValue))
         {
             block_4.item_14 = parsedValue;
+            CheckItem14Warning();
             editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_14));
         }
         else
@@ -714,6 +722,15 @@
             // Auto-clear invalid input (10-digit numbers > Int32.MaxValue)
             block_4.item_14 = null;
             editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_14));
+        }
+    }
+
+    private void CheckItem14Warning()
+    {
+        Item14WarningMessage = string.Empty;
+        if(block_4 != null && block_4.item_14.GetValueOrDefault() > 15)
+        {
+            Item14WarningMessage = $"W026: Please recheck the entry";
         }
     }
 
@@ -787,30 +804,34 @@
     {
         var value = e.Value?.ToString() ?? string.Empty;
 
-        // If length is 10, clear the input/model
-        if (value.Length > 10)
+        // Empty input → clear model
+        if (string.IsNullOrWhiteSpace(value))
         {
             block_4.item_17 = null;
-            editContext?.NotifyFieldChanged(
-                FieldIdentifier.Create(() => block_4.item_17));
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_17));
             return;
         }
 
-        if (string.IsNullOrEmpty(value))
+        // Length check (max 10 digits)
+        if (value.Length > 10)
         {
             block_4.item_17 = null;
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_17));
+            return;
+        }
+
+        // Safe parse with bounds check
+        if (int.TryParse(value, out var result) && result >= 0 && result <= int.MaxValue)
+        {
+            block_4.item_17 = result;
         }
         else
         {
-            // Optionally keep only digits
-            if (value.All(char.IsDigit))
-                block_4.item_17 = int.Parse(value);
-            else
-                block_4.item_17 = null;
+            // Non-numeric, overflow, or negative → clear
+            block_4.item_17 = null;
         }
 
-        editContext?.NotifyFieldChanged(
-            FieldIdentifier.Create(() => block_4.item_17));
+        editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_17));
     }
 
     async void GoBack()
@@ -843,6 +864,7 @@
             {
                 CheckWarningForItem8();
                 CheckWarningForItem10();
+                CheckItem14Warning();
                 CheckWarningForItem16();
 
                 if (!string.IsNullOrEmpty(Item8WarningMessage))
@@ -877,6 +899,11 @@
                             SessionStorage.selected_hhd_id
                         );
                     }
+                }
+
+                if (!string.IsNullOrEmpty(Item14WarningMessage))
+                {
+                    warningVM.AddWarning(Item14WarningMessage, "HIS", "4", "14", SessionStorage.selected_hhd_id);
                 }
 
                 if (!string.IsNullOrEmpty(Item16WarningMessage))
