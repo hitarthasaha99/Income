@@ -33,7 +33,7 @@
                     
                 <button class="btn btn-primary is_sso"
                         @onclick="@(() => HandleModal("ADD"))"
-                        disabled="@(!Q9Needed)">
+                        disabled="@(SessionStorage.FSU_Submitted)">
                     <i class="fi fi-rr-plus me-1"></i>Add Activity
                 </button>
                 }

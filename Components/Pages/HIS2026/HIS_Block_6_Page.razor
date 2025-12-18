@@ -382,7 +382,7 @@
                 }
                 await LoadData();
             }
-            else if (block6Members != null && block6Members.Count != applicableMembers?.Count)
+            else if (block6Members != null && block6Members.Count != 0)
             {
                 int currentSerialNumber = block6Members.Count();
                 var missingMembers = applicableMembers?
@@ -586,6 +586,7 @@
     {
         try
         {
+            SerialMemberError = string.Empty;
             if (action == "ADD")
             {
                 isAdd = true;
@@ -606,7 +607,7 @@
                 isAdd = false;
                 if (data != null)
                 {
-                    newMember = ObjectCloneHelper.CloneTblHISBlock6(data);
+                    newMember = data.ShallowCopy();
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
@@ -662,7 +663,7 @@
 
     private async Task HandleAddMember()
     {
-        // SerialMemberError = string.Empty;
+        SerialMemberError = string.Empty;
         droupdown_warning = string.Empty;
         droupdown_remarks = string.Empty;
         if (isItemEnable)
@@ -708,7 +709,7 @@
         toastService.ShowSuccess("Member added successfully!");
         await AddModal.HideAsync();
         await LoadData();
-
+        SerialMemberError = string.Empty;
     }
 
    async void Next()

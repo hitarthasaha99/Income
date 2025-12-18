@@ -16,6 +16,7 @@ namespace Income.Database.Models.HIS_2026
         public Guid block_7c_id { get; set; }
         public int? code { get; set; }
         public int? serial_number { get; set; }
+        public string? display_serial_number { get; set; }
         //sl no of activity
         public int? item_1 { get; set; }
         //description of activity

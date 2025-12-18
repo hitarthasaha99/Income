@@ -125,7 +125,7 @@
                         <label class="form-label">
                             <span class="form-badge">12</span>@Loc["survey_code"]
                         </label>
-                        <select class="form-select is_sso" disabled="@(hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
+                        <select class="form-select is_sso" disabled="@(SessionStorage.FSU_Submitted)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
                             <option value="">Select</option>
                             @if (commonList.LOOKUP_CONST_HHD_SURVEY_CODE != null && commonList.LOOKUP_CONST_HHD_SURVEY_CODE.Count > 0)
                             {
@@ -156,7 +156,7 @@
                             <span class="form-badge">13</span>@Loc["reason_for_substitution"]
                         </label>
 
-                        <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (hhdStatus != 0 && hhdStatus != 11 && hhdStatus != 12)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
+                        <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (SessionStorage.FSU_Submitted)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
                             <option value="">Select</option>
                             @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
                             {

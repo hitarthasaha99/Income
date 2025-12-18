@@ -195,36 +195,49 @@ namespace Income.Common
         {
             try
             {
-                var location = await Geolocation.GetLocationAsync(new GeolocationRequest
+                var geoTask = Geolocation.GetLocationAsync(new GeolocationRequest
                 {
-                    DesiredAccuracy = GeolocationAccuracy.Medium,
+                    DesiredAccuracy = GeolocationAccuracy.Medium
                 });
+
+                // 5-second timeout
+                var completedTask = await Task.WhenAny(geoTask, Task.Delay(TimeSpan.FromSeconds(5)));
+
+                if (completedTask != geoTask)
+                {
+                    // Timed out
+                    return string.Empty;
+                }
+
+                var location = await geoTask;
 
                 if (location != null)
                 {
                     double latitude = location.Latitude;
                     double longitude = location.Longitude;
-                    SessionStorage.location = $"{latitude.ToString("0.000000")} , {longitude.ToString("0.000000")}";
-                    return $"{latitude.ToString("0.000000")} , {longitude.ToString("0.000000")}";
+
+                    var result = $"{latitude:0.000000} , {longitude:0.000000}";
+                    SessionStorage.location = result;
+
+                    return result;
                 }
-                else
-                {
-                    return string.Empty;
-                }
+
+                return string.Empty;
             }
-            catch (FeatureNotSupportedException fnsEx)
+            catch (FeatureNotSupportedException)
             {
                 return string.Empty;
             }
-            catch (PermissionException pEx)
+            catch (PermissionException)
             {
                 return string.Empty;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return string.Empty;
             }
         }
+
 
         public DateTime ConvertDate(string date)
         {

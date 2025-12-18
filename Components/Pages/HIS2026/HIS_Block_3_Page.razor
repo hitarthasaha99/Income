@@ -1269,7 +1269,7 @@
     private void CheckItem12Warning()
     {
         item_12Warning = string.Empty;
-        if (newMember.age < 15 && newMember.item_12.GetValueOrDefault() is 1 or 2)
+        if (newMember.age < 15 && newMember.item_12.GetValueOrDefault() is 1)
         {
             item_12Warning = $"W012(ii): Invalid entry, please recheck the entry";
         }

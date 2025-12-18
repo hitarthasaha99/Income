@@ -41,7 +41,7 @@ namespace Income.Database.Models.HIS_2026
         //Droupdown
         public int? item_10 { get; set; }
         //remarks
-        public string? remarks { get; set; }
+        public string? item_11 { get; set; }
         public bool isUpdated { get; set; } = false;
        
     }

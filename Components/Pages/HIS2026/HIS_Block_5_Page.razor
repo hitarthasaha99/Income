@@ -456,7 +456,8 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label class="form-label">
-                            <span class="form-badge">Q5.9 </span>  Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)
+                            <span class="form-badge">Q5.9 </span>
+                                Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)
                             </label>
                             <InputNumber @bind-Value="newMember.item_9"
                                          class="form-control no-spinner"
@@ -505,7 +506,7 @@
                                 <textarea class="form-control mt-2"
                                           rows="2"
                                           maxlength="50"
-                                              placeholder="Please specify here..." @bind="newMember.remarks" @oninput="OnRemarksClear">
+                                              placeholder="Please specify here..." @bind="newMember.item_11" @oninput="OnRemarksClear">
       </textarea>
                                     @if (!string.IsNullOrEmpty(droupdown_remarks))
                                     {
@@ -533,7 +534,7 @@
 
         <button class="btn btn-primary"
                 @onclick="HandleAddMember">
-            Save
+            @((isAdd ? "Save" : "Update"))
         </button>
 
     </FooterTemplate>
@@ -671,7 +672,7 @@
                 }
                 await LoadData();
             }
-            else if (block5Members != null && block5Members.Count != applicableMembers?.Count)
+            else if (block5Members != null && block5Members.Count != 0)
             {
                 int currentSerialNumber = block5Members.Count();
                 var missingMembers = applicableMembers?
@@ -749,17 +750,14 @@
         handleCalculateIncome();
     }
 
-
     //Remarks field clear after enter anything 
     private void OnRemarksClear(ChangeEventArgs e)
     {
-        newMember.remarks = e.Value?.ToString();
+        newMember.item_11 = e.Value?.ToString();
         droupdown_remarks = string.Empty;
 
         StateHasChanged();
     }
-
-
 
     //Handle CalculateIncome
     private void handleCalculateIncome()
@@ -785,6 +783,7 @@
     {
         try
         {
+            SerialMemberError = string.Empty;
             if (action == "ADD")
             {
                 isAdd = true;
@@ -806,7 +805,7 @@
 
                 if (data != null)
                 {
-                    newMember = ObjectCloneHelper.CloneTblHISBlock5(data);
+                    newMember = data.ShallowCopy();
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
@@ -854,39 +853,6 @@
         StateHasChanged();
     }
 
-    // private async Task HandleAddMember()
-    // {
-    //     SerialMemberError = string.Empty;
-    //     if (isAdd && block5Members.Any(x => x.fk_block_3 == newMember?.fk_block_3))
-    //     {
-    //         SerialMemberError = "Data for this member has already been added";
-    //         toastService.ShowError("Data for this member has already been added");
-    //         return;
-    //     }
-    //     messageStore.Clear();
-    //     var result = await Validator.ValidateAsync(newMember);
-    //     foreach (var error in result.Errors)
-    //     {
-    //         var fieldIdentifier = new FieldIdentifier(newMember, error.PropertyName);
-    //         messageStore.Add(fieldIdentifier, error.ErrorMessage);
-    //     }
-
-    //     editContext.NotifyValidationStateChanged();
-
-    //     if (!result.IsValid)
-    //     {
-    //         toastService.ShowError("Please resolve pending errors");
-    //         return;
-    //     }
-
-    //     newMember.isUpdated = true;
-       
-    //     await dbq.SaveAsync<Tbl_Block_5>(newMember);
-    //     toastService.ShowSuccess("Member added successfully!");
-    //     await AddModal.HideAsync();
-    //     await LoadData();
-
-    // }
     private async Task HandleAddMember()
     {
         SerialMemberError = string.Empty;
@@ -904,7 +870,7 @@
             }
 
             // If "Others" selected but remarks empty
-            if (newMember.item_10 == 5 && string.IsNullOrWhiteSpace(newMember.remarks))
+            if (newMember.item_10 == 5 && string.IsNullOrWhiteSpace(newMember.item_11))
             {
                 droupdown_remarks = "Please specify remarks for 'Others'";
                 toastService.ShowError("Please specify remarks for 'Others'");
@@ -945,8 +911,8 @@
         toastService.ShowSuccess("Member added successfully!");
         await AddModal.HideAsync();
         await LoadData();
+        SerialMemberError = string.Empty;
     }
-
 
     async void Next()
     {

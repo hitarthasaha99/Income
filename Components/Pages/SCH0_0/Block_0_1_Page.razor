@@ -17,12 +17,11 @@
 {
     <EditForm EditContext="@editContext">
         <FluentValidationValidator />
+        <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+                             survey_time="@survey_time" />
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
             <div class="main-content">
-                <CommonContentHeader SelectedFsuId="@SelectedFsuId"
-                                     survey_time="@survey_time" />
-
-
+                
                 <div class="card custom-card">
                     <div class="card-header">
                         <h3 class="card-title"><span class="text-primary fw-bolder me-2">[0]</span>Descriptive identification of sample FSU</h3>

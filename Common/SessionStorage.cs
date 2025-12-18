@@ -31,6 +31,7 @@ namespace Income.Common
         public static int FSU_Sector = 0;
         public static bool selection_done = false;
         public static bool hamlet_selection_done = false;
+        public static bool subdivision_selection_done = false;
         public static bool FSU_Submitted = false;
         public static int sss = 0;
         public static string hhd_head = string.Empty;
@@ -68,6 +69,7 @@ namespace Income.Common
             selected_hhd_seq = 0;
             selection_done = false;
             hamlet_selection_done = false;
+            subdivision_selection_done = false;
             FSU_Submitted = false;
             sss = 0;
             hhd_head = string.Empty;
