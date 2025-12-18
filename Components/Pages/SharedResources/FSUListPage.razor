@@ -183,10 +183,6 @@
                                         .Distinct()
                                         .ToList();
 
-
-
-
-
                     var statusFlags = new Dictionary<int, bool>
                                 {
                                     { 21, fsuHouses?.Any(x => x.lookup_submit_status == 21) ?? false },
@@ -302,6 +298,7 @@
             {
                 SessionStorage.hamlet_selection_done = subUnitData.Any(x => x.IsChecked);
             }
+
             var sch00block1 = await dB.FetchBlock1();
 
             if (block_name == "sch0.0")
@@ -344,6 +341,12 @@
                 SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
                 SessionStorage.selection_done = await FSU_Selection_Done(fsu_id);
                 SessionStorage.hamlet_selection_done = SessionStorage.selection_done ? true : await CheckHamletSelection(fsu_id);
+                var subDivisionData = await dB.FetchSCH0Block5Data();
+                if (subDivisionData != null && subDivisionData.Count > 0)
+                {
+                    SessionStorage.hamlet_selection_done = true;
+                    SessionStorage.subdivision_selection_done = subDivisionData.Any(x => x.IsChecked == true);
+                }
                 SessionStorage.FSU_Submitted = FsuData?.FirstOrDefault().lookupFsuSubmitStatus is not (0 or 11);
                 SessionStorage.selected_hhd_seq = 0;
                 SessionStorage.selected_hhd_id = 0;
@@ -410,6 +413,7 @@
                 bool selection_done = su_list.Any(x => x.IsChecked);
                 return selection_done;
             }
+            
             return false;
         }
         catch (Exception ex)

@@ -294,6 +294,12 @@
                                      onkeypress="if (this.value.length >= 2) return false; return /^[0-9]$/.test(event.key);"
                                     disabled="@(SessionStorage.FSU_Submitted)" />
                             <ValidationMessage For="@(() => block_4.item_14)" />
+                                    @if (!string.IsNullOrEmpty(Item14WarningMessage))
+                                    {
+                                        <div class="form-text text-success">
+                                            @Item14WarningMessage
+                                        </div>
+                                    }
                         </div>
                     </div>
                     <div class="col-sm-12">
@@ -412,6 +418,7 @@
 
     private string Item8WarningMessage = string.Empty;
     private string Item10WarningMessage = string.Empty;
+    private string Item14WarningMessage = string.Empty;
     private string Item16WarningMessage = string.Empty;
 
     EditContext editContext;
@@ -472,7 +479,7 @@
         block_4_nic_list = await dQ.Fetch_SCH_HIS_Block4_NICList();
         block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         await commonQueries.InsertVisitedBlock(vb);
-        
+        CheckItem14Warning();
         StateHasChanged();
     }
 
@@ -632,7 +639,7 @@
         }
         catch (Exception ex)
         {
-            
+
         }
     }
 
@@ -707,6 +714,7 @@
         else if (int.TryParse(value, out int parsedValue))
         {
             block_4.item_14 = parsedValue;
+            CheckItem14Warning();
             editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_14));
         }
         else
@@ -714,6 +722,15 @@
             // Auto-clear invalid input (10-digit numbers > Int32.MaxValue)
             block_4.item_14 = null;
             editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_14));
+        }
+    }
+
+    private void CheckItem14Warning()
+    {
+        Item14WarningMessage = string.Empty;
+        if(block_4 != null && block_4.item_14.GetValueOrDefault() > 15)
+        {
+            Item14WarningMessage = $"W026: Please recheck the entry";
         }
     }
 
@@ -847,6 +864,7 @@
             {
                 CheckWarningForItem8();
                 CheckWarningForItem10();
+                CheckItem14Warning();
                 CheckWarningForItem16();
 
                 if (!string.IsNullOrEmpty(Item8WarningMessage))
@@ -881,6 +899,11 @@
                             SessionStorage.selected_hhd_id
                         );
                     }
+                }
+
+                if (!string.IsNullOrEmpty(Item14WarningMessage))
+                {
+                    warningVM.AddWarning(Item14WarningMessage, "HIS", "4", "14", SessionStorage.selected_hhd_id);
                 }
 
                 if (!string.IsNullOrEmpty(Item16WarningMessage))

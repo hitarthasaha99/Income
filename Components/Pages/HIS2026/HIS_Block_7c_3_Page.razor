@@ -213,7 +213,7 @@
     DateTime survey_time = DateTime.Now;
     string remarks = string.Empty;
     string item_9_warning = string.Empty;
-   string droupdown_warning = string.Empty;
+    string droupdown_warning = string.Empty;
     string droupdown_remarks = string.Empty;
 
     async void GoBack()
@@ -273,6 +273,11 @@
                 id = Guid.NewGuid()
             };
         }
+        else
+        {
+            CheckItem9Warning();
+        }
+
     }
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)

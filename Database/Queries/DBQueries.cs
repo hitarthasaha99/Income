@@ -1845,6 +1845,18 @@ namespace Income.Database.Queries
                     }
                 }
 
+                //bool hasCode2_item_8_9 = await HasAnyBlock3Item8_9WithCode(2);
+
+                //if (!hasCode2_item_8_9)
+                //{
+                //    var block7cEntries = await FetchListAsync<Tbl_Block_7c_NIC>();
+
+                //    foreach (var entry in block7cEntries)
+                //    {
+                //        await DeleteEntryAsync<Tbl_Block_7c_NIC>(entry.id);
+                //    }
+                //}
+
             }
             catch (Exception ex)
             {

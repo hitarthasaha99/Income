@@ -146,7 +146,7 @@
                         });
                     }
                 }
-                
+
                 StateHasChanged();
             }
             else
@@ -218,6 +218,8 @@
                 toastService.ShowSuccess($"Error while storing data into database, Please try again!");
                 return;
             }
+            SessionStorage.hamlet_selection_done = true;
+            SessionStorage.subdivision_selection_done = true;
             StateHasChanged();
             return;
         }
