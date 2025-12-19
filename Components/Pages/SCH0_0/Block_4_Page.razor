@@ -109,6 +109,10 @@
             };
         await commonQueries.InsertVisitedBlock(vb);
         block_0_1 = await Queries.FetchBlock1() ?? new();
+        if (block_0_1 != null)
+        {
+            remarks = block_0_1.remarks_block_4;
+        }
         block_2_2 = await Queries.FetchSCH0Block2_2Data() ?? new();
         block_4 = await Queries.GetBlock4() ?? null;
         block_5 = await Queries.FetchSCH0Block5Data();

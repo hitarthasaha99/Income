@@ -112,7 +112,7 @@
                                                 <option value="1">a. Production not yet started</option>
                                                 <option value="2">b. Seasonal activity </option>
                                                 <option value="3">c. No operation is carried out during the reference period   </option>
-                                                <option value="4">e. Others (specify in text box) </option>
+                                                <option value="4">d. Others (specify in text box) </option>
                                             </select>
                                                 @if (!string.IsNullOrEmpty(droupdown_warning))
                                                 {
@@ -311,7 +311,7 @@
         try
         {
             item_9_warning = string.Empty;
-            if(fields.item_7_12.GetValueOrDefault() < 0)
+            if(fields.item_7_12.GetValueOrDefault() < 0 && !fields.item_7_13.HasValue)
             {
                 item_9_warning = "Loss reported in Q. 7a.9.1 Please Choose an option";
                 isItemEnable = true;
@@ -334,7 +334,7 @@
                 droupdown_warning = string.Empty;
                 droupdown_remarks = string.Empty;
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -346,7 +346,10 @@
     {
         // update bound value
         if (int.TryParse(e.Value?.ToString(), out var v))
+        {
             fields.item_7_13 = v;
+            item_9_warning = string.Empty;
+        }
         else
             fields.item_7_13 = null;
 
@@ -373,12 +376,12 @@
             droupdown_remarks = string.Empty;
             if (isItemEnable)
             {
-                if (fields.item_7_13 == null)
-                {
-                    droupdown_warning = "Please choose an option for Q5.9.1";
-                    toastService.ShowError("Please select clarification for Q5.9.1");
-                    return;
-                }
+                // if (fields.item_7_13 == null)
+                // {
+                //     droupdown_warning = "Please choose an option for Q5.9.1";
+                //     toastService.ShowError("Please select clarification for Q5.9.1");
+                //     return;
+                // }
 
                 // If "Others" selected but remarks empty
                 if (fields.item_7_13 == 4 && string.IsNullOrWhiteSpace(fields.remarks))
@@ -416,11 +419,12 @@
             }
             else
             {
-                CheckItem9Warning();
-                if (!string.IsNullOrEmpty(item_9_warning))
+                //CheckItem9Warning();
+                if (fields.item_7_12.GetValueOrDefault() < 0 && !fields.item_7_13.HasValue)
                 {
                     warningVM.AddWarning(item_9_warning, "HIS", "7C", "7C.9", SessionStorage.selected_hhd_id);
                 }
+                
                 await warningVM.SaveWarningAsync("HIS", "7C");
                 int saved = await dB.Save_SCH_HIS_Block7C(fields);
                 if (saved > 0)

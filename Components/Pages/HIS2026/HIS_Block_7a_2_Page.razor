@@ -297,10 +297,6 @@
                                             <td>
                                                 <div class="col-sm-12">
                                                     <div class="mb-3">
-                                                        @*     <label class="form-label">
-                                                            Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes
-                                                    </label> *@
-
                                                         <select class="form-select" value ="@block_7A.item_7" @onchange = "clearItem6">
                                                             <option value="">-Select-</option>
                                                             <option value="1">a. Crop damage / failure</option>
@@ -309,13 +305,8 @@
                                                             <option value="4">d. Crop left at field due to low market price </option>
                                                             <option value="5">e. Others (specify in text box) </option>
                                                         </select>
-                                                        @* @if (showDropdownWarning && string.IsNullOrEmpty(selectedOther))
-                                                        {
-                                                            <div class="form-text text-danger mt-1">
-                                                                Please select an option to proceed.
-                                                            </div>
-                                                        } *@
-                                                        @if (!string.IsNullOrEmpty(item_7_warning))
+                                                        
+                                                        @if (!string.IsNullOrEmpty(item_6_warning))
                                                         {
                                                             <div class="form-text text-danger" style="white-space: pre-line;">
                                                                 @item_7_warning
@@ -324,14 +315,14 @@
 
 
                                                         @* if choose others then showing one text field *@
-                                                        @if (selectedOther == "5")
+                                                        @if (block_7A.item_7.GetValueOrDefault() == 5)
                                                         {
                                                             <div>
                                                                 <textarea class="form-control mt-2"
-                                                              rows="2"
-                                                              maxlength="50"
+                                                                          rows="2"
+                                                                          maxlength="50"
                                                                           placeholder="Please specify here..." @bind="block_7A.remarks" @oninput="clearOther">
-                                                             </textarea>
+                                                                </textarea>
                                                                 @if (!string.IsNullOrEmpty(remarks_warning))
                                                                 {
                                                                     <div class="form-text text-danger">
@@ -510,6 +501,11 @@
         block_7A.item_6 = Q7_1_Sum + block_7A.item_3.GetValueOrDefault() + block_7A.item_5.GetValueOrDefault() - block_7A.item_2_13.GetValueOrDefault();
         if (block_7A.item_6.HasValue)
         {
+            if (block_7A.item_6 >= 0)
+            {
+                block_7A.item_7 = null;
+                block_7A.remarks = string.Empty;
+            }
             CheckItem6Warning();
         }
         // Notify Blazor that item_7 changed
@@ -532,30 +528,27 @@
             isCostOfInput = false;
             if (block_7A != null && block_7A.item_6 < 0)
             {
-                // item_6_warning = "Cost of input is more than sale value of produced, please check the entries and provide suitable clarifications in following codes";
                 item_6_warning = "Loss reported in Q. 7a.9. Please Choose an option.";
-                // "e. Crop damage / failure\n" +
-                // "f. Crop not harvested\n" +
-                // "g. Crop production is not started\n" +
-                // "h. Crop left at field due to low market price\n" +
-                // "i. Others (specify in text box)";
-                //Enable Droupdown field
                 isCostOfInput = true;
                 CheckItem7Warning();
+            }
+
+            if(block_7A != null && block_7A.item_7.HasValue)
+            {
+                item_6_warning = "";
             }
         }
         catch (Exception ex)
         {
 
         }
-
     }
 
     private void CheckItem7Warning()
     {
         item_7_warning = string.Empty;
 
-        if (isCostOfInput && !block_7A.item_7.HasValue)
+        if (isCostOfInput && block_7A != null && !block_7A.item_7.HasValue)
         {
             item_7_warning = "Please select a reason for the loss reported.";
         }
@@ -571,8 +564,19 @@
             // Clear warning immediately when user selects anything
             item_6_warning = string.Empty;
             item_7_warning = string.Empty;
-            // showDropdownWarning = false;
-
+            if (int.TryParse(selectedOther, out int result))
+            {
+                block_7A.item_7 = result;
+            }
+            else
+            {
+                block_7A.item_7 = null;
+            }
+        }
+        else
+        {
+            block_7A.item_7 = null;
+            block_7A.remarks = string.Empty;
         }
 
         StateHasChanged();
@@ -582,8 +586,6 @@
     {
         remarks_warning = null;
     }
-
-
 
     private async Task Save(bool is_go_next = false)
     {
@@ -599,7 +601,7 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_7b");
                 return;
             }
-            
+
             messageStore.Clear();
             var validation = Validator.Validate(block_7A);
 
@@ -615,13 +617,15 @@
                 toastService.ShowError("Please resolve all the errors");
                 return;
             }
-           
+
             else
             {
-                // CheckItem7Warning();
-
-                // CheckItem6Warning();
-                if (!string.IsNullOrEmpty(item_6_warning) && string.IsNullOrEmpty(block_1.block_7a_remark))
+                if(block_7A.item_6 < 0 && !block_7A.item_7.HasValue)
+                {
+                    toastService.ShowError("Please provide a reason before proceeding");
+                    return;
+                }
+                if (block_7A.item_7.GetValueOrDefault() == 5 && string.IsNullOrWhiteSpace(block_7A.remarks))
                 {
                     toastService.ShowError("Please provide a remark before proceeding");
                     return;

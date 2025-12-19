@@ -43,6 +43,6 @@ namespace Income.Database.Models.HIS_2026
         //remarks
         public string? item_11 { get; set; }
         public bool isUpdated { get; set; } = false;
-       
+        public bool? addedByUser { get; set; } = false;
     }
 }

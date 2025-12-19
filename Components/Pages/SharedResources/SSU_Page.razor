@@ -301,7 +301,7 @@
 			if (data != null && data.Count > 0)
 			{
 				hhd_list = new();
-				List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ToList();
+				List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).OrderBy(k => k.SSS_household_id).ToList();
 				foreach (var item in selected)
 				{
 					hhd_list.Add(item);

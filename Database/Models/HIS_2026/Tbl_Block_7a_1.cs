@@ -24,5 +24,7 @@ namespace Income.Database.Models.HIS_2026
         public int? item_7 { get; set; }
         public int? item_8 { get; set; }
         public int? item_9 { get; set; }
+        public bool? addedByUser { get; set; } = false;
+
     }
 }

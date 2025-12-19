@@ -612,7 +612,10 @@
     private async Task LoadData()
     {
         block_7B = await dB.Fetch_SCH_HIS_Block7B(SessionStorage.selected_hhd_id);
-        CheckItem6Warning();
+        if (block_7B != null)
+        {
+            CheckItem6Warning();
+        }
     }
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
