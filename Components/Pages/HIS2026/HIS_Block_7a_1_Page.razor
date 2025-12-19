@@ -45,25 +45,26 @@
                 </div>
             }
         </div>
-        <div class="row px-3 py-2">
+        <div class="row px-3 py-2 border-bottom">
             <div class="col">
                 For Agricultural Establishment engaged in crop cultivation (includes production of cereals, pulses, oilseeds, cash-crops, vegetables, fruits, spices, flowers etc. <span class="text-primary">(entry against any one or more of S. nos. 1-2 of Q4.4 of Block 4 is selected)</span>
             </div>
         </div>
+        <div class="row px-3 py-2">
+            <div class="col">
+                <label class="form-label fw-bold m-0">
+                    <span class="form-badge me-2">Q7.1 </span>
+                    Details of the crops cultivated by one or more member of the household during last 365 days?
+                </label>
+            </div>
+        </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered align-middle text-center mb-0">
+                <table class="table table-bordered align-middle text-center mb-0 fixed-column">
                     <thead>
                         <tr>
-                            <th colspan="10">
-                                <label class="form-label fw-bold m-0">
-                                    <span class="form-badge me-2">Q7.1 </span>
-                                    Details of the crops cultivated by one or more member of the household during last 365 days?
-                                </label>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th style="width: 50px;">S. No.</th>
+                            <th class="col-1">Action</th>
+                            <th style="width: 50px;" class="col-2">S. No.</th>
                             <th>Crop code (4 digits)</th>
                             <th>unit (Kg./no.)</th>
                             <th>Total Quantity Produced (harvested)</th>
@@ -72,10 +73,10 @@
                             <th>Average per unit sale value (in Rs.)</th>
                             <th>Value of pre-harvested sale (Rs.)</th>
                             <th>Value of by-products (Rs.)</th>
-                            <th>Action</th>
                         </tr>
                         <tr>
-                            <th>(1)</th>
+                            <th class="col-1"></th>
+                            <th class="col-2">(1)</th>
                             <th>(2)</th>
                             <th>(3)</th>
                             <th>(4)</th>
@@ -84,14 +85,26 @@
                             <th>(7)</th>
                             <th>(8)</th>
                             <th>(9)</th>
-                            <th>(10)</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in ActivityList)
                         {
                             <tr>
-                                <td>@item.serial_number</td>
+                                <td class="col-1">
+                                    @if (!SessionStorage.FSU_Submitted)
+                                    {
+                                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                        {
+
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <button class="btn btn-link me-2 fs-6" @onclick="@(() => OnShowModalClick("UPDATE", item))"><i class="fi fi-rr-pencil"></i></button>
+                                                <button class="btn btn-link text-danger fs-6" @onclick="@(() => Delete(item))"><i class="fi fi-rr-trash"></i></button>
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                                <td class="col-2">@item.serial_number</td>
                                 <td>@item.code</td>
                                 <td>@(item.unit == 1 ? "Kg" : "No.")</td>
                                 <td>@item.item_4</td>
@@ -100,18 +113,6 @@
                                 <td>@item.item_7</td>
                                 <td>@item.item_8</td>
                                 <td>@item.item_9</td>
-                                @if (!SessionStorage.FSU_Submitted)
-                                {
-                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                    {
-                                        
-                                    <td class="d-flex align-items-center justify-content-center">
-                                        <button class="btn btn-link me-2 fs-6" @onclick="@(() => OnShowModalClick("UPDATE", item))"><i class="fi fi-rr-pencil"></i></button>
-                                        <button class="btn btn-link text-danger fs-6" @onclick="@(() => Delete(item))"><i class="fi fi-rr-trash"></i></button>
-                                    </td>
-                                    }
-                                }
-
                             </tr>
                         }
                     </tbody>

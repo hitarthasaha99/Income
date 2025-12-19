@@ -35,26 +35,26 @@
                 </div>
             }
         </div>
-        <div class="row px-3 py-2">
+        <div class="row px-3 py-2 border-bottom">
             <div class="col">
                 For Non-Agricultural Establishment <span class="text-primary">(entry against col. 8 or col. 9 is code 2 for at least one member of the household) </span>
             </div>
-
+        </div>
+        <div class="row px-3 py-2">
+            <div class="col">
+                <label class="form-label fw-bold m-0">
+                    <span class="badge bg-primary me-1">Q7.10</span>
+                    Operating Cost (expenses incurred by the household on inputs used for production activity) during last month
+                </label>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered align-middle text-center mb-0">
+                <table class="table table-bordered align-middle text-center mb-0 fixed-column">
                     <thead>
                         <tr>
-                            <th colspan="13" class="bg-transparent text-start">
-                                <label class="form-label fw-bold m-0">
-                                    <span class="badge bg-primary me-1">Q7.10</span>
-                                    Operating Cost (expenses incurred by the household on inputs used for production activity) during last month
-                                </label>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th style="min-width:50px;" class="text-center">Sl. no.</th>
+                            <th class="col-1">Action</th>
+                            <th style="min-width:50px;" class="col-2">Sl. no.</th>
                             <th style="min-width:150px;">Raw materials (including goods purchased for trading)</th>
                             <th style="min-width:150px;">Electricity, diesel, other fuel and water charges</th>
                             <th style="min-width:100px;">Internet charges and other related expenses</th>
@@ -66,11 +66,11 @@
                             <th style="min-width:100px;">Interest payment and insurance cost</th>
                             <th style="min-width:100px;">Others</th>
                             <th style="min-width:100px;">Total (sum of entries at s. nos. 01-10</th>
-                            <th style="min-width:150px;">Action</th>
                         </tr>
 
                         <tr>
-                            <th></th>
+                            <th class="col-1"></th>
+                            <th class="col-2"></th>
                             <th>(1)</th>
                             <th>(2)</th>
                             <th>(3)</th>
@@ -82,7 +82,6 @@
                             <th>(9)</th>
                             <th>(10)</th>
                             <th>(11)</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,7 +92,23 @@
                                 if (item.is_deleted != true)
                                 {
                                     <tr>
-                                        <td class="text-center">@($"A{item.serial_number}")</td>
+                                        <td class="col-1">
+                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                            {
+                                                <div class="d-flex align-items-center">
+
+                                                    <button class="btn btn-link fs-6"
+                                                            @onclick="@(() => HandleModal("UPDATE", item))">
+                                                        <i class="fi fi-rr-pencil"></i>
+                                                    </button>
+                                                    @* <button class="btn btn-link fs-6 text-danger ms-2"
+                                                        @onclick="@(() => HandleDelete(item.id))">
+                                                    <i class="fi fi-rr-trash"></i>
+                                                    </button> *@
+                                                </div>
+                                            }
+                                        </td>
+                                        <td class="col-2">@($"A{item.serial_number}")</td>
                                         <td>@item.item_10_1</td>
                                         <td>@item.item_10_2</td>
                                         <td>@item.item_10_3</td>
@@ -105,21 +120,6 @@
                                         <td>@item.item_10_9</td>
                                         <td>@item.item_10_10</td>
                                         <td>@item.item_10_11</td>
-
-                                        <td class="d-flex align-items-center">
-                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                            {
-                                                
-                                            <button class="btn btn-link fs-6 me-2"
-                                                    @onclick="@(() => HandleModal("UPDATE", item))">
-                                                <i class="fi fi-rr-pencil"></i>
-                                            </button>
-                                            }
-                                            @* <button class="btn btn-link fs-6 text-danger"
-                                                    @onclick="@(() => HandleDelete(item.id))">
-                                                <i class="fi fi-rr-trash"></i>
-                                            </button> *@
-                                        </td>
                                     </tr>
                                 }
                             }
