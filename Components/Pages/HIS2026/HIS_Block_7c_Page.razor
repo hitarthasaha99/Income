@@ -47,36 +47,35 @@
                 </div>
             }
         </div>
-        <div class="row px-3 py-2">
+        <div class="row px-3 py-2 border-bottom">
             <div class="col">
                 For Non-Agricultural Establishment <span class="text-primary">(entry against col. 8 or col. 9 is code 2 for at least one member of the household) </span>
             </div>
-            
+        </div>
+        <div class="row px-3 py-2">
+            <div class="col">
+                <label class="form-label fw-bold m-0">
+                    <span class="badge bg-primary me-1">Q7.9</span>
+                    Receipt from the non-agricultural activity in last month
+                </label>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered align-middle mb-0">
+                <table class="table table-bordered align-middle mb-0 fixed-column">
                     <thead>
                         <tr>
-                            <th colspan="5" class="bg-transparent text-start">
-                                <label class="form-label fw-bold m-0">
-                                    <span class="badge bg-primary me-1">Q7.9</span>
-                                    Receipt from the non-agricultural activity in last month
-                                </label>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th style="width: 50px;" class="text-center">S. No.</th>
+                            <th style="width: 150px;" class="text-center col-1">Action</th>
+                            <th style="min-width: 50px;" class="text-center col-2">S. No.</th>
                             <th class="text-center">Description of Activity</th>
                             <th style="width: 100px;" class="text-center">NIC Code (2 digit)</th>
-                            <th style="width: 180px;" class="text-center">Gross value of receipts (in Rs.)</th>
-                            <th style="width: 150px;" class="text-center">Action</th>
+                            <th style="width: 180px;" class="text-center">Gross value of receipts (in Rs.)</th>                            
                         </tr>
                         <tr>
-                            <th class="text-center">(1)</th>
+                            <th class="col-1"></th>
+                            <th class="text-center col-2">(1)</th>
                             <th class="text-center">(2)</th>
                             <th class="text-center">(3)</th>
-                            <th class="text-center">(4)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,24 +86,26 @@
                                 if (item.is_deleted != true)
                                 {
                                     <tr>
-                                        <td class="text-center">@item.SerialNumber</td>
+                                        <td class="col-1">
+                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                            {
+
+                                                <div class="d-flex align-items-center">
+                                                    <button class="btn btn-link fs-6 me-2"
+                                                            @onclick="@(() => HandleModal("UPDATE", item))">
+                                                        <i class="fi fi-rr-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-link fs-6 text-danger"
+                                                            @onclick="@(() => HandleDelete(item.id))">
+                                                        <i class="fi fi-rr-trash"></i>
+                                                    </button>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td class="text-center col-2">@item.SerialNumber</td>
                                         <td>@item.ActivityName</td>
                                         <td>@item.NicCode</td>
                                         <td>@item.GrossValue</td>
-                                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                        {
-                                            
-                                        <td class="d-flex align-items-center">
-                                            <button class="btn btn-link fs-6 me-2"
-                                                    @onclick="@(() => HandleModal("UPDATE", item))">
-                                                <i class="fi fi-rr-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-link fs-6 text-danger"
-                                                    @onclick="@(() => HandleDelete(item.id))">
-                                                <i class="fi fi-rr-trash"></i>
-                                            </button>
-                                        </td>
-                                        }
                                     </tr>
                                 }
                             }
