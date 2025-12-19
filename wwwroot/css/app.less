@@ -753,43 +753,41 @@ input[type="radio"] {
     overflow-y: auto;
     display: block;
     .table {
-    width: 100%;
-    border-collapse: collapse;
-    thead {
-      th {
+      thead {
+        th {
+          position: sticky;
+          top: -1px;
+          background: white;
+          z-index: 2;
+        }
+      }
+    //Fixed column
+    &.fixed-column {
+      .col-1 {
         position: sticky;
-        top: -1px;
-        background: white;
-        z-index: 2;
-    }
-    }
-  }
-  //Fixed column
-  .fixed-column {
-    .col-1 {
-      position: sticky;
-      left: -1px;
-      background: #fff;
-      z-index: 3;
-      box-shadow: inset -6px 0 0px -5px rgba(0, 0, 0, 0.1);
-      min-width: 100px;
-    }
-
-    .col-2 {
-      position: sticky;
-      left: 98px;
-      background: #fff;
-      z-index: 2;
-      box-shadow: inset -6px 0 0px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    thead {
-      .col-1  {
-        z-index: 5;
+        left: -1px;
+        background: #fff;
+        z-index: 3;
+        box-shadow: inset -6px 0 0px -5px rgba(0, 0, 0, 0.1);
+        min-width: 125px;
       }
 
       .col-2 {
-        z-index: 4;
+        position: sticky;
+        left: 123px;
+        background: #fff;
+        z-index: 2;
+        box-shadow: inset -6px 0 0px -5px rgba(0, 0, 0, 0.1);
+      }
+
+      thead {
+        .col-1  {
+          z-index: 5;
+        }
+
+        .col-2 {
+          z-index: 4;
+        }
       }
     }
   }

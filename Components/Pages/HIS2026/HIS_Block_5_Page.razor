@@ -48,16 +48,16 @@
         @* Card Body *@
         <div class="card-body p-0">
             <div class="table-responsive table-wrapper">
-                <table class="table table-striped table-bordered mb-0">
+                <table class="table table-striped table-bordered mb-0 fixed-column">
                     <thead>
                         <tr>
-                            <th style="min-width:20px;" rowspan="2" class="text-center">Sl.no. of member</th>
+                            <th rowspan="2" class="col-1">Action</th>
+                            <th style="min-width:20px;" rowspan="2" class="text-center col-2">Sl.no. of member</th>
                             <th style="min-width:20px;" rowspan="2">Name of member</th>
                             <th class="text-center" colspan="1">Last 365 days</th>
                             <th class="text-center" colspan="3">Last month</th>
                             <th class="text-center" colspan="6">Last 365 days</th>
                             <th style="min-width:200px;" rowspan="2">Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)</th>
-                            <th style="min-width:50px;" rowspan="2">Action</th>
                         </tr>
                         <tr>
                             <th style="min-width:150px;">Number of months worked</th>
@@ -72,7 +72,8 @@
                             <th style="min-width:200px;">Others - directors’ fees (fees given to the directors for attending meetings), sitting fees of experts etc.</th>
                         </tr>
                         <tr>
-                            <th></th>
+                            <th class="col-1"></th>
+                            <th class="col-2"></th>
                             <th></th>
                             <th>(1)</th>
                             <th>(2)</th>
@@ -85,14 +86,35 @@
                             <th>(7)</th>
                             <th>(8)</th>
                             <th>(9)</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var member in block5Members)
                         {
                             <tr>
-                                <td class="text-center">@member.serial_member</td>
+                                <td class="col-1">
+                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                    {
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <button class="btn btn-link me-3 fs-6"
+                                                    hidden="@SessionStorage.FSU_Submitted"
+                                                    @onclick="@(() => HandleModal("UPDATE", member))">
+                                                <i class="fi fi-rr-pencil"></i>
+                                            </button>
+
+                                            @if (CanDeleteEntry(member))
+                                            {
+                                                <button class="btn btn-link fs-6 text-danger"
+                                                        hidden="@SessionStorage.FSU_Submitted"
+                                                        @onclick="@(() => HandleDelete(member))">
+                                                    <i class="fi fi-rr-trash"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    }
+
+                                </td>
+                                <td class="text-center col-2">@member.serial_member</td>
                                 <td>@(block3Members.FirstOrDefault(x => x.id == member.fk_block_3)?.item_2 ?? "")</td>
                                 <td>@member.item_1</td>
                                 <td>@member.item_2</td>
@@ -105,26 +127,6 @@
                                 <td>@member.item_7</td>
                                 <td>@member.item_8</td>
                                 <td>@member.item_9</td>
-                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                {
-                                    <td class="d-flex align-items-center">
-                                        <button class="btn btn-link me-3 fs-6"
-                                                hidden="@SessionStorage.FSU_Submitted"
-                                                @onclick="@(() => HandleModal("UPDATE", member))">
-                                            <i class="fi fi-rr-pencil"></i>
-                                        </button>
-
-                                        @if (CanDeleteEntry(member))
-                                        {
-                                            <button class="btn btn-link fs-6 text-danger"
-                                                    hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleDelete(member))">
-                                                <i class="fi fi-rr-trash"></i>
-                                            </button>
-                                        }
-                                    </td>
-                                }
-
                             </tr>
                         }
                     </tbody>
