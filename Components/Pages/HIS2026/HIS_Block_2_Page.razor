@@ -532,7 +532,7 @@
                 if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
                     var hhd = await dB.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
-                    if (hhd != null)
+                    if (hhd != null && hhd.hhdStatus != 12)
                     {
                         hhd.hhdStatus = 15;
                         await dB.SaveUpdateSCH0Block7(hhd);

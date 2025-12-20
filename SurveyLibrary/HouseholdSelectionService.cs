@@ -342,6 +342,7 @@ namespace Income.SurveyLibrary
             // Update original household status
             //originalHousehold.hhdStatus = GetStatusCode("SUBSTITUTED"); // You may need to define status codes
             originalHousehold.status = "SUBSTITUTED";
+            originalHousehold.SubstitutionCount = originalHousehold.SubstitutionCount + 1;
             // Note: Keep isSelected = true for the original household for tracking
 
             // Update substitute household
@@ -350,8 +351,7 @@ namespace Income.SurveyLibrary
             //substitute.hhdStatus = GetStatusCode("SUBSTITUTE");
             substitute.status = "SUBSTITUTE";
             substitute.SubstitutedForID = originalHousehold.Block_7_3;
-            substitute.OriginalHouseholdID = originalHousehold.OriginalHouseholdID ?? originalHousehold.Block_7_3;
-            substitute.SubstitutionCount = originalHousehold.SubstitutionCount + 1;
+            substitute.OriginalHouseholdID = originalHousehold.OriginalHouseholdID ?? 0;
 
             // Inherit the posted SSS from the original household
             substitute.SelectedPostedSSS = originalHousehold.SelectedPostedSSS;

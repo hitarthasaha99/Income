@@ -459,8 +459,8 @@
                                                 <option value="">-Select-</option>
                                                 <option value="1">a. Did not work in the reference period due to illness</option>
                                                 <option value="2">b. Did not get work during the reference period</option>
-                                                <option value="3">c. Did not work in the reference period due to personal work  </option>
-                                                <option value="4">e. Others (please specify)</option>
+                                                <option value="3">c. Did not work in the reference period due to personal work</option>
+                                                <option value="4">d. Others (please specify)</option>
                                             </select>
                                                 @if (!string.IsNullOrEmpty(droupdown_warning))
                                                 {
@@ -664,6 +664,19 @@
 
 
         block_7B.item_9 = block_7B.item_6_12.GetValueOrDefault() + block_7B.item_8.GetValueOrDefault() - block_7B.item_7_13.GetValueOrDefault();
+        if (block_7B.item_9 > 0)
+        {
+            // If value is Positive (or 0), hide the section
+            isItemEnable = false;
+
+            block_7B.item_10 = null;
+            block_7B.remarks = string.Empty;
+
+            isselectOther = false;
+
+            droupdown_warning = string.Empty;
+            droupdown_remarks = string.Empty;
+        }
         CheckItem6Warning();
         // 2️⃣ Clear previous errors
         messageStore?.Clear(identifier);
@@ -679,26 +692,12 @@
             item_9_warning = string.Empty;
             if (block_7B != null && block_7B.item_9 < 0)
             {
-                item_9_warning = "Loss reported in Q. 7b.9. Please Choose an option";
+                if(!block_7B.item_10.HasValue)
+                {
+                    item_9_warning = "Loss reported in Q. 7b.9. \nPlease Choose an option";
+                }
                 isItemEnable = true;
                 isselectOther = block_7B.item_10 == 4;
-
-            }
-            else
-            {
-                // If value is Positive (or 0), hide the section
-                isItemEnable = false;
-
-               
-                block_7B.item_10 = null;
-                block_7B.remarks = string.Empty;
-
-                
-                isselectOther = false;
-
-                
-                droupdown_warning = string.Empty;
-                droupdown_remarks = string.Empty;
             }
         }
         catch (Exception ex)
@@ -711,9 +710,15 @@
     {
         // update bound value
         if (int.TryParse(e.Value?.ToString(), out var v))
+        {
             block_7B.item_10 = v;
+            item_9_warning = string.Empty;
+        }
         else
+        {
             block_7B.item_10 = null;
+            CheckItem6Warning();
+        }
 
         droupdown_warning = string.Empty;
         droupdown_remarks = string.Empty;
@@ -732,25 +737,6 @@
     {
         try
         {
-            droupdown_warning = string.Empty;
-            droupdown_remarks = string.Empty;
-            if (isItemEnable)
-            {
-                if (block_7B.item_10 == null)
-                {
-                    droupdown_warning = "Please choose an option for Q5.9.1";
-                    toastService.ShowError("Please select clarification for Q5.9.1");
-                    return;
-                }
-
-                // If "Others" selected but remarks empty
-                if (block_7B.item_10 == 4 && string.IsNullOrWhiteSpace(block_7B.remarks))
-                {
-                    droupdown_remarks = "Please specify remarks for 'Others'";
-                    toastService.ShowError("Please specify remarks for 'Others'");
-                    return;
-                }
-            }
             if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
                 NavigationManager.NavigateTo("/dashboard/his/block_7c");
@@ -779,6 +765,18 @@
             }
             else
             {
+                droupdown_warning = string.Empty;
+                droupdown_remarks = string.Empty;
+                if (isItemEnable)
+                {
+                    // If "Others" selected but remarks empty
+                    if (block_7B.item_10 == 4 && string.IsNullOrWhiteSpace(block_7B.remarks))
+                    {
+                        droupdown_remarks = "Please specify remarks for 'Others'";
+                        toastService.ShowError("Please specify remarks for 'Others'");
+                        return;
+                    }
+                }
                 int saved = await dB.Save_SCH_HIS_Block7B(block_7B);
                 if (saved > 0)
                 {
@@ -797,14 +795,16 @@
             }
             await warningVM.SaveWarningAsync("HIS", "7B");
 
-            if (!is_go_next)
-            {
-                return;
-            }
             if (block_1 != null)
             {
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
+
+            if (!is_go_next)
+            {
+                return;
+            }
+            
             NavigationManager.NavigateTo("/dashboard/his/block_7c");
         }
         catch (Exception ex)

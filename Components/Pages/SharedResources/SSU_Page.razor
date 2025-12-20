@@ -59,7 +59,7 @@
 								{
 									<tr>
 										
-										@if (((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2) && item.hhdStatus != 21) || (SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS && item.hhdStatus == 31))
+										@if (((SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO) && item.hhdStatus is not (21 or 22 or 31 or 32)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.hhdStatus == 31))
 										{
 											@if (item.status != "SUBSTITUTED" && item.hhdStatus != 32)
 											{
@@ -142,7 +142,7 @@
 											}
 											<div class="badge badge-@surveyStatusColor">@(surveyStatus)</div>
 										</td>
-										<td>@(item.OriginalHouseholdID)</td>
+										<td>@(item.SubstitutedForID)</td>
 										<td>
 											@if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && item.hhdStatus == 12)
 											{
@@ -244,6 +244,11 @@
 	{
 		try
 		{
+			if(selected_for_submission.Count == 0)
+			{
+				toastService.ShowError("Please select atleast one household before proceeding");
+				return;
+			}
 			warningVM.selected_HHdList = [];
 			warningVM.selected_HHdList.AddRange(selected_for_submission);
 			NavigationManager.NavigateTo($"/dashboard/validate_page?schedule={"HIS"}");
@@ -301,7 +306,7 @@
 			if (data != null && data.Count > 0)
 			{
 				hhd_list = new();
-				List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).OrderBy(k => k.SSS_household_id).ToList();
+				List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ThenBy(k => k.SSS_household_id).ToList();
 				foreach (var item in selected)
 				{
 					hhd_list.Add(item);

@@ -441,29 +441,20 @@
     #region Helper Methods
     private static int GetFilteredSubstitution(List<Tbl_Sch_0_0_Block_7> list, int sss)
     {
-        var counter = 0;
+        int counter = 0;
         var initialSelectedList = list.Where(entry => entry.SSS == sss && entry.isInitialySelected == true && entry.SubstitutionCount != 0).ToList();
-
         foreach (var item in initialSelectedList)
         {
-            if (item.SubstitutionCount == 1)
-            {
-                var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID == item.Block_7_3);
-                if (filteredData != null && filteredData.status == "SUBSTITUTE")
-                {
-                    counter++;
-                }
-            }
-            else if (item.SubstitutionCount == 2)
-            {
-                var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID != item.Block_7_3);
-                if (filteredData != null && filteredData.status == "SUBSTITUTE")
-                {
-                    counter++;
-                }
-            }
+           if(item.SubstitutionCount >= 1)
+           {
+               var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID == item.Block_7_3);
+               if(filteredData != null && filteredData.status == "SUBSTITUTE")
+               {
+                   counter++;
+               }
+           }
         }
-        return counter;
+        return initialSelectedList != null ? initialSelectedList.Count : 0;
     }
 
     private static int GetFilteredCountOnInitialySelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)

@@ -398,16 +398,22 @@
                 toastService.ShowError("Please select a reason before proceeding");
                 return;
             }
-            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
-            var confirmation = await dialog.ShowAsync(
-                title: "Alert",
-                message1: "This will delete any existing block data for this household.",
-                message2: "Do you want to proceed?",
-                confirmDialogOptions: options);
-            if (!confirmation)
+            var block_3_exists = await dQ.Fetch_SCH_HIS_Block3(block_1.hhd_id.GetValueOrDefault());
+            if (block_3_exists != null && block_3_exists.Count > 0)
             {
-                return;
+                var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                var confirmation = await dialog.ShowAsync(
+                    title: "Alert",
+                    message1: "This will delete any existing block data for this household.",
+                    message2: "Do you want to proceed?",
+                    confirmDialogOptions: options);
+
+                if (!confirmation)
+                {
+                    return;
+                }
             }
+
             var service = new HouseholdSelectionService();
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
             var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
@@ -447,16 +453,23 @@
                 toastService.ShowError("Please select a reason before proceeding");
                 return;
             }
-            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
-            var confirmation = await dialog.ShowAsync(
-                title: "Alert",
-                message1: "This will delete any existing block data for this household.",
-                message2: "Do you want to proceed?",
-                confirmDialogOptions: options);
-            if (!confirmation)
+
+            var block_3_exists = await dQ.Fetch_SCH_HIS_Block3(block_1.hhd_id.GetValueOrDefault());
+            if (block_3_exists != null && block_3_exists.Count > 0)
             {
-                return;
+                var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                var confirmation = await dialog.ShowAsync(
+                    title: "Alert",
+                    message1: "This will delete any existing block data for this household.",
+                    message2: "Do you want to proceed?",
+                    confirmDialogOptions: options);
+
+                if (!confirmation)
+                {
+                    return;
+                }
             }
+            
             var service = new HouseholdSelectionService();
 
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);

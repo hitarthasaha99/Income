@@ -224,21 +224,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
-        NICBlock7 = await dB.Fetch_SCH_HIS_Block7_NICList();
-        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
-
-        Q10 = await dB.Fetch_SCH_HIS_Block7_Q10_List();
-        NICSUM = NICBlock7.Sum(x => x.GrossValue).GetValueOrDefault();
-        ActivitySum = Q10.Sum(x => x.item_10_11).GetValueOrDefault();
-        var block3 = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
-        if (block3 != null && block3.Count > 0)
-        {
-            Q9Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2);
-        }
-        editContext = new EditContext(fields);
-        messageStore = new ValidationMessageStore(editContext);
-        editContext.OnFieldChanged += EditContext_OnFieldChanged;
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
             block_uri = "/dashboard/his/block_7c_3",
@@ -246,7 +231,24 @@
             block_code = CommonEnum.his_block_7c_3.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
-        CheckItem9Warning();
+        NICBlock7 = await dB.Fetch_SCH_HIS_Block7_NICList();
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
+
+        Q10 = await dB.Fetch_SCH_HIS_Block7_Q10_List();
+        NICSUM = (int)Math.Min(NICBlock7?.Sum(x => (long)(x.GrossValue ?? 0)) ?? 0L, int.MaxValue);
+        ActivitySum = (int)Math.Min(Q10?.Sum(x => (long)(x.item_10_11 ?? 0)) ?? 0L,int.MaxValue);
+
+        var block3 = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+        if (block3 != null && block3.Count > 0)
+        {
+            Q9Needed = block3.Any(x => x.item_8 == 2 || x.item_9 == 2);
+        }
+        await LoadData();
+
+        editContext = new EditContext(fields);
+        messageStore = new ValidationMessageStore(editContext);
+        editContext.OnFieldChanged += EditContext_OnFieldChanged;
+        
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             survey_time = fields.survey_timestamp.GetValueOrDefault();
@@ -275,7 +277,16 @@
         }
         else
         {
-            CheckItem9Warning();
+            fields.item_7_12 = (NICSUM + fields.item_7_11.GetValueOrDefault()) - ActivitySum;
+            if (fields.item_7_12.GetValueOrDefault() < 0)
+            {
+                if (!fields.item_7_13.HasValue)
+                {
+                    item_9_warning = "Loss reported in Q. 7a.9.1 \nPlease Choose an option";
+                }
+                isItemEnable = true;
+                isselectOther = fields?.item_7_13 == 4;
+            }
         }
 
     }
@@ -299,6 +310,23 @@
 
         fields.item_7_12 = (NICSUM + fields.item_7_11.GetValueOrDefault()) - ActivitySum;
         CheckItem9Warning();
+
+        if(fields.item_7_12 > 0)
+        {
+            // If value is Positive (or 0), hide the section
+            isItemEnable = false;
+
+            // OPTIONAL: Reset the dropdown and remarks so old data isn't saved/validated
+            fields.item_7_13 = null;
+            fields.remarks = string.Empty;
+
+            // Reset UI flags for the "Other" textbox
+            isselectOther = false;
+
+            // Clear any lingering validation messages for the hidden fields
+            droupdown_warning = string.Empty;
+            droupdown_remarks = string.Empty;
+        }
         // 2️⃣ Clear previous errors
         messageStore?.Clear(identifier);
 
@@ -313,28 +341,12 @@
             item_9_warning = string.Empty;
             if(fields.item_7_12.GetValueOrDefault() < 0 && !fields.item_7_13.HasValue)
             {
-                item_9_warning = "Loss reported in Q. 7a.9.1 Please Choose an option";
+                item_9_warning = "Loss reported in Q. 7a.9.1 \nPlease Choose an option";
                 isItemEnable = true;
                 isselectOther = fields?.item_7_13 == 4;
 
             }
-            else
-            {
-                // If value is Positive (or 0), hide the section
-                isItemEnable = false;
-
-                // OPTIONAL: Reset the dropdown and remarks so old data isn't saved/validated
-                fields.item_7_13 = null;
-                fields.remarks = string.Empty;
-
-                // Reset UI flags for the "Other" textbox
-                isselectOther = false;
-
-                // Clear any lingering validation messages for the hidden fields
-                droupdown_warning = string.Empty;
-                droupdown_remarks = string.Empty;
-            }
-
+            
         }
         catch (Exception ex)
         {
@@ -353,6 +365,7 @@
         else
             fields.item_7_13 = null;
 
+        CheckItem9Warning();
         droupdown_warning = string.Empty;
         droupdown_remarks = string.Empty;
 
