@@ -111,10 +111,14 @@
                                 </div>
                             </div>
                             <h2>
-                                <span class="sl-no-label">
-                                    <label>@(top?.serial_number)</label>
-                                    <small>SL No.</small>
-                                </span>
+                                @if(top?.serial_number.GetValueOrDefault() > 0)
+                                {
+                                    <span class="sl-no-label">
+                                        <label>@(top?.serial_number)</label>
+                                        <small>SL No.</small>
+                                    </span>
+                                }
+                                
                                 <span class="title-dis ps-3">@(top?.warning_message)</span>
                             </h2>
                             <hr />
