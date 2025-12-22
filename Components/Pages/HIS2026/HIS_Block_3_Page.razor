@@ -251,6 +251,10 @@
                                 </select>
 
                                 <ValidationMessage For="@(() => newMember.item_3)" />
+                            @if (!string.IsNullOrEmpty(spouceWarning))
+                            {
+                                <div class="form-text text-danger fw-bold">@spouceWarning</div>
+                            }
                             </div>
                         </div>
 
@@ -330,6 +334,10 @@
                                 </select>
 
                                 <ValidationMessage For="@(() => newMember.item_6)" />
+                            @if (!string.IsNullOrEmpty(neverMarredWarn))
+                            {
+                                <div class="form-text text-danger fw-bold">@neverMarredWarn</div>
+                            }
 
                                 @if (!string.IsNullOrEmpty(maritalStatusWarning))
                                 {
@@ -619,7 +627,8 @@
     // Errors and warnings for fields
     private string? genderError = null;
     private string? genderWarning = null;
-
+    private string? spouceWarning = null;
+    private string? neverMarredWarn = null;
     private string? ageError = null;
     private string? item_6Error = null;
     private string? item_7Error = null;
@@ -745,6 +754,9 @@
         //check again if change Relation to head change
         CheckGenderWarning();
         checkAgeReletionWarning();
+        //Call then clear error  if select any thing
+        CheckSpouseMaritalWarning();  
+
         checkSingleUser();
 
     }
@@ -798,6 +810,7 @@
             newMember.item_6 = int.Parse(value);
 
         checkItem_6Warning();    // Rule: If item_6 != 1 → age >= 15
+        CheckSpouseMaritalWarning();
 
         StateHasChanged();
     }
@@ -1401,6 +1414,9 @@
             Console.WriteLine(ex.Message);
         }
         clearErrors();
+        // after close
+        spouceWarning = null;
+        neverMarredWarn = null;
 
     }
 
@@ -1472,7 +1488,8 @@
     // Logic: Add member to List when form is submitted
     private async Task HandleAddMember()
     {
-
+        spouceWarning = null;
+        CheckSpouseMaritalWarning(); 
         clearErrors();
         messageStore.Clear();
         var errors = Validator.Validate(newMember);
@@ -1484,8 +1501,22 @@
         editContext.NotifyValidationStateChanged();
         if (!errors.IsValid)
         {
+
             toastService.ShowError("Please resolve pending errors");
             return;
+        }
+        // block if spouce then click save
+        if (!string.IsNullOrEmpty(spouceWarning))
+        {
+            toastService.ShowError(spouceWarning); 
+            warningVM.AddWarning(spouceWarning, "HIS", "3", "3", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            return;  
+        }
+        if (!string.IsNullOrEmpty(neverMarredWarn))
+        {
+            toastService.ShowError(neverMarredWarn);
+            warningVM.AddWarning(neverMarredWarn, "HIS", "3", "3", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            return;  
         }
 
         CheckGenderWarning();
@@ -1596,6 +1627,39 @@
 
 
     }
+    //if self never marred then self add then shoing error 
+    private void CheckSpouseMaritalWarning()
+    {
+        spouceWarning = null;
+        neverMarredWarn = null;
+
+        // Find existing spouse (item3 == 2, not current member if editing)
+        var existingSpouse = block3Members
+            .FirstOrDefault(m => m.item_3 == 2 &&
+                               (newMember.id == Guid.Empty || m.id != newMember.id));
+
+        // Scenario 1: Editing HEAD to never married, but spouse exists
+        if (newMember.item_3 == 1 && newMember.item_6 == 1 && existingSpouse != null)
+        {
+            neverMarredWarn = "H004: Invalid Entry, Please check the entry " +
+                           existingSpouse.serial_no;
+            StateHasChanged();
+            return;
+        }
+
+        // Scenario 2: Adding/Editing SPOUSE, but head is never married
+        var head = block3Members.FirstOrDefault(m => m.item_3 == 1);
+        if (newMember.item_3 == 2 && head?.item_6 == 1)
+        {
+            spouceWarning = "H004: Invalid Entry, Please check the entry";
+            StateHasChanged();
+            return;
+        }
+
+        StateHasChanged();
+    }
+
+
     // Item 8,9,10,11 List
     private List<CustomDropdown.OptionItem> ItemOptions = new()
     {
