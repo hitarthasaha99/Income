@@ -239,7 +239,9 @@
 
     async Task GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+                NavigationManager.NavigateTo("/dashboard/his/block_10");
+
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
 
     async Task OpenModal()

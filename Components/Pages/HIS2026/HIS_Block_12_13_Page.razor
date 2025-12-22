@@ -103,7 +103,9 @@
 
     async void GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        NavigationManager.NavigateTo("/dashboard/his/block_B");
+
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 

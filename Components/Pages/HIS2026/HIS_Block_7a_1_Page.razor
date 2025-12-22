@@ -308,7 +308,9 @@
     DateTime survey_time = DateTime.Now;
     async void GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        NavigationManager.NavigateTo("/dashboard/his/block_6");
+
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 

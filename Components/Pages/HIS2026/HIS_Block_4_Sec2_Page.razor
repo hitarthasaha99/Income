@@ -480,7 +480,9 @@
 
     async void GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        NavigationManager.NavigateTo("/dashboard/his/block_4_1");
+
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 

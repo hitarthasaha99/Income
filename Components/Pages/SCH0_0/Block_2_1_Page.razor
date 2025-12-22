@@ -127,7 +127,8 @@
     int totalSU;
     async void GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        NavigationManager.NavigateTo("/dashboard/sch0.0/block0_1");
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 
