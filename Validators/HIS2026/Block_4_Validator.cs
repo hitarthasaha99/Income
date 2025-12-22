@@ -86,7 +86,7 @@ namespace Income.Validators.HIS2026
                 RuleFor(x => x.item_11).NotEmpty().WithMessage("H023: Invalid Entry, Please check the entry");
 
                 // Condition: item_11 is 1, 2 or 3
-                When(x => x.item_11 == 1 || x.item_11 == 2 || x.item_11 == 3, () =>
+                When(x => x.item_11 == 1 || x.item_11 == 2 || x.item_11 == 3 || x.item_11 == 4, () =>
                 {
                     // item_12: required, numeric, > 0
                     RuleFor(x => x.item_12)

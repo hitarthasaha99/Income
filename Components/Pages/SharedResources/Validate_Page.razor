@@ -111,10 +111,14 @@
                                 </div>
                             </div>
                             <h2>
-                                <span class="sl-no-label">
-                                    <label>@(top?.serial_number)</label>
-                                    <small>SL No.</small>
-                                </span>
+                                @if(top?.serial_number.GetValueOrDefault() > 0)
+                                {
+                                    <span class="sl-no-label">
+                                        <label>@(top?.serial_number)</label>
+                                        <small>SL No.</small>
+                                    </span>
+                                }
+                                
                                 <span class="title-dis ps-3">@(top?.warning_message)</span>
                             </h2>
                             <hr />
@@ -293,24 +297,7 @@
                                                     <td>@item.remarks</td>
                                                 </tr>
                                             }
-                                            @* <tr>
-                                                <td>1</td>
-                                                <td>19 Nov. 2025/11:24:20</td>
-                                                <td>ENM.SML.24</td>
-                                                <td>
-                                                    <div class="badge badge-outline badge-success fw-bold ms-1">ACCEPTED</div>
-                                                </td>
-                                                <td>okASDASDsa</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>19 Nov. 2025/11:24:20</td>
-                                                <td>ENM.SML.24</td>
-                                                <td>
-                                                    <div class="badge badge-outline badge-danger fw-bold ms-1">REJECTED</div>
-                                                </td>
-                                                <td>okASDASDsa</td>
-                                            </tr> *@
+                                            
                                         </tbody>
                                     </table>
                                 </div>
@@ -358,7 +345,16 @@
     }
 
     private async void Validate(Tbl_Warning topWarning)
-    {   int Result = 0;
+    {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            if(!Warning_VM.Is_Accepted && !Warning_VM.IsRejected)
+            {
+                toastService.ShowError("Please accept or reject before making a remark");
+                return;
+            }
+        }
+        int Result = 0;
         Result = await Warning_VM.ValidateWarning(topWarning);
         if(Result>0)
         {

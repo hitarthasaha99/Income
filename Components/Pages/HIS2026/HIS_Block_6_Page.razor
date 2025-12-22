@@ -280,7 +280,7 @@
                                 <option value="1">a. Did not work in the reference period due to illness</option>
                                 <option value="2">b. Did not get work during the reference period</option>
                                 <option value="3">c. Did not work in the reference period due to personal work  </option>                               
-                                <option value="4">e. Others (please specify)</option>
+                                <option value="4">d. Others (please specify)</option>
                             </select>
                                 @if (!string.IsNullOrEmpty(droupdown_warning))
                                 {
@@ -540,6 +540,13 @@
                 item_4_warning = "Improper data reported in Q. 5.9. Please Choose an option.";
                 isItemEnable = true;
             }
+
+            if (isItemEnable && newMember != null && newMember.item_5.HasValue)
+            {
+                item_4_warning = string.Empty;
+            }
+
+            isselectOther = newMember?.item_5 == 4;
         }
         catch (Exception ex)
         {
@@ -559,6 +566,10 @@
         item_4_warning = string.Empty;
         // show only when 5 (Others) is selected, hide otherwise
         isselectOther = newMember?.item_5 == 4;
+        if (!isselectOther)
+        {
+            newMember.remarks = string.Empty;
+        }
     }
     //Remarks field clear after enter anything
     private void OnRemarksClear(ChangeEventArgs e)
@@ -587,6 +598,8 @@
         try
         {
             SerialMemberError = string.Empty;
+            isItemEnable = false;
+
             if (action == "ADD")
             {
                 isAdd = true;
@@ -611,6 +624,7 @@
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
+                    CheckItem4Warning();
                     await AddModal.ShowAsync();
                 }
             }

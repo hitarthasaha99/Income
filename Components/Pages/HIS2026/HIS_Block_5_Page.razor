@@ -505,11 +505,12 @@
                                 {
                                     
                                 <div>
-                                <textarea class="form-control mt-2"
+                                <textarea @ref="remarksRef"
+                                    class="form-control mt-2"
                                           rows="2"
                                           maxlength="50"
-                                              placeholder="Please specify here..." @bind="newMember.item_11" @oninput="OnRemarksClear">
-      </textarea>
+                                              placeholder="Please specify here..." value="@newMember.item_11" @oninput="OnRemarksClear">
+                                </textarea>
                                     @if (!string.IsNullOrEmpty(droupdown_remarks))
                                     {
                                         <div class="form-text text-danger" style="white-space: pre-line;">
@@ -575,6 +576,20 @@
     EditContext editContext;
     private Block_5_Validator validator = new();
     private ValidationMessageStore messageStore;
+    private bool remarksJsAttached = false;
+
+    private ElementReference remarksRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (isselectOther && !remarksJsAttached)
+        {
+            remarksJsAttached = true;
+            await JSRuntime.InvokeVoidAsync(
+                "window.allowAlphaNumSpace", remarksRef);
+        }
+    }
+
 
     async void GoBack()
     {
@@ -613,11 +628,19 @@
             item_9_warning = string.Empty;
             // isCostOfInput = false;
             isItemEnable = false;
-            if (newMember != null && newMember.item_9 == 0)
+            if (newMember != null && newMember.item_9.HasValue && newMember.item_9 == 0)
             {
                 item_9_warning = "Improper data reported in Q. 5.9. Please Choose an option.";
                 isItemEnable = true;
             }
+
+            if(isItemEnable && newMember != null && newMember.item_10.HasValue)
+            {
+                item_9_warning = string.Empty;
+            }
+
+            isselectOther = newMember?.item_10 == 5;
+
         }
         catch (Exception ex)
         {
@@ -639,6 +662,11 @@
 
         // Show remarks only when "Others" (5) is selected
         isselectOther = newMember?.item_10 == 5;
+        if (!isselectOther)
+        {
+            newMember.item_11 = string.Empty;
+            remarksJsAttached = false; //
+        }
 
         StateHasChanged();
     }
@@ -752,14 +780,21 @@
         handleCalculateIncome();
     }
 
-    //Remarks field clear after enter anything 
     private void OnRemarksClear(ChangeEventArgs e)
     {
-        newMember.item_11 = e.Value?.ToString();
-        droupdown_remarks = string.Empty;
+        var rawValue = e.Value?.ToString() ?? string.Empty;
 
-        StateHasChanged();
+        // Remove invalid characters BEFORE re-render
+        var sanitizedValue = System.Text.RegularExpressions.Regex
+            .Replace(rawValue, "[^a-zA-Z0-9 ]", "");
+
+        // Update model
+        newMember.item_11 = sanitizedValue;
+
+        // Clear dropdown
+        droupdown_remarks = string.Empty;
     }
+
 
     //Handle CalculateIncome
     private void handleCalculateIncome()
@@ -786,6 +821,10 @@
         try
         {
             SerialMemberError = string.Empty;
+            isItemEnable = false;
+            isselectOther = false;
+            droupdown_remarks = string.Empty;
+            droupdown_warning = string.Empty;
             if (action == "ADD")
             {
                 isAdd = true;
@@ -812,6 +851,7 @@
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
                     await AddModal.ShowAsync();
+                    CheckItem9Warning();
                 }
             }
             else
@@ -851,7 +891,7 @@
     {
         block5Members = await dbq.Fetch_SCH_HIS_Block5(SessionStorage.selected_hhd_id);
         Question.AddRange(new List<string>() { "1","2","3i","3ii","4i","4ii","5","6","7","8","9"});
-        RowList = block5Members.Select(x => x.serial_member.GetValueOrDefault()).Distinct().ToList();    
+        RowList = block5Members.Select(x => x.serial_member.GetValueOrDefault()).Distinct().ToList();
         StateHasChanged();
     }
 

@@ -28,7 +28,7 @@ namespace Income.Database.Models.HIS_2026
         //please check the entries and provide suitable clarifications in following codes
         public int? item_5 { get; set; }
         public string? remarks { get; set; }
-
         public bool isUpdated { get; set; } = false;
+        public bool? addedByUser { get; set; } = false;
     }
 }

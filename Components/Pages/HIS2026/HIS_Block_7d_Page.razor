@@ -312,6 +312,14 @@
                     };
                     toAdd.Add(newEntry);
                 }
+                else
+                {
+                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4006);
+                    if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
+                    {
+                        existingCode.display_serial_number = $"2";
+                    }
+                }
             }
             if (item_4)
             {
@@ -328,6 +336,14 @@
                         item_2 = "Fisheries"
                     };
                     toAdd.Add(newEntry);
+                }
+                else
+                {
+                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4006);
+                    if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
+                    {
+                        existingCode.display_serial_number = $"3";
+                    }
                 }
             }
             if (item_5)
@@ -346,6 +362,14 @@
                     };
                     toAdd.Add(newEntry);
                 }
+                else
+                {
+                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4005);
+                    if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
+                    {
+                        existingCode.display_serial_number = $"4";
+                    }
+                }
             }
             if (item_6)
             {
@@ -362,6 +386,14 @@
                         item_2 = "Others (bee keeping, sericulture, lac culture, ancillary etc.)"
                     };
                     toAdd.Add(newEntry);
+                }
+                else
+                {
+                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4006);
+                    if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
+                    {
+                        existingCode.display_serial_number = $"5";
+                    }
                 }
             }
         }
@@ -409,6 +441,14 @@
                 };
                 toAdd.Add(newEntry);
             }
+            else
+            {
+                var existingCode = Block7DList.FirstOrDefault(d => d.code == code.code);
+                if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
+                {
+                    existingCode.display_serial_number = $"1.{code.serial_number}";
+                }
+            }
         }
 
         if (toAdd.Any())
@@ -451,6 +491,14 @@
 
                 };
                 toAdd.Add(newEntry);
+            }
+            else
+            {
+                var existingCode = Block7DList.FirstOrDefault(d => d.code == code.NicCode);
+                if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
+                {
+                    existingCode.display_serial_number = $"6.{code.SerialNumber}";
+                }
             }
         }
 
