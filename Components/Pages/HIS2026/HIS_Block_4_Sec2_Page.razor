@@ -15,6 +15,7 @@
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_4_Q5> Validator
 
+<NavigationLock OnBeforeInternalNavigation="ConfirmNavigation" />
 
     <div class="main-content">
         <CommonContentHeader SelectedFsuId="@SelectedFsuId"
@@ -450,7 +451,7 @@
     private void OnNicCodeChanged(ChangeEventArgs e)
     {
         string? val = e.Value?.ToString();
-        
+
         if (int.TryParse(e.Value?.ToString(), out int selectedNic))
         {
             fields.NicCode = selectedNic;
@@ -523,6 +524,17 @@
         else
         {
             NavigationManager.NavigateTo("dashboard/his/block_4_3");
+        }
+    }
+
+    async Task ConfirmNavigation(LocationChangingContext context)
+    {
+        
+        if (Q5Needed && NICfields != null && NICfields.Count == 0 && !context.TargetLocation.EndsWith("/block_4_1"))
+        {
+            context.PreventNavigation();
+            Block_4_5_ErrorMessage = $"H017(i): Please check the entry recorded against col.s 8-11 , block 3";
+            toastService.ShowError("Please resolve pending errors");
         }
     }
 }

@@ -742,9 +742,26 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_7c");
                 return;
             }
-            if (!codeListEntryNeeded)
+            bool hasAnyValueGreaterThanZero =
+                                    new int?[]
+                                    {
+                                        block_7B.item_6_1,
+                                        block_7B.item_6_2,
+                                        block_7B.item_6_3,
+                                        block_7B.item_6_4,
+                                        block_7B.item_6_5,
+                                        block_7B.item_6_6,
+                                        block_7B.item_6_7,
+                                        block_7B.item_6_8,
+                                        block_7B.item_6_9,
+                                        block_7B.item_6_10,
+                                        block_7B.item_6_11,
+                                        block_7B.item_6_12
+                                    }.Any(x => x.HasValue && x.Value > 0);
+
+            if (codeListEntryNeeded && !hasAnyValueGreaterThanZero)
             {
-                NavigationManager.NavigateTo("/dashboard/his/block_7c");
+                toastService.ShowError("Atleast one entry is needed for Q7.6");
                 return;
             }
 
