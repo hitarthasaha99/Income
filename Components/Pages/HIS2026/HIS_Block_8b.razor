@@ -249,7 +249,9 @@
 
     async Task GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        NavigationManager.NavigateTo("/dashboard/his/block_8a");
+
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
     protected override async Task OnInitializedAsync()
     {

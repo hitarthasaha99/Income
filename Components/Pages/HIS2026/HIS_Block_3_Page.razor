@@ -107,10 +107,14 @@
                                                 @onclick="@(() => HandleModal("UPDATE", member))">
                                                     <i class="fi fi-rr-pencil"></i>
                                                 </button>
+                                                @if (!(member.serial_no == 1 && member.item_3 == 1))
+                                                {
+                                                    
                                                 <button class="btn btn-link fs-6 text-danger"
                                                 @onclick="@(() => HandleDelete(member.id))">
                                                     <i class="fi fi-rr-trash"></i>
                                                 </button>
+                                                }
                                             </div>
                                         }
 
@@ -670,7 +674,8 @@
 
     async void GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        NavigationManager.NavigateTo("/dashboard/his/block0_1");
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 

@@ -520,7 +520,9 @@
     CommentModal commentModal = default!;
     async Task GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        NavigationManager.NavigateTo("/dashboard/his/block_9b");
+
+        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
 
     protected async override Task OnInitializedAsync()
