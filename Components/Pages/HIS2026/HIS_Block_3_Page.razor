@@ -779,6 +779,25 @@
         if (string.IsNullOrEmpty(value))
         {
             newMember.age = null;
+
+            // Clear all warnings that depend on age
+            ageWarning = null;
+            ageRelationWarning = null;
+            singleUserWarning = null;
+            maritalStatusWarning = null;
+            item_7Warning = null;
+            item_8Warning = null;
+            item_9Warning = null;
+            item_10Warning = null;
+            item_11Warning = null;
+            item_12Warning = string.Empty;
+
+            StateHasChanged();
+            return;
+        }
+        if (string.IsNullOrEmpty(value))
+        {
+            newMember.age = null;
             return;
         }
         if (value.Length > 3)
@@ -1372,6 +1391,7 @@
         item_9Warning = null;
         item_10Warning = null;
         item_11Warning = null;
+        item_12Warning = null;
     }
 
     async Task HandleModal(string action = "", Tbl_Block_3? data = null)
