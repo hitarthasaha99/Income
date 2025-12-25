@@ -214,6 +214,8 @@
             is_selection_done = true;
             toastService.ShowSuccess($"Selection Has been done for Serial Number : {block_5[selection_index - 1].serial_number}");
             var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+            block_0_1.remarks_block_5 = remarks;
+            await SCH_0_0_Queries.SaveBlock1(block_0_1);
             if (response != 1)
             {
                 toastService.ShowSuccess($"Error while storing data into database, Please try again!");
