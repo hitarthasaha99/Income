@@ -462,7 +462,7 @@
                         <div class="mb-3">
                             <label class="form-label">
                             <span class="form-badge">Q5.9 </span>
-                                Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)
+                                Total monthly income (Q5.2+Q5.3+(Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)
                             </label>
                             <InputNumber @bind-Value="newMember.item_9"
                                          class="form-control no-spinner"
@@ -817,7 +817,7 @@
         int item_8 = newMember.item_8 ?? 0; //5.8
 
 
-        int ans = item_2 + (item_3_i + item_3_ii + item_4_i + item_4_ii + item_5 + item_6 + item_7 + item_8) / 12;
+        int ans = item_2 + item_3_i + item_3_ii + (item_4_i + item_4_ii + item_5 + item_6 + item_7 + item_8) / 12;
         newMember.item_9 = ans;
         CheckItem9Warning();
         StateHasChanged();
