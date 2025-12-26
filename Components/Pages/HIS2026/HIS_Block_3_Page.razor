@@ -1398,6 +1398,7 @@
     {
         try
         {
+            clearErrors();
             if (action == "ADD")
             {
                 isAdd = true;
@@ -1426,6 +1427,7 @@
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
+                    showAllWarnings();
                     await AddModal.ShowAsync();
                 }
             }
@@ -1438,11 +1440,26 @@
         {
             Console.WriteLine(ex.Message);
         }
-        clearErrors();
+        // clearErrors();
         // after close
-        spouceWarning = null;
-        neverMarredWarn = null;
+        // spouceWarning = null;
+        // neverMarredWarn = null;
 
+    }
+    private void showAllWarnings()
+    {
+        CheckGenderWarning();
+        checkAgeWarning();
+        checkAgeReletionWarning();
+        checkSingleUser();
+        checkItem_6Warning();
+        CheckItem7Warning();
+        CheckItem8Warning();
+        CheckItem9Warning();
+        CheckItem10Warning();
+        CheckItem11Warning();
+        CheckItem12Warning();
+        CheckSpouseMaritalWarning();
     }
 
     private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
@@ -1515,7 +1532,7 @@
     {
         spouceWarning = null;
         CheckSpouseMaritalWarning(); 
-        clearErrors();
+        // clearErrors();
         messageStore.Clear();
         var errors = Validator.Validate(newMember);
         foreach (var error in errors.Errors)
