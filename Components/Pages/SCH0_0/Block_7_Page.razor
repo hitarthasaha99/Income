@@ -224,6 +224,7 @@
                                     <label class="form-label"><span class="form-badge">4</span>@(fields.is_household == 1 ? "Name of Head of Household/Structure" : "Name of Head of Household")</label>
                                     <InputText class="form-control"
                                                maxlength="50"
+                                               onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) { event.preventDefault(); }"
                                                 onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
                                                 @bind-Value="fields.Block_7_4"
                                                 @oninput="OnHeadNameInput"/>

@@ -387,7 +387,10 @@
 
             if (!validation.IsValid)
             {
-                toastService.ShowError("Please resolve all the errors");
+                foreach(var error in validation.Errors)
+                {
+                    toastService.ShowError(error.ErrorMessage);
+                }
                 return;
             }
             else
