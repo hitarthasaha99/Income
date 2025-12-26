@@ -1107,22 +1107,48 @@
 
     //Check Single User..............................................................
 
+    // private void checkSingleUser()
+    // {
+    //     singleUserWarning = null;
+
+    //     if (newMember.age.HasValue)
+    //     {
+    //         relation code 1-9 must be selected
+    //         if (!newMember.item_3.HasValue || newMember.item_3.Value < 1 || newMember.item_3.Value > 9)
+    //             return;
+    //         if (newMember.age.Value < 6)
+    //         {
+    //             singleUserWarning = "W006(vii): Please check the entry";
+    //         }
+    //     }
+
+    //     StateHasChanged();
+    // }
+
     private void checkSingleUser()
     {
         singleUserWarning = null;
 
-        if (newMember.age.HasValue)
-        {
-            // relation code 1-9 must be selected
-            if (!newMember.item_3.HasValue || newMember.item_3.Value < 1 || newMember.item_3.Value > 9)
-                return;
-            if (newMember.age.Value < 6)
-            {
-                singleUserWarning = "W006(vii): Please check the entry";
-            }
-        }
+        // Count active members (not deleted)
+        int activeCount = block3Members.Count(m => m.is_deleted != true);
 
-        StateHasChanged();
+        // If ADD mode, include current member
+        if (isAdd)
+            activeCount++;
+
+        // Warning ONLY when exactly ONE member exists
+        if (activeCount != 1)
+            return;
+
+        // That single member must be SELF (serial 1)
+        if (newMember.item_3 != 1 || newMember.serial_no != 1)
+            return;
+
+        // Age rule
+        if (newMember.age.HasValue && newMember.age.Value < 6)
+        {
+            singleUserWarning = "W006(vii): Please check the entry";
+        }
     }
 
 
@@ -1518,6 +1544,8 @@
             }
             await ReorderSerialNumbers();
             await LoadData();
+            checkSingleUser();
+
         }
         else
         {
@@ -1623,7 +1651,7 @@
         toastService.ShowSuccess(isAdd ? "Member added successfully!" : "Member updated successfully!");
         await AddModal.HideAsync();
         await LoadData();
-
+        checkSingleUser();
     }
     private async Task ReorderSerialNumbers()
     {
