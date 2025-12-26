@@ -239,7 +239,7 @@
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_9a_remark" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_9a_remark" placeholder="Enter your remarks here..." ></textarea>
             </fieldset>
         </div>
     </div>
@@ -360,6 +360,7 @@
         if (block_9a != null)
         {
             block_9a.item_1_6 = (block_9a.item_1_1 ?? 0) + (block_9a.item_1_2 ?? 0) + (block_9a.item_1_3 ?? 0) + (block_9a.item_1_4 ?? 0) + (block_9a.item_1_5 ?? 0);
+            CheckWarning();
         }
 
         // 2️⃣ Clear previous errors

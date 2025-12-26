@@ -156,7 +156,7 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
                 ShowItem17 = block_0_1.Block_1_17 != null;
                 ShowItem17RemarksField = ShowItem17 && block_0_1.Block_1_17.GetValueOrDefault() == 9;
-                if(block_0_1.Block_1_16.GetValueOrDefault() is 2 or 3 or 5 or 6 or 7)
+                if(block_0_1.Block_1_16.GetValueOrDefault() is (2 or 3 or 5 or 6 or 7))
                 {
                     DisablePopulation = true;
                 }
@@ -164,7 +164,7 @@ namespace Income.Viewmodels.SCH0_0
                 {
                     if (!SessionStorage.FSU_Submitted)
                     {
-                        DisablePopulation = SessionStorage.hamlet_selection_done;
+                        DisablePopulation = SessionStorage.hamlet_selection_done || SessionStorage.subdivision_selection_done || SessionStorage.selection_done;
                     }
                     else
                     {

@@ -59,7 +59,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
-                <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" @bind="remarks" placeholder="Enter your remarks here..." rows="2" ></textarea>
             </fieldset>
         </div>
     </div>
@@ -95,8 +95,12 @@
 
     async void GoBack()
     {
-        await JSRuntime.InvokeVoidAsync("__handleGoBack");
-        return;
+        if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)
+            NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{false}");
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block0_1");
+        }
     }
 
     protected override async Task OnInitializedAsync()

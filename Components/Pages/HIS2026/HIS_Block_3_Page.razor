@@ -8,6 +8,7 @@
 @using Income.Database.Models.SCH0_0
 @using Income.Viewmodels
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
 @inject ILoggingService loggingService
 @inject Warning_VM warningVM
@@ -163,7 +164,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" ></textarea>
             </div>
         </div>
     </fieldset>
@@ -297,8 +298,11 @@
                                 </label>
 
                             <InputNumber class="form-control no-spinner"
+                                         inputmode="numeric"
+                                         pattern="[0-9]*"
                                          @bind-Value="newMember.age"
                                          @oninput="(e) => ageClear(e)"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="if(this.value.length >= 3) return false; return /^[0-9]$/.test(event.key);" />
                             <ValidationMessage For="@(() => newMember.age)" />
 
@@ -800,6 +804,8 @@
             newMember.age = null;
             return;
         }
+        // Remove everything except digits
+        value = Regex.Replace(value, @"\D", "");
         if (value.Length > 3)
         {
             value = value.Substring(0, 3);

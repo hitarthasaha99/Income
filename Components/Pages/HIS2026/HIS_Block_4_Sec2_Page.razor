@@ -211,9 +211,10 @@
                                 <span class="form-badge">5</span> Number of months of operation during last 365 days
                             </label>
                             <input class="form-control"
-                            type="number"
+                                   type="number"
                                    @bind="fields.NumberOfMonths"
                                    @oninput="OnMonthsInput"
+                                   onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                    disabled="@(SessionStorage.FSU_Submitted)" />
                             <ValidationMessage For="@(() => fields.NumberOfMonths)" />
                         </div>
@@ -257,6 +258,7 @@
     CommentModal commentModal = default!;
     List<int> Rows = [];
     private bool DisableNICInput = false;
+    Tbl_Block_4_Q5? copy = null;
 
     async void Validate()
     {
@@ -342,12 +344,18 @@
     async Task SaveQ5()
     {
         var obj = fields;
+        bool nicchanged = false;
         if (NICfields != null && NICfields.Count > 0 && NICfields.Any(x => x.NicCode == fields.NicCode && x.id != fields.id && x.is_deleted != true))
         {
             toastService.ShowError("Cannot add the same NIC code again");
             return;
         }
-        await dQ.Save_SCH_HIS_Block4_NICList(obj);
+        if (copy != null && copy.NicCode != obj.NicCode)
+        {
+            nicchanged = true;
+        }
+        await dQ.Save_SCH_HIS_Block4_NICList(obj, nicchanged);
+
         NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
         await AddModal.HideAsync();
         StateHasChanged();
@@ -384,6 +392,7 @@
             }
             else if (action == "UPDATE")
             {
+                copy = ObjectCloneHelper.ShallowCopy(data);
                 fields = ObjectCloneHelper.ShallowCopy(data);
                 if (fields?.SerialNumber >= 4)
                 {

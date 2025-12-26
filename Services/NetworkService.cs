@@ -218,6 +218,11 @@ namespace Income.Services
         {
             try
             {
+                //Only for QA
+                if(SessionStorage.env == SessionStorage.Environment.Development)
+                {
+                    await LogoutService(_User_Details.username);
+                }
                 using (var _httpClient = new HttpClient())
                 {
                     _httpClient.BaseAddress = new Uri(CommonConfig.CommonAPIPostAddress);

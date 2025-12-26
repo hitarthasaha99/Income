@@ -114,7 +114,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7d_remark" placeholder="Enter your remarks..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7d_remark" placeholder="Enter your remarks..." ></textarea>
             </fieldset>
         </div>
     </div>
@@ -253,7 +253,7 @@
                 await SyncBlock7A_7DAsync_Batched();
                 await SyncBlock4_7DAsync_Batched();
                 await SyncBlock7C_7DAsync_Batched();
-                await dQ.ReserializeBlock7DList();
+                //await dQ.ReserializeBlock7DList();
             }
             else
             {
@@ -286,6 +286,7 @@
     {
         // Add missing codes from CropCodeList into Block7DList in-memory first
         var toAdd = new List<Tbl_Block_7d>();
+        var toUpdate = new List<Tbl_Block_7d>();
         if (block_4 != null)
         {
             bool item_3 = block_4.item_4_3.GetValueOrDefault();
@@ -316,10 +317,11 @@
                 }
                 else
                 {
-                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4006);
+                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4003);
                     if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
                     {
                         existingCode.display_serial_number = $"2";
+                        toUpdate.Add(existingCode);
                     }
                 }
             }
@@ -341,10 +343,11 @@
                 }
                 else
                 {
-                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4006);
+                    var existingCode = Block7DList.FirstOrDefault(d => d.code == 4004);
                     if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
                     {
                         existingCode.display_serial_number = $"3";
+                        toUpdate.Add(existingCode);
                     }
                 }
             }
@@ -370,6 +373,7 @@
                     if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
                     {
                         existingCode.display_serial_number = $"4";
+                        toUpdate.Add(existingCode);
                     }
                 }
             }
@@ -395,7 +399,23 @@
                     if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
                     {
                         existingCode.display_serial_number = $"5";
+                        toUpdate.Add(existingCode);
                     }
+                }
+            }
+        }
+
+        if (toUpdate.Any())
+        {
+            foreach (var nu in toUpdate)
+            {
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(nu);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving Block7D new entry: {ex.Message}");
                 }
             }
         }
@@ -424,6 +444,7 @@
     {
         // Add missing codes from CropCodeList into Block7DList in-memory first
         var toAdd = new List<Tbl_Block_7d>();
+        var toUpdate = new List<Tbl_Block_7d>();
         foreach (var code in CropCodeList)
         {
             // assume mapping by code id is different - previously used id comparisons; adjust if needed
@@ -449,6 +470,22 @@
                 if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
                 {
                     existingCode.display_serial_number = $"1.{code.serial_number}";
+                    toUpdate.Add(existingCode);
+                }
+            }
+        }
+
+        if (toUpdate.Any())
+        {
+            foreach (var nu in toUpdate)
+            {
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(nu);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving Block7D new entry: {ex.Message}");
                 }
             }
         }
@@ -476,6 +513,7 @@
     private async Task SyncBlock7C_7DAsync_Batched()
     {
         var toAdd = new List<Tbl_Block_7d>();
+        var toUpdate = new List<Tbl_Block_7d>();
         foreach (var code in NICFields)
         {
             bool exists = Block7DList.Any(d => d.code == code.NicCode);
@@ -500,6 +538,22 @@
                 if (existingCode != null && string.IsNullOrEmpty(existingCode.display_serial_number))
                 {
                     existingCode.display_serial_number = $"6.{code.SerialNumber}";
+                    toUpdate.Add(existingCode);
+                }
+            }
+        }
+
+        if (toUpdate.Any())
+        {
+            foreach (var nu in toUpdate)
+            {
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(nu);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving Block7D new entry: {ex.Message}");
                 }
             }
         }
