@@ -15,10 +15,13 @@
 
 @if (editContext != null)
 {
+    <ConfirmDialog @ref="dialog" />
+
     <EditForm EditContext="@editContext">
         <FluentValidationValidator />
         <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                              survey_time="@survey_time" />
+
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
             <div class="main-content">
                 
@@ -225,7 +228,7 @@
                                     <span class="form-badge">17.1</span>
                                     Reason
                                 </label>
-                                <textarea maxlength="50" disabled="@SessionStorage.hamlet_selection_done" type="text" rows="2" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                                <textarea maxlength="50" disabled="@SessionStorage.hamlet_selection_done" type="text" rows="2" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17" placeholder="Enter your remarks here..." ></textarea>
                             </div>
                         </div>
                     </div>
@@ -235,7 +238,7 @@
                         <h3 class="card-title"><span class="text-primary fw-bolder me-2">18</span>Remarks</h3>
                     </div>
                     <div class="card-body">
-                        <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control disabled w-100" placeholder="Enter your remarks here..." rows="2" @bind="block_0_1_VM.block_0_1.remarks" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                        <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" type="text" class="form-control disabled w-100" placeholder="Enter your remarks here..." rows="2" @bind="block_0_1_VM.block_0_1.remarks" ></textarea>
                     </div>
                 </div>
             </div>
@@ -266,6 +269,8 @@
     string Block_1_17_ErrorMessage = string.Empty;
     private FluentValidationValidator? validator;
     DBQueries DBQueries = new();
+    private ConfirmDialog dialog = default!;
+
 
     private string Block114Text
     {
@@ -329,7 +334,7 @@
                     }
                 }
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -402,6 +407,26 @@
             {
                 toastService.ShowError("Please correct the highlighted validation errors before proceeding.");
                 return;
+            }
+
+            if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_16.GetValueOrDefault() is not (1 or 4))
+            {
+                var hhd_data = await DBQueries.GetBlock7Data(SessionStorage.SelectedFSUId);
+                if (hhd_data != null && hhd_data.Count > 0)
+                {
+                    var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                    var confirmation = await dialog.ShowAsync(
+                        title: "Alert",
+                        message1: "Existing data will be deleted with this action",
+                        message2: "Are you sure you want to proceed?",
+                        confirmDialogOptions: options
+                    );
+                    if (!confirmation)
+                    {
+                        return;
+                    }
+                }
+                await DBQueries.DeleteExistingFSUData(SessionStorage.SelectedFSUId);
             }
 
             // Save data

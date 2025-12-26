@@ -143,7 +143,7 @@
         </div>
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
         <div class="card-body">
-                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here.." @bind="@block_1.block_5_remark" rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here.." @bind="@block_1.block_5_remark" rows="2" ></textarea>
         </div>
         </fieldset>
     </div>
@@ -227,6 +227,8 @@
                             </label>
                             <InputNumber @bind-Value="newMember.item_1"
                                             class="form-control no-spinner"
+                                         inputmode="numeric"
+                                         pattern="[0-9]*"
                                             autocomplete="off"
                                             autocorrect="off"
                                             autocapitalize="off"
@@ -234,7 +236,8 @@
                                             min="1" max="12"
                                             maxlength="2"
                                             @oninput="item1OnInput"
-                                            onkeypress="if (this.value.length >= 2) return false; return event.key >= '0' && event.key <= '9';">
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
+                                         onkeypress="if (this.value.length >= 2) return false; return event.key >= '0' && event.key <= '9';">
                             </InputNumber>
                             <ValidationMessage For="@(() => newMember.item_1)" />
                         </div>
@@ -700,6 +703,7 @@
                     obj.serial_member = member.serial_no;
                     obj.serial_number = i++;
                     obj.fk_block_3 = member.id;
+                    obj.addedByUser = false;
                     await dbq.Save_SCH_HIS_Block5(obj);
                 }
                 await LoadData();
@@ -717,6 +721,7 @@
                     obj.serial_member = member.serial_no;
                     obj.fk_block_3 = member.id;
                     obj.serial_number = currentSerialNumber++;
+                    obj.addedByUser = false;
                     await dbq.Save_SCH_HIS_Block5(obj);
                 }
                 await LoadData();
@@ -834,7 +839,8 @@
                 newMember = new Tbl_Block_5
                 {
                     id = Guid.NewGuid(),
-                    serial_number = block5Members.Max(x => x.serial_number) + 1
+                    serial_number = block5Members.Max(x => x.serial_number) + 1,
+                    addedByUser = true
                 };
                 editContext = new EditContext(newMember);
                 messageStore = new ValidationMessageStore(editContext);

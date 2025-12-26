@@ -10,12 +10,16 @@
 @inject ILoggingService Logger
 @inject NetworkService networkService
 @inject ILoggingService loggingService
+@inject PreloadService preloadService
+
 
 <div class="main-content">
     <CommonContentHeader 
         SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time" 
     />
+    <ConfirmDialog @ref="dialog" />
+
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
@@ -172,7 +176,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                <textarea maxlength="500" type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control disabled w-100" @bind="@remarks" placeholder="Enter your remarks here..." rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" type="text" disabled="@SessionStorage.FSU_Submitted" class="form-control disabled w-100" @bind="@remarks" placeholder="Enter your remarks here..." rows="2" ></textarea>
             </fieldset>
         </div>
     </div>
@@ -188,9 +192,20 @@
                 {
                     <Button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
                 }
-                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.FSU_Submitted)
-                {
-                    <Button class="btn btn-success is_sso action me-2" @onclick="@(() => SubmitData())">Submit to SSO<i class="fi fi-rr-arrow-right ms-1"></i></Button>
+                @{
+                    string submissionBtnText = string.Empty;
+                    if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                    {
+                        submissionBtnText = "Submit to SSO";
+                    }
+                    else if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+                    {
+                        submissionBtnText = "Refer Back to JSO";
+                    }
+                    if(ShowValidateButton)
+                    {
+                        <Button class="btn btn-success is_sso action me-2" @onclick="@(() => SubmitData())">@submissionBtnText<i class="fi fi-rr-arrow-right ms-1"></i></Button>
+                    }
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Exit<i class="fi fi-rr-cross-circle ms-1"></i></NavLink>
             </div>
@@ -214,6 +229,8 @@
     string StatusMessage = "";
     string StatusClass = "";
     string? remarks = "";
+    private ConfirmDialog dialog = default!;
+
 
     // protected override async Task OnAfterRenderAsync(bool firstRender)
     // {
@@ -242,13 +259,15 @@
             };
             await commonQueries.InsertVisitedBlock(vb);
             var block_1 = await DBQueries.FetchBlock1();
+            var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+            
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                ShowValidateButton = !SessionStorage.FSU_Submitted;
+                ShowValidateButton = fsu != null && (fsu.lookupFsuSubmitStatus == 80 || fsu.lookupFsuSubmitStatus == 11) && fsu.lookup_fsu_sub_submit_status is (12 or 0 or 11);
             }
             else
             {
-                ShowValidateButton = true;
+                ShowValidateButton = fsu != null && fsu.lookupFsuSubmitStatus == 80 && fsu.lookup_fsu_sub_submit_status == 21;
             }
             if (block_1 != null)
             {
@@ -458,44 +477,90 @@
     {
         try
         {
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmation = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Are you sure you want to submit?",
+                confirmDialogOptions: options
+            );
+            if (!confirmation)
+            {
+                return;
+            }
             if(isBusy)
             {
                 return;
             }
+            preloadService.Show(SpinnerColor.Light, "Submitting data... Please wait...");
             isBusy = true;
+            bool isJSO = SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO;
+            bool isSSO = SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO;
+
             int lookup_submit_status = 0;
             int lookup_sub_submit_status = 0;
             var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
             if (fsu != null)
             {
                 lookup_submit_status = fsu.lookupFsuSubmitStatus.GetValueOrDefault();
+                lookup_sub_submit_status = fsu.lookup_fsu_sub_submit_status.GetValueOrDefault();
             }
-            if (new int [] {21,12,22,31,32,80}.Contains(lookup_submit_status))
+
+            if (new int [] {21,12,22,31,32}.Contains(lookup_submit_status))
             {
-                toastService.ShowInfo("FSU has already been submitted");
+                toastService.ShowInfo("Household data has already been submitted. Cannot allow SCH00 referback.");
                 return;
             }
-            var warnings = await DBQueries.GetWarningList(schedule: "0");
-            if (warnings.Any(x => x.warning_status == 1))
+            var all_warnings = await DBQueries.GetWarningList(schedule: "0");
+            var warnings = all_warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
+            if (isJSO)
             {
-                toastService.ShowError("Warnings need to be resolved before submission");
-                return;
+                if (warnings.Any(x => x.warning_status == 1 || x.warning_status == 3))
+                {
+                    toastService.ShowError("Warnings need to be resolved before submission");
+                    return;
+                }
+                var sch00block2 = await DBQueries.FetchBlock2();
+                if (sch00block2 == null)
+                {
+                    toastService.ShowError("Please save before proceeding");
+                    return;
+                }
+
+                if (lookup_sub_submit_status != 12)
+                {
+                    toastService.ShowError("SCH00 has already been submitted to SSO");
+                    return;
+                }
             }
-            var sch00block2 = await DBQueries.FetchBlock2();
-            if (sch00block2 == null)
+            else if (isSSO)
             {
-                toastService.ShowError("Please save before proceeding");
-                return;
+                if (warnings.Any(x => x.warning_status == 2))
+                {
+                    toastService.ShowError("Warnings need to be resolved before submission");
+                    return;
+                }
+                if (!warnings.Any(x => x.warning_status == 3))
+                {
+                    toastService.ShowError("Atleast one warning needs to be resolved before submission");
+                    return;
+                }
+                
+                if(lookup_sub_submit_status != 21)
+                {
+                    toastService.ShowError("SCH00 has already been referred back to ENM");
+                    return;
+                }
             }
+
             Submission_Model data = new();
             data.IncomeSchHISDto = null;
 
             //Fetch SCH0 Data
-            data.IncomeSch00block0 = await DBQueries.FetchBlock1();
-            data.IncomeSch00block2_1 = await DBQueries.FetchSCH0Block2_1Data();
-            data.IncomeSch00block2_2 = await DBQueries.FetchSCH0Block2_2Data();
-            var block_3 = await DBQueries.GetFileData(0);
-            var block_6 = await DBQueries.GetFileData(1);
+            data.IncomeSch00block0 = isJSO ?  await DBQueries.FetchBlock1() : null;
+            data.IncomeSch00block2_1 = isJSO ? await DBQueries.FetchSCH0Block2_1Data() : null;
+            data.IncomeSch00block2_2 = isJSO ? await DBQueries.FetchSCH0Block2_2Data() : null;
+            var block_3 = isJSO ? await DBQueries.GetFileData(0) : null;
+            var block_6 = isJSO ? await DBQueries.GetFileData(1) : null;
 
             if(block_3 != null)
             {
@@ -505,10 +570,10 @@
             {
                 block_6.file_image_source = ExtractBase64(block_6.file_image_source);
             }
-            data.IncomeSch00block3 = new() { block_3, block_6 };
-            data.IncomeSch00block_4 = await DBQueries.GetBlock4();
-            data.IncomeSch00block_5 = await DBQueries.FetchSCH0Block5Data();
-            data.IncomeSch00block_7 = await DBQueries.GetBlock7DataWithDeleted();
+            data.IncomeSch00block3 = isJSO ? new() { block_3, block_6 } : null;
+            data.IncomeSch00block_4 = isJSO ? await DBQueries.GetBlock4() : null;
+            data.IncomeSch00block_5 = isJSO ? await DBQueries.FetchSCH0Block5Data() : null;
+            data.IncomeSch00block_7 = isJSO ? await DBQueries.GetBlock7DataWithDeleted() : null;
             data.IncomeSch00FieldOp = await DBQueries.FetchBlock2();
             data.IncomeSch00WarningList = await DBQueries.GetWarningList(schedule: "0");
 
@@ -540,7 +605,9 @@
                 toastService.ShowSuccess("Data submitted successfully");
                 SessionStorage.FSU_Submitted = true;
                 fsu.lookupFsuSubmitStatus = 80;
+                fsu.lookup_fsu_sub_submit_status = payload.lookup_fsu_sub_submit_status;
                 await commonQueries.UpdateFSU(fsu);
+                ShowValidateButton = false;
                 StateHasChanged();
             }
             else
@@ -555,6 +622,7 @@
         finally
         {
             isBusy = false;
+            preloadService.Hide();
         }
     }
 

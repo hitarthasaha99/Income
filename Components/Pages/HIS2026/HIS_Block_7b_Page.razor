@@ -34,7 +34,6 @@
                     @* add comment *@
                     @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
                     {
-
                         <div class="card-tools">
                             <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                         </div>
@@ -511,7 +510,7 @@
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
         <div class="card-body">
-                <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="2" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="2" placeholder="Enter your remarks here..." ></textarea>
         </div>
         </fieldset>
     </div>
@@ -769,7 +768,10 @@
 
             messageStore.Clear();
             var validation = Validator.Validate(block_7B);
-
+            if(!codeListEntryNeeded)
+            {
+                validation.Errors.Clear();
+            }
             foreach (var error in validation.Errors)
             {
                 var fieldIdentifier = new FieldIdentifier(block_7B, error.PropertyName);
@@ -777,7 +779,7 @@
             }
             editContext.NotifyValidationStateChanged();
 
-            if (!validation.IsValid)
+            if (!validation.IsValid && codeListEntryNeeded)
             {
                 toastService.ShowError("Please resolve all the errors");
                 return;

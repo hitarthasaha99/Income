@@ -136,7 +136,7 @@
             </div>
             <div class="card-body">
                 <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
-                    <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here..." @bind="@remarks" rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                    <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here..." @bind="@remarks" rows="2" ></textarea>
                 </fieldset>
             </div>
         </div>
@@ -146,9 +146,9 @@
                     <NavLink class="btn btn-outline-secondary" onclick="@GoBack">
                         <i class="fi fi-rr-angle-left me-1"></i>Back
                     </NavLink>
-                    @if (AllowUpdateListing)
+                    @if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                     {
-                        <button class="btn btn-primary ms-2" @onclick="@(() => OpenUpdateListingModal())">Update Listing</button>
+                        <button class="btn btn-primary ms-2" disabled="@(!AllowUpdateListing)" @onclick="@(() => OpenUpdateListingModal())">Update Listing</button>
                     }
                 </div>
             </div>
@@ -377,7 +377,7 @@
         {
             if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected);
+                AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected) && tbl_Fsu_List.lookupFsuSubmitStatus == 80 && tbl_Fsu_List.lookup_fsu_sub_submit_status == 12;
             }
             else
             {

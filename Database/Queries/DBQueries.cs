@@ -439,6 +439,53 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<int> DeleteExistingFSUData(int fsuID)
+        {
+            try
+            {
+                var tenantId = SessionStorage.tenant_id;
+
+                // List of all tables to delete from
+                var tables = new List<string>
+                {
+                    // Existing tables
+                    "Tbl_Sch_0_0_Block_2_1",
+                    "Tbl_Sch_0_0_Block_2_2",
+                    "Tbl_Sch_0_0_Block_3",
+                    "Tbl_Sch_0_0_Block_4",
+                    "Tbl_Sch_0_0_Block_5",
+                    "Tbl_Sch_0_0_Block_7",
+                };
+
+                foreach (var table in tables)
+                {
+                    if (SessionStorage.FSU_Submitted)
+                    {
+                        // Soft delete
+                        await _database.ExecuteAsync(
+                            $"UPDATE {table} SET is_deleted = 1 WHERE fsu_id = ? AND tenant_id = ?",
+                            fsuID, tenantId
+                        );
+                    }
+                    else
+                    {
+                        // Hard delete
+                        await _database.ExecuteAsync(
+                            $"DELETE FROM {table} WHERE fsu_id = ? AND tenant_id = ?",
+                            fsuID, tenantId
+                        );
+                    }
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+
         public async Task<int> HardDeleteHISDataForFSUID(int fsuID, int hhd_id)
         {
             try
@@ -2223,11 +2270,11 @@ namespace Income.Database.Queries
                     }
                 }
 
-                // Save new entries
-                foreach (var item in toAdd)
-                {
-                    await Save_SCH_HIS_Block7D_List(item);
-                }
+                //// Save new entries
+                //foreach (var item in toAdd)
+                //{
+                //    await Save_SCH_HIS_Block7D_List(item);
+                //}
             }
             catch (Exception ex)
             {
@@ -2235,7 +2282,7 @@ namespace Income.Database.Queries
             }
         }
 
-        public async Task<int?> Save_SCH_HIS_Block4_NICList(Tbl_Block_4_Q5 obj)
+        public async Task<int?> Save_SCH_HIS_Block4_NICList(Tbl_Block_4_Q5 obj, bool nicChanged = false)
         {
             try
             {
@@ -2244,6 +2291,18 @@ namespace Income.Database.Queries
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(obj);
+                    if (status > 0 && nicChanged)
+                    {
+                        var block_7c_nic = await Fetch_SCH_HIS_Block7_NICList();
+                        if (block_7c_nic != null && block_7c_nic.Count > 0)
+                        {
+                            var correspondingCode = block_7c_nic.FirstOrDefault(x => x.NicCode == check_existence.NicCode);
+                            if (correspondingCode != null)
+                            {
+                                await DeleteEntryAsync<Tbl_Block_7c_NIC>(correspondingCode.id);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -2274,6 +2333,16 @@ namespace Income.Database.Queries
                     {
                         int deleted = await _database.DeleteAsync(exists);
                     }
+                    var block_7c_nic = await Fetch_SCH_HIS_Block7_NICList();
+                    if (block_7c_nic != null && block_7c_nic.Count > 0)
+                    {
+                        var correspondingCode = block_7c_nic.FirstOrDefault(x => x.NicCode == exists.NicCode);
+                        if (correspondingCode != null)
+                        {
+                            await DeleteEntryAsync<Tbl_Block_7c_NIC>(correspondingCode.id);
+                        }
+
+                    }
                     await ReserializeNICList();
                     return 1;
                 }
@@ -2291,6 +2360,7 @@ namespace Income.Database.Queries
             try
             {
                 var items = await Fetch_SCH_HIS_Block4_NICList();
+
                 if (items != null && items.Count > 0)
                 {
                     int s = 1;
@@ -2447,6 +2517,7 @@ namespace Income.Database.Queries
                     .Where(x => x.fsu_id == SessionStorage.SelectedFSUId
                                 && x.hhd_id == hhd_id
                                 && (x.is_deleted == null || x.is_deleted == false))
+                    .OrderBy(x => x.serial_member)
                     .ToListAsync();
 
                 if (response != null)
@@ -2671,7 +2742,7 @@ namespace Income.Database.Queries
                     var block_7d = await Fetch_SCH_HIS_Block7D();
                     if (block_7d != null)
                     {
-                        var item = block_7d.FirstOrDefault(x => x.block_7c_id == id);
+                        var item = block_7d.FirstOrDefault(x => x.code == exists.code);
                         if (item != null)
                         {
                             _ = await Delete_SCH_HIS_Block7D_List(item);
@@ -3402,7 +3473,8 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.Table<Tbl_Block_11b>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                var response = await _database.Table<Tbl_Block_11b>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false))
+                    .OrderBy(x => x.item_1).ToListAsync();
                 if (response != null)
                 {
                     return response;
