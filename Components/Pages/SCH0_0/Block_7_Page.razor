@@ -540,14 +540,26 @@
 
     async Task HandleSubmit(string action = "")
     {
+
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
+            return;
+        }
+
         string firstWarning = string.Empty;
         string secondWarning = string.Empty;
+
 
         if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && ListItems.Count == 0)
         {
             toastService.ShowError("Please add a household/establishment before proceeding");
             return;
         }
+
+        block_1_obj.remarks_block_7 = remarks;
+        if (block_1_obj.id != Guid.Empty)
+            await SCH_0_0_Queries.SaveBlock1(block_1_obj);
 
         if(SessionStorage.FSU_Submitted || SessionStorage.selection_done)
         {

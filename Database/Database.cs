@@ -106,18 +106,23 @@ namespace Income.Database
             try
             {
                 var indexCommands = new[]
-                    {
-                "CREATE INDEX IF NOT EXISTS idx_UserID ON Tbl_User_Details(id);",
-                "CREATE INDEX IF NOT EXISTS idx_FsuId ON Tbl_Fsu_List(fsu_id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_1_id ON Tbl_Sch_0_0_Block_0_1(id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_2_id ON Tbl_Sch_0_0_FieldOperation(id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_3_id ON Tbl_Sch_0_0_Block_3(id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_4_1_id ON Tbl_Sch_0_0_Block_2_1(id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_4_2_id ON Tbl_Sch_0_0_Block_2_2(id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_4_3_id ON Tbl_Sch_0_0_Block_4(id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_5_id ON Tbl_Sch_0_0_Block_5(id);",
-                "CREATE INDEX IF NOT EXISTS idx_sch_0_block_5_id ON Tbl_Sch_0_0_Block_7(id);",
-            };
+                {
+            "CREATE INDEX IF NOT EXISTS idx_UserID ON Tbl_User_Details(id);",
+            "CREATE INDEX IF NOT EXISTS idx_FsuId ON Tbl_Fsu_List(fsu_id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_1_id ON Tbl_Sch_0_0_Block_0_1(id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_2_id ON Tbl_Sch_0_0_FieldOperation(id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_3_id ON Tbl_Sch_0_0_Block_3(id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_4_1_id ON Tbl_Sch_0_0_Block_2_1(id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_4_2_id ON Tbl_Sch_0_0_Block_2_2(id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_4_3_id ON Tbl_Sch_0_0_Block_4(id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_5_id ON Tbl_Sch_0_0_Block_5(id);",
+            "CREATE INDEX IF NOT EXISTS idx_sch_0_block_7_id ON Tbl_Sch_0_0_Block_7(id);",
+
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_block5_unique_fk_block_3 ON Tbl_Block_5(fk_block_3);",
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_block5_unique_fk_block_3 ON Tbl_Block_6(fk_block_3);",
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_block5_unique_fk_block_3 ON Tbl_Block_11b(fk_block_3);"
+
+        };
 
                 foreach (var cmd in indexCommands)
                     await _database.ExecuteAsync(cmd).ConfigureAwait(false);
@@ -127,5 +132,6 @@ namespace Income.Database
                 Console.WriteLine(ex);
             }
         }
+
     }
 }

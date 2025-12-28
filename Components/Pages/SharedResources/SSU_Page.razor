@@ -751,6 +751,10 @@
 				var block_A = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
 				var block_B = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
 				var warnings = await dQ.FetchListAsync<Tbl_Warning>() ?? new();
+				if (warnings != null && warnings.Count > 0)
+				{
+					warnings = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+				}
 
 				if(block_1 == null)
 				{
@@ -893,6 +897,11 @@
 				if (warnings.Count > 0 && warnings.Any(x => x.warning_status == 1))
 				{
 					errors.Add("All warnings have not been resolved");
+				}
+
+				if (warnings.Count > 0 && warnings.Any(x => x.warning_status == 3))
+				{
+					errors.Add("Rejected warnings need to be addressed before submission");
 				}
 
 				errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
@@ -1187,6 +1196,7 @@
 					preloadService.Show(SpinnerColor.Light, "Updating location details...");
 					preloadService.Hide();
 					SessionStorage.FSU_Submitted = false;
+					SessionStorage.HHD_Submitted = true;
 					NavigationManager.NavigateTo("/dashboard/his/block0_1");
 				}
 				else
@@ -1202,6 +1212,7 @@
 			if (data.hhdStatus == 21 || data.hhdStatus == 22)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				SessionStorage.HHD_Submitted = true;
 				//SessionStorage.selected_hhd_seq = data.seq_no;
 				NavigationManager.NavigateTo("/dashboard/his/block0_1");
 				return;
@@ -1214,6 +1225,7 @@
 			if (data.hhdStatus == 31)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				SessionStorage.HHD_Submitted = true;
 				//SessionStorage.selected_hhd_seq = data.seq_no;
 				NavigationManager.NavigateTo("/dashboard/his/block0_1");
 				return;

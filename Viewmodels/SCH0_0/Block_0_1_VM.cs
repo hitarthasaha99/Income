@@ -175,22 +175,10 @@ namespace Income.Viewmodels.SCH0_0
             OnPropertyChanged(nameof(block_0_1));
         }
 
-        private bool _isAdd = true;
-        private Guid _id;
-
         public async Task<bool> Save()
         {
             try
             {
-                var dataObject = await SCH_0_0_Queries.FetchBlock1();
-                if (dataObject != null)
-                {
-                    _isAdd = false;
-                    _id = dataObject.id;
-                }
-
-                var identificationData = new Tbl_Sch_0_0_Block_0_1();
-                identificationData = block_0_1;
                 await SCH_0_0_Queries.SaveBlock1(block_0_1);
                 return true;
 

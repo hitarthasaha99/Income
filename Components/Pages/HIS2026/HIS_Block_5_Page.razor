@@ -638,6 +638,11 @@
                 item_9_warning = "Improper data reported in Q. 5.9. Please Choose an option.";
                 isItemEnable = true;
             }
+            else if (newMember != null && newMember.item_9.HasValue && newMember.item_9 > 0)
+            {
+                newMember.item_10 = null;
+                newMember.item_11 = string.Empty;
+            }
 
             if(isItemEnable && newMember != null && newMember.item_10.HasValue)
             {
