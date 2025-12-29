@@ -261,7 +261,7 @@
             await commonQueries.InsertVisitedBlock(vb);
             var block_1 = await DBQueries.FetchBlock1();
             var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
-            
+
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
                 ShowValidateButton = fsu != null && (fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 || fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 11) && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() is (12 or 0 or 11);
@@ -324,8 +324,14 @@
     }
     async void GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/sch0.0/block_9");
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        if(block_0_1.Block_1_16.GetValueOrDefault() is (1 or 4))
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_9");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block0_1");
+        }
         return;
     }
 

@@ -377,7 +377,7 @@
         var subD = await SCH_0_0_Queries.FetchSCH0Block5Data() ?? new();
         if (subD.Count > 0)
         {
-            NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
+            NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{true}");
             return;
         }
         else
