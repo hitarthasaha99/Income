@@ -429,7 +429,7 @@
 
             int applicableMemberCount = MemberList.Count(x => x.item_12 == 1);
             int col_3_sum = SchemeList.Sum(x => x.item_3) ?? 0;
-            if (col_3_sum < applicableMemberCount)
+            if (applicableMemberCount > 0 && col_3_sum < applicableMemberCount)
             {
                 toastService.ShowError("H060(ii): Invalid Entry, please check the entry recorded in col. 12, Block 3 ");
                 return;

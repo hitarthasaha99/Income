@@ -135,13 +135,18 @@
 												@statusTitle
 											</span>
 										</td>
-										<td>
-											@{
-												var surveyStatus = SetSurveyStatus(item);
-												var surveyStatusColor = commonFunction.ReturnStatusColor(surveyStatus);
-											}
-											<div class="badge badge-@surveyStatusColor">@(surveyStatus)</div>
-										</td>
+
+										@if(item.status != "SUBSTITUTED")
+										{
+											<td>
+												@{
+													var surveyStatus = SetSurveyStatus(item);
+													var surveyStatusColor = commonFunction.ReturnStatusColor(surveyStatus);
+												}
+												<div class="badge badge-@surveyStatusColor">@(surveyStatus)</div>
+											</td>
+										}
+										
 										<td>@(item.SubstitutedForID)</td>
 										<td>
 											@if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && item.hhdStatus == 12)
@@ -792,10 +797,10 @@
 
 					if (block_4 != null)
 					{
-						if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
-						{
-							errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
-						}
+						// if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
+						// {
+						// 	errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
+						// }
 
 						// if (!block_4.item_4_3.GetValueOrDefault() && !block_4.item_4_4.GetValueOrDefault() && !block_4.item_4_5.GetValueOrDefault() && !block_4.item_4_6.GetValueOrDefault() && (block_7b != null))
 						// {
@@ -826,11 +831,11 @@
 					}
 
 					var block_3_condition_for_block_7c = block_3.Any(x => x.item_8 == 2 || x.item_9 == 2);
-					if (!block_3_condition_for_block_7c && (block_7c_1.Count > 0 || block_7c_Q10.Count > 0))
-					{
-						errors.Add($"H048: Block 7C is applicable only when col 8 and/or col 9 = 2 for atleast one member");
-					}
-					else if(block_3_condition_for_block_7c && (block_7c_1.Count == 0 || block_7c_Q10.Count == 0))
+					// if (!block_3_condition_for_block_7c && (block_7c_1.Count > 0 || block_7c_Q10.Count > 0))
+					// {
+					// 	errors.Add($"H048: Block 7C is applicable only when col 8 and/or col 9 = 2 for atleast one member");
+					// }
+					if(block_3_condition_for_block_7c && (block_7c_1.Count == 0 || block_7c_Q10.Count == 0))
 					{
 						errors.Add($"H048: No Block 7C entry found even though col 8 and/or col 9 = 2 for atleast one member");
 					}
@@ -840,6 +845,7 @@
 					{
 						errors.Add($"H059: Block 8.6 must have atleast one entry if col 12 = 1 for any member");
 					}
+
 					else if(!block_3_block_8_Q6_condition && block_8_Q6.Count != 0)
 					{
 						errors.Add($"H059: Block 8.6 is applicable only when col 12 = 1 for any member");
@@ -894,12 +900,12 @@
 
 
 
-				if (warnings.Count > 0 && warnings.Any(x => x.warning_status == 1))
+				if (warnings != null && warnings.Count > 0 && warnings.Any(x => x.warning_status == 1))
 				{
 					errors.Add("All warnings have not been resolved");
 				}
 
-				if (warnings.Count > 0 && warnings.Any(x => x.warning_status == 3))
+				if (warnings != null && warnings.Count > 0 && warnings.Any(x => x.warning_status == 3))
 				{
 					errors.Add("Rejected warnings need to be addressed before submission");
 				}
@@ -1050,6 +1056,11 @@
 							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 						}
 					}
+					else
+					{
+						errors.Add("Need to have atleast one rejected warning to refer back");
+						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+					}
 				}
 				if (submissionMode == SubmissionMode.sso_to_ds)
 				{
@@ -1063,7 +1074,12 @@
 							errors.Add("Need to accept all warnings before submission");
 							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 						}
-					}				
+					}
+					else
+					{
+						errors.Add("Need to have atleast one rejected warning to refer back");
+						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+					}
 				}
 			}
 			return errorDict;

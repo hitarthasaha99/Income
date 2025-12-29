@@ -126,7 +126,15 @@ namespace Income.Database.Queries
         {
             try
             {
-                var is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ? AND tvb.fsu_id = ?", block_data.block_code, SessionStorage.SelectedFSUId);
+                List<Tbl_Visited_Blocks> is_exist = [];
+                if(SessionStorage.selected_hhd_id == 0)
+                {
+                    is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ? AND tvb.fsu_id = ?", block_data.block_code, SessionStorage.SelectedFSUId);
+                }
+                else
+                {
+                    is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ? AND tvb.fsu_id = ? AND tvb.hhd_id = ?", block_data.block_code, SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+                }
                 if (is_exist == null || is_exist.Count == 0)
                 {
                     block_data.id = Guid.NewGuid();

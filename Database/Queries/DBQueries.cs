@@ -1799,7 +1799,39 @@ namespace Income.Database.Queries
                         }
                     }
                     var json = System.Text.Json.JsonSerializer.Serialize(exists);
+                    var warnings = await GetWarningTableDataForSerial(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, "3", exists.serial_no.GetValueOrDefault());
+                    if (warnings != null && warnings.Count > 0)
+                    {
+                        foreach (var warning in warnings)
+                        {
+                            if (SessionStorage.HHD_Submitted)
+                            {
+                                warning.is_deleted = true;
+                                await _database.UpdateAsync(warning);
+                            }
+                            else
+                            {
+                                await _database.DeleteAsync(warning);
+                            }
+                            var childComments = await GetChildCommentsAsync(warning.id);
+                            if (childComments != null && childComments.Count > 0)
+                            {
+                                foreach (var child in childComments)
+                                {
+                                    if (SessionStorage.HHD_Submitted)
+                                    {
+                                        child.is_deleted = true;
+                                        await _database.UpdateAsync(child);
+                                    }
+                                    else
+                                    {
+                                        await _database.DeleteAsync(child);
+                                    }
+                                }
+                            }
+                        }
 
+                    }
                     //await _logger.LogInfo($"Deleted member - \n{json}");
                     await ReserializeMemberList(exists);
                     //await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
