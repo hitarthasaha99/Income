@@ -125,6 +125,8 @@
     private string validationMessage = "";
     bool is_sel;
     int totalSU;
+
+
     async void GoBack()
     {
         NavigationManager.NavigateTo("/dashboard/sch0.0/block0_1");
@@ -252,8 +254,8 @@
     {
         try
         {
-            var response = await sch_0_0_Queries.SaveSCH0Block2_1(block_2_1_VM.tbl_Sch_0_0_block_2_1);
-            if (response == null || response == 0)
+            var response = await block_2_1_VM.Save();
+            if (!response)
             {
                 toastService.ShowError("Error in saving data");
                 return;

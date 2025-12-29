@@ -274,6 +274,7 @@
     CommonFunction commonFunctions = new();
     bool is_error = false;
     private string? remarks = string.Empty;
+    [Inject] Repository repository { get; set; }
 
     async void GoBack()
     {
@@ -322,27 +323,36 @@
 
     private async Task Generate()
     {
-        var list = new List<Tbl_Sch_0_0_Block_7>();
-
-        foreach (var (sss, count) in InputCounts)
+        try
         {
-            for (int i = 0; i < count; i++)
+            var list = new List<Tbl_Sch_0_0_Block_7>();
+
+            foreach (var (sss, count) in InputCounts)
             {
-                list.Add(new Tbl_Sch_0_0_Block_7
+                for (int i = 0; i < count; i++)
                 {
-                    id = Guid.NewGuid(),
-                    SSS = sss,
-                    Stratum = GetStratum(sss),
-                    isInitialySelected = false,
-                    is_household = 2,
-                    isSelected = false,
-                    fsu_id = SessionStorage.SelectedFSUId
-                });
+                    list.Add(new Tbl_Sch_0_0_Block_7
+                    {
+                        id = Guid.NewGuid(),
+                        SSS = sss,
+                        Stratum = GetStratum(sss),
+                        isInitialySelected = false,
+                        is_household = 2,
+                        isSelected = false,
+                        fsu_id = SessionStorage.SelectedFSUId
+                    });
+                }
             }
+            //await SCH_0_0_Queries.SaveBulkBlock7(list);
+            await repository.InsertManyAsync(list);
+            await ModalRef.HideAsync();
+            await LoadData();
         }
-        await SCH_0_0_Queries.SaveBulkBlock7(list);
-        await ModalRef.HideAsync();
-        await LoadData();
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Error while generating households. Please try again.{ex}");
+        }
+
     }
 
     private async Task OpenGenerateModal()
@@ -413,7 +423,8 @@
                     {
                         item.IsChecked = false;
                         item.is_selected = false;
-                        await SCH_0_0_Queries.SaveSCH0Block2_2(suList);
+                        //await SCH_0_0_Queries.SaveSCH0Block2_2(suList);
+                        await repository.SaveManyAsync(suList);
                     }
                 }
 
@@ -424,7 +435,8 @@
                     {
                         item.IsChecked = false;
                     }
-                    await SCH_0_0_Queries.SaveSCH0Block5(sdList);
+                    //await SCH_0_0_Queries.SaveSCH0Block5(sdList);
+                    await repository.SaveManyAsync(sdList);
                 }
                 await LoadData();
             }
@@ -841,7 +853,7 @@
         }
         catch (Exception ex)
         {
-            
+
         }
         finally
         {
@@ -855,7 +867,8 @@
     {
         block_0_1.remarks_block_7_selection = remarks;
         if (block_0_1.id != Guid.Empty)
-            await SCH_0_0_Queries.SaveBlock1(block_0_1);
+            //await SCH_0_0_Queries.SaveBlock1(block_0_1);
+            await repository.SaveAsync(block_0_1);
 
         var selectionDone = ListItems.Any(x => x.isSelected);
         if (!selectionDone)

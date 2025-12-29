@@ -112,6 +112,7 @@
     string? remarks = string.Empty;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     private ConfirmDialog dialog = default!;
+    [Inject] Repository _repo { get; set; }
 
     async void GoBack()
     {
@@ -213,7 +214,8 @@
             block_5[selection_index - 1].IsChecked = true;
             is_selection_done = true;
             toastService.ShowSuccess($"Selection Has been done for Serial Number : {block_5[selection_index - 1].serial_number}");
-            var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+            //var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+            var response = await _repo.SaveManyAsync(block_5);
             if (response != 1)
             {
                 toastService.ShowSuccess($"Error while storing data into database, Please try again!");
@@ -227,10 +229,12 @@
         else
         {
             block_0_1.remarks_block_5 = remarks;
-            await SCH_0_0_Queries.SaveBlock1(block_0_1);
+            //await SCH_0_0_Queries.SaveBlock1(block_0_1);
+            await _repo.SaveAsync(block_0_1);
             if (action == "SAVE")
             {
-                var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+                //var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+                var response = await _repo!.SaveManyAsync(block_5);
                 if (response != 1)
                 {
                     toastService.ShowError($"Error while storing data into database, Please try again!");
@@ -248,7 +252,8 @@
                 }
                 else
                 {
-                    var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+                    //var response = await SCH_0_0_Queries.SaveSCH0Block5(block_5);
+                    var response = await _repo!.SaveManyAsync(block_5);
                     if (response != 1)
                     {
                         toastService.ShowError($"Error while storing data into database, Please try again!");

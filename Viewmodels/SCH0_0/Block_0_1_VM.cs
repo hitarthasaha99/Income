@@ -20,6 +20,14 @@ namespace Income.Viewmodels.SCH0_0
         private readonly DBQueries DBQueries = new();
         public event Action NotifyUiUpdate;
         private Tbl_Sch_0_0_Block_0_1? _block_0_1 = new();
+
+        private readonly Repository _repository;//generic repo
+
+        public Block_0_1_VM(Repository _repository)
+        {
+            this._repository = _repository;
+        }//Contructor...
+
         public Tbl_Sch_0_0_Block_0_1? block_0_1
         {
             get => _block_0_1;
@@ -85,10 +93,7 @@ namespace Income.Viewmodels.SCH0_0
         [ObservableProperty]
         private bool _showItem17RemarksField = false;
 
-        public Block_0_1_VM()
-        {
-        }
-
+        
         public async Task Init()
         {
             survey_code_list = CommonList.LOOKUP_CONST_SURVEY_CODE;
@@ -178,28 +183,44 @@ namespace Income.Viewmodels.SCH0_0
         private bool _isAdd = true;
         private Guid _id;
 
+        //public async Task<bool> Save()
+        //{
+        //    try
+        //    {
+        //        var dataObject = await SCH_0_0_Queries.FetchBlock1();
+        //        if (dataObject != null)
+        //        {
+        //            _isAdd = false;
+        //            _id = dataObject.id;
+        //        }
+
+        //        var identificationData = new Tbl_Sch_0_0_Block_0_1();
+        //        identificationData = block_0_1;
+        //        await SCH_0_0_Queries.SaveAsync(block_0_1);
+        //        return true;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return false;
+        //    }
+        //}
         public async Task<bool> Save()
         {
             try
             {
-                var dataObject = await SCH_0_0_Queries.FetchBlock1();
-                if (dataObject != null)
-                {
-                    _isAdd = false;
-                    _id = dataObject.id;
-                }
+                if (block_0_1 == null)
+                    return false;
 
-                var identificationData = new Tbl_Sch_0_0_Block_0_1();
-                identificationData = block_0_1;
-                await SCH_0_0_Queries.SaveBlock1(block_0_1);
+                await _repository.SaveAsync(block_0_1);
                 return true;
-
             }
             catch (Exception ex)
             {
+                
                 return false;
             }
-        }
+        }//dont need to fetched data ....
 
         public void SurveyCodeSelectionChanged(ChangeEventArgs args)
         {

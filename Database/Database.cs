@@ -16,6 +16,7 @@ namespace Income.Database
     public class Database
     {
         protected SQLiteAsyncConnection _database;
+        public SQLiteAsyncConnection Connection => _database;
         public CommonFunction CommonFunction = new CommonFunction();
         public const SQLiteOpenFlags Flags = SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache;
         private const string dbKey = "YourStrongProductionKey!"; // Use a strong key!

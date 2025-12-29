@@ -370,6 +370,7 @@
 
     CommonFunction commonFunctions = new();
     bool is_error = false;
+    [Inject] Repository repository { get; set; }
 
     async void GoBack()
     {
@@ -519,7 +520,8 @@
                 obj.UMPCE = obj.is_household == 2 ? (obj.Block_7_9 / obj.Block_7_5) : 0;
                 generatedHHDs.Add(obj);
             }
-            var response = await SCH_0_0_Queries.SaveBulkBlock7(generatedHHDs);
+            //var response = await SCH_0_0_Queries.SaveBulkBlock7(generatedHHDs);
+            var response = await repository.InsertManyAsync(generatedHHDs);
             await LoadData();
         }
         catch(Exception ex)
@@ -557,7 +559,8 @@
 
         block_1_obj.remarks_block_7 = remarks;
         if (block_1_obj.id != Guid.Empty)
-            await SCH_0_0_Queries.SaveBlock1(block_1_obj);
+            // await SCH_0_0_Queries.SaveBlock1(block_1_obj);
+            await repository.SaveAsync(block_1_obj);
 
         //1. No subU and subD OR subU exists but no subD
         if((subU.Count == 0  && subD.Count == 0) || (subU.Count > 0 && subD.Count == 0))
@@ -596,7 +599,7 @@
             }
         }
 
-        
+
         // If message exists, show confirm dialog
         if (!string.IsNullOrWhiteSpace(firstWarning))
         {
@@ -640,6 +643,8 @@
         {
             ListItems[item_index].is_deleted = true;
             await SCH_0_0_Queries.DeleteHHD(id);
+            // await repository.DeleteEntryAsync<Tbl_Sch_0_0_Block_7>(id);
+            // await SCH_0_0_Queries.ReserializeHHD();
             toastService.ShowSuccess("Row deleted successfully!");
             await LoadData();
         }
@@ -806,7 +811,8 @@
             {
                 block_5_obj.UMPCE = null;
             }
-            await SCH_0_0_Queries.SaveUpdateSCH0Block7(block_5_obj);
+            //await SCH_0_0_Queries.SaveUpdateSCH0Block7(block_5_obj);
+            await repository.SaveAsync(block_5_obj);
             await SCH_0_0_Queries.ReserializeHHD();
             if (block_5_obj.Block_7_5 > 30)
             {
