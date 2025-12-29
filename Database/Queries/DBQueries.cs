@@ -2490,9 +2490,9 @@ namespace Income.Database.Queries
                     )
                     .ToListAsync();
 
-                if (response != null)
+                if (response != null && response.Count > 0)
                 {
-                    return response;
+                    return response.OrderBy(x => x.serial_member).ToList();
                 }
                 else
                 {

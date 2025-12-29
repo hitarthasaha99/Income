@@ -15,7 +15,7 @@ namespace Income.Common
         public static string auth_token = string.Empty;
         public static int tenant_id = new();
         public static string user_role = "";
-        public static int survey_type = new();
+        public static int survey_type = 1116;
         public static string survey_code = "";
         public static Guid surveyId = new();
         public static string full_name = "";

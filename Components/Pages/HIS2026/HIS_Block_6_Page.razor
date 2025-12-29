@@ -238,6 +238,7 @@
                             <InputNumber @bind-Value="newMember.item_3"
                                             class="form-control no-spinner"
                                             autocomplete="off"
+                                            onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                             onkeypress="return event.key >= '0' && event.key <= '9'"
                                             autocorrect="off"
                                             autocapitalize="off"

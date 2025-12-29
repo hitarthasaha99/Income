@@ -80,7 +80,8 @@
 
                                             </td>
                                             <td>
-                                                <input disabled="@(d.item_3 == 1 || d.item_3 == null)" class="form-control" value="@(d.item_4?.ToString() ?? "")" @oninput="(e) => UpdateShareholding(d, e)" />
+                                                    <input type="number" onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
+                                                           disabled="@(d.item_3 == 1 || d.item_3 == null)" class="form-control" value="@(d.item_4?.ToString() ?? "")" @oninput="(e) => UpdateShareholding(d, e)" />
                                                 <ValidationMessage For="@(() => d.item_4)" />
                                             </td>
                                         </tr>

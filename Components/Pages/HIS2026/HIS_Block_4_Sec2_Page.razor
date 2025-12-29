@@ -307,10 +307,15 @@
         if (block_4 != null)
         {
             NICfields = await dQ.Fetch_SCH_HIS_Block4_NICList();
-            for(int i=1; i<=NICfields.Count; i++)
+            if (NICfields != null && NICfields.Count > 0)
             {
-                Rows.Add(i);
+                NICfields = NICfields.OrderBy(x => x.SerialNumber).ToList();
+                for (int i = 1; i <= NICfields.Count; i++)
+                {
+                    Rows.Add(i);
+                }
             }
+            
             if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
                 survey_time = block_4.survey_timestamp.GetValueOrDefault();
