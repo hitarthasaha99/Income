@@ -141,7 +141,7 @@
             </div>
             <div class="card-body">
                 <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
-                    <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here..." @bind="@remarks" rows="2" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                    <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here..." @bind="@remarks" rows="2" ></textarea>
                 </fieldset>
             </div>
         </div>
@@ -224,6 +224,7 @@
                                     <label class="form-label"><span class="form-badge">4</span>@(fields.is_household == 1 ? "Name of Head of Household/Structure" : "Name of Head of Household")</label>
                                     <InputText class="form-control"
                                                maxlength="50"
+                                               onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) { event.preventDefault(); }"
                                                 onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
                                                 @bind-Value="fields.Block_7_4"
                                                 @oninput="OnHeadNameInput"/>
@@ -372,11 +373,19 @@
     bool is_error = false;
     [Inject] Repository repository { get; set; }
 
-    async void GoBack()
+    async Task GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
-        return;
+        var subD = await SCH_0_0_Queries.FetchSCH0Block5Data() ?? new();
+        if (subD.Count > 0)
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");
+            return;
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_4");
+        }
+
     }
     protected override async Task OnInitializedAsync()
     {

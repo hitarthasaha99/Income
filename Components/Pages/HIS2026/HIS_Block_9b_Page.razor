@@ -233,7 +233,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_9b_remark" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_9b_remark" placeholder="Enter your remarks here..." ></textarea>
             </fieldset>
         </div>
     </div>
@@ -387,7 +387,10 @@
 
             if (!validation.IsValid)
             {
-                toastService.ShowError("Please resolve all the errors");
+                foreach(var error in validation.Errors)
+                {
+                    toastService.ShowError(error.ErrorMessage);
+                }
                 return;
             }
             else

@@ -64,7 +64,7 @@ namespace Income.Validators.HIS2026
 
                     if (!valid)
                     {
-                        context.AddFailure("H065: Invalid entry, please check the entry");
+                        context.AddFailure("H065: Please check the entry recorded against cols. 8-11");
                     }
                 }
             });

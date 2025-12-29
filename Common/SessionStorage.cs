@@ -35,6 +35,7 @@ namespace Income.Common
         public static bool FSU_Submitted = false;
         public static int sss = 0;
         public static string hhd_head = string.Empty;
+        public static Environment env;
         public static void ClearSession()
         {
             SelectedFSUId = 0;
@@ -95,6 +96,13 @@ namespace Income.Common
             JSO = 1,
             SSO = 2,
             DS = 3
+        }
+
+        public enum Environment
+        {
+            Development = 1,
+            Staging = 2,
+            Production = 3
         }
     }
 }

@@ -13,6 +13,10 @@
     protected override async Task OnInitializedAsync()
     {
         preloadService.Show(SpinnerColor.Light, "We are setting up things ready for you.... Please Wait .........");
+        if (CommonConfig.APIIncomeURL == "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/")
+        {
+            SessionStorage.env = SessionStorage.Environment.Development;
+        }
         var user_details = await CommonQueries.GetUserDetailsAsync()!;
         if (user_details == null)
         {
@@ -31,8 +35,11 @@
             SessionStorage.tenant_id = user_details.tenant_id;
             SessionStorage.user_name = user_details.username;
             SessionStorage.role_name = function.GetUserRoleName(SessionStorage.user_role);
+            
             preloadService.Hide();
 
+            // SessionStorage.SelectedFSUId = 23938;
+            // SessionStorage.selected_hhd_id = 35;
             NavigationManager.NavigateTo("/dashboard/fsulist/");
         }
     }

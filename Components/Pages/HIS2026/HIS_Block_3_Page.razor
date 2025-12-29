@@ -8,6 +8,7 @@
 @using Income.Database.Models.SCH0_0
 @using Income.Viewmodels
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
 @inject ILoggingService loggingService
 @inject Warning_VM warningVM
@@ -163,7 +164,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" ></textarea>
             </div>
         </div>
     </fieldset>
@@ -297,8 +298,11 @@
                                 </label>
 
                             <InputNumber class="form-control no-spinner"
+                                         inputmode="numeric"
+                                         pattern="[0-9]*"
                                          @bind-Value="newMember.age"
                                          @oninput="(e) => ageClear(e)"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="if(this.value.length >= 3) return false; return /^[0-9]$/.test(event.key);" />
                             <ValidationMessage For="@(() => newMember.age)" />
 
@@ -779,8 +783,29 @@
         if (string.IsNullOrEmpty(value))
         {
             newMember.age = null;
+
+            // Clear all warnings that depend on age
+            ageWarning = null;
+            ageRelationWarning = null;
+            singleUserWarning = null;
+            maritalStatusWarning = null;
+            item_7Warning = null;
+            item_8Warning = null;
+            item_9Warning = null;
+            item_10Warning = null;
+            item_11Warning = null;
+            item_12Warning = string.Empty;
+
+            StateHasChanged();
             return;
         }
+        if (string.IsNullOrEmpty(value))
+        {
+            newMember.age = null;
+            return;
+        }
+        // Remove everything except digits
+        value = Regex.Replace(value, @"\D", "");
         if (value.Length > 3)
         {
             value = value.Substring(0, 3);
@@ -1088,22 +1113,48 @@
 
     //Check Single User..............................................................
 
+    // private void checkSingleUser()
+    // {
+    //     singleUserWarning = null;
+
+    //     if (newMember.age.HasValue)
+    //     {
+    //         relation code 1-9 must be selected
+    //         if (!newMember.item_3.HasValue || newMember.item_3.Value < 1 || newMember.item_3.Value > 9)
+    //             return;
+    //         if (newMember.age.Value < 6)
+    //         {
+    //             singleUserWarning = "W006(vii): Please check the entry";
+    //         }
+    //     }
+
+    //     StateHasChanged();
+    // }
+
     private void checkSingleUser()
     {
         singleUserWarning = null;
 
-        if (newMember.age.HasValue)
-        {
-            // relation code 1-9 must be selected
-            if (!newMember.item_3.HasValue || newMember.item_3.Value < 1 || newMember.item_3.Value > 9)
-                return;
-            if (newMember.age.Value < 6)
-            {
-                singleUserWarning = "W006(vii): Please check the entry";
-            }
-        }
+        // Count active members (not deleted)
+        int activeCount = block3Members.Count(m => m.is_deleted != true);
 
-        StateHasChanged();
+        // If ADD mode, include current member
+        if (isAdd)
+            activeCount++;
+
+        // Warning ONLY when exactly ONE member exists
+        if (activeCount != 1)
+            return;
+
+        // That single member must be SELF (serial 1)
+        if (newMember.item_3 != 1 || newMember.serial_no != 1)
+            return;
+
+        // Age rule
+        if (newMember.age.HasValue && newMember.age.Value < 6)
+        {
+            singleUserWarning = "W006(vii): Please check the entry";
+        }
     }
 
 
@@ -1372,12 +1423,14 @@
         item_9Warning = null;
         item_10Warning = null;
         item_11Warning = null;
+        item_12Warning = null;
     }
 
     async Task HandleModal(string action = "", Tbl_Block_3? data = null)
     {
         try
         {
+            clearErrors();
             if (action == "ADD")
             {
                 isAdd = true;
@@ -1406,6 +1459,7 @@
                     editContext = new EditContext(newMember);
                     messageStore = new ValidationMessageStore(editContext);
                     editContext.OnFieldChanged += EditContext_OnFieldChanged;
+                    showAllWarnings();
                     await AddModal.ShowAsync();
                 }
             }
@@ -1418,11 +1472,26 @@
         {
             Console.WriteLine(ex.Message);
         }
-        clearErrors();
+        // clearErrors();
         // after close
-        spouceWarning = null;
-        neverMarredWarn = null;
+        // spouceWarning = null;
+        // neverMarredWarn = null;
 
+    }
+    private void showAllWarnings()
+    {
+        CheckGenderWarning();
+        checkAgeWarning();
+        checkAgeReletionWarning();
+        checkSingleUser();
+        checkItem_6Warning();
+        CheckItem7Warning();
+        CheckItem8Warning();
+        CheckItem9Warning();
+        CheckItem10Warning();
+        CheckItem11Warning();
+        CheckItem12Warning();
+        CheckSpouseMaritalWarning();
     }
 
     private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
@@ -1481,6 +1550,8 @@
             }
             await ReorderSerialNumbers();
             await LoadData();
+            checkSingleUser();
+
         }
         else
         {
@@ -1495,7 +1566,7 @@
     {
         spouceWarning = null;
         CheckSpouseMaritalWarning(); 
-        clearErrors();
+        // clearErrors();
         messageStore.Clear();
         var errors = Validator.Validate(newMember);
         foreach (var error in errors.Errors)
@@ -1586,7 +1657,7 @@
         toastService.ShowSuccess(isAdd ? "Member added successfully!" : "Member updated successfully!");
         await AddModal.HideAsync();
         await LoadData();
-
+        checkSingleUser();
     }
     private async Task ReorderSerialNumbers()
     {

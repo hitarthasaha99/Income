@@ -143,7 +143,7 @@
                         <h3 class="card-title">Remarks</h3>
                     </div>
                     <div class="card-body">
-                        <textarea maxlength="500" class="form-control" @bind="block_1.block_8a_remark" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"></textarea>
+                        <textarea maxlength="500" class="form-control" @bind="block_1.block_8a_remark" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." ></textarea>
                     </div>
                 </div>
             </fieldset>
@@ -203,18 +203,21 @@
         item_1_warning = string.Empty;
         item_2_warning = string.Empty;
         item_3_warning = string.Empty;
+        bool isItem1Blank = string.IsNullOrWhiteSpace(model?.item_1?.ToString());
+        bool isItem2Blank = string.IsNullOrWhiteSpace(model?.item_2?.ToString());
+        bool isItem3Blank = string.IsNullOrWhiteSpace(model?.item_3?.ToString());
         //W057
-        if (MemberList.Any(x => x.item_8 == 11 || x.item_9 == 11 || x.item_10 == 11 || x.item_11 == 11) && (model?.item_1.GetValueOrDefault() <= 0))
+        if (!isItem1Blank && MemberList.Any(x => x.item_8 == 11 || x.item_9 == 11 || x.item_10 == 11 || x.item_11 == 11) && (model?.item_1.GetValueOrDefault() <= 0))
         {
             item_1_warning = "W057: Invalid Entry, please check the entry recorded in Q8.1";
         }
         //W058
-        if (MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_2.GetValueOrDefault() <= 0))
+        if (!isItem2Blank && MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_2.GetValueOrDefault() <= 0))
         {
             item_2_warning = "W058: Invalid Entry, please check the entry recorded in Q8.2";
         }
         //W058
-        if (MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_3.GetValueOrDefault() <= 0))
+        if (!isItem3Blank && MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_3.GetValueOrDefault() <= 0))
         {
             item_3_warning = "W058: Invalid Entry, please check the entry recorded in Q8.3";
         }

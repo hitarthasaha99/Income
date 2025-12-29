@@ -1,5 +1,6 @@
 @page "/dashboard/fsulist"
 @using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
 @using Income.Database.Models.SCH0_0
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
@@ -27,10 +28,10 @@
                 <table class="table table-bordered table-striped mb-0 custom-badge">
                     <thead class="text-uppercase">
                         <tr>
-                            @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                            @* @if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
                             {
                                 <th><input class="form-check-input" type="checkbox" style="width: 20px; height: 20px" checked="@(tbl_Fsu_List.Count == selected_guid.Count)"/></th>
-                            }
+                            } *@
                             <th>subround</th>
                             <th>fsu id</th>
                             <th>location details</th>
@@ -45,10 +46,10 @@
                             @foreach (var item in temp_fsu_list)
                             {
                                 <tr>
-                                    @if(SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                                    @* @if(SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
                                     {
                                         <td><input class="form-check-input" type="checkbox" checked="@((selected_guid.Contains(item.fsu_id) ? true : false))" /></td>
-                                    }
+                                    } *@
                                     <td>@item.subrnd</td>
                                     <td>@item.fsu_id</td>
                                     <td>
@@ -66,14 +67,41 @@
                                     <td>@item.framepop</td>
                                     <td>
                                         @{
+                                            bool onlysch00submitted = false;
+                                            var message = string.Empty;
+                                            if(item.lookupFsuSubmitStatus == 80)
+                                            {
+                                                onlysch00submitted = true;
+                                                if (item.lookup_fsu_sub_submit_status == 21)
+                                                {
+                                                    message = "SCH0.0 Submitted by ENM";
+                                                }
+                                                else if (item.lookup_fsu_sub_submit_status == 12)
+                                                {
+                                                    message = "SCH0.0 Referred back by SUP";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                onlysch00submitted = false;
+                                            }
                                             bool noTotal = item.total_hhd == 0;
                                             bool noCompleted = item.completed_hhd == 0;
                                             string badgeClass = noTotal? "" :  noCompleted ? "badge-success" : "badge-warning";
                                         }
+                                        @if(!onlysch00submitted)
+                                        {
+                                            <div class="badge @badgeClass">
+                                                @(noTotal ? "-" : $"{item.completed_hhd}/{item.total_hhd}")
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="badge badge-success">
+                                                @message
+                                            </div>
+                                        }
 
-                                        <div class="badge @badgeClass">
-                                            @(noTotal ? "-" : $"{item.completed_hhd}/{item.total_hhd}")
-                                        </div>
                                     </td>
                                         
                                     <td>
@@ -81,9 +109,15 @@
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">HIS26</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
-
-                                          <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-download ms-1"></i></NavLink>
-                                         </div>
+                                            @if(SessionStorage.env == SessionStorage.Environment.Development)
+                                            {
+                                                <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
+                                            }
+                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.lookupFsuSubmitStatus != 32)
+                                            {
+                                                <NavLink @onclick="@(() => HandleFinalSubmisssion(item))" class="btn btn-sm btn-outline-primary">Final Submit<i class="bi bi-cloud-upload ms-1"></i></NavLink>
+                                            }
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -91,7 +125,7 @@
                         else
                         {
                             <tr>
-                                <td class="text-center" colspan="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_DS ? 7 : 6))"><div class="alert custom-alert alert-danger"><i class="fi fi-rr-triangle-warning me-2"></i> No Data Found</div></td>
+                                <td class="text-center" colspan="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_DS ? 6 : 6))"><div class="alert custom-alert alert-danger"><i class="fi fi-rr-triangle-warning me-2"></i> No Data Found</div></td>
                             </tr>
                         }
                     </tbody>
@@ -413,7 +447,7 @@
                 bool selection_done = su_list.Any(x => x.IsChecked);
                 return selection_done;
             }
-            
+
             return false;
         }
         catch (Exception ex)
@@ -426,93 +460,154 @@
         }
     }
 
-    // async Task HandleFinalSubmisssion()
-    // {
-    //     try
-    //     {
-    //         if (!funcs.checkHasInternet())
-    //         {
-    //             toastService.ShowWarning("No Internet Connection, Please try again once when you came back online!");
-    //             return;
-    //         }
-    //         foreach (var fsu_id in selected_guid)
-    //         {
-    //             SessionStorage.SelectedFSUId = fsu_id;
+    async Task HandleFinalSubmisssion(Tbl_Fsu_List fsu)
+    {
+        try
+        {
+            if (!funcs.checkHasInternet())
+            {
+                toastService.ShowWarning("No Internet Connection, Please try again once when you came back online!");
+                return;
+            }
+            if (fsu.lookupFsuSubmitStatus == 32)
+            {
+                toastService.ShowWarning("This FSU has already been submitted");
+                return;
+            }
+            bool preventSubmission = false;
 
-    //             var data = await dB.GetSelectedBlock5List(fsu_id);
-    //             var FsuData = await commonQuaries.FetchFsuListByFsuId(fsu_id);
-    //             if (data == null || data.Count == 0 || FsuData?.FirstOrDefault()?.NeedDownload == true)
-    //             {
-    //                 toastService.ShowError($"Please ensure the Selection Done and the data is downloaded Sucessfully for fsu id {fsu_id}");
-    //                 continue;
-    //             }
+            int fsu_id = fsu.fsu_id;
+            SessionStorage.SelectedFSUId = fsu_id;
 
-    //             var pending_comment_respone = await commonQueries.IsDSHasPendingCommentWarning(fsu_id);
-    //             if (pending_comment_respone == true)
-    //             {
-    //                 toastService.ShowError($"Warining Or Comment Validation pending for fsu id {fsu_id}");
-    //                 continue;
-    //             }
+            var data = await dB.GetBlock7Data(fsu_id);
+            List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true && k.status != "SUBSTITUTED").OrderBy(k => k.SSS).ThenBy(k => k.SSS_household_id).ToList();
 
-    //             var Block5List = await dB.GetSelectedBlock5List(fsu_id);
-    //             if (Block5List == null || Block5List.Count == 0)
-    //             {
-    //                 toastService.ShowError($"FSU ID: {fsu_id} has no Selected household, Please complete survey before Final submit");
-    //                 continue;
-    //             }
+            var fsuDetails = await commonQueries.FetchFsuByFsuId(fsu_id);
+            if (data == null || (data != null && data.Count == 0))
+            {
+                toastService.ShowError($"Please ensure the Selection Done and the data is downloaded Sucessfully for fsu id {fsu_id}");
+                return;
+            }
 
-    //             bool isValid = true;
-    //             foreach (var item in Block5List.Where(x => x.status_travel != "SUBSTITUTED"))
-    //             {
-    //                 var status = await sCH_25_Quaries.FetchStatusManager(item.Block_5A_3);
-    //                 if (status?.hhd_status != 31)
-    //                 {
-    //                     toastService.ShowError($"FSU ID: {fsu_id} has not completed all the households. Please complete all households before Final submit ");
-    //                     isValid = false;
-    //                     break; // stop checking households
-    //                 }
-    //             }
+            if (fsuDetails != null)
+            {
+                var fsuHouses = fsuDetails.fsu_houses != null ? JsonConvert.DeserializeObject<List<fsu_houses>>(fsuDetails.fsu_houses) : new();
 
-    //             if (!isValid)
-    //                 continue; // skip this FSU, go to next one
+                if (fsuHouses == null || (fsuHouses != null && fsuHouses.Count == 0))
+                {
+                    toastService.ShowError("No households have been submitted yet");
+                    return;
+                }
+                else if (fsuHouses != null && fsuHouses.Count > 0)
+                {
+                    bool anyHHDNotSubmittedToDS = fsuHouses.Any(x => x.lookup_submit_status != 31);
+                    if (anyHHDNotSubmittedToDS)
+                    {
+                        toastService.ShowError("All households need to be submitted to DS");
+                        return;
+                    }
+                }
+            }
 
-    //             var submission_data = await commonQuaries.Fetch_SubmissionDataFinalSubmit(Block5List, 32);
-    //             if (submission_data == null)
-    //             {
-    //                 toastService.ShowError("We had faced some error while collecting data from local database. Please try again!");
-    //                 continue;
-    //             }
+            foreach (var hhd in selected)
+            {
+                SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+                var warnings = await dB.FetchListAsync<Tbl_Warning>() ?? new();
+                //DS needs to have accepted all warnings
+                if (warnings.Count > 0)
+                {
+                    var parents = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
+                    bool rejectedWarnings = parents.Any(x => x.warning_status != 5);
+                    if (rejectedWarnings)
+                    {
+                        toastService.ShowError($"All warnings have not been accepted for HHD Srl - {hhd.Block_7_3}");
+                        preventSubmission = true;
+                    }
+                }
+            }
 
-    //             preloadService.Show(SpinnerColor.Light, "We are saving your responses! Please hang on.");
-    //             toastService.ShowSuccess("Data retrieved successfully from local database!");
+            if (preventSubmission)
+            {
+                return;
+            }
 
-    //             var response = await travelService.PostAsync(CommonConfig.SAVE_SUBMITTED_RESPONSE, submission_data);
-    //             if (response != null)
-    //             {
-    //                 toastService.ShowSuccess("Final submitted successfully!");
-    //                 preloadService.Show(SpinnerColor.Light, "DB Cleaning in-progress! Please hang on.");
-    //                 var stat = await commonQuaries.ClearUnusedData();
-    //                 if (stat != CommonConstants.SUCCESS_TEXT)
-    //                 {
-    //                     toastService.ShowError(stat);
-    //                 }
-    //             }
-    //             else
-    //             {
-    //                 toastService.ShowError("Error while submitting data to server, Please connect with administrator!");
-    //             }
-    //         }
-    //         preloadService.Hide();
+            preloadService.Show(SpinnerColor.Light, "Submission is in progress");
+            Submission_Model submissionData = new();
+            submissionData.IncomeSchHISDto = [];
 
-    //         return;
-    //     }
-    //     catch(Exception)
-    //     {
-    //         toastService.ShowError($"Facing Error while running final submission process. Please Connect with adminstartor!");
-    //         preloadService.Hide();
-    //         return;
-    //     }    
-    // }
+            foreach (var hhd in selected)
+            {
+                hhd.hhdStatus = 32;
+                var hhd_data = await GetHHDData_OnlyWarnings(hhd);
+                if (hhd_data != null)
+                {
+                    submissionData.IncomeSchHISDto.Add(hhd_data);
+
+                }
+            }
+
+            string json = JsonConvert.SerializeObject(submissionData);
+            Upsert_Model payload = new()
+            {
+                lookup_fsu_submit_status = 32,
+                fsu_id = SessionStorage.SelectedFSUId.ToString(),
+                submitted_json_data = json,
+                survey_id = SessionStorage.surveyId,
+                created_on = DateTime.Now
+            };
+
+            var response = await commonService.PostAsync(CommonConfig.BaseController, CommonConfig.SAVE_SUBMITTED_RESPONSE, payload);
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                toastService.ShowSuccess("Data submitted successfully");
+                await Fsu_Load();
+                StateHasChanged();
+            }
+            else
+            {
+                toastService.ShowError("Data could not be submitted");
+            }
+            preloadService.Hide();
+
+        }
+        catch(Exception ex)
+        {
+            toastService.ShowError($"Facing Error while running final submission process. Please Connect with adminstartor!");
+            preloadService.Hide();
+        }    
+        finally
+        {
+            preloadService.Hide();
+        }
+    }
+
+    private async Task<SCH_HIS_Model?> GetHHDData_OnlyWarnings(Tbl_Sch_0_0_Block_7 hhd)
+    {
+        try
+        {
+            int status = 32;
+
+            SessionStorage.SelectedFSUId = hhd.fsu_id;
+            SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
+
+            var block_2 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>();
+            var warnings = await dB.FetchListAsync<Tbl_Warning>(DBQueries.DeleteFilter.IncludeAll) ?? new();
+
+            SCH_HIS_Model model = new()
+            {
+                Id = Guid.NewGuid(),
+                hhd_id = hhd.Block_7_3.GetValueOrDefault(),
+                hhd_status = status,
+                IncomeWarningList = warnings
+            };
+
+            return model;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
 
 
     async Task Fsu_Load()
@@ -581,6 +676,18 @@
                                 if (item.fsuHouses != null && item.fsuHouses.Count > 0)
                                 {
                                     pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 21 || x.lookup_submit_status == 22);
+                                    totalHouses = item.fsuHouses.Count();
+                                }
+                                item.completed_hhd = pendingHouses;
+                                item.total_hhd = totalHouses;
+                            }
+                            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)
+                            {
+                                int pendingHouses = 0;
+                                int totalHouses = 0;
+                                if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                                {
+                                    pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 31);
                                     totalHouses = item.fsuHouses.Count();
                                 }
                                 item.completed_hhd = pendingHouses;

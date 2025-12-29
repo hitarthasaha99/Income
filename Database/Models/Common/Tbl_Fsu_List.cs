@@ -36,6 +36,7 @@ namespace Income.Database.Models.Common
         public int? sec { get; set; }
         public int? quarter { get; set; }
         public int? lookupFsuSubmitStatus { get; set; }
+        public int? lookup_fsu_sub_submit_status { get; set; }
         public string? enumaretor { get; set; }
         public string? supervisor { get; set; }
         public int? assigntoEnumaretor { get; set; }
