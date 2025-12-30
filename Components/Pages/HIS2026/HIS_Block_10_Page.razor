@@ -620,16 +620,17 @@
                 {
                     toastService.ShowSuccess("Data could not be saved");
                 }
+                if (block_1 != null)
+                {
+                    await dQ.SaveAsync<Tbl_Block_1>(block_1);
+                }
             }
 
             if (!is_go_next)
             {
                 return;
             }
-            if (block_1 != null)
-            {
-                await dQ.SaveAsync<Tbl_Block_1>(block_1);
-            }
+            
             NavigationManager.NavigateTo("/dashboard/his/block_11a");
 
         }

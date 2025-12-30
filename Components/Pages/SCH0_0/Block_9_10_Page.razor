@@ -131,11 +131,11 @@
         {
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                tbl_Sch_0_0_Block_0_1.EnumeratorRemarks = EnumeratorRemarks;
+                tbl_Sch_0_0_Block_0_1.EnumeratorRemarks = EnumeratorRemarks.Trim();
             }
             else if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
             {
-                tbl_Sch_0_0_Block_0_1.SupervisorRemarks = SupervisorRemarks;
+                tbl_Sch_0_0_Block_0_1.SupervisorRemarks = SupervisorRemarks.Trim();
             }
             else
             {

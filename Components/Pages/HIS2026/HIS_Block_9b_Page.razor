@@ -404,6 +404,10 @@
                 {
                     toastService.ShowSuccess("Data could not be saved");
                 }
+                if (block_1 != null)
+                {
+                    await dB.SaveAsync<Tbl_Block_1>(block_1);
+                }
             }
 
             if (!string.IsNullOrEmpty(item_9_6_warning))
@@ -416,10 +420,7 @@
             {
                 return;
             }
-            if (block_1 != null)
-            {
-                await dB.SaveAsync<Tbl_Block_1>(block_1);
-            }
+            
             NavigationManager.NavigateTo("/dashboard/his/block_10");
             
         }

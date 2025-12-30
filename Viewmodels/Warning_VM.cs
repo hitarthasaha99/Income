@@ -22,7 +22,7 @@ namespace Income.Viewmodels
             tbl_Warning.item_no = item;
             tbl_Warning.warning_status = 1;
             tbl_Warning.role_code = SessionStorage.user_role;
-            tbl_Warning.user_name = SessionStorage.full_name;
+            tbl_Warning.user_name = SessionStorage.user_name;
             tbl_Warning.warning_message = warningMsg;
             tbl_Warning.schedule = schedule;
             tbl_Warning.serial_number = serial;
@@ -231,7 +231,7 @@ namespace Income.Viewmodels
                         tbl_Warning.parent_comment_id = warning.id;
                             tbl_Warning.hhd_id = warning.hhd_id;
                            tbl_Warning.role_code = SessionStorage.user_role;
-                           tbl_Warning.user_name = SessionStorage.full_name;
+                           tbl_Warning.user_name = SessionStorage.user_name;
                         if(tbl_Warning.serial_number.GetValueOrDefault() == 0)
                         {
                             tbl_Warning.serial_number = child_srl;

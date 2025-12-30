@@ -80,7 +80,8 @@
 
                                             </td>
                                             <td>
-                                                <input disabled="@(d.item_3 == 1 || d.item_3 == null)" class="form-control" value="@(d.item_4?.ToString() ?? "")" @oninput="(e) => UpdateShareholding(d, e)" />
+                                                    <input type="number" onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
+                                                           disabled="@(d.item_3 == 1 || d.item_3 == null)" class="form-control" value="@(d.item_4?.ToString() ?? "")" @oninput="(e) => UpdateShareholding(d, e)" />
                                                 <ValidationMessage For="@(() => d.item_4)" />
                                             </td>
                                         </tr>
@@ -183,7 +184,6 @@
             editContext.OnValidationRequested += (_, __) => messageStore.Clear();
             // After completing load and sync, trigger one render.
             await InvokeAsync(StateHasChanged);
-            block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
 
         }
     }
@@ -233,6 +233,7 @@
         _isBusy = true;
         try
         {
+            block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
             if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
                 // Load lists in parallel where possible (no UI changes yet).
@@ -253,11 +254,25 @@
                 await SyncBlock7A_7DAsync_Batched();
                 await SyncBlock4_7DAsync_Batched();
                 await SyncBlock7C_7DAsync_Batched();
-                //await dQ.ReserializeBlock7DList();
+
+                await NormalizeBlock7DDisplaySerialsAsync();
+                await dQ.ReserializeBlock7DList();
+                Block7DList = Block7DList
+                                .OrderBy(x => int.Parse(x.display_serial_number!.Split('.')[0]))
+                                .ThenBy(x => x.display_serial_number!.Contains('.')
+                                    ? int.Parse(x.display_serial_number.Split('.')[1])
+                                    : 0)
+                                .ToList();
             }
             else
             {
                 Block7DList = await dQ.Fetch_SCH_HIS_Block7D();
+                Block7DList = Block7DList
+                                .OrderBy(x => int.Parse(x.display_serial_number!.Split('.')[0]))
+                                .ThenBy(x => x.display_serial_number!.Contains('.')
+                                    ? int.Parse(x.display_serial_number.Split('.')[1])
+                                    : 0)
+                                .ToList();
                 RowList = Block7DList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
             }
 
@@ -576,6 +591,7 @@
         }
     }
 
+
     // Handler for changing mode of operation (select)
     private void UpdateModeOfOperation(Tbl_Block_7d entry, ChangeEventArgs e)
     {
@@ -609,6 +625,96 @@
         ValidateRow(entry);
     }
 
+    private async Task NormalizeBlock7DDisplaySerialsAsync()
+    {
+        if (Block7DList == null || Block7DList.Count == 0)
+            return;
+
+        var updates = new List<Tbl_Block_7d>();
+
+        // ---------------------------
+        // 1.x → Block 7A (renumber)
+        // ---------------------------
+        var from7A = Block7DList
+            .Where(x => x.block_7a_id != Guid.Empty)
+            .OrderBy(x => x.item_1 ?? int.MaxValue)
+            .ThenBy(x => x.id)
+            .ToList();
+
+        int sub = 1;
+        foreach (var item in from7A)
+        {
+            string newValue = $"1.{sub++}";
+            if (item.display_serial_number != newValue)
+            {
+                item.display_serial_number = newValue;
+                updates.Add(item);
+            }
+        }
+
+        // ---------------------------
+        // 2–5 → Block 4 (code-bound)
+        // ---------------------------
+        foreach (var item in Block7DList.Where(x =>
+            x.block_7a_id == Guid.Empty &&
+            x.block_7c_id == Guid.Empty))
+        {
+            string? newValue = item.code switch
+            {
+                4003 => "2",
+                4004 => "3",
+                4005 => "4",
+                4006 => "5",
+                _ => null
+            };
+
+            if (newValue != null && item.display_serial_number != newValue)
+            {
+                item.display_serial_number = newValue;
+                updates.Add(item);
+            }
+        }
+
+        // ---------------------------
+        // 6.x → Block 7C (renumber)
+        // ---------------------------
+        var from7C = Block7DList
+            .Where(x => x.block_7c_id != Guid.Empty)
+            .OrderBy(x => x.item_1 ?? int.MaxValue)
+            .ThenBy(x => x.id)
+            .ToList();
+
+        sub = 1;
+        foreach (var item in from7C)
+        {
+            string newValue = $"6.{sub++}";
+            if (item.display_serial_number != newValue)
+            {
+                item.display_serial_number = newValue;
+                updates.Add(item);
+            }
+        }
+
+        // ---------------------------
+        // Persist only changed rows
+        // ---------------------------
+        if (updates.Count > 0)
+        {
+            foreach (var u in updates)
+            {
+                try
+                {
+                    await dQ.Save_SCH_HIS_Block7D_List(u);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error normalizing display_serial_number: {ex.Message}");
+                }
+            }
+        }
+    }
+
+
 
     async Task SaveClicked(bool is_go_next = false)
     {
@@ -616,6 +722,10 @@
         {
             Next();
             return;
+        }
+        if (block_1 != null)
+        {
+            await dQ.SaveAsync<Tbl_Block_1>(block_1);
         }
         // Simple guard
         bool hasErrors = false;
@@ -658,10 +768,7 @@
             {
                 Next();
             }
-            if (block_1 != null)
-            {
-                await dQ.SaveAsync<Tbl_Block_1>(block_1);
-            }
+            
         }
         catch (Exception ex)
         {
