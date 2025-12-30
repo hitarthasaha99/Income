@@ -1077,16 +1077,16 @@ namespace Income.Database.Queries
         }
 
 
-        public async Task<Tbl_Sch_0_0_Block_7> GetBlock7DataByHHD(int hhd_id = 0)
+        public async Task<Tbl_Sch_0_0_Block_7?> GetBlock7DataByHHD(int hhd_id = 0)
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ? AND Block_5A_3 = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id, SessionStorage.selected_hhd_id);
-                return data_set != null && data_set.Count > 0 ? data_set.FirstOrDefault() : new();
+                var data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND Block_7_3 = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId, hhd_id);
+                return data_set != null && data_set.Count > 0 ? data_set.FirstOrDefault() : null;
             }
             catch (Exception ex)
             {
-                return new Tbl_Sch_0_0_Block_7();
+                return null;
             }
         }
 
@@ -1586,11 +1586,29 @@ namespace Income.Database.Queries
             var query = "UPDATE Tbl_Sch_0_0_Block_7 SET hhdStatus = ? WHERE Block_7_3 = ? AND fsu_id = ?";
             return await _database.ExecuteAsync(query, status, hhd_id, fsu_id);
         }
-        public async Task<int> Update_SCH0_0_Block_5Download_Status(int status, int hhd_id, int fsu_id)
+        public async Task<int> Update_SCH0_0_Block_5Download_Status(int status, int hhd_id, int fsu_id, int downloadStatus)
         {
-            var query = "UPDATE Tbl_Sch_0_0_Block_5 SET needDownload = ? WHERE Block_5A_3 = ? AND fsu_id = ?";
-            return await _database.ExecuteAsync(query, status, hhd_id, fsu_id);
+            var query = "UPDATE Tbl_Sch_0_0_Block_7 SET needDownload = ? WHERE Block_7_3 = ? AND fsu_id = ?";
+            return await _database.ExecuteAsync(query, status, hhd_id, fsu_id, downloadStatus);
         }
+        public async Task UpdateHHDStatusAndDownloadStatus(int status, int hhd_id, int fsu_id, int needDownload)
+        {
+            try
+            {
+                var hhd = await GetBlock7DataByHHD(hhd_id);
+                if (hhd != null)
+                {
+                    hhd.hhdStatus = status;
+                    hhd.needDownload = needDownload;
+                    await Update_SCH0_0_Block_7(hhd);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
 
         public async Task<int> UpdateAllRowsForColumnAsync(int fsu_id)
         {

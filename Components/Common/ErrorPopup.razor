@@ -46,6 +46,7 @@
     public async Task ShowPopup()
     {
         await errorModal.ShowAsync();
+        accordion ??= new();
         await accordion.ShowAllAccordionItemsAsync();
     }
 
