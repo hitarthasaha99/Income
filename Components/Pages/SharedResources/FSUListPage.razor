@@ -267,20 +267,11 @@
                         else
                         {
                             //Delete household data only for households already submitted
-                            if (hhdIdsToDelete?.Count > 0)
-                            {
-                                foreach (var hhdId in hhdIdsToDelete)
-                                {
-                                    await dB.HardDeleteHISDataForFSUID(
-                                        currentFSU.fsu_id,
-                                        hhdId
-                                    );
-                                }
-                            }
+                            
                             var received_data = JsonConvert.DeserializeObject<Submission_Model>(list.submitted_json_data);
                             if (received_data != null && received_data.IncomeSch00block0 != null)
                             {
-
+                                
                                 var success = await dB.SaveReceivedHISDataAsync(received_data);
                                 if (success > 0)
                                 {

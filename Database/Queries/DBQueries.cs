@@ -3,6 +3,7 @@ using BootstrapBlazor.Components;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Income.Common;
 using Income.Common.HIS2026;
@@ -126,6 +127,17 @@ namespace Income.Database.Queries
                     {
                         foreach (var hhd in sch_his_object_list)
                         {
+                            if (hhd.IncomeBlock1 != null)
+                            {
+                                await HardDeleteHISDataForFSUID(
+                                        hhd.IncomeBlock1.fsu_id,
+                                        hhd.hhd_id);
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+
                             var block_1 = hhd.IncomeBlock1;
                             var block_2 = hhd.IncomeBlockFieldOp;
                             var block_3 = hhd.IncomeBlock3;
@@ -2941,6 +2953,7 @@ namespace Income.Database.Queries
                 var response = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null && response.Count > 0)
                 {
+                    response = response.OrderBy(x => x.SerialNumber).ToList();
                     return response;
                 }
                 else
@@ -3056,6 +3069,7 @@ namespace Income.Database.Queries
                 var response = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null && response.Count > 0)
                 {
+                    response = response.OrderBy(x => x.serial_number).ToList();
                     return response;
                 }
                 else
@@ -3577,6 +3591,27 @@ namespace Income.Database.Queries
             {
                 Console.WriteLine($"Error While saving SCH HIS Block 11b: {ex.Message}");
                 return 0;
+            }
+        }
+
+        public async Task<Tbl_Block_FieldOperation?> Fetch_SCH_HIS_Block2(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_FieldOperation>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block Field Op: {ex.Message}");
+                return null;
             }
         }
 
