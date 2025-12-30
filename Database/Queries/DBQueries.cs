@@ -2252,7 +2252,7 @@ namespace Income.Database.Queries
                 if (check_existence != null)
                 {
                     status = await _database.UpdateAsync(tbl_block_4);
-                    await SyncBlock7D(check_existence);
+                    await SyncBlock7D(tbl_block_4);
 
                 }
                 else
