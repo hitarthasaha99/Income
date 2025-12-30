@@ -16,6 +16,7 @@
 @inject Warning_VM warningVM
 @inject IValidator<Tbl_Block_6> Validator
 
+<NavigationLock OnBeforeInternalNavigation="ConfirmforNavigation" />
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
     <div class="card custom-card">
@@ -112,6 +113,16 @@
                             </tr>
                         }
                     </tbody>
+                    @if (!string.IsNullOrEmpty(Block_6_ConfirmNavigation))
+                    {
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="form-text text-danger">@Block_6_ConfirmNavigation</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
                 </table>
             </div>
         </div>
@@ -354,7 +365,7 @@
     CommentModal commentModal = default!;
     private List<int> RowList = [];
     string SerialMemberError = string.Empty;
-
+    private string Block_6_ConfirmNavigation { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -756,6 +767,22 @@
                 return;
             }
             NavigationManager.NavigateTo("/dashboard/his/block_7a");
+
+    }
+    async Task ConfirmforNavigation(LocationChangingContext context)
+    {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("dashboard/his/block_7a");
+            return;
+        }
+
+        if (block6Members.Any(x => !x.isUpdated) && !context.TargetLocation.EndsWith("/block_5"))
+        {
+            context.PreventNavigation();
+            Block_6_ConfirmNavigation = $"Please save/ update details for all entries before proceeding";
+            toastService.ShowError("Please resolve pending errors");
+        }
 
     }
 

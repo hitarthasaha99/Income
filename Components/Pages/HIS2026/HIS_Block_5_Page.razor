@@ -17,6 +17,8 @@
 @inject Warning_VM warningVM
 @inject IValidator<Tbl_Block_5> Validator
 
+
+<NavigationLock OnBeforeInternalNavigation="ConfirmforNavigation" />
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
     <div class="card custom-card">
@@ -130,6 +132,16 @@
                             </tr>
                         }
                     </tbody>
+                    @if (!string.IsNullOrEmpty(Block_5_ConfirmNavigation))
+                    {
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="form-text text-danger">@Block_5_ConfirmNavigation</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
                 </table>
             </div>
         </div>
@@ -589,7 +601,9 @@
     private ValidationMessageStore messageStore;
     private bool remarksJsAttached = false;
 
+
     private ElementReference remarksRef;
+    private string Block_5_ConfirmNavigation { get; set; } = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -702,6 +716,7 @@
         block3Members = await dbq.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         block_1 = await dbq.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         var applicableMembers = block3Members?.Where(x => x.item_8 == 4 || x.item_9 == 4|| x.item_10 == 4 || x.item_11 == 4).ToList();
+
         await LoadData();
 
         if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
@@ -995,6 +1010,28 @@
             return;
         }
         NavigationManager.NavigateTo("/dashboard/his/block_6");
+
+    }
+    async Task ConfirmforNavigation(LocationChangingContext context)
+    {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("dashboard/his/block_6");
+            return;
+        }
+ 
+        // if (block5Members != null && block5Members.Count == 0 && !context.TargetLocation.EndsWith("/block_4_3"))
+        // {
+        //     context.PreventNavigation();
+        //     Block_5_ConfirmNavigation = $"Please save/ update details for all entries before proceeding";
+        //     toastService.ShowError("Please resolve pending errors");
+        // }
+        if (block5Members.Any(x => !x.isUpdated) && !context.TargetLocation.EndsWith("/block_4_3"))
+        {
+            context.PreventNavigation();
+            Block_5_ConfirmNavigation = $"Please save/ update details for all entries before proceeding";
+            toastService.ShowError("Please resolve pending errors");
+        }
 
     }
 
