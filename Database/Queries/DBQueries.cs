@@ -1779,7 +1779,7 @@ namespace Income.Database.Queries
                 var exists = await _database.Table<Tbl_Block_3>().Where(x => x.id == id).FirstOrDefaultAsync();
                 if (exists != null)
                 {
-                    if (SessionStorage.FSU_Submitted)
+                    if (SessionStorage.HHD_Submitted)
                     {
                         exists.is_deleted = true;
                         int status = await _database.UpdateAsync(exists);
@@ -1799,7 +1799,39 @@ namespace Income.Database.Queries
                         }
                     }
                     var json = System.Text.Json.JsonSerializer.Serialize(exists);
+                    var warnings = await GetWarningTableDataForSerial(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id, "3", exists.serial_no.GetValueOrDefault());
+                    if (warnings != null && warnings.Count > 0)
+                    {
+                        foreach (var warning in warnings)
+                        {
+                            if (SessionStorage.HHD_Submitted)
+                            {
+                                warning.is_deleted = true;
+                                await _database.UpdateAsync(warning);
+                            }
+                            else
+                            {
+                                await _database.DeleteAsync(warning);
+                            }
+                            var childComments = await GetChildCommentsAsync(warning.id);
+                            if (childComments != null && childComments.Count > 0)
+                            {
+                                foreach (var child in childComments)
+                                {
+                                    if (SessionStorage.HHD_Submitted)
+                                    {
+                                        child.is_deleted = true;
+                                        await _database.UpdateAsync(child);
+                                    }
+                                    else
+                                    {
+                                        await _database.DeleteAsync(child);
+                                    }
+                                }
+                            }
+                        }
 
+                    }
                     //await _logger.LogInfo($"Deleted member - \n{json}");
                     await ReserializeMemberList(exists);
                     //await UpdateOrDeleteDependentBlocks_HIS_Block_3(exists);
@@ -2324,7 +2356,7 @@ namespace Income.Database.Queries
                 var exists = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.id == id).FirstOrDefaultAsync();
                 if (exists != null)
                 {
-                    if (SessionStorage.FSU_Submitted)
+                    if (SessionStorage.HHD_Submitted)
                     {
                         exists.is_deleted = true;
                         await _database.UpdateAsync(exists);
@@ -2339,7 +2371,7 @@ namespace Income.Database.Queries
                         var correspondingCode = block_7c_nic.FirstOrDefault(x => x.NicCode == exists.NicCode);
                         if (correspondingCode != null)
                         {
-                            await DeleteEntryAsync<Tbl_Block_7c_NIC>(correspondingCode.id);
+                            await DeleteBlock7_NICList(correspondingCode.id);
                         }
 
                     }
@@ -2384,22 +2416,54 @@ namespace Income.Database.Queries
             try
             {
                 var items = await Fetch_SCH_HIS_Block7D();
-                if (items != null && items.Count > 0)
+
+                if (items == null || items.Count == 0)
+                    return;
+
+                var orderedItems = items
+                    .OrderBy(x =>
+                        x.block_7a_id != Guid.Empty ? 1 :
+                        (x.block_7a_id == Guid.Empty && x.block_7c_id == Guid.Empty) ? 2 :
+                        x.block_7c_id != Guid.Empty ? 3 : 4
+                    )
+                    // deterministic tie-breakers (no business meaning change)
+                    .ThenBy(x => x.serial_number ?? int.MaxValue)
+                    .ThenBy(x => x.id)
+                    .ToList();
+
+                int s = 1;
+                foreach (var item in orderedItems)
                 {
-                    int s = 1;
-                    foreach (var item in items)
+                    if (item.serial_number != s)
                     {
                         item.serial_number = s;
-                        s++;
                         await _database.UpdateAsync(item);
                     }
+                    s++;
                 }
             }
             catch (Exception ex)
             {
-
+                // log ex properly
             }
         }
+
+
+
+        private static int GetBlock7DPriority(Tbl_Block_7d x)
+        {
+            if (x.block_7a_id != Guid.Empty)
+                return 1;
+
+            if (x.block_7a_id == Guid.Empty && x.block_7c_id == Guid.Empty)
+                return 2;
+
+            if (x.block_7c_id != Guid.Empty)
+                return 3;
+
+            return 4; // safety fallback
+        }
+
 
         private async Task ReserializeHISBlock5()
         {
@@ -2458,9 +2522,9 @@ namespace Income.Database.Queries
                     )
                     .ToListAsync();
 
-                if (response != null)
+                if (response != null && response.Count > 0)
                 {
-                    return response;
+                    return response.OrderBy(x => x.serial_member).ToList();
                 }
                 else
                 {
@@ -2730,7 +2794,7 @@ namespace Income.Database.Queries
                 var exists = await _database.Table<Tbl_Block_7a_1>().Where(x => x.id == id).FirstOrDefaultAsync();
                 if (exists != null)
                 {
-                    if (SessionStorage.FSU_Submitted)
+                    if (SessionStorage.HHD_Submitted)
                     {
                         exists.is_deleted = true;
                         await _database.UpdateAsync(exists);
@@ -2933,7 +2997,7 @@ namespace Income.Database.Queries
                 var exists = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.id == id).FirstOrDefaultAsync();
                 if (exists != null)
                 {
-                    if (SessionStorage.FSU_Submitted)
+                    if (SessionStorage.HHD_Submitted)
                     {
                         exists.is_deleted = true;
                         await _database.UpdateAsync(exists);
@@ -3131,7 +3195,7 @@ namespace Income.Database.Queries
                 var check_existence = await _database.Table<Tbl_Block_7d>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
-                    if (SessionStorage.FSU_Submitted)
+                    if (SessionStorage.HHD_Submitted)
                     {
                         obj.is_deleted = true;
                         status = await _database.UpdateAsync(obj);
@@ -3249,7 +3313,7 @@ namespace Income.Database.Queries
                 var check_existence = await _database.Table<Tbl_Block_8_Q6>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
-                    if (SessionStorage.FSU_Submitted)
+                    if (SessionStorage.HHD_Submitted)
                     {
                         obj.is_deleted = true;
                         status = await _database.UpdateAsync(obj);
@@ -3625,7 +3689,7 @@ namespace Income.Database.Queries
                 return;
 
             // If FSU is submitted → soft delete
-            if (SessionStorage.FSU_Submitted)
+            if (SessionStorage.HHD_Submitted)
             {
                 entry.is_deleted = true;
                 await _database.UpdateAsync(entry);

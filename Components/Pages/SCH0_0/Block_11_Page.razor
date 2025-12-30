@@ -202,6 +202,7 @@
                     {
                         submissionBtnText = "Refer Back to JSO";
                     }
+
                     if(ShowValidateButton)
                     {
                         <Button class="btn btn-success is_sso action me-2" @onclick="@(() => SubmitData())">@submissionBtnText<i class="fi fi-rr-arrow-right ms-1"></i></Button>
@@ -260,14 +261,14 @@
             await commonQueries.InsertVisitedBlock(vb);
             var block_1 = await DBQueries.FetchBlock1();
             var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
-            
+
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                ShowValidateButton = fsu != null && (fsu.lookupFsuSubmitStatus == 80 || fsu.lookupFsuSubmitStatus == 11) && fsu.lookup_fsu_sub_submit_status is (12 or 0 or 11);
+                ShowValidateButton = fsu != null && (fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 || fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 11) && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() is (12 or 0 or 11);
             }
             else
             {
-                ShowValidateButton = fsu != null && fsu.lookupFsuSubmitStatus == 80 && fsu.lookup_fsu_sub_submit_status == 21;
+                ShowValidateButton = fsu != null && fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() == 21;
             }
             if (block_1 != null)
             {
@@ -323,8 +324,14 @@
     }
     async void GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/sch0.0/block_9");
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        if(block_0_1.Block_1_16.GetValueOrDefault() is (1 or 4))
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block_9");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/sch0.0/block0_1");
+        }
         return;
     }
 
@@ -526,7 +533,7 @@
                     return;
                 }
 
-                if (lookup_sub_submit_status != 12)
+                if (lookup_submit_status == 80 && lookup_sub_submit_status == 21)
                 {
                     toastService.ShowError("SCH00 has already been submitted to SSO");
                     return;
@@ -539,13 +546,14 @@
                     toastService.ShowError("Warnings need to be resolved before submission");
                     return;
                 }
-                if (!warnings.Any(x => x.warning_status == 3))
+
+                if (warnings.Count() > 0 && !warnings.Any(x => x.warning_status == 3))
                 {
                     toastService.ShowError("Atleast one warning needs to be resolved before submission");
                     return;
                 }
                 
-                if(lookup_sub_submit_status != 21)
+                if(lookup_sub_submit_status == 12)
                 {
                     toastService.ShowError("SCH00 has already been referred back to ENM");
                     return;

@@ -154,13 +154,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
-            {
-                block_uri = "/dashboard/fsulist",
-                block_title = "FSU List",
-                block_code = CommonEnum.fsu_list_page.ToString(),
-            };
-        await commonQueries.InsertVisitedBlock(vb);
         preloadService.Show(SpinnerColor.Light, "Checking for updates, Please hang on....");
         //CheckAPKVersion();
         await Fsu_Load();

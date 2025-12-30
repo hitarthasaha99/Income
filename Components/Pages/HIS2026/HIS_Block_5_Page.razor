@@ -57,7 +57,7 @@
                             <th class="text-center" colspan="1">Last 365 days</th>
                             <th class="text-center" colspan="3">Last month</th>
                             <th class="text-center" colspan="6">Last 365 days</th>
-                            <th style="min-width:200px;" rowspan="2">Total monthly income (Q5.2+(Q5.3+Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12)</th>
+                            <th style="min-width:200px;" rowspan="2">Total monthly income</th>
                         </tr>
                         <tr>
                             <th style="min-width:150px;">Number of months worked</th>
@@ -250,7 +250,8 @@
                             </label>
                             <InputNumber @bind-Value="newMember.item_2"
                                             class="form-control no-spinner"
-                                            autocomplete="off"
+                                             onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
+                                             autocomplete="off"
                                             autocorrect="off"
                                             autocapitalize="off"
                                             spellcheck="false"
@@ -273,6 +274,7 @@
                           <InputNumber @bind-Value="newMember.item_3_i"
                                         class="form-control no-spinner"
                                         autocomplete="off"
+                                        onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                         onkeypress="return event.key >= '0' && event.key <= '9'"
                                         autocorrect="off"
                                         autocapitalize="off"
@@ -296,6 +298,7 @@
                             <InputNumber @bind-Value="newMember.item_3_ii"
                                          class="form-control no-spinner"
                                          autocomplete="off"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="return event.key >= '0' && event.key <= '9'"
                                          autocorrect="off"
                                          autocapitalize="off"
@@ -320,6 +323,7 @@
                             <InputNumber @bind-Value="newMember.item_4_i"
                                          class="form-control no-spinner"
                                          autocomplete="off"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="return event.key >= '0' && event.key <= '9'"
                                          autocorrect="off"
                                          autocapitalize="off"
@@ -345,6 +349,7 @@
                             <InputNumber @bind-Value="newMember.item_4_ii"
                                          class="form-control no-spinner"
                                          autocomplete="off"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="return event.key >= '0' && event.key <= '9'"
                                          autocorrect="off"
                                          autocapitalize="off"
@@ -393,6 +398,7 @@
                             <InputNumber @bind-Value="newMember.item_6"
                                          class="form-control no-spinner"
                                          autocomplete="off"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="return event.key >= '0' && event.key <= '9'"
                                          autocorrect="off"
                                          autocapitalize="off"
@@ -417,6 +423,7 @@
                             <InputNumber @bind-Value="newMember.item_7"
                                          class="form-control no-spinner"
                                          autocomplete="off"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="return event.key >= '0' && event.key <= '9'"
                                          autocorrect="off"
                                          autocapitalize="off"
@@ -441,6 +448,7 @@
                             <InputNumber @bind-Value="newMember.item_8"
                                          class="form-control no-spinner"
                                          autocomplete="off"
+                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
                                          onkeypress="return event.key >= '0' && event.key <= '9'"
                                          autocorrect="off"
                                          autocapitalize="off"
@@ -637,6 +645,11 @@
             {
                 item_9_warning = "Improper data reported in Q. 5.9. Please Choose an option.";
                 isItemEnable = true;
+            }
+            else if (newMember != null && newMember.item_9.HasValue && newMember.item_9 > 0)
+            {
+                newMember.item_10 = null;
+                newMember.item_11 = string.Empty;
             }
 
             if(isItemEnable && newMember != null && newMember.item_10.HasValue)
