@@ -192,19 +192,33 @@
                 {
                     <Button class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</Button>
                 }
-                @{
+                @* @{
                     string submissionBtnText = string.Empty;
-                    if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                    if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                     {
                         submissionBtnText = "Submit to SSO";
                     }
-                    else if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+                    else if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                     {
                         submissionBtnText = "Refer Back to JSO";
                     }
-                    if(ShowValidateButton)
+                    if (ShowValidateButton)
                     {
                         <Button class="btn btn-success is_sso action me-2" @onclick="@(() => SubmitData())">@submissionBtnText<i class="fi fi-rr-arrow-right ms-1"></i></Button>
+                    }
+                } *@
+
+                @{
+                    if (ShowValidateButton)
+                    {
+                        if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                        {
+                            <Button class="btn btn-success is_sso action me-2" @onclick="@(() => SubmitData())">Submit to SSO<i class="fi fi-rr-arrow-right ms-1"></i></Button>
+                        }
+                        else if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+                        {
+                            <Button class="btn btn-danger is_sso action me-2" @onclick="@(() => SubmitData())"><i class="fi fi-rr-undo me-1"></i>Refer Back to JSO</Button>
+                        }
                     }
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Exit<i class="fi fi-rr-cross-circle ms-1"></i></NavLink>
