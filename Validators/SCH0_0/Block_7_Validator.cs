@@ -17,6 +17,11 @@ namespace Income.Validators.SCH0_0
             RuleFor(x => x.is_household).NotEmpty().WithMessage("Please select a value");
             RuleFor(x => x.Block_7_2).NotEmpty().WithMessage("House number is required");
 
+            When(x => x.is_household == 1, () =>
+            {
+                RuleFor(x => x.Block_7_4).NotEmpty().WithMessage("Household/ Structure Head name is required");
+            });
+
             When(x => x.is_household == 2, () =>
             {
                 RuleFor(x => x.Block_7_4).NotEmpty().WithMessage("Household Head name is required");

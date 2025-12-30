@@ -62,7 +62,7 @@
 												<td>
 													<div class="siteCustomCheckbox">
 														<label>
-															<input type="checkbox" @onchange="@((ChangeEventArgs args) => HandleCheckedChange(args, item))">
+															<input type="checkbox" checked="@selected_for_submission.Any(x => x.id == item.id)" @onchange="@((ChangeEventArgs args) => HandleCheckedChange(args, item))">
 														</label>
 													</div>
 												</td>
@@ -307,9 +307,20 @@
 			if (data != null && data.Count > 0)
 			{
 				hhd_list = new();
+				selected_for_submission = new();
 				List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ThenBy(k => k.SSS_household_id).ToList();
 				foreach (var item in selected)
 				{
+					if(item.hhdStatus == 15 && !(await Block2Present(item)) && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+					{
+						item.hhdStatus = 0;
+					}
+
+					if (item.hhdStatus is 0 && (await Block1Present(item)) && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+					{
+						item.hhdStatus = 11;
+					}
+
 					hhd_list.Add(item);
 				}
 			}
@@ -429,6 +440,7 @@
 								hhd.needDownload = 1;
 								await dQ.SaveUpdateSCH0Block7(hhd);
 							}
+							await SyncFSUHouseStatus();
 							SessionStorage.FSU_Submitted = true;
 							StateHasChanged();
 						}
@@ -658,6 +670,7 @@
 		{
 			isSyncing = false;
 			preloadService.Hide();
+			await LoadData();
 		}
 	}
 
@@ -681,6 +694,7 @@
 						foreach (var item in fsuHouseList)
 						{
 							await dQ.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
+							await dQ.Update_SCH0_0_Block_5Download_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id, 1);
 						}
 					}
 				}
@@ -755,6 +769,11 @@
 				if (warnings != null && warnings.Count > 0)
 				{
 					warnings = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+				}
+
+				if (hhd.needDownload != 0)
+				{
+					errors.Add("Please Sync before submission");
 				}
 
 				if(block_1 == null)
@@ -1198,7 +1217,7 @@
 			{
 				if (data.hhdStatus == 12 && data.needDownload != 0)
 				{
-					toastService.ShowError("Supervisor Comments need to be downloaded before editing the Household");
+					toastService.ShowError("Please sync before proceeding");
 					return;
 				}
 				else if (data.hhdStatus == 12 && data.needDownload == 0)
@@ -1323,16 +1342,63 @@
 
 	}
 
+	private async Task<bool> Block1Present(Tbl_Sch_0_0_Block_7 hhd)
+	{
+		try
+		{
+			var block_1 = await dQ.Fetch_SCH_HIS_Block1(hhd.Block_7_3.GetValueOrDefault());
+			if (block_1 != null)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (Exception ex)
+		{
+			return false;
+		}
+	}
+
+	private async Task<bool> Block2Present(Tbl_Sch_0_0_Block_7 hhd)
+	{
+		try
+		{
+			var block_2 = await dQ.Fetch_SCH_HIS_Block2(hhd.Block_7_3.GetValueOrDefault());
+			if (block_2 != null)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (Exception ex)
+		{
+			return false;
+        }
+	}
+
 	private string SetSurveyStatus(Tbl_Sch_0_0_Block_7 item)
 	{
 		try
 		{
+			// Special rule for Surveyed
+			// if (item.hhdStatus == 15)
+			// {
+			// 	bool block2Present = await Block2Present(item);
+			// 	return block2Present ? "Surveyed" : "Not Surveyed Yet";
+			// }
+
 			return item.hhdStatus switch
 			{
 				0 => "Not Surveyed Yet",
 				11 => "Ongoing",
-				15 => "Surveyed",
 				12 => "Referred back by Supervisor",
+				15 => "Surveyed",
 				21 => "Submitted by Enumerator",
 				22 => "Referred back by DS",
 				31 => "Submitted by Supervisor",
@@ -1341,11 +1407,12 @@
 				_ => ""
 			};
 		}
-		catch (Exception ex)
+		catch
 		{
 			return "";
 		}
 	}
+
 
 	private string SetStatus(string status)
 	{

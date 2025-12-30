@@ -268,11 +268,10 @@
             {
                 Block7DList = await dQ.Fetch_SCH_HIS_Block7D();
                 Block7DList = Block7DList
-                                .OrderBy(x => int.Parse(x.display_serial_number!.Split('.')[0]))
-                                .ThenBy(x => x.display_serial_number!.Contains('.')
-                                    ? int.Parse(x.display_serial_number.Split('.')[1])
-                                    : 0)
-                                .ToList();
+                .OrderBy(x => SafeParseDisplaySerial(x.display_serial_number).Major)
+                .ThenBy(x => SafeParseDisplaySerial(x.display_serial_number).Minor)
+                .ThenBy(x => x.id) // deterministic tie-breaker
+                .ToList();
                 RowList = Block7DList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
             }
 
@@ -287,6 +286,24 @@
             _isBusy = false;
         }
     }
+
+    private static (int Major, int Minor) SafeParseDisplaySerial(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return (int.MaxValue, int.MaxValue); // push to end
+
+        var parts = value.Split('.', StringSplitOptions.RemoveEmptyEntries);
+
+        if (!int.TryParse(parts[0], out int major))
+            return (int.MaxValue, int.MaxValue);
+
+        int minor = 0;
+        if (parts.Length > 1 && !int.TryParse(parts[1], out minor))
+            minor = 0;
+
+        return (major, minor);
+    }
+
 
     int GetCurrentSerialNumber()
     {

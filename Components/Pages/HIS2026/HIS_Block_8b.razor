@@ -387,7 +387,11 @@
     private async Task LoadData()
     {
         SchemeList = await dB.Fetch_SCH_HIS_Block8_6(SessionStorage.selected_hhd_id);
-        RowList = SchemeList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
+        if (SchemeList != null && SchemeList.Count > 0)
+        {
+            SchemeList = SchemeList.OrderBy(x => x.serial_number).ToList();
+            RowList = SchemeList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
+        }
         StateHasChanged();
     }
 

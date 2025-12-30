@@ -17,7 +17,6 @@
 @if (editContext != null)
 {
     <EditForm EditContext="editContext">
-        <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
             <div class="main-content">
                 <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
                 <div class="card custom-card">
@@ -33,432 +32,435 @@
                             </div>
                         }
                     </div>
-                    <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-bordered mb-0 align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">Q.no.</th>
-                                            <th class="text-center">Question description</th>
-                                            <th class="text-center">Reference Period </th>
-                                            <th class="text-center">Expenditure (in whole no. of Rs.)</th>
+
+                    <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">
+                        <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered mb-0 align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Q.no.</th>
+                                                <th class="text-center">Question description</th>
+                                                <th class="text-center">Reference Period </th>
+                                                <th class="text-center">Expenditure (in whole no. of Rs.)</th>
+                                            </tr>
+
+                                    </thead>
+                                    <tbody>
+                                        @* Food items *@
+                                        <tr style="border-bottom:1px solid #20ba43;">
+                                            <td colspan="8"class="text-center">
+                                                <label class="fw-bold fs-6">Food items</label>
+                                            </td>
                                         </tr>
+                                        <tr class="row-light-success">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.1</span>
+                                                </label> 
+                                            </td>
+                                            <td>Vegetables including ginger, garlic & fruits (fresh)</td>
+                                            <td>Last 7 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_1"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_1, e); handleCalculate(); }" />
 
-                                </thead>
-                                <tbody>
-                                    @* Food items *@
-                                    <tr style="border-bottom:1px solid #20ba43;">
-                                        <td colspan="8"class="text-center">
-                                            <label class="fw-bold fs-6">Food items</label>
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-success">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.1</span>
-                                            </label> 
-                                        </td>
-                                        <td>Vegetables including ginger, garlic & fruits (fresh)</td>
-                                        <td>Last 7 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_1"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_1, e); handleCalculate(); }" />
-
-                                            <ValidationMessage For="@(() => model.item_1)" />
-                                        </td>
+                                                <ValidationMessage For="@(() => model.item_1)" />
+                                            </td>
 
 
-                                    </tr>
-                                    <tr class="row-light-success">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.2</span>
-                                            </label>
-                                        </td>
-                                        <td>Egg, fish & meat </td>
-                                        <td>Last 7 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_2"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_2, e); handleCalculate(); }" />
+                                        </tr>
+                                        <tr class="row-light-success">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.2</span>
+                                                </label>
+                                            </td>
+                                            <td>Egg, fish & meat </td>
+                                            <td>Last 7 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_2"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_2, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_2)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.3</span>
-                                            </label>
-                                        </td>
-                                        <td>Cereals & cereal products, pulses & pulse products, salt & sugar, edible oil, spices, dry fruits & nuts</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_3"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_3, e); handleCalculate(); }" />
-
-                                            <ValidationMessage For="@(() => model.item_3)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.4</span>
-                                            </label>
-                                        </td>
-                                        <td>Milk & milk products</td>
+                                                <ValidationMessage For="@(() => model.item_2)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.3</span>
+                                                </label>
+                                            </td>
+                                            <td>Cereals & cereal products, pulses & pulse products, salt & sugar, edible oil, spices, dry fruits & nuts</td>
                                             <td>Last 30 days</td>
                                             <td>
                                                 <input type="number" class="form-control form-control-sm no-spinner"
-                                                        value="@model.item_4"
+                                                        value="@model.item_3"
                                                         onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_4, e); handleCalculate(); }" />
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_3, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_4)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.5</span>
-                                            </label>
-                                        </td>
-                                        <td>Beverages, processed food, pan, tobacco & intoxicants</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_5"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_5, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_3)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.4</span>
+                                                </label>
+                                            </td>
+                                            <td>Milk & milk products</td>
+                                                <td>Last 30 days</td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm no-spinner"
+                                                            value="@model.item_4"
+                                                            onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                            @oninput="e => { UpdateFieldAndValidate(() => model.item_4, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_5)" />
-                                        </td>
-                                    </tr>
-                                    @* Non - Food Items – Consumable Services *@
-                                    <tr style="border-bottom:1px solid #2471DD;">
-                                        <td colspan="8" class="text-center">
-                                            <label class="fw-bold fs-6">Non - Food Items – Consumable Services</label>
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.6</span>
-                                            </label>
-                                        </td>
-                                        <td>Fuel & light (including petrol/diesel/CNG/other fuel for vehicles)</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_6"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_6, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_4)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.5</span>
+                                                </label>
+                                            </td>
+                                            <td>Beverages, processed food, pan, tobacco & intoxicants</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_5"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_5, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_6)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.7</span>
-                                            </label>
-                                        </td>
-                                        <td>Toilet articles & other household consumables</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_7"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_7, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_5)" />
+                                            </td>
+                                        </tr>
+                                        @* Non - Food Items – Consumable Services *@
+                                        <tr style="border-bottom:1px solid #2471DD;">
+                                            <td colspan="8" class="text-center">
+                                                <label class="fw-bold fs-6">Non - Food Items – Consumable Services</label>
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.6</span>
+                                                </label>
+                                            </td>
+                                            <td>Fuel & light (including petrol/diesel/CNG/other fuel for vehicles)</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_6"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_6, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_7)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.8</span>
-                                            </label>
-                                        </td>
-                                        <td>Conveyance</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_8"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_8, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_6)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.7</span>
+                                                </label>
+                                            </td>
+                                            <td>Toilet articles & other household consumables</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_7"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_7, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_8)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.9</span>
-                                            </label>
-                                        </td>
-                                        <td>Entertainment expenses, consumer services excluding conveyance</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_9"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_9, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_7)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.8</span>
+                                                </label>
+                                            </td>
+                                            <td>Conveyance</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_8"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_8, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_9)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.10</span>
-                                            </label>
-                                        </td>
-                                        <td>Rent & garage rent, consumer taxes and cesses</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_10"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_10, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_8)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.9</span>
+                                                </label>
+                                            </td>
+                                            <td>Entertainment expenses, consumer services excluding conveyance</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_9"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_9, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_10)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.11</span>
-                                            </label>
-                                        </td>
-                                        <td>House rent, garage rent (imputed) </td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_11"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_11, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_9)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.10</span>
+                                                </label>
+                                            </td>
+                                            <td>Rent & garage rent, consumer taxes and cesses</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_10"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_10, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_11)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-blue">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.12</span>
-                                            </label>
-                                        </td>
-                                        <td>Medical expenses: non - hospitalization (includes medicine, doctor’s fee, medical test fees etc.)</td>
-                                        <td>Last 30 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_12"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_12, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_10)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.11</span>
+                                                </label>
+                                            </td>
+                                            <td>House rent, garage rent (imputed) </td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_11"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_11, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_12)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.13</span>
-                                            </label>
-                                        </td>
-                                        <td>Medical expenses: hospitalization</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_13"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_13, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_11)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.12</span>
+                                                </label>
+                                            </td>
+                                            <td>Medical expenses: non - hospitalization (includes medicine, doctor’s fee, medical test fees etc.)</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_12"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_12, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_13)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.14</span>
-                                            </label>
-                                        </td>
-                                        <td>Educational expenses</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_14"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_14, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_12)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.13</span>
+                                                </label>
+                                            </td>
+                                            <td>Medical expenses: hospitalization</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_13"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_13, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_14)" />
-                                        </td>
-                                    </tr>
-                                    @* Non-Food Items – Durable Goods *@
-                                    <tr style="border-bottom:1px solid #bc1ed6;">
-                                        <td colspan="8" class="text-center">
-                                            <label class="fw-bold fs-6">Non-Food Items – Durable Goods</label>
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.15</span>
-                                            </label>
-                                        </td>
-                                        <td>Clothing, bedding and footwear</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_15"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_15, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_13)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.14</span>
+                                                </label>
+                                            </td>
+                                            <td>Educational expenses</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_14"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_14, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_15)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.16</span>
-                                            </label>
-                                        </td>
-                                        <td>Personal and sports goods, medical and therapeutic appliances</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_16"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_16, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_14)" />
+                                            </td>
+                                        </tr>
+                                        @* Non-Food Items – Durable Goods *@
+                                        <tr style="border-bottom:1px solid #bc1ed6;">
+                                            <td colspan="8" class="text-center">
+                                                <label class="fw-bold fs-6">Non-Food Items – Durable Goods</label>
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.15</span>
+                                                </label>
+                                            </td>
+                                            <td>Clothing, bedding and footwear</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_15"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_15, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_16)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.17</span>
-                                            </label>
-                                        </td>
-                                        <td>Personal transport equipment</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_17"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_17, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_15)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.16</span>
+                                                </label>
+                                            </td>
+                                            <td>Personal and sports goods, medical and therapeutic appliances</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_16"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_16, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_17)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.18</span>
-                                            </label>
-                                        </td>
-                                        <td>Furniture and fixtures & goods for recreation,</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_18"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_18, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_16)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.17</span>
+                                                </label>
+                                            </td>
+                                            <td>Personal transport equipment</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_17"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_17, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_18)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.19</span>
-                                            </label>
-                                        </td>
-                                        <td>Cooking and household appliances</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_19"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_19, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_17)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.18</span>
+                                                </label>
+                                            </td>
+                                            <td>Furniture and fixtures & goods for recreation,</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_18"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_18, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_19)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.20</span>
-                                            </label>
-                                        </td>
-                                        <td>Repair and maintenance of residential buildings, land</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_20"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_20, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_18)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.19</span>
+                                                </label>
+                                            </td>
+                                            <td>Cooking and household appliances</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_19"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_19, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_20)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.21</span>
-                                            </label>
-                                        </td>
-                                        <td>Repair & maintenance of vehicles, household appliances and other durable goods</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_21"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_21, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_19)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.20</span>
+                                                </label>
+                                            </td>
+                                            <td>Repair and maintenance of residential buildings, land</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_20"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_20, e); handleCalculate(); }" />
 
-                                            <ValidationMessage For="@(() => model.item_21)" />
-                                        </td>
-                                    </tr>
-                                    <tr class="row-light-pink">
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.22</span>
-                                            </label>
-                                        </td>
-                                        <td>Jewellery & ornaments</td>
-                                        <td>Last 365 days</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm no-spinner"
-                                                    value="@model.item_22"
-                                                    onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                    @oninput="e => { UpdateFieldAndValidate(() => model.item_22, e); handleCalculate(); }" />
+                                                <ValidationMessage For="@(() => model.item_20)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.21</span>
+                                                </label>
+                                            </td>
+                                            <td>Repair & maintenance of vehicles, household appliances and other durable goods</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_21"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_21, e); handleCalculate(); }" />
 
-                                                <ValidationMessage For="@(() => model.item_22)" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label class="form-label mb-0">
-                                                <span class="form-badge me-0">Q10.23</span>
-                                            </label>
-                                        </td>
-                                        <td>Total expenditure = sum (Q10.1: 10.2) /7×30 + sum (Q10.3: Q10.12) + sum (Q10.13: Q10.22)/365×30</td>
-                                        <td class="text-center">-</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly />
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                                <ValidationMessage For="@(() => model.item_21)" />
+                                            </td>
+                                        </tr>
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.22</span>
+                                                </label>
+                                            </td>
+                                            <td>Jewellery & ornaments</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_22"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_22, e); handleCalculate(); }" />
+
+                                                    <ValidationMessage For="@(() => model.item_22)" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.23</span>
+                                                </label>
+                                            </td>
+                                            <td>Total expenditure = sum (Q10.1: 10.2) /7×30 + sum (Q10.3: Q10.12) + sum (Q10.13: Q10.22)/365×30</td>
+                                            <td class="text-center">-</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    </fieldset>
+
                 </div>
             </div>
-        </fieldset>
         <div class="footer">
             <!-- Remarks textarea -->
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">

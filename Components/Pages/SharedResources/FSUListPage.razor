@@ -13,7 +13,7 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h3 class="page-heading m-0">FSU List</h3>
         <div class="ms-auto">
-            <NavLink class="btn btn-sm btn-dark text-white d-flex align-items-center" onclick="@Fsu_Load">Reload <i class="fi fi-rr-rotate-right ms-2"></i></NavLink>
+            <NavLink class="btn btn-sm btn-dark text-white d-flex align-items-center" onclick="@(async() => await Fsu_Load())">Reload <i class="fi fi-rr-rotate-right ms-2"></i></NavLink>
         </div>
     </div>
     <div class="card custom-card">
@@ -251,6 +251,8 @@
                                 return;
                             }
                         }
+                        currentFSU.NeedDownload = false;
+                        await commonQueries.UpdateFSU(currentFSU);
                     }
 
                     foreach (var kv in downloadTasks)
@@ -267,16 +269,7 @@
                         else
                         {
                             //Delete household data only for households already submitted
-                            if (hhdIdsToDelete?.Count > 0)
-                            {
-                                foreach (var hhdId in hhdIdsToDelete)
-                                {
-                                    await dB.HardDeleteHISDataForFSUID(
-                                        currentFSU.fsu_id,
-                                        hhdId
-                                    );
-                                }
-                            }
+
                             var received_data = JsonConvert.DeserializeObject<Submission_Model>(list.submitted_json_data);
                             if (received_data != null && received_data.IncomeSch00block0 != null)
                             {
@@ -306,7 +299,7 @@
         }
         finally
         {
-            await Fsu_Load();
+            await Fsu_Load(false);
             preloadService.Hide();
             StateHasChanged();
         }
@@ -390,6 +383,11 @@
             }
             else
             {
+                if (FsuData?.FirstOrDefault()?.NeedDownload == true)
+                {
+                    toastService.ShowError("Please download before proceeding.");
+                    return;
+                }
                 SessionStorage.FSU_Sector = FsuData?.FirstOrDefault().sec.GetValueOrDefault() ?? 0;
                 SessionStorage.selection_done = true;
                 SessionStorage.hamlet_selection_done = true;
@@ -603,7 +601,7 @@
     }
 
 
-    async Task Fsu_Load()
+    async Task Fsu_Load(bool checkDownload = true)
     {
         try
         {
@@ -629,7 +627,10 @@
                         foreach (var item in fsu_list)
                         { 
                             var OldFsuData = await dB.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(item.fsu_id);
-                            CheckDownloadNeed(item,OldFsuData,item.fsuHouses);
+                            if(checkDownload)
+                            {
+                                CheckDownloadNeed(item, OldFsuData, item.fsuHouses);
+                            }
 
                             await UpdateFsu(item.fsuHouses);
                             var houses = item.fsuHouses != null && item.fsuHouses.Count > 0 ? item.fsuHouses.Count : 0;
@@ -999,29 +1000,29 @@
         }
 
 
-   private void CheckDownloadNeed( Tbl_Fsu_List FsuData , List<Tbl_Sch_0_0_Block_7>? oldData , List<fsu_houses>? FsuHouseData )
+   private void CheckDownloadNeed(Tbl_Fsu_List FsuData , List<Tbl_Sch_0_0_Block_7>? oldData , List<fsu_houses>? FsuHouseData)
    {
-     try
-     {   if(FsuHouseData == null || FsuHouseData.Count == 0 || oldData == null || oldData.Count == 0)
+         try
          {
-             return;
-         }
-         foreach(var Item in FsuHouseData)
-         {
-           var  RefinedData = oldData.FirstOrDefault(x=> x.fsu_id == Item.fsu_id && x.Block_7_3 == Item.hhd_id);
-            if(RefinedData != null)
-            {
-                if(RefinedData.hhdStatus != Item.lookup_submit_status)
+             if(FsuHouseData == null || FsuHouseData.Count == 0 || oldData == null || oldData.Count == 0)
+             {
+                 return;
+             }
+             foreach(var Item in FsuHouseData)
+             {
+                var RefinedData = oldData.FirstOrDefault(x=> x.fsu_id == Item.fsu_id && x.Block_7_3 == Item.hhd_id);
+                if (RefinedData != null)
                 {
-                  FsuData.NeedDownload = true;
-                  return;
+                    if(RefinedData.hhdStatus != Item.lookup_submit_status)
+                    {
+                          FsuData.NeedDownload = true;
+                          return;
+                    }
                 }
-            }
-          }
-          
-     }
-     catch(Exception ex)
-     {
-     }
+             }
+         }
+         catch(Exception ex)
+         {
+         }
    }
 }

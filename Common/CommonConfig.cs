@@ -32,7 +32,7 @@ namespace Income.Common
         }
         public List<Validation_Model> SCH_0_0_BLOCK_1_REQ_FIELDS { get; set; } = new();
 
-        public static readonly string APP_VERSION = "1.0.17";
+        public static readonly string APP_VERSION = "1.0.18";
 
         //Test
         public static readonly string PostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/";
