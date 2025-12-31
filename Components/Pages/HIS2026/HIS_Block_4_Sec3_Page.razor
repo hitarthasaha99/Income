@@ -70,9 +70,10 @@
                                 If yes, total area (in acre)
                             </label>
                             <input type="number"
-                                    class="form-control is_sso"
+                                    class="form-control is_sso no-spinner"
                                     value="@block_4.item_7"
                                     @oninput="OnItem7Changed"
+                                    onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(event.target.value + event.key)"
                                     disabled="@(block_4?.item_6 != 1 || (SessionStorage.FSU_Submitted))" />
                             <ValidationMessage For="@(() => block_4.item_7)" />
                         </div>
