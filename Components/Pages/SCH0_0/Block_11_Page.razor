@@ -564,7 +564,7 @@
             data.IncomeSchHISDto = null;
 
             //Fetch SCH0 Data
-            data.IncomeSch00block0 = isJSO ?  await DBQueries.FetchBlock1() : null;
+            data.IncomeSch00block0 = await DBQueries.FetchBlock1();
             data.IncomeSch00block2_1 = isJSO ? await DBQueries.FetchSCH0Block2_1Data() : null;
             data.IncomeSch00block2_2 = isJSO ? await DBQueries.FetchSCH0Block2_2Data() : null;
             var block_3 = isJSO ? await DBQueries.GetFileData(0) : null;

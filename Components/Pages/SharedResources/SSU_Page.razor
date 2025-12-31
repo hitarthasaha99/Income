@@ -1021,6 +1021,7 @@
 			SessionStorage.SelectedFSUId = hhd.fsu_id;
 			SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
 
+            var block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
 			var block_2 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>();
 			var warnings = await dQ.FetchListAsync<Tbl_Warning>(DBQueries.DeleteFilter.IncludeAll) ?? new();
 
@@ -1029,6 +1030,7 @@
 				Id = Guid.NewGuid(),
 				hhd_id = hhd.Block_7_3.GetValueOrDefault(),
 				hhd_status = status,
+                IncomeBlock1 = block_1,
 				IncomeBlockFieldOp = block_2,
 				IncomeWarningList = warnings
 			};
