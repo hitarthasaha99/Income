@@ -478,7 +478,10 @@
         block_4_nic_list = await dQ.Fetch_SCH_HIS_Block4_NICList();
         block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         await commonQueries.InsertVisitedBlock(vb);
+        CheckWarningForItem8();
+        CheckWarningForItem10();
         CheckItem14Warning();
+        CheckWarningForItem16();
         StateHasChanged();
     }
 
@@ -881,7 +884,7 @@
                         warningVM.AddWarning(
                             warning.Trim(),
                             "HIS",
-                            "4",
+                            "4_3",
                             "8",
                             SessionStorage.selected_hhd_id
                         );
@@ -898,7 +901,7 @@
                         warningVM.AddWarning(
                             warning.Trim(),
                             "HIS",
-                            "4",
+                            "4_3",
                             "10",
                             SessionStorage.selected_hhd_id
                         );
@@ -907,14 +910,14 @@
 
                 if (!string.IsNullOrEmpty(Item14WarningMessage))
                 {
-                    warningVM.AddWarning(Item14WarningMessage, "HIS", "4", "14", SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(Item14WarningMessage, "HIS", "4_3", "14", SessionStorage.selected_hhd_id);
                 }
 
                 if (!string.IsNullOrEmpty(Item16WarningMessage))
                 {
-                    warningVM.AddWarning(Item16WarningMessage, "HIS", "4", "16", SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(Item16WarningMessage, "HIS", "4_3", "16", SessionStorage.selected_hhd_id);
                 }
-                await warningVM.SaveWarningAsync("HIS", "4");
+                await warningVM.SaveWarningAsync("HIS", "4_3");
                 int save = await dQ.Save_SCH_HIS_Block4(block_4);
                 if (block_1 != null)
                 {

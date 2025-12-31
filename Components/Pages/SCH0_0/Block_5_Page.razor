@@ -129,6 +129,10 @@
         await commonQueries.InsertVisitedBlock(vb);
         var response = await SCH_0_0_Queries.FetchSCH0Block5Data();
         block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+        if (block_0_1 != null)
+        {
+            remarks = block_0_1.remarks_block_5;
+        }
         block_4 = await SCH_0_0_Queries.GetBlock4();
         if (response == null || response.Count == 0)
         {
@@ -190,6 +194,8 @@
             toastService.ShowError("Percentage cannot be zero");
             return;
         }
+        block_0_1.remarks_block_5 = remarks;
+        await SCH_0_0_Queries.SaveBlock1(block_0_1);
         if (action == "SELECTION")
         {
             if(PopulationVariationExists())

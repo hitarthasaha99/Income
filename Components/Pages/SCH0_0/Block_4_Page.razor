@@ -98,7 +98,7 @@
 
     async void GoBack()
     {
-        if (block_0_1.number_of_sub_division_of_su_to_be_formed > 1)
+        if (block_0_1.Block_1_15.GetValueOrDefault() > 1)
             NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{false}");
         else
         {
@@ -160,6 +160,7 @@
             if(block_5 != null && block_5.Count > 0 && block_5.Any())
             {
                 DisableEdit = true;
+                return;
             }
             else
             {

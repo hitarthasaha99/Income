@@ -221,6 +221,7 @@ namespace Income.Services
                 //Only for QA
                 if(SessionStorage.env == SessionStorage.Environment.Development)
                 {
+                    SessionStorage.survey_type = 1116;
                     await LogoutService(_User_Details.username);
                 }
                 using (var _httpClient = new HttpClient())

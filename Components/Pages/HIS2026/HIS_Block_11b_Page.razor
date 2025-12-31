@@ -89,7 +89,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-                <textarea maxlength="500" class="form-control" id="remarksTextarea" placeholder="Enter your remarks here..." rows="2" ></textarea>
+                <textarea maxlength="500" class="form-control" id="remarksTextarea" placeholder="Enter your remarks here..." @bind="block_1.block_11b_remark" rows="2"></textarea>
             </div>
         </div>
     </fieldset>
@@ -400,7 +400,7 @@
 
     }
 
-    private void Navigate()
+    private async void Navigate()
     {
         try
         {
@@ -408,6 +408,10 @@
             {
                 NavigationManager.NavigateTo("/dashboard/his/block_A");
                 return;
+            }
+            if (block_1 != null)
+            {
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
             // Navigate to the next block/page
             if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))

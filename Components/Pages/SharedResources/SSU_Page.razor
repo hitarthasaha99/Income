@@ -14,10 +14,6 @@
 
 
 <div class="main-content">
-	<CommonContentHeader SelectedFsuId="@SelectedFsuId"
-						 survey_time="@survey_time"
-						 page_name="/dashboard/fsulist"
-						 ShowVisitedBlock="false" />
 
 	<ConfirmDialog @ref="dialog" />
 	<ErrorPopup @ref="errorPopup" ErrorDict="errorDict"></ErrorPopup>
@@ -66,7 +62,7 @@
 												<td>
 													<div class="siteCustomCheckbox">
 														<label>
-															<input type="checkbox" @onchange="@((ChangeEventArgs args) => HandleCheckedChange(args, item))">
+															<input type="checkbox" checked="@selected_for_submission.Any(x => x.id == item.id)" @onchange="@((ChangeEventArgs args) => HandleCheckedChange(args, item))">
 														</label>
 													</div>
 												</td>
@@ -135,13 +131,18 @@
 												@statusTitle
 											</span>
 										</td>
-										<td>
-											@{
-												var surveyStatus = SetSurveyStatus(item);
-												var surveyStatusColor = commonFunction.ReturnStatusColor(surveyStatus);
-											}
-											<div class="badge badge-@surveyStatusColor">@(surveyStatus)</div>
-										</td>
+
+										@if(item.status != "SUBSTITUTED")
+										{
+											<td>
+												@{
+													var surveyStatus = SetSurveyStatus(item);
+													var surveyStatusColor = commonFunction.ReturnStatusColor(surveyStatus);
+												}
+												<div class="badge badge-@surveyStatusColor">@(surveyStatus)</div>
+											</td>
+										}
+										
 										<td>@(item.SubstitutedForID)</td>
 										<td>
 											@if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && item.hhdStatus == 12)
@@ -183,9 +184,9 @@
 				{
 					
 				
-					<button class="btn btn-primary me-2"
+					<button class="btn btn-danger me-2"
 							onclick="@(() => Submit(SubmissionMode.sso_to_jso))">
-						<i class="fi fi-rr-arrow-left me-1"></i>
+						<i class="fi fi-rr-undo me-1"></i>
 						Refer back to ENM
 					</button>
 
@@ -306,9 +307,20 @@
 			if (data != null && data.Count > 0)
 			{
 				hhd_list = new();
+				selected_for_submission = new();
 				List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ThenBy(k => k.SSS_household_id).ToList();
 				foreach (var item in selected)
 				{
+					if(item.hhdStatus == 15 && !(await Block2Present(item)) && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+					{
+						item.hhdStatus = 0;
+					}
+
+					if (item.hhdStatus is 0 && (await Block1Present(item)) && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+					{
+						item.hhdStatus = 11;
+					}
+
 					hhd_list.Add(item);
 				}
 			}
@@ -428,6 +440,7 @@
 								hhd.needDownload = 1;
 								await dQ.SaveUpdateSCH0Block7(hhd);
 							}
+							await SyncFSUHouseStatus();
 							SessionStorage.FSU_Submitted = true;
 							StateHasChanged();
 						}
@@ -657,6 +670,7 @@
 		{
 			isSyncing = false;
 			preloadService.Hide();
+			await LoadData();
 		}
 	}
 
@@ -680,6 +694,7 @@
 						foreach (var item in fsuHouseList)
 						{
 							await dQ.Update_SCH0_0_Block_5AHHD_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id);
+							await dQ.Update_SCH0_0_Block_5Download_Status(item.lookup_submit_status, item.hhd_id, item.fsu_id, 1);
 						}
 					}
 				}
@@ -751,6 +766,15 @@
 				var block_A = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
 				var block_B = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
 				var warnings = await dQ.FetchListAsync<Tbl_Warning>() ?? new();
+				if (warnings != null && warnings.Count > 0)
+				{
+					warnings = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+				}
+
+				if (hhd.needDownload != 0)
+				{
+					errors.Add("Please Sync before submission");
+				}
 
 				if(block_1 == null)
 				{
@@ -788,10 +812,10 @@
 
 					if (block_4 != null)
 					{
-						if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
-						{
-							errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
-						}
+						// if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
+						// {
+						// 	errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
+						// }
 
 						// if (!block_4.item_4_3.GetValueOrDefault() && !block_4.item_4_4.GetValueOrDefault() && !block_4.item_4_5.GetValueOrDefault() && !block_4.item_4_6.GetValueOrDefault() && (block_7b != null))
 						// {
@@ -822,11 +846,11 @@
 					}
 
 					var block_3_condition_for_block_7c = block_3.Any(x => x.item_8 == 2 || x.item_9 == 2);
-					if (!block_3_condition_for_block_7c && (block_7c_1.Count > 0 || block_7c_Q10.Count > 0))
-					{
-						errors.Add($"H048: Block 7C is applicable only when col 8 and/or col 9 = 2 for atleast one member");
-					}
-					else if(block_3_condition_for_block_7c && (block_7c_1.Count == 0 || block_7c_Q10.Count == 0))
+					// if (!block_3_condition_for_block_7c && (block_7c_1.Count > 0 || block_7c_Q10.Count > 0))
+					// {
+					// 	errors.Add($"H048: Block 7C is applicable only when col 8 and/or col 9 = 2 for atleast one member");
+					// }
+					if(block_3_condition_for_block_7c && (block_7c_1.Count == 0 || block_7c_Q10.Count == 0))
 					{
 						errors.Add($"H048: No Block 7C entry found even though col 8 and/or col 9 = 2 for atleast one member");
 					}
@@ -836,6 +860,7 @@
 					{
 						errors.Add($"H059: Block 8.6 must have atleast one entry if col 12 = 1 for any member");
 					}
+
 					else if(!block_3_block_8_Q6_condition && block_8_Q6.Count != 0)
 					{
 						errors.Add($"H059: Block 8.6 is applicable only when col 12 = 1 for any member");
@@ -890,9 +915,14 @@
 
 
 
-				if (warnings.Count > 0 && warnings.Any(x => x.warning_status == 1))
+				if (warnings != null && warnings.Count > 0 && warnings.Any(x => x.warning_status == 1))
 				{
 					errors.Add("All warnings have not been resolved");
+				}
+
+				if (warnings != null && warnings.Count > 0 && warnings.Any(x => x.warning_status == 3))
+				{
+					errors.Add("Rejected warnings need to be addressed before submission");
 				}
 
 				errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
@@ -1041,6 +1071,11 @@
 							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 						}
 					}
+					else
+					{
+						errors.Add("Need to have atleast one rejected warning to refer back");
+						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+					}
 				}
 				if (submissionMode == SubmissionMode.sso_to_ds)
 				{
@@ -1054,7 +1089,12 @@
 							errors.Add("Need to accept all warnings before submission");
 							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 						}
-					}				
+					}
+					else
+					{
+						errors.Add("Need to have atleast one rejected warning to refer back");
+						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+					}
 				}
 			}
 			return errorDict;
@@ -1177,7 +1217,7 @@
 			{
 				if (data.hhdStatus == 12 && data.needDownload != 0)
 				{
-					toastService.ShowError("Supervisor Comments need to be downloaded before editing the Household");
+					toastService.ShowError("Please sync before proceeding");
 					return;
 				}
 				else if (data.hhdStatus == 12 && data.needDownload == 0)
@@ -1187,6 +1227,7 @@
 					preloadService.Show(SpinnerColor.Light, "Updating location details...");
 					preloadService.Hide();
 					SessionStorage.FSU_Submitted = false;
+					SessionStorage.HHD_Submitted = true;
 					NavigationManager.NavigateTo("/dashboard/his/block0_1");
 				}
 				else
@@ -1202,6 +1243,7 @@
 			if (data.hhdStatus == 21 || data.hhdStatus == 22)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				SessionStorage.HHD_Submitted = true;
 				//SessionStorage.selected_hhd_seq = data.seq_no;
 				NavigationManager.NavigateTo("/dashboard/his/block0_1");
 				return;
@@ -1214,6 +1256,7 @@
 			if (data.hhdStatus == 31)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
+				SessionStorage.HHD_Submitted = true;
 				//SessionStorage.selected_hhd_seq = data.seq_no;
 				NavigationManager.NavigateTo("/dashboard/his/block0_1");
 				return;
@@ -1299,16 +1342,63 @@
 
 	}
 
+	private async Task<bool> Block1Present(Tbl_Sch_0_0_Block_7 hhd)
+	{
+		try
+		{
+			var block_1 = await dQ.Fetch_SCH_HIS_Block1(hhd.Block_7_3.GetValueOrDefault());
+			if (block_1 != null)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (Exception ex)
+		{
+			return false;
+		}
+	}
+
+	private async Task<bool> Block2Present(Tbl_Sch_0_0_Block_7 hhd)
+	{
+		try
+		{
+			var block_2 = await dQ.Fetch_SCH_HIS_Block2(hhd.Block_7_3.GetValueOrDefault());
+			if (block_2 != null)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (Exception ex)
+		{
+			return false;
+        }
+	}
+
 	private string SetSurveyStatus(Tbl_Sch_0_0_Block_7 item)
 	{
 		try
 		{
+			// Special rule for Surveyed
+			// if (item.hhdStatus == 15)
+			// {
+			// 	bool block2Present = await Block2Present(item);
+			// 	return block2Present ? "Surveyed" : "Not Surveyed Yet";
+			// }
+
 			return item.hhdStatus switch
 			{
 				0 => "Not Surveyed Yet",
 				11 => "Ongoing",
-				15 => "Surveyed",
 				12 => "Referred back by Supervisor",
+				15 => "Surveyed",
 				21 => "Submitted by Enumerator",
 				22 => "Referred back by DS",
 				31 => "Submitted by Supervisor",
@@ -1317,11 +1407,12 @@
 				_ => ""
 			};
 		}
-		catch (Exception ex)
+		catch
 		{
 			return "";
 		}
 	}
+
 
 	private string SetStatus(string status)
 	{

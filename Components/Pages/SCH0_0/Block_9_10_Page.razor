@@ -8,7 +8,7 @@
 @inject ILoggingService Logger
 
 
-<div class="main-content pb-5">
+<div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" />
     @* Enumerator Comments *@
     <div class="card custom-card">
@@ -131,11 +131,11 @@
         {
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                tbl_Sch_0_0_Block_0_1.EnumeratorRemarks = EnumeratorRemarks;
+                tbl_Sch_0_0_Block_0_1.EnumeratorRemarks = EnumeratorRemarks.Trim();
             }
             else if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
             {
-                tbl_Sch_0_0_Block_0_1.SupervisorRemarks = SupervisorRemarks;
+                tbl_Sch_0_0_Block_0_1.SupervisorRemarks = SupervisorRemarks.Trim();
             }
             else
             {

@@ -126,7 +126,15 @@ namespace Income.Database.Queries
         {
             try
             {
-                var is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ? AND tvb.fsu_id = ?", block_data.block_code, SessionStorage.SelectedFSUId);
+                List<Tbl_Visited_Blocks> is_exist = [];
+                if(SessionStorage.selected_hhd_id == 0)
+                {
+                    is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ? AND tvb.fsu_id = ?", block_data.block_code, SessionStorage.SelectedFSUId);
+                }
+                else
+                {
+                    is_exist = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id FROM Tbl_Visited_Blocks tvb WHERE tvb.block_code = ? AND tvb.fsu_id = ? AND tvb.hhd_id = ?", block_data.block_code, SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+                }
                 if (is_exist == null || is_exist.Count == 0)
                 {
                     block_data.id = Guid.NewGuid();
@@ -152,7 +160,18 @@ namespace Income.Database.Queries
                     block_title = "FSU List",
                     block_code = CommonEnum.fsu_list_page.ToString()
                 };
+                
                 list.Add(tbl_visited_block);
+                if (SessionStorage.selected_hhd_id != 0)
+                {
+                    Tbl_Visited_Blocks tbl_visited_block_0 = new()
+                    {
+                        block_uri = "/dashboard/his/ssu_page",
+                        block_title = "SSU Page",
+                        block_code = CommonEnum.ssu_list_page.ToString()
+                    };
+                    list.Add(tbl_visited_block_0);
+                }
                 var items = await _database.QueryAsync<Tbl_Visited_Blocks>("SELECT id, block_uri, block_title, block_code FROM Tbl_Visited_Blocks tvb WHERE tvb.fsu_id = ? and tvb.hhd_id = ?", SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
                 if (items != null && items.Count > 0)
                 {
@@ -293,7 +312,7 @@ namespace Income.Database.Queries
             {
                 int fsuId = SessionStorage.SelectedFSUId;
                 int hhdId = SessionStorage.selected_hhd_id;
-                bool submitted = SessionStorage.FSU_Submitted;
+                bool submitted = SessionStorage.HHD_Submitted;
 
                 // List of all block tables involved
                 var tables = new Type[]

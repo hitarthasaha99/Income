@@ -15,7 +15,7 @@ namespace Income.Common
         public static string auth_token = string.Empty;
         public static int tenant_id = new();
         public static string user_role = "";
-        public static int survey_type = new();
+        public static int survey_type = 1116;
         public static string survey_code = "";
         public static Guid surveyId = new();
         public static string full_name = "";
@@ -33,6 +33,7 @@ namespace Income.Common
         public static bool hamlet_selection_done = false;
         public static bool subdivision_selection_done = false;
         public static bool FSU_Submitted = false;
+        public static bool HHD_Submitted = false;
         public static int sss = 0;
         public static string hhd_head = string.Empty;
         public static Environment env;
@@ -60,6 +61,7 @@ namespace Income.Common
             FSU_Submitted = false;
             sss = 0;
             hhd_head = string.Empty;
+            HHD_Submitted = false;
         }
 
         public static void ClearFSUFlags()
@@ -74,6 +76,7 @@ namespace Income.Common
             FSU_Submitted = false;
             sss = 0;
             hhd_head = string.Empty;
+            HHD_Submitted = false;
         }
 
         public static UserRole GetUserRole()

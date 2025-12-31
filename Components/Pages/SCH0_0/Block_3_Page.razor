@@ -105,8 +105,16 @@
         }
         else
         {
-            //2.2
-            NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2R");
+            if(block_0_1.Block_1_15.GetValueOrDefault() <= 1)
+            {
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block0_1");
+            }
+            else
+            {
+                //2.2
+                NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2R");
+            }
+            
         }
     }
 
