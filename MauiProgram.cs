@@ -2,6 +2,7 @@
 using FluentValidation;
 using Income.Common;
 using Income.Database.Models.HIS_2026;
+using Income.Database.Queries;
 using Income.Services;
 using Income.Validators.HIS2026;
 using Income.Validators.SCH0_0;
@@ -52,6 +53,9 @@ namespace Income
 
 
             builder.Services.AddBlazoredToast();
+
+            builder.Services.AddScoped<Repository>();//for dependency Injection...
+            builder.Services.AddSingleton<Income.Database.Database>();
 
 
 #if DEBUG

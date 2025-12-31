@@ -23,11 +23,37 @@ namespace Income.Viewmodels.SCH0_0
         DBQueries dB = new();
         CommonQueries cQ = new();
         int D = 0;
-        public Block_2_1_VM(IToastService toastService)
+        private readonly Repository _repository ;//generic repo
+        public Block_2_1_VM(IToastService toastService, Repository _repository)
         {
             // block_4_1 = new Tbl_Sch_0_0_Block_4_1();
+            this ._repository = _repository;
+            _toastService = toastService;
+        }//constructor...
+
+        public async Task<bool> Save()
+        {
+            try
+            {
+                if (tbl_Sch_0_0_block_2_1 == null || tbl_Sch_0_0_block_2_1.Count == 0)
+                    return true;
+
+                foreach (var row in tbl_Sch_0_0_block_2_1)
+                {
+                    // Skip rows that are marked deleted AND never saved before
+                    if (row.is_deleted == true && row.id == Guid.Empty)
+                        continue;
+
+                    await _repository.SaveAsync(row);
+                }//Save  one by one data ...
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
-        
         public void AddRow()
         {
             var newRow = new Tbl_Sch_0_0_Block_2_1

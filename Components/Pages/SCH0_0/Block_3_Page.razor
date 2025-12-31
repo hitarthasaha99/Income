@@ -89,6 +89,10 @@
     DBQueries SCH_0_0_Querie = new();
     string? remarks = string.Empty;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
+    #region for Genenric Repo
+    [Inject] Repository? _repository { get; set; }
+    public List<Tbl_Sch_0_0_Block_3> tbl_Sch_0_0_Block_3 = new List<Tbl_Sch_0_0_Block_3>();
+    #endregion
 
     async void GoBack()
     {
@@ -255,7 +259,8 @@
                 return;
             }
             file.is_sub_unit = is_sub_unit;
-            var status = await SCH_0_0_Querie.SaveFileData(new List<Tbl_Sch_0_0_Block_3>() { file});
+            var status = await SCH_0_0_Querie.SaveFileData(new List<Tbl_Sch_0_0_Block_3>() { file });
+            //var status = await _repository!.SaveManyAsync(tbl_Sch_0_0_Block_3);
             if (status != 1)
             {
                 toastService.ShowError("Getting Error while saving file, please try agian!");

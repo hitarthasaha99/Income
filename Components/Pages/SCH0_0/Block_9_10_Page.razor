@@ -84,7 +84,7 @@
     string EnumeratorRemarks = string.Empty;
     string SupervisorRemarks = string.Empty;
     bool ShowSaveButton = false;
-
+    [Inject] Repository? repository { get; set; }
     protected override async Task OnInitializedAsync()
     {
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
@@ -142,7 +142,8 @@
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
                 return;
             }
-            int update = await SCH_0_0_Queries.SaveBlock1(tbl_Sch_0_0_Block_0_1) ?? 0;
+            //int update = await SCH_0_0_Queries.SaveBlock1(tbl_Sch_0_0_Block_0_1) ?? 0;
+            int update = await repository.SaveAsync(tbl_Sch_0_0_Block_0_1);
             if (update > 0)
             {
                 if (go_next)

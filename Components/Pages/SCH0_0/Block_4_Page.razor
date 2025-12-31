@@ -92,6 +92,9 @@
     CommonConfig commonConfig = new();
     string? remarks = string.Empty;
     bool DisableEdit = false;
+    #region
+    [Inject] Repository? _repository { get; set; }
+    #endregion
 
     async void GoBack()
     {
@@ -282,9 +285,10 @@
             return;
         }
         block_0_1.remarks_block_4 = remarks;
-        var update = await Queries.SaveBlock1(block_0_1);
-        var update_block_4 = await Queries.SaveBlock4(block_4);
-        if (update_block_4.GetValueOrDefault() != 0)
+        var update = await _repository!.SaveAsync(block_0_1);
+        //var update_block_4 = await Queries.SaveBlock4(block_4);
+        var update_block_4 = await _repository.SaveAsync(block_4);
+        if (update_block_4 != 0)
         {
             if (block_4.number_of_sub_division_of_su_to_be_formed > 1)
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_5");

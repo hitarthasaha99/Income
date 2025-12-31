@@ -129,6 +129,7 @@
     private ConfirmDialog dialog = default!;
     string? remarks = string.Empty;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
+    [Inject] Repository? _repository{ get; set; }
 
     async void GoBack()
     {
@@ -253,7 +254,7 @@
             else
             {
                 block_0_1.remarks_block_2_2 = remarks;
-                await SCH_0_0_Queries.SaveBlock1(block_0_1);
+                await _repository!.SaveAsync(block_0_1);
                 NavigationManager.NavigateTo($"/dashboard/sch0.0/block_3/{false}");
             }
         }
