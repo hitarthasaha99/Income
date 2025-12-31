@@ -14,12 +14,14 @@
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_4_Q5> Validator
+@inject ILoggingService loggingService
 
 <NavigationLock OnBeforeInternalNavigation="ConfirmNavigation" />
 
     <div class="main-content">
         <CommonContentHeader SelectedFsuId="@SelectedFsuId"
                              survey_time="@survey_time" />
+    <ConfirmDialog @ref="dialog" />
         <div class="card custom-card">
             <div class="card-header">
                 <h3 class="card-title"><span class="text-primary me-2">[4]</span>Household Characteristics</h3>
@@ -259,6 +261,7 @@
     List<int> Rows = [];
     private bool DisableNICInput = false;
     Tbl_Block_4_Q5? copy = null;
+    private ConfirmDialog dialog = default!;
 
     async void Validate()
     {
@@ -315,7 +318,7 @@
                     Rows.Add(i);
                 }
             }
-            
+
             if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
                 survey_time = block_4.survey_timestamp.GetValueOrDefault();
@@ -502,18 +505,37 @@
 
     async Task HandleDelete(Guid id)
     {
-        int item_index = NICfields.FindIndex(l => l.id == id);
-        if (item_index != -1)
+        try
         {
-            NICfields[item_index].is_deleted = true;
-            await dQ.DeleteBlock4_NICList(id);
-            toastService.ShowSuccess("Row deleted successfully!");
-            await LoadData();
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmed = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Are you sure you want to delete this entry?",
+                confirmDialogOptions: options
+            );
+
+            if (!confirmed)
+                return;
+            int item_index = NICfields.FindIndex(l => l.id == id);
+            if (item_index != -1)
+            {
+                NICfields[item_index].is_deleted = true;
+                await dQ.DeleteBlock4_NICList(id);
+                toastService.ShowSuccess("Row deleted successfully!");
+                await LoadData();
+            }
+            else
+            {
+                toastService.ShowError("Not Able to delete row, Please try again!");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            toastService.ShowError("Not Able to delete row, Please try again!");
+            await loggingService.LogError(ex.ToString());
+            toastService.ShowError("An unexpected error occurred while deleting.");
         }
+
+   
     }
 
     void HandleSubmit(bool is_go_next)

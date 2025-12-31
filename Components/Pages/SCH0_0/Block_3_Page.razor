@@ -13,6 +13,7 @@
         SelectedFsuId="@SelectedFsuId"
         survey_time="@survey_time" 
     />
+    <ConfirmDialog @ref="dialog" />
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
@@ -89,7 +90,7 @@
     DBQueries SCH_0_0_Querie = new();
     string? remarks = string.Empty;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
-
+    private ConfirmDialog dialog = default!;
     async void GoBack()
     {
         // await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -290,6 +291,15 @@
     {
         try
         {
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmed = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Are you sure you want to delete this entry?",
+                confirmDialogOptions: options
+            );
+
+            if (!confirmed)
+                return;
             if (file != null)
             {
                 // Clear all file properties

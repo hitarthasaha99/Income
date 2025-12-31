@@ -15,9 +15,11 @@
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7a_1> Validator
+@inject ILoggingService loggingService
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time"/>
+    <ConfirmDialog @ref="dialog" />
      @* 7.1 *@
     <div class="card custom-card">
         <div class="card-header">
@@ -306,6 +308,7 @@
     CommentModal commentModal = default!;
     List<int> RowList = [];
     DateTime survey_time = DateTime.Now;
+    private ConfirmDialog dialog = default!;
     async void GoBack()
     {
         NavigationManager.NavigateTo("/dashboard/his/block_6");
@@ -517,6 +520,15 @@
     {
         try
         {
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmed = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Are you sure you want to delete this entry?",
+                confirmDialogOptions: options
+            );
+
+            if (!confirmed)
+                return;
             int deleted = await dB.DeleteBlock7A_CodeList(item.id);
             if (deleted == 1)
             {
@@ -531,6 +543,8 @@
         }
         catch (Exception ex)
         {
+            await loggingService.LogError(ex.ToString());
+            toastService.ShowError("An unexpected error occurred while deleting.");
 
         }
     }
