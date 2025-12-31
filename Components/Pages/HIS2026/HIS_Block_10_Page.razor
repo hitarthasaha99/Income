@@ -449,9 +449,16 @@
                                             </td>
                                             <td>Total expenditure = sum (Q10.1: 10.2) /7×30 + sum (Q10.3: Q10.12) + sum (Q10.13: Q10.22)/365×30</td>
                                             <td class="text-center">-</td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" value="@model.item_23?.ToString("F2")" readonly />
-                                            </td>
+                                            @* <td>
+                                                <input type="number" class="form-control form-control-sm text-end" value="@model.item_23?.ToString("F2")" readonly />
+                                            </td> *@
+                                        <td>
+                                            <input
+                                                   class="form-control form-control-sm text-bg-light-primary text-end"
+                                                   value="@model.item_23?.ToString("F2")"
+                                                   readonly />
+                                        </td>
+
                                         </tr>
                                     </tbody>
                                 </table>
@@ -643,30 +650,56 @@
 
     }
 
-    private void handleCalculate()
+    // private void handleCalculate()
+    // {
+    //     Weekly items (convert to monthly)
+    //     decimal weeklySum = (model.item_1 ?? 0) + (model.item_2 ?? 0);
+    //     decimal weeklyToMonthly = weeklySum / 7m * 30m;
+
+    //     Monthly items (use as-is)
+    //     decimal monthlySum = (model.item_3 ?? 0) + (model.item_4 ?? 0) +
+    //                         (model.item_5 ?? 0) + (model.item_6 ?? 0) +
+    //                         (model.item_7 ?? 0) + (model.item_8 ?? 0) +
+    //                         (model.item_9 ?? 0) + (model.item_10 ?? 0) +
+    //                         (model.item_11 ?? 0) + (model.item_12 ?? 0);
+
+    //     Annual items (convert to monthly)
+    //     decimal annualSum = (model.item_13 ?? 0) + (model.item_14 ?? 0) +
+    //                        (model.item_15 ?? 0) + (model.item_16 ?? 0) +
+    //                        (model.item_17 ?? 0) + (model.item_18 ?? 0) +
+    //                        (model.item_19 ?? 0) + (model.item_20 ?? 0) +
+    //                        (model.item_21 ?? 0) + (model.item_22 ?? 0);
+    //     decimal annualToMonthly = annualSum / 365m * 30m;
+
+    //     Total expenditure
+    //     model.item_23 = Math.Round((double)(weeklyToMonthly + monthlySum + annualToMonthly), 2);
+    //     StateHasChanged(); Ensure UI updates
+    // }
+    public void handleCalculate()
     {
-        // Weekly items (convert to monthly)
-        decimal weeklySum = (model.item_1 ?? 0) + (model.item_2 ?? 0);
-        decimal weeklyToMonthly = weeklySum / 7m * 30m;
+        // 1. Weekly Items (Q10.1 - Q10.2) -> Normalize to 30 days
+        // Cast to decimal for precision during division
+        decimal weeklySum = (decimal)(model.item_1 ?? 0) + (decimal)(model.item_2 ?? 0);
+        decimal weeklyToMonthly = (weeklySum / 7m) * 30m;
 
-        // Monthly items (use as-is)
-        decimal monthlySum = (model.item_3 ?? 0) + (model.item_4 ?? 0) +
-                            (model.item_5 ?? 0) + (model.item_6 ?? 0) +
-                            (model.item_7 ?? 0) + (model.item_8 ?? 0) +
-                            (model.item_9 ?? 0) + (model.item_10 ?? 0) +
-                            (model.item_11 ?? 0) + (model.item_12 ?? 0);
+        // 2. Monthly Items (Q10.3 - Q10.12) -> Use as-is
+        decimal monthlySum = (decimal)(model.item_3 ?? 0) + (decimal)(model.item_4 ?? 0) +
+                             (decimal)(model.item_5 ?? 0) + (decimal)(model.item_6 ?? 0) +
+                             (decimal)(model.item_7 ?? 0) + (decimal)(model.item_8 ?? 0) +
+                             (decimal)(model.item_9 ?? 0) + (decimal)(model.item_10 ?? 0) +
+                             (decimal)(model.item_11 ?? 0) + (decimal)(model.item_12 ?? 0);
 
-        // Annual items (convert to monthly)
-        decimal annualSum = (model.item_13 ?? 0) + (model.item_14 ?? 0) +
-                           (model.item_15 ?? 0) + (model.item_16 ?? 0) +
-                           (model.item_17 ?? 0) + (model.item_18 ?? 0) +
-                           (model.item_19 ?? 0) + (model.item_20 ?? 0) +
-                           (model.item_21 ?? 0) + (model.item_22 ?? 0);
-        decimal annualToMonthly = annualSum / 365m * 30m;
+        // 3. Annual Items (Q10.13 - Q10.22) -> Normalize to 30 days
+        decimal annualSum = (decimal)(model.item_13 ?? 0) + (decimal)(model.item_14 ?? 0) +
+                            (decimal)(model.item_15 ?? 0) + (decimal)(model.item_16 ?? 0) +
+                            (decimal)(model.item_17 ?? 0) + (decimal)(model.item_18 ?? 0) +
+                            (decimal)(model.item_19 ?? 0) + (decimal)(model.item_20 ?? 0) +
+                            (decimal)(model.item_21 ?? 0) + (decimal)(model.item_22 ?? 0);
+        decimal annualToMonthly = (annualSum / 365m) * 30m;
 
-        // Total expenditure
-        model.item_23 = Math.Round((double)(weeklyToMonthly + monthlySum + annualToMonthly), 2);
-        StateHasChanged(); // Ensure UI updates
+        // 4. Final Total assigned to item_23
+        // Cast back to double because item_23 is defined as 'double?'
+        this.model.item_23 = (double)Math.Round(weeklyToMonthly + monthlySum + annualToMonthly, 2);
     }
 
 }

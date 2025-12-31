@@ -753,6 +753,8 @@
     private void item_3_changed(ChangeEventArgs e)
     {
         ClearRelationError();
+        //after change the item 3 value then clear item 6 error massage
+        clearItem_6Error();
         var value = e.Value?.ToString();
 
         if (string.IsNullOrEmpty(value))
@@ -865,6 +867,7 @@
         newMember.item_8 = value;
         CheckItem8Warning();
         StateHasChanged();
+        ClearItem9Error();
     }
     // private void ClearItem8(ChangeEventArgs e)
     // {
@@ -903,6 +906,7 @@
     private void OnItem10Changed(int? value)
     {
         ClearItem10Error();
+        ClearItem11Error();
         item_10Error = null;
         newMember.item_10 = value;
         CheckItem10Warning();
