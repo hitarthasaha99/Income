@@ -17,6 +17,7 @@
 @inject IValidator<Tbl_Block_7a_1> Validator
 @inject ILoggingService loggingService
 
+<NavigationLock OnBeforeInternalNavigation="ConfirmforNavigation" />
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time"/>
     <ConfirmDialog @ref="dialog" />
@@ -118,6 +119,16 @@
                             </tr>
                         }
                     </tbody>
+                    @if (!string.IsNullOrEmpty(Block_7_ConfirmNavigation))
+                    {
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="form-text text-danger">@Block_7_ConfirmNavigation</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
                 </table>
             </div>
         </div>  
@@ -309,6 +320,7 @@
     List<int> RowList = [];
     DateTime survey_time = DateTime.Now;
     private ConfirmDialog dialog = default!;
+    private string Block_7_ConfirmNavigation { get; set; } = string.Empty;
     async void GoBack()
     {
         NavigationManager.NavigateTo("/dashboard/his/block_6");
@@ -573,4 +585,16 @@
             
         }
     }
+    async Task ConfirmforNavigation(LocationChangingContext context)
+    {
+
+        if (codeListEntryNeeded && ActivityList.Count == 0 && !context.TargetLocation.EndsWith("/block_6"))
+        {
+            context.PreventNavigation();
+            Block_7_ConfirmNavigation = $"H037: Need to enter atleast entry in 7.1";
+            toastService.ShowError("Please resolve pending errors");
+        }
+
+    }
+
 }

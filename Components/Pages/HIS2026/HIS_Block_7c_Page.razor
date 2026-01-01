@@ -17,6 +17,7 @@
 @inject IValidator<Tbl_Block_7c_NIC> Validator
 @inject ILoggingService loggingService
 
+<NavigationLock OnBeforeInternalNavigation="ConfirmforNavigation" />
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
                          survey_time="@survey_time" />
@@ -114,6 +115,16 @@
                             }
                         }
                     </tbody>
+                    @if (!string.IsNullOrEmpty(Block_7_c_ConNavemsg))
+                    {
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="form-text text-danger">@Block_7_c_ConNavemsg</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
                 </table>
             </div>
         </div>
@@ -226,6 +237,8 @@
     List<int> RowList = [];
     List<Tbl_Lookup_NIC> NICCodes = [];
     private ConfirmDialog dialog = default!;
+    private string Block_7_c_ConNavemsg { get; set; } = string.Empty;
+
 
     async void GoBack()
     {
@@ -490,6 +503,17 @@
         {
             NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
         }
+    }
+    async Task ConfirmforNavigation(LocationChangingContext context)
+    {
+
+        if (Q9Needed && NICFields.Count == 0 && !context.TargetLocation.EndsWith("/block_7b"))
+        {
+            context.PreventNavigation();
+            Block_7_c_ConNavemsg = $"Need to add atleast one entry before proceeding";
+            toastService.ShowError("Please resolve pending errors");
+        }
+
     }
 }
 

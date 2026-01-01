@@ -17,6 +17,8 @@
 @inject IValidator<Tbl_Block_7c_Q10> Validator
 @inject ILoggingService loggingService
 
+
+<NavigationLock OnBeforeInternalNavigation="ConfirmforNavigation" />
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
                          survey_time="@survey_time" />
@@ -127,6 +129,16 @@
                             }
                         }
                     </tbody>
+                    @if (!string.IsNullOrEmpty(Block_7_c_ConfirmNavigation))
+                    {
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="form-text text-danger">@Block_7_c_ConfirmNavigation</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
                 </table>
             </div>
         </div>
@@ -299,6 +311,7 @@
     CommentModal commentModal = default!;
     List<int> RowList = [];
     private ConfirmDialog dialog = default!;
+    private string Block_7_c_ConfirmNavigation { get; set; } = string.Empty;
 
     async void GoBack()
     {
@@ -546,5 +559,16 @@
 
         NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
     }
+    async Task ConfirmforNavigation(LocationChangingContext context)
+    {
+        if (ActivityList.Any(x => !x.isUpdated) && !context.TargetLocation.EndsWith("/block_7c"))
+        {
+            context.PreventNavigation();
+            Block_7_c_ConfirmNavigation = $"Please save all entries before proceeding";
+            toastService.ShowError("Please resolve pending errors");
+        }
+
+    }
+
 }
 

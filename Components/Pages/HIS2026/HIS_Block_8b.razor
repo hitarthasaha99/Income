@@ -16,6 +16,9 @@
 @inject LocalizationService Loc
 @inject ILoggingService loggingService
 
+
+<NavigationLock OnBeforeInternalNavigation="ConfirmforNavigation" />
+
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
     <ConfirmDialog @ref="dialog" />
@@ -99,6 +102,16 @@
                             </tr>
                         }
                     </tbody>
+                    @if (!string.IsNullOrEmpty(Block_8_b_ConNavemsg))
+                    {
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="form-text text-danger">@Block_8_b_ConNavemsg</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
                 </table>
             </div>
         </div>
@@ -248,6 +261,8 @@
     List<int> RowList = [];
     DateTime survey_time = DateTime.Now;
     private ConfirmDialog dialog = default!;
+    private string Block_8_b_ConNavemsg { get; set; } = string.Empty;
+
 
     async Task GoBack()
     {
@@ -464,5 +479,17 @@
         {
             await loggingService.LogError(ex.ToString());
         }
+    }
+
+    async Task ConfirmforNavigation(LocationChangingContext context)
+    {
+
+        if (benefitsEntryNeeded && SchemeList.Count == 0 && !context.TargetLocation.EndsWith("/block_8a"))
+        {
+            context.PreventNavigation();
+            Block_8_b_ConNavemsg = $"H059: Need to enter atleast entry in Q8.6";
+            toastService.ShowError("Please resolve pending errors");
+        }
+
     }
 }
