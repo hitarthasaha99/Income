@@ -21,6 +21,7 @@
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
+    <ConfirmDialog @ref="dialog" />
     @* 7.1 *@
     <div class="card custom-card">
         <div class="card-header">
@@ -259,6 +260,7 @@
     CommentModal commentModal = default!;
     List<int> RowList = [];
     DateTime survey_time = DateTime.Now;
+    private ConfirmDialog dialog = default!;
     private string Block_8_b_ConNavemsg { get; set; } = string.Empty;
 
 
@@ -402,7 +404,11 @@
     private async Task LoadData()
     {
         SchemeList = await dB.Fetch_SCH_HIS_Block8_6(SessionStorage.selected_hhd_id);
-        RowList = SchemeList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
+        if (SchemeList != null && SchemeList.Count > 0)
+        {
+            SchemeList = SchemeList.OrderBy(x => x.serial_number).ToList();
+            RowList = SchemeList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
+        }
         StateHasChanged();
     }
 
@@ -410,6 +416,15 @@
     {
         try
         {
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmed = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Are you sure you want to delete this entry?",
+                confirmDialogOptions: options
+            );
+
+            if (!confirmed)
+                return;
             int deleted = await dB.Delete_SCH_HIS_Block8_Q6(item);
             if (deleted == 1)
             {
@@ -468,11 +483,6 @@
 
     async Task ConfirmforNavigation(LocationChangingContext context)
     {
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-        {
-            NavigationManager.NavigateTo("/dashboard/his/block_9a");
-            return;
-        }
 
         if (benefitsEntryNeeded && SchemeList.Count == 0 && !context.TargetLocation.EndsWith("/block_8a"))
         {

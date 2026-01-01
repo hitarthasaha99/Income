@@ -102,7 +102,7 @@
                                 <label class="form-label">
                                     <span class="form-badge">4</span>@Loc["number"]
                                 </label>
-                                <input type="text" class="form-control is_sso" value="@block_2?.number_of_enumerators"
+                                <input type="number" class="form-control is_sso" value="@block_2?.number_of_enumerators"
                                        @oninput="e =>
                                        {
                                            UpdateFieldAndValidate(() => block_2.number_of_enumerators, e);

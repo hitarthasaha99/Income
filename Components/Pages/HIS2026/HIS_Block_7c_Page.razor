@@ -15,11 +15,13 @@
 @inject Comment_vm comment_vm
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7c_NIC> Validator
+@inject ILoggingService loggingService
 
 <NavigationLock OnBeforeInternalNavigation="ConfirmforNavigation" />
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
                          survey_time="@survey_time" />
+    <ConfirmDialog @ref="dialog" />
     @* 7.9 *@
     <div class="card custom-card">
         <div class="card-header">
@@ -234,6 +236,7 @@
     CommentModal commentModal = default!;
     List<int> RowList = [];
     List<Tbl_Lookup_NIC> NICCodes = [];
+    private ConfirmDialog dialog = default!;
     private string Block_7_c_ConNavemsg { get; set; } = string.Empty;
 
 
@@ -320,18 +323,36 @@
 
     async Task HandleDelete(Guid id)
     {
-        int item_index = NICFields.FindIndex(l => l.id == id);
-        if (item_index != -1)
+        try
         {
-            NICFields[item_index].is_deleted = true;
-            await dQ.DeleteBlock7_NICList(id);
-            toastService.ShowSuccess("Row deleted successfully!");
-            await LoadData();
+            var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+            var confirmed = await dialog.ShowAsync(
+                title: "Alert",
+                message1: "Are you sure you want to delete this entry?",
+                confirmDialogOptions: options
+            );
+
+            if (!confirmed)
+                return;
+            int item_index = NICFields.FindIndex(l => l.id == id);
+            if (item_index != -1)
+            {
+                NICFields[item_index].is_deleted = true;
+                await dQ.DeleteBlock7_NICList(id);
+                toastService.ShowSuccess("Row deleted successfully!");
+                await LoadData();
+            }
+            else
+            {
+                toastService.ShowError("Not Able to delete row, Please try again!");
+            }
+
         }
-        else
+        catch (Exception ex)
         {
-            toastService.ShowError("Not Able to delete row, Please try again!");
+            await loggingService.LogError(ex.ToString());
         }
+
     }
 
 
@@ -485,11 +506,6 @@
     }
     async Task ConfirmforNavigation(LocationChangingContext context)
     {
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-        {
-            NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
-            return;
-        }
 
         if (Q9Needed && NICFields.Count == 0 && !context.TargetLocation.EndsWith("/block_7b"))
         {
