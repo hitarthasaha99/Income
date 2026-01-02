@@ -61,5 +61,8 @@ namespace Income.Database.Models.SCH0_0
         public int? SSS_household_id { get; set; }
         public decimal a { get; set; }
         public decimal b { get; set; }
+        [JsonIgnore]
+        [Ignore]
+        public bool sss_overridden { get; set; } = false;
     }
 }

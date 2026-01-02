@@ -87,7 +87,7 @@ namespace Income.Database
                 await _database.CreateTableAsync<Tbl_Warning>().ConfigureAwait(false);
                 // Run indexes
                 await CreateIndexesAsync();
-
+                await CreateFsuHhdCompositeIndexesAsync();
                 // Optimize
                 await _database.ExecuteAsync("PRAGMA optimize;").ConfigureAwait(false);
                 await _database.ExecuteAsync("PRAGMA page_size = 16384;").ConfigureAwait(false);
@@ -128,6 +128,53 @@ namespace Income.Database
                 Console.WriteLine(ex);
             }
         }
+
+        private async Task CreateFsuHhdCompositeIndexesAsync()
+        {
+            try
+            {
+                var indexCommands = new[]
+                {
+            "CREATE INDEX IF NOT EXISTS idx_block1_fsu_hhd ON Tbl_Block_1(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block3_fsu_hhd ON Tbl_Block_3(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block4_fsu_hhd ON Tbl_Block_4(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block4_q5_fsu_hhd ON Tbl_Block_4_Q5(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block5_fsu_hhd ON Tbl_Block_5(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block6_fsu_hhd ON Tbl_Block_6(fsu_id, hhd_id);",
+
+            "CREATE INDEX IF NOT EXISTS idx_block7a_fsu_hhd ON Tbl_Block_7a(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block7a1_fsu_hhd ON Tbl_Block_7a_1(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block7b_fsu_hhd ON Tbl_Block_7b(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block7c_fsu_hhd ON Tbl_Block_7c(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block7c_nic_fsu_hhd ON Tbl_Block_7c_NIC(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block7c_q10_fsu_hhd ON Tbl_Block_7c_Q10(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block7d_fsu_hhd ON Tbl_Block_7d(fsu_id, hhd_id);",
+
+            "CREATE INDEX IF NOT EXISTS idx_block8_fsu_hhd ON Tbl_Block_8(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block8_q6_fsu_hhd ON Tbl_Block_8_Q6(fsu_id, hhd_id);",
+
+            "CREATE INDEX IF NOT EXISTS idx_block9a_fsu_hhd ON Tbl_Block_9a(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block9b_fsu_hhd ON Tbl_Block_9b(fsu_id, hhd_id);",
+
+            "CREATE INDEX IF NOT EXISTS idx_block10_fsu_hhd ON Tbl_Block_10(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block11a_fsu_hhd ON Tbl_Block_11a(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_block11b_fsu_hhd ON Tbl_Block_11b(fsu_id, hhd_id);",
+
+            "CREATE INDEX IF NOT EXISTS idx_blockA_fsu_hhd ON Tbl_Block_A(fsu_id, hhd_id);",
+            "CREATE INDEX IF NOT EXISTS idx_blockB_fsu_hhd ON Tbl_Block_B(fsu_id, hhd_id);",
+
+            "CREATE INDEX IF NOT EXISTS idx_block_fieldop_fsu_hhd ON Tbl_Block_FieldOperation(fsu_id, hhd_id);"
+        };
+
+                foreach (var cmd in indexCommands)
+                    await _database.ExecuteAsync(cmd).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
 
     }
 }

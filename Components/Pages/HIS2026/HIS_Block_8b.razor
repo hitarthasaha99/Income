@@ -33,10 +33,9 @@
             {
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
-                    
-                <div class="card-tools">
-                    <button class="btn btn-primary" disabled="@(!benefitsEntryNeeded)" @onclick="@(() => OnShowModalClick("ADD"))"><i class="fi fi-rr-plus me-1"></i>Add</button>
-                </div>
+                    <div class="card-tools">
+                        <button class="btn btn-primary" @onclick="@(() => OnShowModalClick("ADD"))"><i class="fi fi-rr-plus me-1"></i>Add</button>
+                    </div>
                 }
             }
             @* add comment *@
