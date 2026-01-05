@@ -14,7 +14,8 @@ namespace Income.Validators.HIS2026
         public Block_3_Validator()
         {
 
-            RuleFor(x => x.item_2).NotNull().WithMessage("Please enter a name.").Matches(@"^[a-zA-Z ]+$").WithMessage("Name must contain only letters and spaces.");
+            //RuleFor(x => x.item_2).NotNull().WithMessage("Please enter a name.").Matches(@"^[a-zA-Z ]+$").WithMessage("Name must contain only letters and spaces.");
+            RuleFor(x => x.item_2).NotEmpty().WithMessage("Please enter a name.").Matches(@"^[A-Za-z][A-Za-z ]*$").WithMessage("Name must start with a letter and contain only letters and spaces.");
             RuleFor(x => x.age).NotNull().WithMessage("Age is required.").GreaterThanOrEqualTo(0).WithMessage("Age must be 0 or above.");
             RuleFor(x => x.item_3).NotNull().WithMessage("H004(i):Invalid Entry, Please check the entry").InclusiveBetween(1, 9).WithMessage("H004(i):Invalid Entry, Please check the entry");
             //sl.no is one then reletion to head self-1

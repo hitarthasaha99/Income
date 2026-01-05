@@ -181,7 +181,7 @@
                         <h3 class="card-title">Remarks</h3>
                     </div>
                     <div class="card-body">
-                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." @bind="block_1.block_11a_remark" ></textarea>
+                        <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..." @bind="block_1.block_11a_remark" oninput="validateRemarks(event)"></textarea>
                     </div>
                 </div>
             </fieldset>

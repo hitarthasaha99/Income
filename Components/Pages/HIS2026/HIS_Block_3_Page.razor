@@ -164,7 +164,7 @@
                 <h3 class="card-title">Remarks</h3>
             </div>
             <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" ></textarea>
+                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" oninput="validateRemarks(event)"></textarea>
             </div>
         </div>
     </fieldset>
@@ -220,8 +220,7 @@
                                            placeholder="Enter Name of member"
                                            @oninput="ClearNameError"
                                            autocomplete="off"
-                                           onkeypress="return /^[A-Za-z ]$/.test(event.key)"
-                                           onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) { event.preventDefault(); }"
+                                           onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) {event.preventDefault(); return false;}return validateText(event, this.value);"
                                            maxlength="50"
                                            autocorrect="off"
                                            autocapitalize="off"
@@ -299,6 +298,7 @@
 
                             <InputNumber class="form-control no-spinner"
                                          inputmode="numeric"
+                                         placeholder="Enter Your Age"
                                          pattern="[0-9]*"
                                          @bind-Value="newMember.age"
                                          @oninput="(e) => ageClear(e)"

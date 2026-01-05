@@ -21,7 +21,7 @@
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks" placeholder="Enter your remarks here..." ></textarea>
+                <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" @bind="EnumeratorRemarks" placeholder="Enter your remarks here..." oninput="validateRemarks(event)"></textarea>
             </fieldset>
         </div>
     </div>
@@ -35,7 +35,7 @@
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
-            <textarea maxlength="500" disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks" placeholder="Enter your remarks here..." ></textarea>
+                <textarea maxlength="500" disabled="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO))" class="form-control w-100" rows="4" @bind="SupervisorRemarks" placeholder="Enter your remarks here..." oninput="validateRemarks(event)"></textarea>
             </fieldset>
         </div>
     </div>

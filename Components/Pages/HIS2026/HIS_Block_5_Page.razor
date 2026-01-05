@@ -157,7 +157,7 @@
         </div>
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
         <div class="card-body">
-                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here.." @bind="@block_1.block_5_remark" rows="2" ></textarea>
+                <textarea maxlength="500" type="text" class="form-control disabled w-100" disabled="@SessionStorage.FSU_Submitted" placeholder="Enter your remarks here.." @bind="@block_1.block_5_remark" rows="2" oninput="validateRemarks(event)"></textarea>
         </div>
         </fieldset>
     </div>
@@ -827,7 +827,7 @@
             .Replace(rawValue, "[^a-zA-Z0-9 ]", "");
 
         // Update model
-        newMember.item_11 = sanitizedValue;
+        newMember.item_11 = sanitizedValue.Trim();
 
         // Clear dropdown
         droupdown_remarks = string.Empty;
