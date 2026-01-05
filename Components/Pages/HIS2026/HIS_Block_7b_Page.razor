@@ -510,7 +510,7 @@
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
         <div class="card-body">
-                <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="2" placeholder="Enter your remarks here..." ></textarea>
+                <textarea maxlength="500" class="form-control w-100" disabled="@SessionStorage.FSU_Submitted" @bind="block_1.block_7b_remark" rows="2" placeholder="Enter your remarks here..." oninput="validateRemarks(event)"></textarea>
         </div>
         </fieldset>
     </div>
@@ -729,7 +729,7 @@
     //Remarks field clear after enter anything
     private void OnRemarksClear(ChangeEventArgs e)
     {
-        block_7B.remarks = e.Value?.ToString();
+        block_7B.remarks = e.Value?.ToString().Trim();
         droupdown_remarks = string.Empty;
 
         StateHasChanged();

@@ -115,7 +115,7 @@
         </div>
         <div class="card-body">
             <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7d_remark" placeholder="Enter your remarks..." ></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7d_remark" placeholder="Enter your remarks..." oninput="validateRemarks(event)"></textarea>
             </fieldset>
         </div>
     </div>

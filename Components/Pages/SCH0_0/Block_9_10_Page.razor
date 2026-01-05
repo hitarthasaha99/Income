@@ -18,7 +18,7 @@
             </h3>
         </div>
         <div class="card-body">
-            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" placeholder="Enter your remarks here..." @bind="EnumeratorRemarks" ></textarea>
+            <textarea maxlength="500" disabled="@SessionStorage.FSU_Submitted" class="form-control w-100" rows="4" placeholder="Enter your remarks here..." @bind="EnumeratorRemarks" oninput="validateRemarks(event)"></textarea>
         </div>
     </div>
     @* Supervisor Comments *@

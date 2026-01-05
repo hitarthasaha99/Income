@@ -44,6 +44,26 @@
             var modal = bootstrap.Modal.getInstance(document.getElementById(id));
             if (modal) modal.hide();
         }
+
+        // All Remarks field Regex
+
+        function validateRemarks(e) {
+            const el = e.target;
+            let value = el.value;
+
+            // If first character is NOT a letter → remove it (typing + paste)
+            if (value.length > 0 && !/^[a-zA-Z]/.test(value)) {
+                el.value = value.replace(/^[^a-zA-Z]+/, '');
+            }
+        }
+
+
+        //All Text Field Regex
+        function validateText(e, v) {
+            return !e.data
+                || /^[A-Za-z]$/.test(e.data)
+                || (v.length > 0 && e.data === ' ');
+        }
     </script>
 
 </body>

@@ -73,7 +73,7 @@
                                     class="form-control is_sso no-spinner"
                                     value="@block_4.item_7"
                                     @oninput="OnItem7Changed"
-                                    onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(event.target.value + event.key)"
+                                    onbeforeinput="return !event.data ||(/^\d|\.$/.test(event.data) && /^(\d{0,10}(\.\d{0,3})?)$/.test(event.target.value + event.data))"
                                     disabled="@(block_4?.item_6 != 1 || (SessionStorage.FSU_Submitted))" />
                             <ValidationMessage For="@(() => block_4.item_7)" />
                         </div>
@@ -354,7 +354,7 @@
                 <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
 
             <div class="card-body">
-                <textarea type="text" class="form-control is_sso w-100" maxlength="500" placeholder="Enter your text here..." rows="2" @bind="block_1.block_4_remark" ></textarea>
+                        <textarea type="text" class="form-control is_sso w-100" maxlength="500" placeholder="Enter your text here..." rows="2" @bind="block_1.block_4_remark" oninput="validateRemarks(event)"></textarea>
             </div>
             </fieldset>
         </div>

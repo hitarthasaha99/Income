@@ -359,7 +359,7 @@
         </div>
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
             <div class="card-body">
-                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7a_remark" placeholder="Enter your remarks here..." ></textarea>
+                <textarea maxlength="500" class="form-control w-100" rows="2" @bind="block_1.block_7a_remark" placeholder="Enter your remarks here..." oninput="validateRemarks(event)"></textarea>
             </div>
         </fieldset>
     </div>
@@ -591,6 +591,7 @@
 
     private void clearOther(ChangeEventArgs e)
     {
+        block_7A.remarks = e.Value?.ToString().Trim();
         remarks_warning = null;
     }
 
