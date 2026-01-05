@@ -24,9 +24,9 @@
 			<h3 class="card-title">
 				Selected Sampling Units list
 			</h3>
-			@* <button class="btn btn-sm btn-primary ms-auto" @onclick="HandlePrint">
+			<button class="btn btn-sm btn-primary ms-auto" @onclick="HandlePrint">
 				<i class="bi bi-printer"></i> Print
-			</button> *@
+			</button>
 		</div>
 		<div class="card-body p-0">
 			<div class="table-responsive">
@@ -1493,6 +1493,39 @@
 	// 		return;
 	// 	}
 	// }
+
+    private async Task HandlePrint()
+    {
+        try
+        {
+            // if (selected_for_submission.Count == 0)
+            // {
+            //     toastService.ShowError("Please select at least one household for printing");
+            //     return;
+            // }
+
+            preloadService.Show(SpinnerColor.Light, "Files printing in-progress... please wait!");
+
+            var helper = new PrintHelper();
+            var result = await helper.GenerateReportAsync(SessionStorage.SelectedFSUId);
+
+            if (result == 1)
+            {
+                toastService.ShowSuccess($"Files printed successfully");
+            }
+            else
+            {
+                toastService.ShowError($"Failed to print files");
+            }
+
+            preloadService.Hide();
+        }
+        catch (Exception ex)
+        {
+            preloadService.Hide();
+            toastService.ShowError($"Error while printing: {ex.Message}");
+        }
+    }
 
 	// async Task HandleDownload(Tbl_Sch_0_0_Block_7 householdData)
 	// {
