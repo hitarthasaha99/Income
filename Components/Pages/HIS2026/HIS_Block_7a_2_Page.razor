@@ -609,6 +609,7 @@
             }
             if (!codeListEntryNeeded)
             {
+                int saved = await dB.Save_SCH_HIS_Block7A(block_7A);
                 if(is_go_next)
                 {
                     NavigationManager.NavigateTo("/dashboard/his/block_7b");

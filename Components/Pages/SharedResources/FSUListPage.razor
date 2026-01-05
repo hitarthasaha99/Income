@@ -1,4 +1,5 @@
 @page "/dashboard/fsulist"
+@using Income.Common.SCH0_0
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Income.Database.Models.SCH0_0
@@ -313,6 +314,7 @@
         {
             SessionStorage.ClearFSUFlags();
             SessionStorage.SelectedFSUId = fsu_id;
+            await commonQueries.DeleteSSUBlockAsync();
             var FsuData = await commonQueries.FetchFsuListByFsuId(fsu_id);
             var subUnitData = await dB.FetchSCH0Block2_2Data();
             if (subUnitData != null && subUnitData.Count > 0)
@@ -630,7 +632,7 @@
                 if (response != null)
                 {
                     var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(response);
-                    //CheckFSUSubstitution(fsu_list);
+                    CheckFSUSubstitution(fsu_list);
                     preloadService.Hide();
                     //CheckFSUUpdateListingDone(fsu_list);
                     preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
@@ -831,48 +833,70 @@
             return;
         }
     }
-    // private async void CheckFSUSubstitution(List<Tbl_Fsu_List>? result)
-    // {
-    //     try
-    //     {
-    //         List<string> substitutedFSUList = [];
-    //         List<string> fsuWithSCH0Block1Data = [];
-    //         var localFSUList = await commonQueries.FetchFsuList();
-    //         if (result != null && result.Count > 0)
-    //         {
-    //             foreach (var fsu in result)
-    //             {
-    //                 var localFSUData = localFSUList.FirstOrDefault(x => x.fsu_id == fsu.fsu_id);
-    //                 //If FSU substitution count from API > local count, then show message
-    //                 if (localFSUData?.isSubstituteDone.GetValueOrDefault() < fsu.isSubstituteDone)
-    //                 {
-    //                     localFSUData.isSubstituteDone = fsu.isSubstituteDone;
-    //                     await commonQueries.SaveFsuList(new List<Tbl_Fsu_List> { localFSUData });
-    //                     substitutedFSUList.Add(fsu.fsu_id.ToString());
-    //                     var sch0bl1Data = await dB.Get_Block_0_1_By_hhd_id(fsu.fsu_id);
-    //                     if (sch0bl1Data != null)
-    //                     {
-    //                         fsuWithSCH0Block1Data.Add(fsu.fsu_id.ToString());
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         if (substitutedFSUList.Count > 0)
-    //         {
-    //             string fsuSubstitutionMessage = $"FSU substitution done for {string.Join(",", substitutedFSUList)}.";
-    //             string downloadSCH0Message = fsuWithSCH0Block1Data.Count > 0 ? $"Download SCH0.0 again for {string.Join(",", fsuWithSCH0Block1Data)}." : string.Empty;
-    //             if (!string.IsNullOrEmpty(downloadSCH0Message))
-    //             {
-    //                 fsuSubstitutionMessage += "\n" + downloadSCH0Message;
-    //             }
-    //             toastService.ShowInfo($"{fsuSubstitutionMessage}");
-    //         }
-    //         //Show message for update listing for FSUs where listing is already done
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //     }
-    // }
+
+    private async void CheckFSUSubstitution(List<Tbl_Fsu_List>? result)
+    {
+        try
+        {
+            List<string> substitutedFSUList = [];
+            List<string> fsuWithSCH0Block1Data = [];
+            var localFSUList = await commonQueries.FetchFsuList();
+            if (result != null && result.Count > 0)
+            {
+                foreach (var fsu in result)
+                {
+                    var localFSUData = localFSUList.FirstOrDefault(x => x.fsu_id == fsu.fsu_id);
+                    //If FSU substitution count from API > local count, then show message
+                    if (localFSUData?.isSubstituteDone.GetValueOrDefault() < fsu.isSubstituteDone)
+                    {
+                        localFSUData.isSubstituteDone = fsu.isSubstituteDone;
+                        await commonQueries.SaveFsuList(new List<Tbl_Fsu_List> { localFSUData });
+                        substitutedFSUList.Add(fsu.fsu_id.ToString());
+                        var block_0_1 = await dB.FetchBlock1ByFSUID(fsu.fsu_id);
+                        if (block_0_1 != null)
+                        {
+                            block_0_1.state_code = fsu.st;
+                            block_0_1.Block_0_1 = fsu.stn;
+                            block_0_1.Block_0_2 = fsu.dn;
+                            block_0_1.Block_0_3 = fsu.tehn;
+                            block_0_1.Block_0_4 = fsu.fsuname;
+                            block_0_1.Block_0_5 = fsu.iv_unit;
+                            block_0_1.Block_0_6 = fsu.block;
+                            block_0_1.Block_1_1 = fsu.fsu_id.ToString();
+                            block_0_1.Block_1_2 = 80;
+                            block_0_1.Block_1_3 = "00";
+                            block_0_1.Block_1_4 = Block_0_1_Constants.Sample.FirstOrDefault(x => x.id == Convert.ToInt16(fsu.sample))?.id ?? 0;
+                            block_0_1.Block_1_5 = Block_0_1_Constants.Sector.FirstOrDefault(x => x.id == Convert.ToInt16(fsu.sec))?.id;
+                            block_0_1.Block_1_6 = fsu.nss_reg;
+                            block_0_1.Block_1_7 = fsu.dc;
+                            block_0_1.Block_1_8 = fsu.strm;
+                            block_0_1.Block_1_9 = fsu.sstrm;
+                            block_0_1.Block_1_10 = fsu.subrnd;
+                            block_0_1.Block_1_11 = fsu.sro;
+                            block_0_1.Block_1_12 = Block_0_1_Constants.FrameCode.FirstOrDefault(x => x.id == Convert.ToInt16(fsu.fc))?.id ?? 0;
+                            block_0_1.Block_1_13 = fsu.framepop;
+                            block_0_1.Block_1_15 = fsu.totalsu;
+                            await dB.SaveBlock1(block_0_1);
+                        }
+                    }
+                }
+            }
+            if (substitutedFSUList.Count > 0)
+            {
+                string fsuSubstitutionMessage = $"FSU substitution done for {string.Join(",", substitutedFSUList)}.";
+                // string downloadSCH0Message = fsuWithSCH0Block1Data.Count > 0 ? $"Download SCH0.0 again for {string.Join(",", fsuWithSCH0Block1Data)}." : string.Empty;
+                // if (!string.IsNullOrEmpty(downloadSCH0Message))
+                // {
+                //     fsuSubstitutionMessage += "\n" + downloadSCH0Message;
+                // }
+                toastService.ShowInfo($"{fsuSubstitutionMessage}");
+            }
+            //Show message for update listing for FSUs where listing is already done
+        }
+        catch (Exception ex)
+        {
+        }
+    }
 
     private async void CheckFSUUpdateListingDone(List<Tbl_Fsu_List>? result)
     {

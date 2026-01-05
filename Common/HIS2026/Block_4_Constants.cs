@@ -162,6 +162,7 @@ namespace Income.Common.HIS2026
             new() { id = 95,  title = "Repair of Computers and Personal and Household Goods - 95" },
             new() { id = 96,  title = "Other Personal Service Activities - 96" },
             new() { id = 0,   title = "Cotton Ginning, Cleaning and Bailing (01632) - 00" },
+            new() { id = -1, title = "Others"}
         ];
     }
 }
