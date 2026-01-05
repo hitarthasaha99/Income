@@ -403,30 +403,6 @@
                                                 <CustomDropdown Value="@newMember.item_8"
                                                             ValueChanged="@(v => OnItem8Changed(v))"
                                                             Options="@ItemOptions" />
-
-                                            @*     <select class="form-select"
-                                                        value="@newMember.item_8"
-                                                        @onchange="ClearItem8">
-
-                                                options
-                                                <option value="">-Select-</option>
-                                                <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                                <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                                <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                                <option value="4">regular wage/ salary – 04 </option>
-                                                <option value="5">casual labour – 05 </option>
-                                                <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                                <option value="7">student / attended educational institution - 07 </option>
-                                                <option value="8">attended domestic duties only – 08 </option>
-                                                <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.),sewing, tailoring, weaving, etc. for household use - 09</option>
-                                                <option value="10">earning from rent – 10 </option>
-                                                <option value="11">earning from pensions -11 </option>
-                                                <option value="12">earning from remittances -12 </option>
-                                                <option value="13">earning from interest - 13 </option>
-                                                <option value="14">unfit for work due to disability or illness – 14 </option>
-                                                <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                            </select> *@
-
                                                 <ValidationMessage For="@(() => newMember.item_8)" />
 
                                                 @if (!string.IsNullOrEmpty(item_8Warning))
@@ -442,31 +418,19 @@
                                                 <label class="form-label">
                                                     <span class="form-badge">9</span> Secondary
                                                 </label>
+                                            @if (newMember.item_8 == 14 || newMember.item_8 == 15)
+                                            {
+                                                <select class="form-select" disabled>
+                                                    <option>- Not Applicable -</option>
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                               
                                                 <CustomDropdown Value="@newMember.item_9"
                                                             ValueChanged="@(v => OnItem9Changed(v))"
                                                             Options="@ItemOptions" />
-                                                @* <select class="form-select"
-                                                        value="@newMember.item_9"
-                                                        @onchange="ClearItem9">
-
-                                                    options
-                                                    <option value="">-Select-</option>
-                                                    <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                                    <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                                    <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                                    <option value="4">regular wage/ salary – 04 </option>
-                                                    <option value="5">casual labour – 05 </option>
-                                                    <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                                    <option value="7">student / attended educational institution - 07 </option>
-                                                    <option value="8">attended domestic duties only – 08 </option>
-                                                    <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                                    <option value="10">earning from rent – 10 </option>
-                                                    <option value="11">earning from pensions -11 </option>
-                                                    <option value="12">earning from remittances -12 </option>
-                                                    <option value="13">earning from interest - 13 </option>
-                                                    <option value="14">unfit for work due to disability or illness – 14 </option>
-                                                    <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                                </select> *@
+                                            }
 
                                                 <ValidationMessage For="@(() => newMember.item_9)" />
 
@@ -495,29 +459,6 @@
                                                 <CustomDropdown Value="@newMember.item_10"
                                                                 ValueChanged="@(v => OnItem10Changed(v))"
                                                                 Options="@ItemOptions" />
-                                                @* <select class="form-select"
-                                                        value="@newMember.item_10"
-                                                        @onchange="ClearItem10">
-
-                                                    options
-                                                    <option value="">-Select-</option>
-                                                    <!-- Same options as above for primary -->
-                                                    <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                                    <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                                    <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                                    <option value="4">regular wage/ salary – 04 </option>
-                                                    <option value="5">casual labour – 05 </option>
-                                                    <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                                    <option value="7">student / attended educational institution - 07 </option>
-                                                    <option value="8">attended domestic duties only – 08 </option>
-                                                    <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                                    <option value="10">earning from rent – 10 </option>
-                                                    <option value="11">earning from pensions -11 </option>
-                                                    <option value="12">earning from remittances -12 </option>
-                                                    <option value="13">earning from interest - 13 </option>
-                                                    <option value="14">unfit for work due to disability or illness – 14 </option>
-                                                    <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                                </select> *@
 
                                                 <ValidationMessage For="@(() => newMember.item_10)" />
 
@@ -534,43 +475,25 @@
                                                 <label class="form-label">
                                                     <span class="form-badge">11</span> Secondary
                                                 </label>
+                                            @if (newMember.item_10 == 14 || newMember.item_10 == 15)
+                                            {
+                                                <select class="form-select" disabled>
+                                                    <option>- Not Applicable -</option>
+                                                </select>
+                                            }
+                                            else{
                                                 <CustomDropdown Value="@newMember.item_11"
                                                             ValueChanged="@(v => OnItem11Changed(v))"
                                                             Options="@ItemOptions" />
-                                                @* <select class="form-select"
-                                                        value="@newMember.item_11"
-                                                        @onchange="ClearItem11">
 
-                                                    options
-                                                    <option value="">-Select-</option>
-                                                    <option value="1">self-employed in agriculture (own account worker/employer) - 01 </option>
-                                                    <option value="2">self-employed in non- agriculture (own account worker/employer) – 02 </option>
-                                                    <option value="3">unpaid family worker in agriculture or non-agriculture – 03 </option>
-                                                    <option value="4">regular wage/ salary – 04 </option>
-                                                    <option value="5">casual labour – 05 </option>
-                                                    <option value="6">did not work but was seeking and/or available for work – 06 </option>
-                                                    <option value="7">student / attended educational institution - 07 </option>
-                                                    <option value="8">attended domestic duties only – 08 </option>
-                                                    <option value="9">attended domestic duties and was also engaged in free collection of goods (vegetables, roots, firewood, cattle feed, etc.), sewing, tailoring, weaving, etc. for household use - 09 </option>
-                                                    <option value="10">earning from rent – 10 </option>
-                                                    <option value="11">earning from pensions -11 </option>
-                                                    <option value="12">earning from remittances -12 </option>
-                                                    <option value="13">earning from interest - 13 </option>
-                                                    <option value="14">unfit for work due to disability or illness – 14 </option>
-                                                    <option value="15">others (including children not attending school, begging, prostitution, etc.) – 15 </option>
-                                                </select> *@
-
+                                            }
+                                                
                                                 <ValidationMessage For="@(() => newMember.item_11)" />
 
                                                 @if (!string.IsNullOrEmpty(item_11Warning))
                                                 {
                                                     <div class="form-text text-success">@item_11Warning</div>
-                                                }
-
-                                                @if (!string.IsNullOrEmpty(singleUserWarning))
-                                                {
-                                                    <div class="form-text text-success">@singleUserWarning</div>
-                                                }
+                                                }                                          
                                             </div>
                                         </div>
                                     </div>
@@ -866,23 +789,17 @@
         item_8Error = null;
         newMember.item_8 = value;
         CheckItem8Warning();
-        StateHasChanged();
         ClearItem9Error();
+        if (value == 14 || value == 15)
+        {
+            newMember.item_9 = null;
+            item_9Warning = null;
+            ClearItem9Error();
+        }
+        StateHasChanged();
+
     }
-    // private void ClearItem8(ChangeEventArgs e)
-    // {
-    //     ClearItem8Error();
-    //     item_8Error = null;
-
-    //     if (int.TryParse(e.Value?.ToString(), out int v))
-    //         newMember.item_8 = v;
-    //     else
-    //         newMember.item_8 = null;
-
-    //     CheckItem8Warning();
-    //     StateHasChanged();
-    // }
-
+    
     private void OnItem9Changed(int? value)
     {
         ClearItem9Error();
@@ -891,18 +808,7 @@
         CheckItem9Warning();
         StateHasChanged();
     }
-    // private void ClearItem9(ChangeEventArgs e)
-    // {
-    //     ClearItem9Error();
-    //     item_9Error = null;
-
-    //     if (int.TryParse(e.Value?.ToString(), out int v))
-    //         newMember.item_9 = v;
-    //     else
-    //         newMember.item_9 = null;
-    //     CheckItem9Warning();
-    //     StateHasChanged();
-    // }
+  
     private void OnItem10Changed(int? value)
     {
         ClearItem10Error();
@@ -910,20 +816,16 @@
         item_10Error = null;
         newMember.item_10 = value;
         CheckItem10Warning();
+        if (value == 14 || value == 15)
+        {
+            newMember.item_11 = null;
+            item_11Warning = null;
+            ClearItem11Error();
+
+        }
         StateHasChanged();
     }
-    // private void ClearItem10(ChangeEventArgs e)
-    // {
-    //     ClearItem10Error();
-    //     item_10Error = null;
 
-    //     if (int.TryParse(e.Value?.ToString(), out int v))
-    //         newMember.item_10 = v;
-    //     else
-    //         newMember.item_10 = null;
-    //     CheckItem10Warning();
-    //     StateHasChanged();
-    // }
     private void OnItem11Changed(int? value)
     {
         ClearItem11Error();
@@ -932,18 +834,7 @@
         CheckItem11Warning();
         StateHasChanged();
     }
-    // private void ClearItem11(ChangeEventArgs e)
-    // {
-    //     ClearItem11Error();
-    //     item_11Error = null;
-
-    //     if (int.TryParse(e.Value?.ToString(), out int v))
-    //         newMember.item_11 = v;
-    //     else
-    //         newMember.item_11 = null;
-    //     CheckItem11Warning();
-    //     StateHasChanged();
-    // }
+    
     private void ClearItem12(ChangeEventArgs e)
     {
         // Clear validation error
@@ -1116,24 +1007,6 @@
     }
 
     //Check Single User..............................................................
-
-    // private void checkSingleUser()
-    // {
-    //     singleUserWarning = null;
-
-    //     if (newMember.age.HasValue)
-    //     {
-    //         relation code 1-9 must be selected
-    //         if (!newMember.item_3.HasValue || newMember.item_3.Value < 1 || newMember.item_3.Value > 9)
-    //             return;
-    //         if (newMember.age.Value < 6)
-    //         {
-    //             singleUserWarning = "W006(vii): Please check the entry";
-    //         }
-    //     }
-
-    //     StateHasChanged();
-    // }
 
     private void checkSingleUser()
     {
