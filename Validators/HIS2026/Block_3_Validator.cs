@@ -30,35 +30,8 @@ namespace Income.Validators.HIS2026
             RuleFor(x => x.item_7).NotNull().WithMessage("H008(i): Invalid Entry, Please check the entry");
             RuleFor(x => x.item_7).Must(v => new[] { 1, 2, 3, 4, 5, 6, 7, 8, 10, 11 }.Contains(v.Value)).When(x => x.item_7 != null).WithMessage("H008(i): Invalid Entry, Please check the entry");
             RuleFor(x => x.item_8).NotNull().WithMessage("H008(i): Invalid Entry, Please check the entry").InclusiveBetween(1, 15).WithMessage("H008(i): Invalid Entry, Please check the entry");
-            //RuleFor(x => x.item_9).NotNull().WithMessage("H009(i): Invalid Entry, Please check the entry").InclusiveBetween(1, 15).When(x => x.item_8 >= 1 && x.item_8 <= 13).WithMessage("H009(i): Invalid Entry, Please check the entry");
-            //RuleFor(x => x.item_9).Must(v => v == null).When(x => x.item_8 >= 14 && x.item_8 <= 15).WithMessage("H009(i): Invalid Entry, Please check the entry");
-            // Col 9 admissible only if Col 8 = 1–13 (optional)
-            RuleFor(x => x.item_9)
-                .InclusiveBetween(1, 15)
-                .When(x => x.item_8 >= 1 && x.item_8 <= 13 && x.item_9 != null)
-                .WithMessage("H009(i): Invalid Entry, Please check the entry");
-
-            // Col 9 mandatory if Col 8 = 14 or 15
-            RuleFor(x => x.item_9)
-                .NotNull()
-                .When(x => x.item_8 == 14 || x.item_8 == 15)
-                .WithMessage("H009(i): Invalid Entry, Please check the entry");
-
             RuleFor(x => x.item_9).Must((model, item9) => item9 != model.item_8).When(x => x.item_9 != null && x.item_8 != null).WithMessage("H009(iii): Please recheck entries recorded against cols. 8 & 9.");
             RuleFor(x => x.item_10).NotNull().WithMessage("H010(i): Invalid Entry, Please check the entry").InclusiveBetween(1, 15).WithMessage("H010(i): Invalid Entry, Please check the entry");
-            //RuleFor(x => x.item_11).NotNull().WithMessage("H011(i): Invalid Entry, Please check the entry").InclusiveBetween(1, 15).When(x => x.item_10 >= 1 && x.item_10 <= 13).WithMessage("H011(i): Invalid Entry, Please check the entry");
-            //RuleFor(x => x.item_11).Must(v => v == null).When(x => x.item_10 >= 14 && x.item_10 <= 15).WithMessage("H011(i): Invalid Entry, Please check the entry");
-            // Col 11 admissible only if Col 10 = 1–13 (optional)
-            RuleFor(x => x.item_11)
-                .InclusiveBetween(1, 15)
-                .When(x => x.item_10 >= 1 && x.item_10 <= 13 && x.item_11 != null)
-                .WithMessage("H011(i): Invalid Entry, Please check the entry");
-
-            // Col 11 mandatory if Col 10 = 14 or 15
-            RuleFor(x => x.item_11)
-                .NotNull()
-                .When(x => x.item_10 == 14 || x.item_10 == 15)
-                .WithMessage("H011(i): Invalid Entry, Please check the entry");
             RuleFor(x => x.item_11).Must((model, item11) => item11 != model.item_10).When(x => x.item_11 != null && x.item_10 != null).WithMessage("H011(iii): Please recheck entries recorded against cols. 10 & 11.");
             // 2. Age > 15 → item_12 required (must be 1 or 2)
             RuleFor(x => x.item_12).NotNull().WithMessage("H012(ii): Invalid Entry, Please check the entry").InclusiveBetween(1, 2).WithMessage("H012(ii): Invalid Entry, Please check the entry");
