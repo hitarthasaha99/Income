@@ -513,6 +513,17 @@
                 return;
             }
             preloadService.Show(SpinnerColor.Light, "Submitting data... Please wait...");
+            var hhds = await DBQueries.GetBlock7Data(SessionStorage.SelectedFSUId);
+            bool selectedHHDPresent = false;
+            if (hhds != null)
+            {
+                selectedHHDPresent = hhds.Count() > 0 && hhds.Any(x => x.isSelected == true);
+            }
+            if (block_0_1.Block_1_16.GetValueOrDefault() is (1 or 4) && !selectedHHDPresent)
+            {
+                toastService.ShowError("Atleast one household must be selected in Block 7 for survey code 1 or 4");
+                return;
+            }
             isBusy = true;
             bool isJSO = SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO;
             bool isSSO = SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO;

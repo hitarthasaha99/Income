@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Income.Database.Models.Common
 {
-    public class Tbl_Base
+    public class  Tbl_Base
     {
         [PrimaryKey]
         public Guid id { get; set; }

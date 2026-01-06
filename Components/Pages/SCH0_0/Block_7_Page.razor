@@ -726,7 +726,7 @@
                 {
                     fields.id = Guid.NewGuid();
                     originalSrl = data.Block_7_3.GetValueOrDefault();
-                    fields.Block_7_1 = data.Block_7_1;
+                    fields.Block_7_1 = data.Block_7_1 + 1;
                     fields.Block_7_3 = data.is_household == 2 ?  (data.Block_7_3 + 1) : 0;
                     editContext = new EditContext(fields);
                     messageStore = new ValidationMessageStore(editContext);

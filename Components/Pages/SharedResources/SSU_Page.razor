@@ -771,7 +771,7 @@
 					warnings = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
 				}
 
-				if (hhd.needDownload != 0)
+				if (hhd.hhdStatus == 12 && hhd.needDownload != 0)
 				{
 					errors.Add("Please Sync before submission");
 				}
@@ -1401,6 +1401,7 @@
 				22 => "Referred back by DS",
 				31 => "Submitted by Supervisor",
 				32 => "Accepted by DS",
+				42 => "Referred back by CPG",
 				null => "",
 				_ => ""
 			};

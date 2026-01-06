@@ -185,6 +185,21 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task DeleteSSUBlockAsync()
+        {
+            try
+            {
+                await _database.ExecuteAsync(
+                    "DELETE FROM Tbl_Visited_Blocks WHERE block_title = ?",
+                    "SSU List Page"
+                );
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         public async Task<List<Tbl_Fsu_List>>? FetchFsuList()
         {
             try

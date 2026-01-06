@@ -377,7 +377,11 @@
         {
             if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected) && tbl_Fsu_List.lookupFsuSubmitStatus == 80 && tbl_Fsu_List.lookup_fsu_sub_submit_status == 12;
+                AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected);
+                if (tbl_Fsu_List.lookup_fsu_sub_submit_status == 21)
+                {
+                    AllowUpdateListing = false;
+                }
             }
             else
             {
@@ -459,197 +463,300 @@
 
     private async Task CalculateSSS()
     {
-        //1. Separate logic for rural (consider both A and B) and urban (only A)
-        //     //2. A - Arrange usual monthly consumption expenditure (Block_7_9) in ascending order and find median (This will be determined for individual household types - Block_7_7)
-        //     //3. B - Arrange land area (Block_7_8) in ascending order and find 60th percentile value (This will be determined for individual household types - Block_7_7)
-        //     //4. Calculate SSS using formula below -
-        //     /*
-        //      * Rural:
-        //      * SSS - 11 = Block_7_7 = 1 and Block_7_8 < B
-        //      * SSS - 12 = Block_7_7 = 1 and Block_7_8 >= B
-        //      * SSS - 21 = Block_7_7 = 2 and Block_7_9 < A
-        //      * SSS - 22 = Block_7_7 = 2 and Block_7_9 >= A
-        //      * SSS - 31 = Block_7_7 = 3 and Block_7_9 < A
-        //      * SSS - 32 = Block_7_7 = 3 and Block_7_9 >= A
-        //      * SSS - 40 = Block_7_7 = 4
-        //      * SSS - 90 = Block_7_7 = 9
-        //      * Urban:
-        //      * SSS - 11 = Block_7_7 = 1 and Block_7_9 < A
-        //      * SSS - 121 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
-        //      * SSS - 122 = Block_7_7 = 1 and Block_7_9 >= A and Block_7_6 in [7,8,10,11]
-        //      * SSS - 21 = Block_7_7 = 2 and Block_7_9 < A
-        //      * SSS - 221 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [1,2,3,4,5,6]
-        //      * SSS - 222 = Block_7_7 = 2 and Block_7_9 >= A and Block_7_6 in [7,8,10,11]
-        //      * SSS - 40 = Block_7_7 = 3
-        //      * SSS - 90 = Block_7_7 in [4,9]
-        //      */
         try
         {
             preloadService.Show(SpinnerColor.Info, "Assigning SSS");
 
-            // 1. Fetch data
             var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
-
             if (response == null || response.Count == 0)
                 return;
 
             // Only households
             response = response.Where(x => x.is_household == 2).ToList();
 
-            // 2. Group by household type (Block_7_7)
-            var grouped = response.GroupBy(x => x.Block_7_7 ?? 0);
+            // Group by household type
+            var grouped = response.GroupBy(x => x.Block_7_7 ?? 0).ToList();
 
-            // 3. For each household type, compute A and B
+            // ------------------------------------------------------------
+            // STEP 1: Compute A (median UMPCE) and B (60th percentile land)
+            // ------------------------------------------------------------
             foreach (var group in grouped)
             {
                 var items = group.ToList();
 
-                // ---- Compute A: median of UMPCE ----
-                var expenditures = items
-                    .Where(x => x.UMPCE.HasValue)
-                    .Select(x => (decimal)x.UMPCE.Value)
-                    .OrderBy(x => x)
-                    .ToList();
+                var exp = items.Where(x => x.UMPCE.HasValue)
+                               .Select(x => (decimal)x.UMPCE.Value)
+                               .OrderBy(x => x)
+                               .ToList();
 
-                decimal A = 0;
-                int count = expenditures.Count;
+                decimal A = exp.Count == 0 ? 0 :
+                    exp.Count % 2 == 1
+                        ? exp[exp.Count / 2]
+                        : (exp[exp.Count / 2 - 1] + exp[exp.Count / 2]) / 2;
 
-                if (count > 0)
-                {
-                    if (count % 2 == 1)
-                        A = expenditures[count / 2];
-                    else
-                        A = (expenditures[(count / 2) - 1] + expenditures[count / 2]) / 2;
-                }
+                var land = items.Where(x => x.Block_7_8.HasValue)
+                                .Select(x => x.Block_7_8.Value)
+                                .OrderBy(x => x)
+                                .ToList();
 
-                // ---- Compute B: 60th percentile of land area ----
-                var landAreas = items
-                    .Where(x => x.Block_7_8.HasValue)
-                    .Select(x => x.Block_7_8.Value)
-                    .OrderBy(x => x)
-                    .ToList();
+                decimal B = land.Count == 0 ? 0 : (decimal)Percentile_NPlus1(land, 60);
 
-                double B = 0;
-                int landCount = landAreas.Count;
-
-                if (landCount > 0)
-                {
-                    B = Percentile_NPlus1(landAreas, 60);
-                    // double percentileIndex = 0.6 * (landCount - 1);
-                    // int lowerIndex = (int)Math.Floor(percentileIndex);
-                    // int upperIndex = (int)Math.Ceiling(percentileIndex);
-
-                    // B = (decimal)(landAreas[lowerIndex] +
-                    //     (landAreas[upperIndex] - landAreas[lowerIndex]) * (percentileIndex - lowerIndex));
-                }
-
-                // ---- Assign A & B to each member of this household type ----
                 foreach (var item in items)
                 {
                     item.a = A;
-                    item.b = (decimal)B;
+                    item.b = B;
+                    item.sss_overridden = false;
                 }
             }
 
-            // 4. Assign SSS using item.a and item.b (HH-type wise values)
-            foreach (var item in response)
+            // ------------------------------------------------------------
+            // STEP 2: RURAL EXCEPTIONS
+            // ------------------------------------------------------------
+            if (sector == 1)
+            {
+                foreach (var group in grouped)
+                {
+                    int block7 = group.Key;
+                    var items = group.ToList();
+                    int N = items.Count;
+                    if (N == 0) continue;
+
+                    // block7 = 1 (Land identical)
+                    if (block7 == 1 &&
+                        items.Where(x => x.Block_7_8.HasValue)
+                             .Select(x => x.Block_7_8.Value)
+                             .Distinct()
+                             .Count() == 1)
+                    {
+                        var ordered = items.OrderBy(x => x.Block_7_8)
+                                           .ThenBy(x => x.Block_7_3)
+                                           .ToList();
+
+                        int split = N % 2 == 1 ? (N - 1) / 2 : N / 2;
+
+                        for (int i = 0; i < N; i++)
+                        {
+                            ordered[i].SSS = i < split ? 11 : 12;
+                            ordered[i].Stratum = 10;
+                            ordered[i].sss_overridden = true;
+                        }
+                    }
+
+                    // block7 = 2 or 3 (UMPCE identical)
+                    if ((block7 == 2 || block7 == 3) &&
+                        items.Where(x => x.UMPCE.HasValue)
+                             .Select(x => x.UMPCE.Value)
+                             .Distinct()
+                             .Count() == 1)
+                    {
+                        var ordered = items.OrderBy(x => x.UMPCE)
+                                           .ThenBy(x => x.Block_7_3)
+                                           .ToList();
+
+                        int split = N % 2 == 1 ? (N - 1) / 2 : N / 2;
+
+                        for (int i = 0; i < N; i++)
+                        {
+                            ordered[i].SSS = block7 == 2
+                                ? (i < split ? 21 : 22)
+                                : (i < split ? 31 : 32);
+
+                            ordered[i].Stratum = block7 == 2 ? 20 : 30;
+                            ordered[i].sss_overridden = true;
+                        }
+                    }
+                }
+
+                decimal? LandAsDecimal(double? v) =>
+                    v.HasValue ? (decimal)v.Value : (decimal?)null;
+
+                decimal? UmpceAsDecimal(double? v) =>
+                    v.HasValue ? (decimal)v.Value : (decimal?)null;
+                // ------------------------------------------------------------
+                // RURAL – MIXED (= B and > B) / (= A and > A) SPLIT EXCEPTION
+                // ------------------------------------------------------------
+                foreach (var group in grouped)
+                {
+                    int block7 = group.Key;
+                    var items = group.ToList();
+                    int N = items.Count;
+                    if (N == 0) continue;
+
+                    int split = N % 2 == 1 ? (N - 1) / 2 : N / 2;
+
+                    // ---------- Block_7_7 = 1 (Land: =B and >B) ----------
+                    if (block7 == 1)
+                    {
+                        decimal B = items.First().b;
+
+                        bool hasEqualB = items.Any(x =>
+                            LandAsDecimal(x.Block_7_8) == B);
+
+                        bool hasGreaterB = items.Any(x =>
+                            LandAsDecimal(x.Block_7_8) > B);
+
+                        if (hasEqualB && hasGreaterB)
+                        {
+                            var ordered = items
+                                .OrderBy(x => x.Block_7_8)
+                                .ThenBy(x => x.Block_7_3)
+                                .ToList();
+
+                            for (int i = 0; i < N; i++)
+                            {
+                                ordered[i].SSS = i < split ? 11 : 12;
+                                ordered[i].Stratum = 10;
+                                ordered[i].sss_overridden = true;
+                            }
+                        }
+                    }
+
+                    // ---------- Block_7_7 = 2 (UMPCE: =A and >A) ----------
+                    if (block7 == 2)
+                    {
+                        decimal A = items.First().a;
+
+                        bool hasEqualA = items.Any(x =>
+                            UmpceAsDecimal(x.UMPCE) == A);
+
+                        bool hasGreaterA = items.Any(x =>
+                            UmpceAsDecimal(x.UMPCE) > A);
+
+                        if (hasEqualA && hasGreaterA)
+                        {
+                            var ordered = items
+                                .OrderBy(x => x.UMPCE)
+                                .ThenBy(x => x.Block_7_3)
+                                .ToList();
+
+                            for (int i = 0; i < N; i++)
+                            {
+                                ordered[i].SSS = i < split ? 21 : 22;
+                                ordered[i].Stratum = 20;
+                                ordered[i].sss_overridden = true;
+                            }
+                        }
+                    }
+
+                    // ---------- Block_7_7 = 3 (UMPCE: =A and >A) ----------
+                    if (block7 == 3)
+                    {
+                        decimal A = items.First().a;
+
+                        bool hasEqualA = items.Any(x =>
+                            UmpceAsDecimal(x.UMPCE) == A);
+
+                        bool hasGreaterA = items.Any(x =>
+                            UmpceAsDecimal(x.UMPCE) > A);
+
+                        if (hasEqualA && hasGreaterA)
+                        {
+                            var ordered = items
+                                .OrderBy(x => x.UMPCE)
+                                .ThenBy(x => x.Block_7_3)
+                                .ToList();
+
+                            for (int i = 0; i < N; i++)
+                            {
+                                ordered[i].SSS = i < split ? 31 : 32;
+                                ordered[i].Stratum = 30;
+                                ordered[i].sss_overridden = true;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            // ------------------------------------------------------------
+            // STEP 3: URBAN EXCEPTIONS
+            // ------------------------------------------------------------
+            if (sector == 2)
+            {
+                foreach (var group in grouped)
+                {
+                    int block7 = group.Key;
+                    if (block7 != 1 && block7 != 2) continue;
+
+                    var items = group.ToList();
+                    int N = items.Count;
+                    if (N == 0) continue;
+
+                    if (items.Where(x => x.UMPCE.HasValue)
+                             .Select(x => x.UMPCE.Value)
+                             .Distinct()
+                             .Count() != 1)
+                        continue;
+
+                    if (items.Any(x => !x.Block_7_6.HasValue))
+                        continue;
+
+                    bool allLowEdu = items.All(x => x.Block_7_6 == 1 || x.Block_7_6 == 2 || x.Block_7_6 == 3 || x.Block_7_6 == 4 || x.Block_7_6 == 5 || x.Block_7_6 == 6);
+                    bool allHighEdu = items.All(x => x.Block_7_6 == 7 || x.Block_7_6 == 8 || x.Block_7_6 == 10 || x.Block_7_6 == 11);
+
+                    if (!allLowEdu && !allHighEdu)
+                        continue;
+
+                    foreach (var h in items)
+                    {
+                        h.SSS = block7 == 1
+                            ? (allLowEdu ? 121 : 122)
+                            : (allLowEdu ? 221 : 222);
+
+                        h.Stratum = block7 == 1 ? 10 : 20;
+                        h.sss_overridden = true;
+                    }
+                }
+            }
+
+            // ------------------------------------------------------------
+            // STEP 4: DEFAULT SSS ASSIGNMENT
+            // ------------------------------------------------------------
+            foreach (var item in response.Where(x => !x.sss_overridden))
             {
                 int block7 = item.Block_7_7 ?? 0;
                 decimal A = item.a;
                 decimal B = item.b;
+                decimal exp = (decimal)(item.UMPCE ?? 0);
+                decimal land = (decimal)(item.Block_7_8 ?? 0);
+                int edu = item.Block_7_6 ?? 0;
 
-                decimal expenditure = (decimal)(item.UMPCE ?? 0);
-                decimal landArea = (decimal)(item.Block_7_8 ?? 0);
-                int education = item.Block_7_6 ?? 0;
-
-                if (sector == 1)   // ---------------------- RURAL ----------------------
+                if (sector == 1) // Rural
                 {
                     switch (block7)
                     {
-                        case 1:
-                            item.SSS = landArea < B ? 11 : 12;
-                            item.Stratum = 10;
-                            break;
-
-                        case 2:
-                            item.SSS = expenditure < A ? 21 : 22;
-                            item.Stratum = 20;
-                            break;
-
-                        case 3:
-                            item.SSS = expenditure < A ? 31 : 32;
-                            item.Stratum = 30;
-                            break;
-
-                        case 4:
-                            item.SSS = 40;
-                            item.Stratum = 40;
-                            break;
-
-                        case 9:
-                            item.SSS = 90;
-                            item.Stratum = 90;
-                            break;
-
-                        default:
-                            item.SSS = 0;
-                            item.Stratum = 0;
-                            break;
+                        case 1: item.SSS = land < B ? 11 : 12; item.Stratum = 10; break;
+                        case 2: item.SSS = exp < A ? 21 : 22; item.Stratum = 20; break;
+                        case 3: item.SSS = exp < A ? 31 : 32; item.Stratum = 30; break;
+                        case 4: item.SSS = 40; item.Stratum = 40; break;
+                        case 9: item.SSS = 90; item.Stratum = 90; break;
                     }
                 }
-                else if (sector == 2)  // ---------------------- URBAN ----------------------
+                else // Urban
                 {
                     switch (block7)
                     {
                         case 1:
                             item.Stratum = 10;
-                            if (expenditure < A)
-                                item.SSS = 11;
-                            else if (new[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
-                                item.SSS = 121;
-                            else if (new[] { 7, 8, 10, 11 }.Contains(education))
-                                item.SSS = 122;
-                            else
-                                item.SSS = 0;
+                            item.SSS = exp < A ? 11 : (edu <= 6 ? 121 : 122);
                             break;
 
                         case 2:
                             item.Stratum = 20;
-                            if (expenditure < A)
-                                item.SSS = 21;
-                            else if (new[] { 1, 2, 3, 4, 5, 6 }.Contains(education))
-                                item.SSS = 221;
-                            else if (new[] { 7, 8, 10, 11 }.Contains(education))
-                                item.SSS = 222;
-                            else
-                                item.SSS = 0;
+                            item.SSS = exp < A ? 21 : (edu <= 6 ? 221 : 222);
                             break;
 
-                        case 3:
-                            item.Stratum = 40;
-                            item.SSS = 40;
-                            break;
-
+                        case 3: item.SSS = 40; item.Stratum = 40; break;
                         case 4:
-                            item.Stratum = 90;
-                            item.SSS = 90;   // Rule: all type-3 are SSS = 40
-                            break;
-                        case 9:
-                            item.Stratum = 90;
-                            item.SSS = 90;
-                            break;
-
-                        default:
-                            item.Stratum = 0;
-                            item.SSS = 0;
-                            break;
+                        case 9: item.SSS = 90; item.Stratum = 90; break;
                     }
                 }
             }
 
-            // 5. Save to DB
+            // ------------------------------------------------------------
+            // STEP 5: SAVE
+            // ------------------------------------------------------------
             var update = await SCH_0_0_Queries.SaveSSSToDatabase(response);
-
             if (update == 1)
             {
                 toastService.ShowSuccess("SSS assignment successful");
@@ -665,6 +772,7 @@
             preloadService.Hide();
         }
     }
+
 
     public static double Percentile_NPlus1(IList<double> sequence, double percentile)
     {

@@ -296,15 +296,8 @@
             await JSRuntime.InvokeVoidAsync("__disableFieldsAndButtons");
         }
         var row = await dQ.GetSelectedSubUnit(SessionStorage.SelectedFSUId.ToString());
-        int subD = 0;
-        if (row != null)
-        {
-            subD = row.serial_number.GetValueOrDefault() == 0 ? 1 : row.serial_number.GetValueOrDefault();
-        }
-        else
-        {
-            subD = 1;
-        }
+
+        
         var response = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id) ?? new();
         if (response.id != Guid.Empty)
         {
@@ -328,6 +321,7 @@
         {
             var sch_0_block_1_res = await dQ.FetchBlock1();
             var GetSelectedSUNumber = await dQ.FetchSCH0Block2_2Data();
+            var GetSelectedSubDivision = await dQ.FetchSCH0Block5Data();
             block_1 = new();
             block_1.id = Guid.NewGuid();
             block_1.state_name = sch_0_block_1_res.Block_0_1;
@@ -336,11 +330,11 @@
             block_1.sub_district_name = sch_0_block_1_res.Block_0_3;
             block_1.village_name = sch_0_block_1_res.Block_0_4;
             block_1.investigator_unit_no = sch_0_block_1_res.Block_1_7;
-            block_1.sample_su_number = GetSelectedSUNumber?.Where(x => x.IsChecked == true)?.FirstOrDefault()?.serial_number.ToString();//sch_0_block_1_res.Block_1_8;
+            block_1.sample_su_number = GetSelectedSUNumber?.Where(x => x.IsChecked == true)?.FirstOrDefault()?.serial_number.ToString();
             block_1.schedule_number = "HIS2026";
             block_1.sss_number = hhd?.SSS ?? 0;
             block_1.serial_number_sample_fsu = SessionStorage.SelectedFSUId.ToString();
-            block_1.sample_sub_division_number = subD;
+            block_1.sample_sub_division_number = GetSelectedSubDivision?.Where(x => x.IsChecked == true)?.FirstOrDefault()?.serial_number ?? 1;
             block_1.sample_hhd_number = SessionStorage.selected_hhd_seq;
             block_1.town_name = sch_0_block_1_res.Block_0_4;
             block_1.survey_coordinates = string.IsNullOrEmpty(SessionStorage.location) ? await function.fetchGeoLocation() : SessionStorage.location;

@@ -262,6 +262,7 @@
     private bool DisableNICInput = false;
     Tbl_Block_4_Q5? copy = null;
     private ConfirmDialog dialog = default!;
+    bool isAdd = false;
 
     async void Validate()
     {
@@ -358,9 +359,24 @@
             toastService.ShowError("Cannot add the same NIC code again");
             return;
         }
+        if (isAdd && NICfields != null && NICfields.Any(x => x.ActivityName == "Others"))
+        {
+            toastService.ShowError("Cannot add other activities when 'Others' is already added");
+            return;
+        }
+        else if(!isAdd && NICfields != null && NICfields.Any(x => x.ActivityName == "Others") && fields.ActivityName == "Others")
+        {
+            toastService.ShowError("NIC code 'Others' has already been added");
+            return;
+        }
         if (copy != null && copy.NicCode != obj.NicCode)
         {
             nicchanged = true;
+        }
+        //Workaround for 'Others' NIC code - NIC code is null when 'Others' is selected
+        if (obj != null && obj.NicCode == -1)
+        {
+            obj.NicCode = null;
         }
         await dQ.Save_SCH_HIS_Block4_NICList(obj, nicchanged);
 
@@ -377,6 +393,7 @@
             DisableNICInput = false;
             if (action == "ADD")
             {
+                isAdd = true;
                 if(NICfields.Count >= 4)
                 {
                     toastService.ShowInfo("Cannot add more than 4 entries");
@@ -400,11 +417,16 @@
             }
             else if (action == "UPDATE")
             {
+                isAdd = false;
                 copy = ObjectCloneHelper.ShallowCopy(data);
                 fields = ObjectCloneHelper.ShallowCopy(data);
                 if (fields?.SerialNumber >= 4)
                 {
                     DisableNICInput = true;
+                }
+                if (fields?.ActivityName == "Others" || fields?.NicCode == null)
+                {
+                    fields.NicCode = -1;
                 }
                 editContext = new EditContext(fields);
                 messageStore = new ValidationMessageStore(editContext);

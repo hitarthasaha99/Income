@@ -17,6 +17,7 @@ namespace Income.Database.Models.HIS_2026
         public int serial_number { get; set; }
         //crop code
         public int? code {  get; set; }
+        public int? whetherCropSold { get; set; }
         public int? unit {  get; set; }
         public int? item_4 {  get; set; }
         public int? item_5 { get; set; }

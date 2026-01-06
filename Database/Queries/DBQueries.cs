@@ -1032,6 +1032,27 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<Tbl_Sch_0_0_Block_0_1?> FetchBlock1ByFSUID(int fsu_id)
+        {
+            try
+            {
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_0_1>("SELECT * FROM Tbl_Sch_0_0_Block_0_1 WHERE fsu_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", fsu_id);
+                if (response != null && response.Count > 0)
+                {
+                    return response.FirstOrDefault();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While saving SCH 0 Block 1: {ex.Message}");
+                return null;
+            }
+        }
+
         public async Task<Tbl_Sch_0_0_FieldOperation?> FetchBlock2()
         {
             try

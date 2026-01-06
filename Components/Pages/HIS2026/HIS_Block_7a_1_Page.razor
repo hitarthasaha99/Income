@@ -69,6 +69,7 @@
                             <th class="col-1">Action</th>
                             <th style="width: 50px;" class="col-2">S. No.</th>
                             <th>Crop code (4 digits)</th>
+                            <th>Whether the entire crop is sold before harvest</th>
                             <th>unit (Kg./no.)</th>
                             <th>Total Quantity Produced (harvested)</th>
                             <th>Total quantity sold (out of total production) </th>
@@ -88,6 +89,7 @@
                             <th>(7)</th>
                             <th>(8)</th>
                             <th>(9)</th>
+                            <th>(10)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +111,7 @@
                                 </td>
                                 <td class="col-2">@item.serial_number</td>
                                 <td>@item.code</td>
+                                <td>@(item.whetherCropSold == 1 ? "Yes" : "No")</td>
                                 <td>@(item.unit == 1 ? "Kg" : "No.")</td>
                                 <td>@item.item_4</td>
                                 <td>@item.item_5</td>
@@ -194,9 +197,27 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="" class="form-label">
-                                <span class="form-badge">3</span> unit (Kg./no.)
+                                <span class="form-badge">3</span> Whether the entire crop is sold before harvest
                             </label>
-                            <select disabled="@SessionStorage.FSU_Submitted" value="@block_7_1?.unit" class="form-select"
+                            <select disabled="@SessionStorage.FSU_Submitted" value="@block_7_1?.whetherCropSold" class="form-select"
+                                    @onchange="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.whetherCropSold, e);
+                                    }">
+                                  <option>Select</option>
+                                  <option value="1">1 - Yes</option>
+                                  <option value="2">2 - No</option>
+                              </select>
+                              <ValidationMessage For="@(() => block_7_1.whetherCropSold)" />
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="" class="form-label">
+                                <span class="form-badge">4</span> unit (Kg./no.)
+                            </label>
+                            <select disabled="@(block_7_1?.whetherCropSold == 1)" value="@block_7_1?.unit" class="form-select"
                                     @onchange="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.unit, e);
@@ -212,9 +233,9 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="" class="form-label">
-                                <span class="form-badge">4</span> Total Quantity Produced (harvested)
+                                <span class="form-badge">5</span> Total Quantity Produced (harvested)
                             </label>
-                            <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                            <input disabled="@(block_7_1?.whetherCropSold == 1)" type="number" class="form-control no-spinner" value="@block_7_1?.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_4, e);
@@ -226,9 +247,9 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="" class="form-label">
-                                <span class="form-badge">5</span> Total quantity sold (out of total production)
+                                <span class="form-badge">6</span> Total quantity sold (out of total production)
                             </label>
-                            <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                            <input disabled="@(block_7_1?.whetherCropSold == 1)" type="number" class="form-control no-spinner" value="@block_7_1?.item_5" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                     @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_5, e);
@@ -239,9 +260,9 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="" class="form-label">
-                                <span class="form-badge">6</span> Total sale value(in Rs.)
+                                <span class="form-badge">7</span> Total sale value(in Rs.)
                             </label>
-                              <input disabled="@isItem7UserEntered" type="number" class="form-control no-spinner" value="@block_7_1?.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input disabled="@(block_7_1?.whetherCropSold == 1 || isItem7UserEntered)" type="number" class="form-control no-spinner" value="@block_7_1?.item_6" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_6, e);
@@ -252,9 +273,9 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="" class="form-label">
-                                <span class="form-badge">7</span> Average per unit sale value (in Rs.)
+                                <span class="form-badge">8</span> Average per unit sale value (in Rs.)
                             </label>
-                              <input disabled="@((block_7_1.item_6.HasValue && !isItem7UserEntered))" type="number" class="form-control no-spinner" value="@block_7_1?.item_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input disabled="@(block_7_1?.whetherCropSold == 1 || (block_7_1.item_6.HasValue && !isItem7UserEntered))" type="number" class="form-control no-spinner" value="@block_7_1?.item_7" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_7, e);
@@ -265,9 +286,9 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="" class="form-label">
-                                <span class="form-badge">8</span> Value of pre-harvested sale (Rs.)
+                                <span class="form-badge">9</span> Value of pre-harvested sale (Rs.)
                             </label>
-                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input disabled="@(block_7_1?.whetherCropSold == 1)" type="number" class="form-control no-spinner" value="@block_7_1?.item_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_8, e);
@@ -278,9 +299,9 @@
                     <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="" class="form-label">
-                                <span class="form-badge">9</span> Value of by-products (Rs.)
+                                <span class="form-badge">10</span> Value of by-products (Rs.)
                             </label>
-                            <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control no-spinner" value="@block_7_1?.item_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input disabled="@(block_7_1?.whetherCropSold == 1)" type="number" class="form-control no-spinner" value="@block_7_1?.item_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_9, e);
@@ -373,6 +394,47 @@
         // Set value
         var prop = (PropertyInfo)((MemberExpression)field.Body).Member;
         prop.SetValue(block_7_1, value);
+
+        if (fieldName == nameof(block_7_1.whetherCropSold))
+        {
+            if (value.HasValue && value == 2)
+            {
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.whetherCropSold))
+                );
+            }
+            else
+            {
+                block_7_1.unit = null;
+                block_7_1.item_4 = null;
+                block_7_1.item_5 = null;
+                block_7_1.item_6 = null;
+                block_7_1.item_7 = null;
+                block_7_1.item_8 = null;
+                block_7_1.item_9 = null;
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.unit))
+                );
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_4))
+                );
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_5))
+                );
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_6))
+                );
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_7))
+                );
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_8))
+                );
+                editContext?.NotifyFieldChanged(
+                    new FieldIdentifier(block_7_1, nameof(block_7_1.item_9))
+                );
+            }
+        }
 
         if (fieldName == nameof(block_7_1.item_7))
         {
