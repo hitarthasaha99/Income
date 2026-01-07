@@ -139,7 +139,7 @@ namespace Income.Common
                     FillBlock4(body, block_4);
                     FillBlock5(body, block_5);
                     FillBlock7(body, block_7);
-                    //FillBlock0_8(body, block_7);
+                    FillBlock0_8(body, block_7);
                     FillBlock11(body, block_11);
 
                     // Save explicitly (safe)
@@ -271,7 +271,7 @@ namespace Income.Common
 
             var rows = table.Elements<TableRow>().ToList();
             TableRow templateRow = rows[3];
-            for (int i = rows.Count - 3; i >= 3; i--)
+            for (int i = rows.Count - 4; i >= 3; i--)
                 rows[i].Remove();
 
             int maxRows = Math.Max(block21?.Count ?? 0, block22?.Count ?? 0);
@@ -330,6 +330,90 @@ namespace Income.Common
                 ReplaceCellText(remarkCells.Last(), block_0_1?.remarks_block_2_2 ?? "");
             }
         }
+        //   private void FillBlock2_1_And_2_2(
+        //Body body,
+        //List<Tbl_Sch_0_0_Block_2_1> block21,
+        //List<Tbl_Sch_0_0_Block_2_2> block22)
+        //   {
+        //       var table = body.Elements<Table>()
+        //           .FirstOrDefault(t => t.InnerText.Contains("[2.1]"));
+
+        //       if (table == null)
+        //           return;
+
+        //       var rows = table.Elements<TableRow>().ToList();
+        //       if (rows.Count < 2)
+        //           return;
+
+        //       // ✅ Remarks row = LAST row (stable in your template)
+        //       var remarksRow = rows.Last();
+
+        //       // ✅ Template row = first row AFTER column-numbering row
+        //       TableRow templateRow = null;
+
+        //       for (int i = 0; i < rows.Count; i++)
+        //       {
+        //           if (rows[i].InnerText.Contains("(1)") &&
+        //               rows[i].InnerText.Contains("(2)") &&
+        //               rows[i].InnerText.Contains("(3)"))
+        //           {
+        //               if (i + 1 < rows.Count)
+        //                   templateRow = rows[i + 1];
+        //               break;
+        //           }
+        //       }
+
+        //       if (templateRow == null)
+        //           return;
+
+        //       // 🔥 Remove old data rows (between template & remarks)
+        //       foreach (var r in rows
+        //           .SkipWhile(r => r != templateRow)
+        //           .Skip(1)
+        //           .TakeWhile(r => r != remarksRow)
+        //           .ToList())
+        //       {
+        //           r.Remove();
+        //       }
+
+        //       int maxRows = Math.Max(block21?.Count ?? 0, block22?.Count ?? 0);
+
+        //       for (int i = 0; i < maxRows; i++)
+        //       {
+        //           var row = (TableRow)templateRow.CloneNode(true);
+        //           var cells = row.Elements<TableCell>().ToList();
+
+        //           void Put(int index, string value)
+        //           {
+        //               if (index < cells.Count)
+        //                   ReplaceCellText(cells[index], value ?? "");
+        //           }
+
+        //           // ---- LEFT (2.1) ----
+        //           Put(0, block21 != null && i < block21.Count ? block21[i].serial_no?.ToString() : "");
+        //           Put(1, block21 != null && i < block21.Count ? block21[i].hamlet_name : "");
+        //           Put(2, block21 != null && i < block21.Count ? block21[i].percentage?.ToString() : "");
+
+        //           // ---- RIGHT (2.2) ----
+        //           Put(3, block22 != null && i < block22.Count ? block22[i].serial_number?.ToString() : "");
+        //           Put(4, block22 != null && i < block22.Count ? block22[i].serial_no_of_hamlets_in_su : "");
+        //           Put(5, block22 != null && i < block22.Count ? block22[i].Percentage?.ToString() : "");
+        //           //Put(6, block22 != null && i < block22.Count && block22[i].IsChecked ? "✔" : "");
+
+        //           table.InsertBefore(row, remarksRow);
+        //       }
+
+        //       // ---- REMARKS ----
+        //       var remarkCells = remarksRow.Elements<TableCell>().ToList();
+
+        //       if (remarkCells.Count > 0)
+        //           ReplaceCellText(remarkCells[0], block_0_1?.remarks_block_2_1 ?? "");
+
+        //       if (remarkCells.Count > 1)
+        //           ReplaceCellText(remarkCells.Last(), block_0_1?.remarks_block_2_2 ?? "");
+        //   }
+
+
         private void FillBlock4(Body body, Tbl_Sch_0_0_Block_4? block4)
         {
             if (block4 == null)
@@ -434,13 +518,11 @@ namespace Income.Common
 
             var rows = table.Elements<TableRow>().ToList();
 
-            // Template row (first data row)
+
             TableRow templateRow = rows[3];
 
-            // ✅ FIXED: remarks row ko pehle hi pakad lo
             TableRow remarksRow = rows.Last();
 
-            // ✅ REMOVE old data rows (remarks ko chhod ke)
             for (int i = rows.Count - 2; i >= 3; i--)
                 rows[i].Remove();
 
@@ -475,6 +557,7 @@ namespace Income.Common
             );
         }
 
+       
         private void FillBlock0_8(Body body, List<Tbl_Sch_0_0_Block_7> block0_8)
         {
             int population = 0;
@@ -541,7 +624,7 @@ namespace Income.Common
             int total_casualty = 0;
 
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[8]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(10);
+            var table = body.Elements<Table>().ElementAtOrDefault(7);
             if (table != null)
             {
                 var cells = table.Descendants<TableCell>().ToList();
@@ -1037,7 +1120,7 @@ namespace Income.Common
                     var body = doc.MainDocumentPart.Document.Body;
 
                     FillBlockHis1(body, blockhis_1);
-                    //FillBlockHis3(body, blockhis_3);
+                    FillBlockHis3(body, blockhis_3);
                     FillBlockHis4(body, blockhis_4);
                     //FillBlockHis5(body, blockhis_5);
                     //FillBlockHis6(body, blockhis_6);
@@ -1097,34 +1180,7 @@ namespace Income.Common
             SafeReplace(rows, 14, 2, block1.substitution_reason?.ToString());
             SafeReplace(rows, 15, 2, block1.block_1_remark);
         }
-        //private void FillBlockHis3(Body body, List<Tbl_Block_3> members)
-        //{
-        //    var table = body.Elements<Table>()
-        //        .FirstOrDefault(t => t.InnerText.Contains("[3]"));
-
-        //    if (table == null || members == null || members.Count == 0)
-        //        return;
-
-        //    var rows = table.Elements<TableRow>().ToList();
-        //    var templateRow = rows[2];
-
-        //    for (int i = rows.Count - 1; i > 2; i--)
-        //        rows[i].Remove();
-
-        //    foreach (var m in members)
-        //    {
-        //        var row = (TableRow)templateRow.CloneNode(true);
-        //        var cells = row.Elements<TableCell>().ToList();
-
-        //        ReplaceCellText(cells[0], m.serial_no?.ToString());
-        //        ReplaceCellText(cells[1], m.item_2);
-        //        ReplaceCellText(cells[2], m.item_3?.ToString());
-        //        ReplaceCellText(cells[3], m.gender?.ToString());
-        //        ReplaceCellText(cells[4], m.age?.ToString());
-
-        //        table.AppendChild(row);
-        //    }
-        //}
+        
         private void FillBlockHis3(Body body, List<Tbl_Block_3> members)
         {
             var table = body.Elements<Table>()
@@ -1135,10 +1191,11 @@ namespace Income.Common
 
             var rows = table.Elements<TableRow>().ToList();
 
-            int templateRowIndex = 2;
+            // 👉 According to template: header rows = 0,1 ; data template row = 2
+            int templateRowIndex = 4;
             var templateRow = rows[templateRowIndex];
 
-            // 🔥 Remove old data rows
+            // 🔥 Remove old data rows (keep header + remarks)
             for (int i = rows.Count - 1; i > templateRowIndex; i--)
                 rows[i].Remove();
 
@@ -1150,30 +1207,32 @@ namespace Income.Common
                 var cells = row.Elements<TableCell>().ToList();
                 int col = 0;
 
-                void Put(string value)
+                // sequential writer (MERGE SAFE)
+                void Put(string? value)
                 {
                     if (col < cells.Count)
                     {
-                        ReplaceCellText(cells[col], value);
+                        ReplaceCellText(cells[col], value ?? "");
                         col++;
                     }
                 }
 
-                // 🔐 Logical column mapping (MERGE SAFE)
-                Put(m.serial_no?.ToString());
-                Put(m.item_2);
-                Put(m.item_3?.ToString());
-                Put(m.gender?.ToString());
-                Put(m.age?.ToString());
-                Put(m.item_6?.ToString());
-                Put(m.item_7?.ToString());
-                Put(m.item_8?.ToString());
-                Put(m.item_9?.ToString());
-                Put(m.item_10?.ToString());
-                Put(m.item_11?.ToString());
-                Put(m.item_12?.ToString());
+                // ---- EXACT mapping as per template ----
+                Put(m.serial_no?.ToString());   // (1) S. no.
+                Put(m.item_2);                 // (2) Name of member
+                Put(m.item_3?.ToString());     // (3) Relation to head
+                Put(m.gender?.ToString());     // (4) Gender
+                Put(m.age?.ToString());        // (5) Age
+                Put(m.item_6?.ToString());     // (6) Marital status
+                Put(m.item_7?.ToString());     // (7) Education level
+                Put(m.item_8?.ToString());     // (8) 30 days - Primary
+                Put(m.item_9?.ToString());     // (9) 30 days - Secondary
+                Put(m.item_10?.ToString());    // (10) 365 days - Primary
+                Put(m.item_11?.ToString());    // (11) 365 days - Secondary
+                Put(m.item_12?.ToString());    // (12) Beneficiary
             }
         }
+
 
 
 
@@ -1188,14 +1247,14 @@ namespace Income.Common
 
             var rows = table.Elements<TableRow>().ToList();
 
-            SafeReplace(rows, 2, 1, block4.item_1?.ToString());
-            SafeReplace(rows, 3, 1, block4.item_2?.ToString());
-            SafeReplace(rows, 4, 1, block4.item_3?.ToString());
-            SafeReplace(rows, 5, 1, block4.item_6?.ToString());
-            SafeReplace(rows, 6, 1, block4.item_7?.ToString());
-            SafeReplace(rows, 7, 1, block4.item_11?.ToString());
-            SafeReplace(rows, 8, 1, block4.item_14?.ToString());
-            SafeReplace(rows, 9, 1, block4.remarks);
+            SafeReplace(rows, 2, 2, block4.item_1?.ToString());
+            SafeReplace(rows, 3, 2, block4.item_2?.ToString());
+            SafeReplace(rows, 4, 2, block4.item_3?.ToString());
+            SafeReplace(rows, 5, 2, block4.item_6?.ToString());
+            SafeReplace(rows, 6, 2, block4.item_7?.ToString());
+            SafeReplace(rows, 7, 2, block4.item_11?.ToString());
+            SafeReplace(rows, 8, 2, block4.item_14?.ToString());
+            SafeReplace(rows, 9, 2, block4.remarks);
         }
         private void FillBlockHis5(Body body, List<Tbl_Block_5> list)
         {
