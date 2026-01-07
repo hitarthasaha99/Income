@@ -80,6 +80,11 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Resources\Template\IncomeSch00Template.docx" />
+      <None Remove="Resources\Template\TemplateHis2026.docx" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="FluentValidation" Version="12.0.0" />
@@ -100,6 +105,15 @@
 
     <ItemGroup>
       <Folder Include="Viewmodels\HIS2026\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiAsset Include="Resources\Template\IncomeSch00Template.docx">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </MauiAsset>
+      <MauiAsset Include="Resources\Template\TemplateHis2026.docx">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </MauiAsset>
     </ItemGroup>
 
 </Project>
