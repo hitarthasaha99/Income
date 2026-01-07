@@ -180,7 +180,8 @@ namespace Income.SurveyLibrary
                     int shortfall = totalRequired - totalAvailable;
                     var compensationOrder = isRural ? RuralStratumCompensation[stratum] : UrbanStratumCompensation[stratum];
 
-                    CompensateShortfall(pool, compensationOrder, shortfall, firstSSS, result, allocation);
+                    CompensateShortfall(pool, compensationOrder, shortfall, firstSSS, result, allocation, isRural, stratum, availableInStratum);
+
                 }
                 else
                 {
@@ -229,7 +230,11 @@ namespace Income.SurveyLibrary
                             int shortfall = required - available;
                             var compensationOrder = isRural ? RuralSSSCompensation[sss] : UrbanSSSCompensation[sss];
 
-                            CompensateShortfall(pool, compensationOrder, shortfall, sss, result, allocation);
+                            // Get all households in the stratum for special case check
+                            var allInStratum = pool.GetAvailable(stratum: stratum);
+
+                            // For SSS-level compensation, use the unified method
+                            CompensateShortfall(pool, compensationOrder, shortfall, sss, result, allocation, isRural, stratum, allInStratum);
                         }
                     }
                 }
@@ -244,10 +249,31 @@ namespace Income.SurveyLibrary
         int shortfall,
         int postedSSS,
         SelectionResult result,
-        Dictionary<int, Dictionary<int, int>> allocation)
+        Dictionary<int, Dictionary<int, int>> allocation,
+        bool isRural = true,
+        int stratum = 0,
+        List<Tbl_Sch_0_0_Block_7> allHouseholdsInStratum = null)
         {
             int compensated = 0;
             int targetStratum = GetStratumFromSSS(postedSSS); // Get the stratum we're compensating for
+
+            // Check if urban special case applies for this stratum
+            bool isUrbanSpecialCase = false;
+            if (!isRural && allHouseholdsInStratum != null && (targetStratum == 10 || targetStratum == 20))
+            {
+                var allSSSInStratum = allHouseholdsInStratum.Select(h => h.SSS).Distinct().ToList();
+
+                if (targetStratum == 10)
+                {
+                    // Check if ALL households are 121 or 122 (no SSS 11)
+                    isUrbanSpecialCase = allSSSInStratum.All(s => s == 121 || s == 122);
+                }
+                else if (targetStratum == 20)
+                {
+                    // Check if ALL households are 221 or 222 (no SSS 21)
+                    isUrbanSpecialCase = allSSSInStratum.All(s => s == 221 || s == 222);
+                }
+            }
 
             foreach (int compensationSSS in compensationOrder)
             {
@@ -289,12 +315,38 @@ namespace Income.SurveyLibrary
                         hh.isSelected = true;
 
                         // Determine SelectedPostedSSS based on stratum
-                        int hhStratum = GetStratumFromSSS(postedSSS); // Get household's stratum
+                        int hhStratum = GetStratumFromSSS(hh.SSS); // Get household's stratum
 
                         if (hhStratum == targetStratum)
                         {
-                            // Same stratum - assign to first SSS (posted SSS)
-                            hh.SelectedPostedSSS = postedSSS;
+                            // Same stratum compensation
+                            // Check if this household qualifies for urban special case
+                            bool applySpecialCase = false;
+
+                            if (isUrbanSpecialCase)
+                            {
+                                // Special case applies to entire stratum
+                                // Keep household's original SSS if it's 121/122 or 221/222
+                                if (targetStratum == 10 && (hh.SSS == 121 || hh.SSS == 122))
+                                {
+                                    applySpecialCase = true;
+                                }
+                                else if (targetStratum == 20 && (hh.SSS == 221 || hh.SSS == 222))
+                                {
+                                    applySpecialCase = true;
+                                }
+                            }
+
+                            if (applySpecialCase)
+                            {
+                                // Urban special case: Keep household's original SSS
+                                hh.SelectedPostedSSS = hh.SSS;
+                            }
+                            else
+                            {
+                                // Normal same stratum: assign to posted SSS
+                                hh.SelectedPostedSSS = postedSSS;
+                            }
                         }
                         else
                         {

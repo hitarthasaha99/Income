@@ -1,5 +1,6 @@
 ﻿@page "/dashboard/sch0.0/block0_1"
 @using Blazored.FluentValidation
+@using Income.Database.Models.Common
 @using Income.Database.Models.SCH0_0
 @using Income.Viewmodels
 @using Income.Viewmodels.SCH0_0
@@ -442,7 +443,7 @@
                     await DBQueries.DeleteEntryAsync<Tbl_Sch_0_0_FieldOperation>(fieldOp.id);
                 }
 
-                var warnings = await DBQueries.GetWarningList(schedule:"0");
+                var warnings = await DBQueries.GetWarningList(schedule: "0");
                 if (warnings != null && warnings.Count > 0)
                 {
                     foreach(var warning in warnings)

@@ -3763,7 +3763,7 @@ namespace Income.Database.Queries
                 return;
 
             // If FSU is submitted → soft delete
-            if (SessionStorage.HHD_Submitted)
+            if (SessionStorage.HHD_Submitted || SessionStorage.FSU_Submitted)
             {
                 entry.is_deleted = true;
                 await _database.UpdateAsync(entry);
@@ -3815,6 +3815,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    warning.survey_coordinates = SessionStorage.location;
+                    warning.survey_timestamp = DateTime.Now;
                     await _database.InsertAsync(warning);
                     result++;
                 }
