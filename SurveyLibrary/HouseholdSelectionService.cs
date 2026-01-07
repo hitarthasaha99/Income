@@ -247,7 +247,7 @@ namespace Income.SurveyLibrary
         Dictionary<int, Dictionary<int, int>> allocation)
         {
             int compensated = 0;
-            int targetStratum = (postedSSS / 10) * 10; // Get the stratum we're compensating for
+            int targetStratum = GetStratumFromSSS(postedSSS); // Get the stratum we're compensating for
 
             foreach (int compensationSSS in compensationOrder)
             {
@@ -289,7 +289,7 @@ namespace Income.SurveyLibrary
                         hh.isSelected = true;
 
                         // Determine SelectedPostedSSS based on stratum
-                        int hhStratum = (hh.SSS / 10) * 10; // Get household's stratum
+                        int hhStratum = GetStratumFromSSS(postedSSS); // Get household's stratum
 
                         if (hhStratum == targetStratum)
                         {
@@ -312,6 +312,20 @@ namespace Income.SurveyLibrary
             if (compensated < shortfall)
             {
                 result.Messages[postedSSS * 1000] = $"WARNING: Could not fully compensate shortfall for SSS {postedSSS}. Shortfall: {shortfall}, Compensated: {compensated}";
+            }
+        }
+
+        private int GetStratumFromSSS(int sss)
+        {
+            if (sss >= 100)
+            {
+                // 3-digit SSS (Urban): 121, 122, 221, 222
+                return (sss / 100) * 10; // 121 -> 10, 221 -> 20
+            }
+            else
+            {
+                // 2-digit SSS (Rural and some Urban): 11, 12, 21, 22, 31, 32, 40, 90
+                return (sss / 10) * 10; // 11 -> 10, 21 -> 20, 40 -> 40
             }
         }
 

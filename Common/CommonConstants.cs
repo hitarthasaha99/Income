@@ -150,6 +150,7 @@ namespace Income.Common
         his_block_A,
         his_block_B,
         his_block_12,
+        his_block_12_1,
         his_block_2
     }
 

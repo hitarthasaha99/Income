@@ -165,4 +165,13 @@
         NavigationManager.NavigateTo(blockUri);
         return;
     }
+
+    public async Task ReloadVisitedBlocksAsync()
+    {
+        var result = await commonQueries.GetVisitedBlocks();
+
+        visited_Blocks = result ?? new List<Tbl_Visited_Blocks>();
+
+        StateHasChanged();
+    }
 }

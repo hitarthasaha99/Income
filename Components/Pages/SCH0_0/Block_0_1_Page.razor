@@ -1,5 +1,6 @@
 ﻿@page "/dashboard/sch0.0/block0_1"
 @using Blazored.FluentValidation
+@using Income.Database.Models.SCH0_0
 @using Income.Viewmodels
 @using Income.Viewmodels.SCH0_0
 @layout Income.Components.Layout.DashboardLayout
@@ -19,7 +20,7 @@
 
     <EditForm EditContext="@editContext">
         <FluentValidationValidator />
-        <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+        <CommonContentHeader @ref="_header" SelectedFsuId="@SelectedFsuId"
                              survey_time="@survey_time" />
 
         <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
@@ -270,7 +271,9 @@
     private FluentValidationValidator? validator;
     DBQueries DBQueries = new();
     private ConfirmDialog dialog = default!;
-
+    int existingSurveyCode = 0;
+    CommonQueries commonQueries = new CommonQueries();
+    private CommonContentHeader? _header;
 
     private string Block114Text
     {
@@ -365,6 +368,7 @@
             survey_time = block_0_1_VM.block_0_1.survey_timestamp.GetValueOrDefault();
         }
         editContext = new EditContext(block_0_1_VM.block_0_1);
+        existingSurveyCode = block_0_1_VM.block_0_1.Block_1_16.GetValueOrDefault();
     }
 
     private async void Nav_LocationChanged(object sender, LocationChangedEventArgs e)
@@ -409,8 +413,49 @@
                 return;
             }
 
+            bool surveyCodeChanged = (existingSurveyCode is (1 or 4) && block_0_1_VM.block_0_1.Block_1_16.GetValueOrDefault() is not (1 or 4)) ||
+                (existingSurveyCode is not (1 or 4) && block_0_1_VM.block_0_1.Block_1_16.GetValueOrDefault() is (1 or 4));
+
+            if (surveyCodeChanged)
+            {
+                await commonQueries.DeleteVisitedBlocksAsync(SessionStorage.SelectedFSUId, blockTitles: new[]
+                {
+                    CommonEnum.sch_0_0_block_2_1.ToString(),
+                    CommonEnum.sch_0_0_block_2_2.ToString(),
+                    CommonEnum.sch_0_0_block_3.ToString(),
+                    CommonEnum.sch_0_0_block_4.ToString(),
+                    CommonEnum.sch_0_0_block_5.ToString(),
+                    CommonEnum.sch_0_0_block_6.ToString(),
+                    CommonEnum.sch_0_0_block_7.ToString(),
+                    CommonEnum.sch_0_0_block_7_selection.ToString(),
+                    CommonEnum.sch_0_0_block_8.ToString(),
+                    CommonEnum.sch_0_0_block_9.ToString(),
+                    CommonEnum.sch_0_0_block_11.ToString()
+                });
+
+                await _header?.ReloadVisitedBlocksAsync();
+
+
+                var fieldOp = await DBQueries.FetchBlock2();
+                if (fieldOp != null)
+                {
+                    await DBQueries.DeleteEntryAsync<Tbl_Sch_0_0_FieldOperation>(fieldOp.id);
+                }
+
+                var warnings = await DBQueries.GetWarningList(schedule:"0");
+                if (warnings != null && warnings.Count > 0)
+                {
+                    foreach(var warning in warnings)
+                    {
+                        await DBQueries.DeleteEntryAsync<Tbl_Warning>(warning.id);
+                    }
+                }
+
+            }
+
             if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_16.GetValueOrDefault() is not (1 or 4))
             {
+                
                 var hhd_data = await DBQueries.GetBlock7Data(SessionStorage.SelectedFSUId);
                 if (hhd_data != null && hhd_data.Count > 0)
                 {
@@ -453,7 +498,7 @@
             {
                 return;
             }
-            Navigate();
+            await Navigate();
 
         }
         catch (Exception ex)
