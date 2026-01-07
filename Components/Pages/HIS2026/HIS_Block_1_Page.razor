@@ -1,4 +1,5 @@
 @page "/dashboard/his/block0_1"
+@using Income.Common.HIS2026
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Income.SurveyLibrary
@@ -199,6 +200,10 @@
         </div>
         <div class="col-sm-6">
             <div class="d-flex align-items-center justify-content-end">
+                <button class="btn btn-outline-primary me-2" @onclick="GenerateBlockData">
+                    <i class="fi fi-rr-settings me-1"></i>Generate Data
+                </button>
+
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
                     <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
@@ -516,4 +521,1229 @@
         return;
 
     }
+
+
+    private async Task GenerateBlockData()
+    {
+        try
+        {
+            //  Delete any previous Block  data for this household
+            await commonQueries.DeleteBlockDataForCasulaty();
+
+            // Get Block 7 data for current household only
+            var block7List = await dQ.GetBlock7Data(SessionStorage.SelectedFSUId);
+
+
+            var currentHousehold = block7List
+                .FirstOrDefault(x => x.Block_7_3 == SessionStorage.selected_hhd_id && x.is_household == 2);
+
+            if (currentHousehold == null)
+            {
+                toastService.ShowWarning("No valid Block 7 data found for the current household!");
+                return;
+            }
+
+            int serialNo = 1;
+            Random rand = new Random();
+
+            // FIRST & LAST NAME LISTS
+            string[] firstNames = { "Amit", "Rahul", "Suman", "Ravi", "Anita", "Pooja", "Sunil", "Kiran", "Neha", "Vikas" };
+            string[] lastNames = { "Sharma", "Das", "Singh", "Patel", "Roy", "Gupta", "Verma", "Mishra", "Bose", "Kumar" };
+
+            //  Generate Block_3 members for the current household
+            int membersToGenerate = (currentHousehold.Block_7_5 ?? 1);
+            // 1. Create a list to hold the generated members
+            List<Tbl_Block_3> generatedMembers = new();
+            for (int m = 1; m <= membersToGenerate; m++)
+            {
+                var member = new Tbl_Block_3
+                {
+                    id = Guid.NewGuid(),
+                    hhd_id = SessionStorage.selected_hhd_id,
+                    serial_no = serialNo++,
+
+                    // Random first + last name
+                    item_2 = $"{firstNames[rand.Next(firstNames.Length)]} {lastNames[rand.Next(lastNames.Length)]}",
+
+                    item_3 = m == 1 ? 1 : 5,  // Head = 1, others = 5
+                    gender = rand.Next(1, 3),
+                    age = rand.Next(15, 70),
+                    item_6 = rand.Next(1, 5),
+                    item_7 = rand.Next(2, 9),
+                    item_8 = rand.Next(1, 7),
+                    item_9 = rand.Next(1, 7),
+                    item_10 = rand.Next(1, 7),
+                    item_11 = rand.Next(1, 7),
+                    item_12 = rand.Next(1, 3)
+                };
+
+                await dQ.Save_SCH_HIS_Block3(member);
+            }
+
+            // 4. Fetch the Block 3 list
+            var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
+            // -------- BLOCK 4.1 ----------
+            await generateBlock4(membersToGenerate);
+
+            // Block 4.2
+            await generateBlock4_2(block3);
+            //block 4.3
+            await generateBlock4_3();
+            //Block5
+            await generateBlock5();
+            // Block 6
+            await generateBlock6();
+            // Block 7a_1
+            await generateBlock7a_1();
+            // Block 7a_2
+
+            await generateBlock7a_2();
+            await generateBlock7b();
+            await generateBlock7c(block3);
+            await generateBlock7c_Q10();
+            await generateBlock7c_3();
+            // await generateBlock7d();
+            await generateBlock8a();
+            await generateBlock8b();
+            await generateBlock9a();
+            await generateBlock9b();
+            await generateBlock10();
+            await generateBlock11a();
+            await generateBlock11b();
+            await generateBlock2();
+            
+
+            toastService.ShowSuccess("Data generated successfully");
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($" Error: {ex.Message}");
+        }
+    }
+
+
+
+    // Generate Block 4.1 Data
+    // -----------------------------------------------------
+
+    private async Task generateBlock4(int membersToGenerate)
+    {
+        Random rand = new Random();
+
+        bool q4_needed = true;
+
+        var block4 = new Tbl_Block_4
+        {
+            id = Guid.NewGuid(),
+            hhd_id = SessionStorage.selected_hhd_id,
+            fsu_id = SessionStorage.SelectedFSUId,
+
+            // [4.1] Household Size (Matches Block 3 count)
+            item_1 = membersToGenerate,
+
+            // [4.2] Social Group (Random 1-3, or 9)
+
+            item_2 = new[] { 1, 2, 3, 9 }[rand.Next(4)],
+
+            // [4.3] Religion (Random 1-7)
+            item_3 = rand.Next(1, 8),
+
+            // [4.4] Agricultural Activities
+            // Only generate true if needed, otherwise false
+            // Logic: At least one must be true if Q4Needed is true to pass validation
+            item_4_1 = q4_needed && rand.Next(2) == 0,
+            item_4_2 = q4_needed && rand.Next(2) == 0,
+            item_4_3 = q4_needed && rand.Next(2) == 0,
+            item_4_4 = q4_needed && rand.Next(2) == 0,
+            item_4_5 = q4_needed && rand.Next(2) == 0,
+            item_4_6 = false,
+
+        };
+
+        // SAFETY: If Q4 is needed but random chance made all false, force one to be true
+        if (q4_needed &&
+           !(block4.item_4_1 == true || block4.item_4_2 == true ||
+             block4.item_4_3 == true || block4.item_4_4 == true ||
+             block4.item_4_5 == true))
+        {
+            block4.item_4_1 = true; // Force cultivation if nothing else selected
+        }
+
+        // Save Data
+        await dQ.Save_SCH_HIS_Block4(block4);
+    }
+
+    private async Task generateBlock4_2(List<Tbl_Block_3> block3List)
+    {
+        // 1. Check if Block 4.2 (Q5) is needed based on Block 3 data
+        // Logic: Look for any member where status is '2' (Self-employed) in columns 8, 9, 10, or 11
+        bool q5Needed = block3List.Any(x =>
+            x.item_8 == 2 ||
+            x.item_9 == 2 ||
+            x.item_10 == 2 ||
+            x.item_11 == 2
+        );
+
+        // 2. Strict Check: If NO member is self-employed (status 2), DO NOT generate data.
+        if (!q5Needed)
+        {
+            return; // Exit immediately
+        }
+
+        // 3. Define Mock NIC Codes (Only reached if q5Needed is true)
+        var dummyNicCodes = new[]
+        {
+        new { Id = 10, Title = "Retail sale of food" },
+        new { Id = 11, Title = "Manufacturing of textiles" },
+        new { Id = 12, Title = "Land transport" },
+        new { Id = 13, Title = "Construction of buildings" },
+        new { Id = 14, Title = "Food and beverage service activities" }
+    };
+
+        Random rand = new Random();
+
+        // Generate 1 to 3 activities randomly
+        int activitiesToGenerate = rand.Next(1, 4);
+
+        // Shuffle and pick unique NIC codes to avoid duplicates
+        var selectedNics = dummyNicCodes.OrderBy(x => rand.Next()).Take(activitiesToGenerate).ToList();
+
+        for (int i = 0; i < selectedNics.Count; i++)
+        {
+            var nicItem = selectedNics[i];
+
+            var record = new Tbl_Block_4_Q5
+            {
+                id = Guid.NewGuid(),
+                hhd_id = SessionStorage.selected_hhd_id,
+                SerialNumber = i + 1,
+                ActivityName = nicItem.Title,
+                NicCode = nicItem.Id,
+                BusinessSeasonal = rand.Next(1, 3), // 1=Yes, 2=No
+                NumberOfMonths = rand.Next(1, 13)
+            };
+
+            await dQ.Save_SCH_HIS_Block4_NICList(record, false);
+        }
+    }
+
+
+    private async Task generateBlock4_3()
+    {
+        var rand = new Random();
+
+        // Load existing Block 4 record for this household
+        var block4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id)
+                    ?? new Tbl_Block_4
+                    {
+                        id = Guid.NewGuid(),
+                        hhd_id = SessionStorage.selected_hhd_id,
+                        fsu_id = SessionStorage.SelectedFSUId
+                    };
+
+        // ---- Q4.6: Own any land? (1 Yes, 2 No) ----
+        block4.item_6 = rand.Next(1, 3); // 1 or 2
+
+        // ---- Q4.7 & Q4.8: Area and use of land ----
+        if (block4.item_6 == 1)
+        {
+            // Random area up to 50 acre with 3 decimals
+            var raw = rand.NextDouble() * 50;
+            block4.item_7 = Math.Round((decimal)raw, 3);
+
+            // Use of land owned (codes from Block_4_Constants.Q4_8)
+            // For demo: pick 1–3 distinct codes from 1?4
+            var landUsePool = new[] { 1, 2, 3, 4 };
+            var landUses = landUsePool
+                .OrderBy(_ => rand.Next())
+                .Take(rand.Next(1, landUsePool.Length + 1))
+                .ToList();
+            block4.item_8 = string.Join(",", landUses);
+        }
+        else
+        {
+            block4.item_7 = null;
+            block4.item_8 = string.Empty;
+        }
+
+        // ---- Q4.9 & Q4.10: Economic activity on building/structure ----
+        // 1–4 (from your constants page)
+        block4.item_9 = rand.Next(1, 5);
+
+        if (block4.item_9 == 1 || block4.item_9 == 2 || block4.item_9 == 3)
+        {
+            // Example: choose 1–3 activities from codes 1–4
+            var econPool = new[] { 1, 2, 3, 4 };
+            var econActs = econPool
+                .OrderBy(_ => rand.Next())
+                .Take(rand.Next(1, econPool.Length + 1))
+                .ToList();
+            block4.item_10 = string.Join(",", econActs);
+        }
+        else
+        {
+            block4.item_10 = string.Empty;
+        }
+
+        // ---- Q4.11, 4.12, 4.13, 4.14: Dwelling unit, carpet area, structure, rooms ----
+        // Type of dwelling (1–5)
+        block4.item_11 = rand.Next(1, 6);
+
+        if (block4.item_11 == 5)
+        {
+            // No dwelling ? clear structure related items
+            block4.item_12 = null;
+            block4.item_13 = null;
+            block4.item_14 = null;
+        }
+        else
+        {
+            // Carpet area: 100–1500 sq ft
+            block4.item_12 = rand.Next(100, 1501);
+
+            // Type of structure (1–3)
+            block4.item_13 = rand.Next(1, 4);
+
+            // Number of rooms: 1–10 but keep <= 15 to avoid warnings
+            block4.item_14 = rand.Next(1, 11);
+        }
+
+        // ---- Q4.15, 4.16, 4.17: Loan details ----
+        // Any outstanding loan? 1 Yes, 2 No
+        block4.item_15 = rand.Next(1, 3);
+
+        if (block4.item_15 == 1)
+        {
+            // Purpose of loan 1–3
+            block4.item_16 = rand.Next(1, 4);
+
+            // Amount paid last month (?0–5,00,000)
+            var amount = rand.Next(0, 500001);
+            block4.item_17 = amount;
+        }
+        else
+        {
+            block4.item_16 = null;
+            block4.item_17 = null;
+        }
+
+
+        // Save back
+        await dQ.Save_SCH_HIS_Block4(block4);
+    }
+
+    //Block 5
+    private async Task generateBlock5()
+    {
+        var rand = new Random();
+
+        // 1. Get all Block 3 members for this household
+        var block3Members = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
+        // 2. Applicable members for Block 5: item_8/9/10/11 == 4
+        var applicableMembers = block3Members
+            .Where(x => x.item_8 == 4 || x.item_9 == 4 || x.item_10 == 4 || x.item_11 == 4)
+            .OrderBy(x => x.serial_no)
+            .ToList();
+
+        if (!applicableMembers.Any())
+            return;
+
+        // 3. Existing Block 5 rows for this household
+        var existingBlock5 = await dQ.Fetch_SCH_HIS_Block5(SessionStorage.selected_hhd_id)
+                             ?? new List<Tbl_Block_5>();
+
+        int nextSerial = (existingBlock5.Any() ? existingBlock5.Max(b => b.serial_number ?? 0) : 0) + 1;
+
+        foreach (var m in applicableMembers)
+        {
+            // Try to find existing row for this Block 3 member
+            var row = existingBlock5.FirstOrDefault(b => b.fk_block_3 == m.id);
+
+            if (row == null)
+            {
+                row = new Tbl_Block_5
+                {
+                    id = Guid.NewGuid(),
+                    hhd_id = SessionStorage.selected_hhd_id,
+                    serial_member = m.serial_no,
+                    serial_number = nextSerial++,
+                    fk_block_3 = m.id,
+                    addedByUser = false
+                };
+            }
+
+            // Skip rows that user has already edited
+            if (row.isUpdated)
+                continue;
+
+            // --------- AUTO?FILL FIELDS ---------
+            // Q5.1 – number of months worked (1–12)
+            row.item_1 = rand.Next(1, 13);
+
+            // Q5.2 – gross salary (last month)
+            row.item_2 = rand.Next(8000, 60001);       // 8k–60k
+
+            // Q5.3(i) – allowances (last month)
+            row.item_3_i = rand.Next(0, 10001);
+
+            // Q5.3(ii) – other tips, fees (last month)
+            row.item_3_ii = rand.Next(0, 5001);
+
+            // Q5.4(i) – bonuses (last 365 days)
+            row.item_4_i = rand.Next(0, 50001);
+
+            // Q5.4(ii) – commission (last 365 days)
+            row.item_4_ii = rand.Next(0, 30001);
+
+            // Q5.5 – ESOP sale value (last 365 days)
+            row.item_5 = rand.Next(0, 100001);
+
+            // Q5.6 – leave encashment etc. (last 365 days)
+            row.item_6 = rand.Next(0, 40001);
+
+            // Q5.7 – severance / termination benefits (last 365 days)
+            row.item_7 = rand.Next(0, 80001);
+
+            // Q5.8 – others (directors’ fees etc.) (last 365 days)
+            row.item_8 = rand.Next(0, 50001);
+
+            // Q5.9 – total monthly income:
+            // Q5.2 + Q5.3 + (Q5.4+Q5.5+Q5.6+Q5.7+Q5.8)/12
+            int item2 = row.item_2 ?? 0;
+            int item3i = row.item_3_i ?? 0;
+            int item3ii = row.item_3_ii ?? 0;
+            int item4i = row.item_4_i ?? 0;
+            int item4ii = row.item_4_ii ?? 0;
+            int item5 = row.item_5 ?? 0;
+            int item6 = row.item_6 ?? 0;
+            int item7 = row.item_7 ?? 0;
+            int item8 = row.item_8 ?? 0;
+
+            row.item_9 = item2 + item3i + item3ii +
+                         (item4i + item4ii + item5 + item6 + item7 + item8) / 12;
+
+            // Clarification dropdown and remarks (Q5.9.1) not needed when income > 0
+            row.item_10 = null;
+            row.item_11 = string.Empty;
+
+            row.isUpdated = true; // mark as filled
+
+            await dQ.Save_SCH_HIS_Block5(row);
+        }
+    }
+
+    // Block 6
+    private async Task generateBlock6()
+    {
+        var rand = new Random();
+
+        // 1. Get all Block 3 members for this household
+        var block3Members = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
+        // 2. Applicable members for Block 6: item_8 or item_9 == 5 (as in Block 6 page)
+        var applicableMembers = block3Members
+            .Where(x => x.item_8 == 5 || x.item_9 == 5)
+            .OrderBy(x => x.serial_no)
+            .ToList();
+
+        if (!applicableMembers.Any())
+            return;
+
+        // 3. Existing Block 6 rows
+        var existingBlock6 = await dQ.Fetch_SCH_HIS_Block6(SessionStorage.selected_hhd_id)
+                             ?? new List<Tbl_Block_6>();
+
+        int nextSerial = (existingBlock6.Any() ? existingBlock6.Max(b => b.serial_number ?? 0) : 0) + 1;
+
+        foreach (var m in applicableMembers)
+        {
+            // Find existing row for this Block 3 member
+            var row = existingBlock6.FirstOrDefault(b => b.fk_block_3 == m.id);
+
+            if (row == null)
+            {
+                row = new Tbl_Block_6
+                {
+                    id = Guid.NewGuid(),
+                    hhd_id = SessionStorage.selected_hhd_id,
+                    serial_member = m.serial_no,
+                    serial_number = nextSerial++,
+                    fk_block_3 = m.id,
+                    addedByUser = false
+                };
+            }
+
+            // Skip rows already edited in Block 6 page
+            if (row.isUpdated)
+                continue;
+
+            // Q6.1 – number of days worked last month (1–31)
+            row.item_1 = rand.Next(1, 32);
+
+            // Q6.2 – average daily wage (Rs.)
+            row.item_2 = rand.Next(300, 1501); // 300–1500
+
+            // Q6.3 – bonuses/tips (last 365 days)
+            row.item_3 = rand.Next(0, 20001);
+
+            // Q6.4 – total monthly income = Q6.1×Q6.2 + Q6.3/12
+            int d = row.item_1 ?? 0;
+            int w = row.item_2 ?? 0;
+            int tip = row.item_3 ?? 0;
+
+            row.item_4 = (d * w) + tip / 12;
+
+            // Clarification (Q6.4.1) and remarks only needed when income = 0
+            if (row.item_4 > 0)
+            {
+                row.item_5 = null;
+                row.remarks = string.Empty;
+            }
+
+            row.isUpdated = true;
+
+            await dQ.Save_SCH_HIS_Block6(row);
+        }
+    }
+
+    //Block 7a_1
+    // Block 7a_1
+    private async Task generateBlock7a_1()
+    {
+        var rand = new Random();
+
+        // 1. Ensure Block 4 says crop-cultivation is relevant
+        var block4 = await dQ.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
+        if (block4 == null || (block4.item_4_1 != true && block4.item_4_2 != true))
+        {
+            // No cultivation related activity, so do not generate Block 7a_1
+            return;
+        }
+
+        // 2. Existing rows for this household
+        var existingRows = await dQ.Fetch_SCH_HIS_Block7A_CodeList()
+                          ?? new List<Tbl_Block_7a_1>();
+
+        existingRows = existingRows
+            .Where(x => x.hhd_id == SessionStorage.selected_hhd_id && x.is_deleted != true)
+            .OrderBy(x => x.serial_number)
+            .ToList();
+
+        int nextSerial = (existingRows.Any()
+            ? existingRows.Max(r => r.serial_number)
+            : 0) + 1;
+
+        // 3. Use full CropCodes list and pick random unique crops
+        var cropList = Block_7_1_Constants.CropCodes;
+        if (cropList == null || cropList.Count == 0)
+            return;
+
+        int rowsToGenerate = rand.Next(1, 4); // 1–3 crops
+
+        var selectedCrops = cropList
+            .OrderBy(_ => rand.Next())
+            .Take(rowsToGenerate)
+            .ToList();
+
+        foreach (var crop in selectedCrops)
+        {
+            var row = new Tbl_Block_7a_1
+            {
+                id = Guid.NewGuid(),
+                Block_7a_Id = Guid.NewGuid(),
+                hhd_id = SessionStorage.selected_hhd_id,
+                serial_number = nextSerial++,
+                code = crop.id,
+                addedByUser = false
+            };
+
+            // 4. Whether crop sold before harvest (Q7.1 col 3): 1=Yes, 2=No
+            row.whetherCropSold = rand.Next(1, 3);
+
+            if (row.whetherCropSold == 1)
+            {
+                // Entire crop sold before harvest ? quantities disabled
+                row.unit = null;
+                row.item_4 = null; // Total quantity produced
+                row.item_5 = null; // Total quantity sold
+                row.item_6 = null; // Total sale value (post-harvest)
+                row.item_7 = null; // Average sale value
+            }
+            else
+            {
+                // Sold after harvest ? fill quantity and sale values
+
+                // Unit: 1=Kg, 2=No.
+                row.unit = rand.Next(1, 3);
+
+                // Total quantity produced (5): 50–2000
+                row.item_4 = rand.Next(50, 2001);
+
+                // Total quantity sold (6): 0–item_4
+                row.item_5 = rand.Next(0, row.item_4.Value + 1);
+
+                // Average per unit sale value (8): 5–80 Rs
+                row.item_7 = rand.Next(5, 81);
+
+                // Total sale value (7) = qty sold × avg price
+                row.item_6 = row.item_5.Value * row.item_7.Value;
+            }
+
+            // Value of pre?harvested sale (9)
+            row.item_8 = rand.Next(0, 5001);
+
+            // Value of by?products (10)
+            row.item_9 = rand.Next(0, 3001);
+
+            await dQ.Save_SCH_HIS_Block7A_CodeList(row);
+        }
+    }
+
+
+    private async Task generateBlock7a_2()
+    {
+        var rand = new Random();
+
+        // Load or create Block 7a record
+        var block7A = await dQ.Fetch_SCH_HIS_Block7A(SessionStorage.selected_hhd_id)
+                      ?? new Tbl_Block_7a
+                      {
+                          id = Guid.NewGuid(),
+                          hhd_id = SessionStorage.selected_hhd_id
+                      };
+
+        // Q7.2: Inputs cost (1-12) - RANDOM
+        block7A.item_2_1 = rand.Next(0, 20001);
+        block7A.item_2_2 = rand.Next(0, 30001);
+        block7A.item_2_3 = rand.Next(0, 15001);
+        block7A.item_2_4 = rand.Next(0, 20001);
+        block7A.item_2_5 = rand.Next(0, 15001);
+        block7A.item_2_6 = rand.Next(0, 25001);
+        block7A.item_2_7 = rand.Next(0, 30001);
+        block7A.item_2_8 = rand.Next(0, 20001);
+        block7A.item_2_9 = rand.Next(0, 15001);
+        block7A.item_2_10 = rand.Next(0, 10001);
+        block7A.item_2_11 = rand.Next(0, 10001);
+        block7A.item_2_12 = rand.Next(0, 10001);
+
+        // Sum Q7.2 (item_2_13)
+        block7A.item_2_13 = block7A.item_2_1 + block7A.item_2_2 + block7A.item_2_3 +
+                           block7A.item_2_4 + block7A.item_2_5 + block7A.item_2_6 +
+                           block7A.item_2_7 + block7A.item_2_8 + block7A.item_2_9 +
+                           block7A.item_2_10 + block7A.item_2_11 + block7A.item_2_12;
+
+        // Q7.3-Q7.5: Receipts - RANDOM
+        block7A.item_3 = rand.Next(0, 50001);
+        block7A.item_4 = rand.Next(0, 80001);
+        block7A.item_5 = rand.Next(0, 60001);
+
+        // Q7a.9: Profit/Loss
+        block7A.item_6 = (block7A.item_3 ?? 0) + (block7A.item_4 ?? 0) + (block7A.item_5 ?? 0) - (block7A.item_2_13 ?? 0);
+
+        // ?? Q7a.9.1 & REMARKS - FORCE SHOW FIELD ?
+        if (rand.Next(2) == 1 || block7A.item_6 < 0) // 50% chance OR loss
+        {
+            // Random clarification code (1-5)
+            block7A.item_7 = rand.Next(1, 6);  // 1=a, 2=b, 3=c, 4=d, 5=Others
+
+            // If "Others" (5) ? Random remarks
+            if (block7A.item_7 == 5)
+            {
+                string[] remarksOptions = {
+                "Heavy crop damage due to flood",
+                "Market price crash - left in field",
+                "Production not started due to drought",
+                "Test remark for auto-generation",
+                "Partial harvest - rest damaged"
+            };
+                block7A.remarks = remarksOptions[rand.Next(remarksOptions.Length)];
+            }
+        }
+
+        await dQ.Save_SCH_HIS_Block7A(block7A);
+    }
+
+
+    // Random generator for Block 7b
+    private async Task generateBlock7b()
+    {
+        var rand = new Random();
+
+        // 1. Load or create Block 7b for this household
+        var block7B = await dQ.Fetch_SCH_HIS_Block7B(SessionStorage.selected_hhd_id)
+                     ?? new Tbl_Block_7b
+                     {
+                         id = Guid.NewGuid(),
+                         hhd_id = SessionStorage.selected_hhd_id
+                     };
+
+        // --------- Q7.6: receipts from sale (item_6_1–item_6_11) ---------
+        block7B.item_6_1 = rand.Next(0, 50001);  // Fish & fishery products
+        block7B.item_6_2 = rand.Next(0, 40001);  // Milk & milk products
+        block7B.item_6_3 = rand.Next(0, 40001);  // Eggs, poultry
+        block7B.item_6_4 = rand.Next(0, 40001);  // Meat
+        block7B.item_6_5 = rand.Next(0, 30001);  // Honey, bee?keeping
+        block7B.item_6_6 = rand.Next(0, 30001);  // Forestry products
+        block7B.item_6_7 = rand.Next(0, 30001);  // Fishing services etc.
+        block7B.item_6_8 = rand.Next(0, 30001);  // Animal husbandry services
+        block7B.item_6_9 = rand.Next(0, 30001);  // Other allied services
+        block7B.item_6_10 = rand.Next(0, 30001);  // Any other receipts
+        block7B.item_6_11 = rand.Next(0, 30001);  // Misc.
+
+        // Total receipts (Q7.6 total)
+        block7B.item_6_12 =
+            (block7B.item_6_1 ?? 0) +
+            (block7B.item_6_2 ?? 0) +
+            (block7B.item_6_3 ?? 0) +
+            (block7B.item_6_4 ?? 0) +
+            (block7B.item_6_5 ?? 0) +
+            (block7B.item_6_6 ?? 0) +
+            (block7B.item_6_7 ?? 0) +
+            (block7B.item_6_8 ?? 0) +
+            (block7B.item_6_9 ?? 0) +
+            (block7B.item_6_10 ?? 0) +
+            (block7B.item_6_11 ?? 0);
+
+        // --------- Q7.7: expenses on allied activities (item_7_1–item_7_12) ---------
+        block7B.item_7_1 = rand.Next(0, 30001);
+        block7B.item_7_2 = rand.Next(0, 30001);
+        block7B.item_7_3 = rand.Next(0, 30001);
+        block7B.item_7_4 = rand.Next(0, 30001);
+        block7B.item_7_5 = rand.Next(0, 30001);
+        block7B.item_7_6 = rand.Next(0, 30001);
+        block7B.item_7_7 = rand.Next(0, 30001);
+        block7B.item_7_8 = rand.Next(0, 30001);
+        block7B.item_7_9 = rand.Next(0, 30001);
+        block7B.item_7_10 = rand.Next(0, 30001);
+        block7B.item_7_11 = rand.Next(0, 30001);
+        block7B.item_7_12 = rand.Next(0, 30001);
+
+        // Total expenses (Q7.7 total)
+        block7B.item_7_13 =
+            (block7B.item_7_1 ?? 0) +
+            (block7B.item_7_2 ?? 0) +
+            (block7B.item_7_3 ?? 0) +
+            (block7B.item_7_4 ?? 0) +
+            (block7B.item_7_5 ?? 0) +
+            (block7B.item_7_6 ?? 0) +
+            (block7B.item_7_7 ?? 0) +
+            (block7B.item_7_8 ?? 0) +
+            (block7B.item_7_9 ?? 0) +
+            (block7B.item_7_10 ?? 0) +
+            (block7B.item_7_11 ?? 0) +
+            (block7B.item_7_12 ?? 0);
+
+        // --------- Q7.8: imputed value (single field) ---------
+        // If you want some positive allied imputed value:
+        block7B.item_8 = rand.Next(0, 40001);
+
+        // --------- Q7b.9: gross profit/loss item_9 ---------
+        // Same formula your page uses: receipts + item_8 – expenses
+        int totalReceipts = block7B.item_6_12 ?? 0;
+        int imputed = block7B.item_8 ?? 0;
+        int totalExpenses = block7B.item_7_13 ?? 0;
+
+        block7B.item_9 = totalReceipts + imputed - totalExpenses;
+
+        // Do not auto?set item_10 / remarks; UI logic will handle when item_9 < 0
+        block7B.item_10 = null;
+        block7B.remarks = null;
+
+        await dQ.Save_SCH_HIS_Block7B(block7B);
+    }
+
+    private async Task generateBlock7c(List<Tbl_Block_3> block3List)
+    {
+        // 1. Check if Block 7c is needed (same as Q9Needed logic)
+        bool need7c = block3List.Any(x => x.item_8 == 2 || x.item_9 == 2);
+        if (!need7c)
+            return;
+
+
+        var dummyActivities = new[]
+        {
+        new { Id = 10, Title = "Retail sale of food" },
+        new { Id = 11, Title = "Manufacturing of textiles" },
+        new { Id = 12, Title = "Land transport" },
+        new { Id = 13, Title = "Construction of buildings" },
+        new { Id = 14, Title = "Food and beverage service activities" }
+    };
+
+        Random rand = new Random();
+
+        int activitiesToGenerate = rand.Next(1, 4); // 1–3 rows
+
+        var selected = dummyActivities
+            .OrderBy(x => rand.Next())
+            .Take(activitiesToGenerate)
+            .ToList();
+
+        for (int i = 0; i < selected.Count; i++)
+        {
+            var a = selected[i];
+
+            var record = new Tbl_Block_7c_NIC
+            {
+                id = Guid.NewGuid(),
+                hhd_id = SessionStorage.selected_hhd_id,
+                Block7CId = Guid.NewGuid(),  // or your real parent Block7C id
+                SerialNumber = i + 1,
+                ActivityName = a.Title,
+                NicCode = a.Id,
+                GrossValue = rand.Next(1000, 50001) // example 1000–50000
+            };
+
+            await dQ.Save_SCH_HIS_Block7_NICList(record);
+        }
+    }
+
+
+    private async Task generateBlock7c_Q10()
+    {
+        var rand = new Random();
+
+        // Ensure NIC list and Q10 rows exist
+        var nicList = await dQ.Fetch_SCH_HIS_Block7_NICList();
+        var q10List = await dQ.Fetch_SCH_HIS_Block7_Q10_List();
+
+        if (nicList == null || nicList.Count == 0)
+            return;
+
+        // Create missing Q10 rows (same logic as in OnInitializedAsync)
+        int nextSerial = q10List?.Count > 0 ? q10List.Max(x => x.serial_number) + 1 : 1;
+        q10List ??= new List<Tbl_Block_7c_Q10>();
+
+        foreach (var nic in nicList)
+        {
+            var row = q10List.FirstOrDefault(x => x.parent_id == nic.id);
+            if (row == null)
+            {
+                row = new Tbl_Block_7c_Q10
+                {
+                    id = Guid.NewGuid(),
+                    parent_id = nic.id,
+                    serial_number = nextSerial++
+                };
+            }
+
+            if (row.isUpdated)
+                continue;
+
+            // Random item-wise costs (you can tune ranges)
+            row.item_10_1 = rand.Next(0, 50001);  // Raw materials
+            row.item_10_2 = rand.Next(0, 10001);  // Electricity, fuel, water
+            row.item_10_3 = rand.Next(0, 5001);   // Internet etc.
+            row.item_10_4 = rand.Next(0, 20001);  // Rent
+            row.item_10_5 = rand.Next(0, 15001);  // Machinery rent
+            row.item_10_6 = rand.Next(0, 10001);  // Transport
+            row.item_10_7 = rand.Next(0, 40001);  // Labour
+            row.item_10_8 = rand.Next(0, 8001);   // Repair & maintenance
+            row.item_10_9 = rand.Next(0, 7001);   // Interest & insurance
+            row.item_10_10 = rand.Next(0, 5001);   // Others
+
+            row.item_10_11 =
+                (row.item_10_1 ?? 0) +
+                (row.item_10_2 ?? 0) +
+                (row.item_10_3 ?? 0) +
+                (row.item_10_4 ?? 0) +
+                (row.item_10_5 ?? 0) +
+                (row.item_10_6 ?? 0) +
+                (row.item_10_7 ?? 0) +
+                (row.item_10_8 ?? 0) +
+                (row.item_10_9 ?? 0) +
+                (row.item_10_10 ?? 0);
+
+            row.isUpdated = true;
+
+            await dQ.Save_SCH_HIS_Block7_Q10_List(row);
+        }
+    }
+
+
+    private async Task generateBlock7c_3()
+    {
+        var rand = new Random();
+
+        // 1. Load NIC and Q10 data so we can compute sums
+        var nicList = await dQ.Fetch_SCH_HIS_Block7_NICList();
+        var q10List = await dQ.Fetch_SCH_HIS_Block7_Q10_List();
+
+        int nicSum = (int)Math.Min(nicList?.Sum(x => (long)(x.GrossValue ?? 0)) ?? 0L, int.MaxValue);
+        int activitySum = (int)Math.Min(q10List?.Sum(x => (long)(x.item_10_11 ?? 0)) ?? 0L, int.MaxValue);
+
+        // 2. Load or create Block 7c row
+        var block7c = await dQ.Fetch_SCH_HIS_Block7C(SessionStorage.selected_hhd_id);
+        if (block7c == null)
+        {
+            block7c = new Tbl_Block_7c
+            {
+                id = Guid.NewGuid(),
+                hhd_id = SessionStorage.selected_hhd_id
+            };
+        }
+
+        // 3. Random imputed value (Q7.11) – tune range as you like
+        if (!block7c.item_7_11.HasValue)
+        {
+            // for example: between 0 and 30% of NIC receipts
+            int upper = Math.Max(1000, (int)(nicSum * 0.3));
+            block7c.item_7_11 = rand.Next(0, upper + 1);
+        }
+
+        // 4. Compute gross profit / loss before tax (Q7c.9)
+        block7c.item_7_12 = (nicSum + block7c.item_7_11.GetValueOrDefault()) - activitySum;
+
+        // 5. If loss, optionally auto-fill clarification (Q7c.9.1)
+        if (block7c.item_7_12.GetValueOrDefault() < 0)
+        {
+            // 1–4: a,b,c,d; you can fix one or randomize
+            block7c.item_7_13 = rand.Next(1, 5);
+
+            if (block7c.item_7_13 == 4 && string.IsNullOrWhiteSpace(block7c.remarks))
+            {
+                block7c.remarks = "Test data: cost exceeds receipts.";
+            }
+        }
+        else
+        {
+            // No loss ? clear clarification
+            block7c.item_7_13 = null;
+            block7c.remarks = string.Empty;
+        }
+
+        // 6. Save
+        await dQ.Save_SCH_HIS_Block7C(block7c);
+    }
+
+    // private async Task generateBlock7d()
+    // {
+    //     var rand = new Random();
+
+    //     var block7dList = await dQ.Fetch_SCH_HIS_Block7D()
+    //                      ?? new List<Tbl_Block_7d>();
+
+    //     block7dList = block7dList
+    //         .Where(x => x.hhd_id == SessionStorage.selected_hhd_id)
+    //         .ToList();
+
+    //     foreach (var row in block7dList)
+    //     {
+    //         PURE RANDOM - NO LOGIC ?
+    //         row.item_3 = rand.Next(1, 3);  1 or 2
+    //         row.item_4 = rand.Next(0, 101); 0-100 (includes null case)
+
+    //         Save each row
+    //         await dQ.Save_SCH_HIS_Block7D_List(row);
+    //     }
+    // }
+
+
+    private async Task generateBlock8a()
+    {
+        var rand = new Random();
+
+        // 1. Load or create Block 8A record
+        var block8a = await dQ.Fetch_SCH_HIS_Block8(SessionStorage.selected_hhd_id)
+                      ?? new Tbl_Block_8
+                      {
+                          id = Guid.NewGuid(),
+                          hhd_id = SessionStorage.selected_hhd_id,
+                          fsu_id = SessionStorage.SelectedFSUId
+                      };
+
+        // Skip if already user-updated
+        if (block8a.isUpdated) return;
+
+        // --------- PURE RANDOM VALUES - NO LOGIC ? ---------
+
+        // Q8.1: Pension (Last month) - 0-50k
+        block8a.item_1 = rand.Next(0, 50001);
+
+        // Q8.2: Family support (Last month) - 0-30k
+        block8a.item_2 = rand.Next(0, 30001);
+
+        // Q8.3: Remittances (365 days) - 0-3Lakh
+        block8a.item_3 = rand.Next(0, 300001);
+
+        // Q8.4: Scholarship (365 days) - 0-75k
+        block8a.item_4 = rand.Next(0, 75001);
+
+        // Q8.5: Retirement benefits (365 days) - 0-2Lakh
+        block8a.item_5 = rand.Next(0, 200001);
+
+        // Q8.6: Others - 0-50k
+        block8a.item_6 = rand.Next(0, 50001);
+
+        // Mark as updated
+        block8a.isUpdated = true;
+
+        // 2. Save
+        int saved = await dQ.Save_SCH_HIS_Block8(block8a);
+    }
+
+    private async Task generateBlock8b()
+    {
+        var rand = new Random();
+
+       
+
+        // Generate 3 random entries
+        for (int i = 1; i <= 3; i++)
+        {
+            var record = new Tbl_Block_8_Q6
+            {
+                id = Guid.NewGuid(),
+                hhd_id = SessionStorage.selected_hhd_id,
+                fk_block_8 = Guid.NewGuid(),
+                serial_number = i,
+
+                // PURE RANDOM ?
+                item_2 = rand.Next(1, 13),     // Scheme 1-12
+                item_3 = rand.Next(1, 6),      // Beneficiaries 1-5
+                item_4 = rand.Next(1, 13),     // Months 1-12
+                item_5 = rand.Next(10000, 100001) // Amount 10k-1Lakh
+            };
+
+            record.isUpdated = true;
+            await dQ.Save_SCH_HIS_Block8_Q6(record);
+        }
+    }
+
+    private async Task generateBlock9a()
+    {
+        var rand = new Random();
+
+        // Load or create Block 9A
+        var block9a = await dQ.Fetch_SCH_HIS_Block9a(SessionStorage.selected_hhd_id)
+                      ?? new Tbl_Block_9a
+                      {
+                          id = Guid.NewGuid(),
+                          hhd_id = SessionStorage.selected_hhd_id,
+                          fsu_id = SessionStorage.SelectedFSUId
+                      };
+
+        // PURE RANDOM VALUES ?
+
+        // Q9.1.1-5: Interest sources (0-2Lakh each)
+        block9a.item_1_1 = rand.Next(0, 200001);
+        block9a.item_1_2 = rand.Next(0, 200001);
+        block9a.item_1_3 = rand.Next(0, 200001);
+        block9a.item_1_4 = rand.Next(0, 200001);
+        block9a.item_1_5 = rand.Next(0, 200001);
+
+        // Q9.1.6: Total (auto-calculated in UI, but set random for consistency)
+        block9a.item_1_6 = rand.Next(0, 500001);
+
+        // Q9.2: Dividend (0-3Lakh)
+        block9a.item_2 = rand.Next(0, 300001);
+
+        // Q9.3: Annuities (0-1Lakh)
+        block9a.item_3 = rand.Next(0, 100001);
+
+        // Q9.4: Other receipts (0-75k)
+        block9a.item_4 = rand.Next(0, 75001);
+
+        // Save
+        await dQ.Save_SCH_HIS_Block9a(block9a);
+    }
+    private async Task generateBlock9b()
+    {
+        var rand = new Random();
+
+        // Load or create Block 9B
+        var block9b = await dQ.Fetch_SCH_HIS_Block9B(SessionStorage.selected_hhd_id)
+                      ?? new Tbl_Block_9b
+                      {
+                          id = Guid.NewGuid(),
+                          hhd_id = SessionStorage.selected_hhd_id,
+                          fsu_id = SessionStorage.SelectedFSUId
+                      };
+
+        // PURE RANDOM VALUES ?
+
+        // Q9.5.1: Dwelling (Months, Rent, Expenses)
+        block9b.item_5_1_3 = rand.Next(0, 13);    // Months 0-12
+        block9b.item_5_1_4 = rand.Next(0, 50001); // Monthly rent 0-50k
+        block9b.item_5_1_5 = rand.Next(0, 25001); // Expenses 0-25k
+
+        // Q9.5.2: Building/Structure
+        block9b.item_5_2_3 = rand.Next(0, 13);    // Months 0-12
+        block9b.item_5_2_4 = rand.Next(0, 30001); // Monthly rent 0-30k
+        block9b.item_5_2_5 = rand.Next(0, 15001); // Expenses 0-15k
+
+        // Q9.5.3: Machinery/Equipment
+        block9b.item_5_3_3 = rand.Next(0, 13);    // Months 0-12
+        block9b.item_5_3_4 = rand.Next(0, 40001); // Monthly rent 0-40k
+        block9b.item_5_3_5 = rand.Next(0, 20001); // Expenses 0-20k
+
+        // Q9.6: Land leasing (0-2Lakh)
+        block9b.item_6 = rand.Next(0, 200001);
+
+        // Q9.7: Intellectual property (0-1Lakh)
+        block9b.item_7 = rand.Next(0, 100001);
+
+        // Save
+        await dQ.Save_SCH_HIS_Block9B(block9b);
+    }
+
+    private async Task generateBlock10()
+    {
+        var rand = new Random();
+
+        var block10 = await dQ.Fetch_SCH_HIS_Block10()
+                      ?? new Tbl_Block_10
+                      {
+                          id = Guid.NewGuid(),
+                          hhd_id = SessionStorage.selected_hhd_id,
+                          fsu_id = SessionStorage.SelectedFSUId
+                      };
+
+        // Fill all fields with random values
+        block10.item_1 = rand.Next(0, 10001);
+        block10.item_2 = rand.Next(0, 10001);
+        block10.item_3 = rand.Next(0, 50001);
+        block10.item_4 = rand.Next(0, 50001);
+        block10.item_5 = rand.Next(0, 50001);
+        block10.item_6 = rand.Next(0, 50001);
+        block10.item_7 = rand.Next(0, 50001);
+        block10.item_8 = rand.Next(0, 50001);
+        block10.item_9 = rand.Next(0, 50001);
+        block10.item_10 = rand.Next(0, 50001);
+        block10.item_11 = rand.Next(0, 50001);
+        block10.item_12 = rand.Next(0, 50001);
+        block10.item_13 = rand.Next(0, 500001);
+        block10.item_14 = rand.Next(0, 500001);
+        block10.item_15 = rand.Next(0, 500001);
+        block10.item_16 = rand.Next(0, 500001);
+        block10.item_17 = rand.Next(0, 500001);
+        block10.item_18 = rand.Next(0, 500001);
+        block10.item_19 = rand.Next(0, 500001);
+        block10.item_20 = rand.Next(0, 500001);
+        block10.item_21 = rand.Next(0, 500001);
+        block10.item_22 = rand.Next(0, 500001);
+        block10.item_23 = (double)rand.Next(50000, 2000001);
+
+        // Save using correct method
+        await dQ.Save_SCH_HIS_Block10(block10);
+    }
+
+    private async Task generateBlock11a()
+    {
+        var rand = new Random();
+
+        // Load or create Block 11A (parameterless method)
+        var block11a = await dQ.Fetch_SCH_HIS_Block11(SessionStorage.selected_hhd_id)
+                       ?? new Tbl_Block_11a
+                       {
+                           id = Guid.NewGuid(),
+                           hhd_id = SessionStorage.selected_hhd_id,
+                           fsu_id = SessionStorage.SelectedFSUId
+                       };
+
+        // PURE RANDOM VALUES ?
+
+        // Q11.1: Yes/No (1 or 2)
+        block11a.item_1 = rand.Next(1, 3);
+
+        // Q11.2: Amount (0-50k)
+        block11a.item_2 = rand.Next(0, 50001);
+
+        // Q11.3: Yes/No (1 or 2)
+        block11a.item_3 = rand.Next(1, 3);
+
+        // Q11.4: Times (1-12)
+        block11a.item_4 = rand.Next(1, 13);
+
+        // Q11.5: Total amount (10k-2Lakh)
+        block11a.item_5 = rand.Next(10000, 200001);
+
+        // Q11.6: Charity (0-50k)
+        block11a.item_6 = rand.Next(0, 50001);
+
+        // Save
+        await dQ.Save_SCH_HIS_Block11a(block11a);
+    }
+
+    private async Task generateBlock11b()
+    {
+        var rand = new Random();
+
+        // Delete existing Block 11B
+        // await dQ.Delete_SCH_HIS_Block11b(SessionStorage.selected_hhd_id);
+
+        // ? FETCH ALL Block 3 MEMBERS
+        var block3Members = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
+        // Generate entry for EVERY Block 3 member
+        foreach (var member in block3Members)
+        {
+            bool paidTax = rand.Next(2) == 1; // 50% chance pays tax
+
+            var record = new Tbl_Block_11b
+            {
+                id = Guid.NewGuid(),
+                fk_block_3 = member.id,             // Link to real member
+                hhd_id = SessionStorage.selected_hhd_id,
+                item_1 = member.serial_no,          // Real serial no
+                item_2 = member.item_2,             // Real name
+
+                // RANDOM TAX DATA ?
+                item_3 = paidTax ? 1 : 2,           // Yes(1)/No(2)
+                item_4 = paidTax ? rand.Next(10000, 100001) : 0,  // Tax amount
+                // is_updated = true
+            };
+
+            await dQ.Save_SCH_HIS_Block11b(record);
+        }
+    }
+
+
+    private async Task generateBlock2()
+    {
+        var rand = new Random();
+
+        // Load or create Block 2
+        var block2 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>()
+                     ?? new Tbl_Block_FieldOperation
+                     {
+                         id = Guid.NewGuid(),
+                         fsu_id = SessionStorage.SelectedFSUId,
+                         hhd_id = SessionStorage.selected_hhd_id
+                     };
+
+        // PURE RANDOM VALUES for ALL FIELDS ?
+
+        // Names/Codes
+        block2.enumerator_name = $"Enumerator-{rand.Next(1001, 9999)}";
+        block2.enumerator_code = $"E{rand.Next(1001, 9999)}";
+        block2.supervisor_name = $"Supervisor-{rand.Next(1001, 9999)}";
+        block2.supervisor_code = $"S{rand.Next(1001, 9999)}";
+
+        // Dates (random recent dates)
+        block2.date_of_survey = DateTime.Now.AddDays(-rand.Next(1, 30));
+        block2.date_of_receipt = block2.date_of_survey.Value.AddDays(rand.Next(1, 5));
+        block2.date_of_scrutiny = block2.date_of_receipt.Value.AddDays(rand.Next(1, 10));
+        block2.date_of_despatch = block2.date_of_scrutiny.Value.AddDays(rand.Next(1, 7));
+
+        // Numbers
+        block2.total_time = rand.Next(30, 121);              // 30-120 mins
+        block2.number_of_enumerators = rand.Next(1, 4);      // 1-3
+
+        // Booleans (random)
+        block2.item_5_1_remarks = rand.Next(2) == 1;
+        block2.item_5_2_remarks = rand.Next(2) == 1;
+
+        // Informant (random from 1-10, age>15 assumed)
+        block2.informant_serial = rand.Next(1, 11);
+        block2.informant_name = $"Informant-{rand.Next(1, 21)}";
+        block2.informant_mobile = $"9{rand.Next(100000000, 999999999)}"; // 10-digit
+        block2.informant_response_code = rand.Next(1, 5);        // 1-4
+        block2.fk_block_3 = Guid.NewGuid();
+
+        // Save
+        await dQ.SaveAsync<Tbl_Block_FieldOperation>(block2);
+    }
+
 }

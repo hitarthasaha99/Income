@@ -414,7 +414,7 @@
                 await dB.SaveAsync<Tbl_Block_1>(block_1);
             }
             // Navigate to the next block/page
-            if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == false))
+            if (showDataTable11B.Count > 0 && showDataTable11B.Any(x => x.is_updated == true))
             {
                 toastService.ShowError("Please save all the entries before proceeding");
                 return;
