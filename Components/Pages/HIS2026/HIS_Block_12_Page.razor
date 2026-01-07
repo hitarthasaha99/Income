@@ -1,0 +1,121 @@
+﻿@page "/dashboard/his/block_12_"
+@layout Income.Components.Layout.DashboardLayout
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@using FluentValidation
+@using Income.Database.Models.Common
+@using Income.Database.Models.HIS_2026
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@using System.Reflection
+@inject IJSRuntime JSRuntime
+
+<div class="main-content">
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title m-0">
+                <span class="text-primary me-1">Block 12</span>Particulars of Total Income of the Household
+            </h3>
+            <div class="card-tools">
+                <button class="btn btn-primary"><i class="fi fi-rr-plus me-1"></i>Add</button>
+            </div>
+        </div>
+        <div class="card-header">
+            <h3 class="card-title text-success">Information will be collected at household level in this block.</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Q. no.</th>
+                            <th class="text-center">Question Description</th>
+                            <th class="text-center">Entry</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="align-middle text-center">12.1</td>
+                            <td>
+                                <p>Total household income from all sources earned by all the members of the
+                                    household during last financial year?
+                                </p>
+                                <ul>
+                                    <li>(Less than 1 lakh - 1,</li>
+                                    <li>1 lakh to 2 lakhs - 2,</li>
+                                    <li>2 lakhs to 4 lakhs - 3,</li>
+                                    <li>4 lakhs to 8 lakhs - 4,</li>
+                                    <li>8 lakhs to 12 lakhs - 5,</li>
+                                    <li>12 lakhs to 16 lakhs - 6,</li>
+                                    <li>16 lakhs to 20 lakhs - 7,</li>
+                                    <li>20 lakhs to 24 lakhs - 8,</li>
+                                    <li>24 lakhs to 30 lakhs - 9,</li>
+                                    <li>Above 30 lakhs - 10)</li>
+                                </ul>
+                            </td>
+                            <td>
+                               <select class="form-select form-select-sm">
+                                    <option>Please Select</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                               </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <!-- Remarks textarea -->
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title">Remarks</h3>
+        </div>
+        <div class="card-body">
+            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..."></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="d-flex">
+                <NavLink class="btn btn-outline-primary">
+                    <i class="fi fi-rr-angle-left me-1"></i>Back
+                </NavLink>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="d-flex align-items-center justify-content-end">               
+                <button class="btn btn-outline-primary me-2">
+                    <i class="fi fi-rr-disk me-1"></i>
+                    Save
+                </button>               
+                <NavLink class="btn btn-primary">
+                    Next
+                    <i class="fi fi-rr-angle-right ms-1"></i>
+                </NavLink>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int SelectedFsuId { get; set; }
+    [Parameter]
+    public DateTime? survey_time { get; set; }
+    [Parameter]
+    public string? page_name { get; set; } = string.Empty;
+    [Parameter]
+    public bool ShowVisitedBlock { get; set; } = true;
+}
