@@ -364,7 +364,7 @@ namespace Income.Database.Queries
                         // Soft delete → set is_deleted = 1
                         string query =
                             $"UPDATE {table.Name} SET is_deleted = 1 " +
-                            $"WHERE fsu_ref_id = ? AND hhd_id = ?";
+                            $"WHERE fsu_id = ? AND hhd_id = ?";
 
                         await _database.ExecuteAsync(query, fsuId, hhdId);
                     }
@@ -373,7 +373,7 @@ namespace Income.Database.Queries
                         // Hard delete → remove records
                         string query =
                             $"DELETE FROM {table.Name} " +
-                            $"WHERE fsu_ref_id = ? AND hhd_id = ?";
+                            $"WHERE fsu_id = ? AND hhd_id = ?";
 
                         await _database.ExecuteAsync(query, fsuId, hhdId);
                     }
