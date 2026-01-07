@@ -1,18 +1,4 @@
-﻿//using BootstrapBlazor.Components;
-//using DocumentFormat.OpenXml;
-//using DocumentFormat.OpenXml.Packaging;
-//using DocumentFormat.OpenXml.Wordprocessing;
-//using Microsoft.Maui.Controls;
-//using Newtonsoft.Json;
-//using System;
-//using System.Collections.Generic;
-//using System.Globalization;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using Income.Database.Models.SCH0_0;
-//using Income.Database.Models.HIS_2026;
-//using Income.Database.Queries;
+﻿
 
 #if ANDROID
 using Android.App;
@@ -38,11 +24,27 @@ using BootstrapBlazor.Components;
 namespace Income.Common
 {
     public class PrintHelper
-    {               
+    {
 
-        public Query SCH_0_0_Quaries = new();      
-        Tbl_Sch_0_0_Block_0_1? block_0_1 = new();        
-        int hhdId = 0;
+        public Query SCH_0_0_Quaries = new();
+        Tbl_Sch_0_0_Block_0_1? block_0_1 = new();
+        List<Tbl_Sch_0_0_Block_2_1>? block_2_1 = new();
+        List<Tbl_Sch_0_0_Block_2_2>? block_2_2 = new();
+        Tbl_Sch_0_0_Block_4? block_4 = new();
+        List<Tbl_Sch_0_0_Block_5>? block_5 = new();
+        List<Tbl_Sch_0_0_Block_7>? block_7 = new();
+        Tbl_Sch_0_0_FieldOperation? block_11 = new();//sch00
+
+        Tbl_Block_1? blockhis_1 = new();
+        List<Tbl_Block_3>? blockhis_3 = new();
+        Tbl_Block_4? blockhis_4 = new();
+        List<Tbl_Block_5>? blockhis_5 = new();
+        List<Tbl_Block_6>? blockhis_6 = new();
+        Tbl_Block_7a? blockhis_7a = new();
+        Tbl_Block_10? blockhis_10 = new();
+    
+
+        //int hhdId = 0;
         //public PrintHelper(ScheduleZeroDatabase _scheduleZeroDatabase, ScheduleTenOFourDatabase sch104Db)
         //{
         //    _ScheduleZeroDatabase = _scheduleZeroDatabase;
@@ -54,7 +56,7 @@ namespace Income.Common
             {
                 //hhdId = HhdId;
                 string printDir;
-                string downloadsDir;               
+                string downloadsDir;
                 var fileName = $"{FsuId}.docx";
 
                 //Stream templateStream;
@@ -72,8 +74,8 @@ namespace Income.Common
 
                 sch00TemplateStream = await FileSystem.OpenAppPackageFileAsync("Resources/Template/IncomeSch00Template.docx");
                 sch26TemplateStream = await FileSystem.OpenAppPackageFileAsync("Resources/Template/TemplateHis2026.docx");
-#endif                
-                
+#endif
+
                 var generatedDoc00 = await FillDocument00(sch00TemplateStream);
                 var generatedDoc2026 = await FillDocument26(sch26TemplateStream);
                 if (generatedDoc00 == null || generatedDoc00.Length == 0)
@@ -119,24 +121,26 @@ namespace Income.Common
                 var commonQueries = new CommonQueries();
                 var dbQueries = new DBQueries();
                 block_0_1 = await dbQueries.FetchBlock1();
-                //using var ms = new MemoryStream(File.ReadAllBytes(templatePath));
+                block_2_1 = await dbQueries.FetchSCH0Block2_1Data();
+                block_2_2 = await dbQueries.FetchSCH0Block2_2Data();
+                block_4 = await dbQueries.GetBlock4();
+                block_5 = await dbQueries.FetchSCH0Block5Data();
+                //block_7 = await dbQueries.GetBlock7Data();
+                block_7 = await dbQueries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+                block_11 = await dbQueries.FetchBlock2();
+
+
                 using (var doc = WordprocessingDocument.Open(ms, true))
                 {
                     var body = doc.MainDocumentPart.Document.Body;
 
                     FillBlock0_1(body, block_0_1);
-                    //FillBlock1(body, sch104record, SCH00record);
-                    //FillBlock2(body, sch104record);
-                    //FillListOfMember(body, sch104record);
-                    //FillBlock3(body, sch104record);
-                    //FillBlock4(body, sch104record);
-                    //FillBlock41(body, sch104record);
-                    //FillBlock5A(body, sch104record);
-                    //FillBlock5B(body, sch104record);
-                    //FillBlock5C(body, sch104record);
-                    //FillBlock5D(body, sch104record);
-                    //FillIdentification1(body, sch104record);
-                    //FillBlock6(body, sch104record);
+                    FillBlock2_1_And_2_2(body, block_2_1, block_2_2);
+                    FillBlock4(body, block_4);
+                    FillBlock5(body, block_5);
+                    FillBlock7(body, block_7);
+                    //FillBlock0_8(body, block_7);
+                    FillBlock11(body, block_11);
 
                     // Save explicitly (safe)
                     doc.MainDocumentPart.Document.Save();
@@ -151,800 +155,20 @@ namespace Income.Common
             }
         }
 
-        public async Task<byte[]> FillDocument26(Stream templatePath00)
+
+
+        /// <summary>
+        ///  Works even if cells are merged 
+        ///  Always gives the code/number column
+        ///  Does not break if Word layout changes
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+
+        private TableCell GetLastCell(TableRow row)
         {
-            try
-            {
-                using var ms = new MemoryStream();
-                await templatePath00.CopyToAsync(ms);
-                ms.Position = 0;
-                var commonQueries = new CommonQueries();
-                var dbQueries = new DBQueries();
-                block_0_1 = await dbQueries.FetchBlock1();
-                //using var ms = new MemoryStream(File.ReadAllBytes(templatePath));
-                using (var doc = WordprocessingDocument.Open(ms, true))
-                {
-                    var body = doc.MainDocumentPart.Document.Body;
-
-                    //FillBlock0_1(body, block_0_1);
-                    //FillBlock1(body, sch104record, SCH00record);
-                    //FillBlock2(body, sch104record);
-                    //FillListOfMember(body, sch104record);
-                    //FillBlock3(body, sch104record);
-                    //FillBlock4(body, sch104record);
-                    //FillBlock41(body, sch104record);
-                    //FillBlock5A(body, sch104record);
-                    //FillBlock5B(body, sch104record);
-                    //FillBlock5C(body, sch104record);
-                    //FillBlock5D(body, sch104record);
-                    //FillIdentification1(body, sch104record);
-                    //FillBlock6(body, sch104record);
-
-                    // Save explicitly (safe)
-                    doc.MainDocumentPart.Document.Save();
-                }
-
-                return ms.ToArray();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error generating document: {ex.Message}");
-                return null;
-            }
+            return row.Elements<TableCell>().Last();
         }
-
-        private void FillBlock0_1(Body body, Tbl_Sch_0_0_Block_0_1 block01)
-        {
-            var table = body.Elements<Table>().FirstOrDefault(t => t.InnerText.ToLower().Contains("[0]"));
-            if (table != null)
-            {
-                var cells = table.Descendants<TableCell>().ToList();
-                ReplaceCellText(cells[6], block01?.Block_0_1 ?? "");
-                ReplaceCellText(cells[9], block01?.Block_0_2 ?? "");
-                ReplaceCellText(cells[12], block01?.Block_0_3 ?? "");
-                ReplaceCellText(cells[15], block01?.Block_0_4 ?? "");
-                ReplaceCellText(cells[18], block01?.Block_0_5 ?? "");
-                ReplaceCellText(cells[21], block01?.Block_0_6 ?? "");              
-            }
-        }
-
-        //private void FillBlock1(Body body, Sch104Record sch104record, Sch000Record SCH00record)
-        //{
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[1] identification of sample household"));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(1);
-        //    var Household = SCH00record.Households.FirstOrDefault(p => p.IsSelected && p.HHDSerial == hhdId);
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        ReplaceCellText(cells[9], sch104record?.FsuNumber ?? "");
-        //        ReplaceCellText(cells[12], sch104record?.SRO ?? "");   // need data
-        //        ReplaceCellText(cells[15], sch104record?.SchNumber ?? "");
-        //        ReplaceCellText(cells[18], SCH00record?.TotalSu.ToInt() > 1 ? "1" : "");
-        //        ReplaceCellText(cells[21], sch104record?.Sector ?? "");
-        //        ReplaceCellText(cells[24], sch104record?.SelSubDiv ?? "");
-        //        ReplaceCellText(cells[27], sch104record?.NssReg ?? "");
-        //        ReplaceCellText(cells[30], sch104record?.SSS ?? "");
-        //        ReplaceCellText(cells[33], sch104record?.DisCode ?? "");
-        //        ReplaceCellText(cells[36], Household?.HouseSerial ?? "");
-        //        ReplaceCellText(cells[39], sch104record?.Strm ?? "");
-        //        ReplaceCellText(cells[42], sch104record?.InfSrl ?? "");
-        //        ReplaceCellText(cells[45], sch104record?.Sstrm ?? "");
-        //        ReplaceCellText(cells[48], sch104record?.RespCode ?? "");
-        //        ReplaceCellText(cells[51], sch104record?.MmYear ?? "");
-        //        ReplaceCellText(cells[54], sch104record?.SurvCode ?? "");
-        //        ReplaceCellText(cells[57], sch104record?.Year ?? "");
-        //        ReplaceCellText(cells[60], sch104record?.ReasonCode ?? "");
-        //        ReplaceCellText(cells[63], sch104record?.Month ?? "");
-        //        ReplaceCellText(cells[66], sch104record?.Visit ?? "");
-        //        ReplaceCellText(cells[69], sch104record?.Panel ?? "");
-
-        //    }
-
-        //}
-
-        //private void FillBlock2(Body body, Sch104Record sch104record)
-        //{
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(2);
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        ReplaceCellText(cells[11], sch104record?.Fi1 ?? "");
-        //        ReplaceCellText(cells[23], sch104record?.Fi2 ?? "");
-        //        ReplaceCellText(cells[39], sch104record?.DOS ?? "");
-        //        ReplaceCellText(cells[59], sch104record?.Time ?? "0");
-        //        string informantDisplay = GetInformantDisplay(sch104record);
-        //        ReplaceCellText(cells[63], informantDisplay);
-
-        //        ReplaceCellText(cells[67], sch104record?.RespCode ?? "0");
-
-        //    }
-
-        //    var table7 = body.Elements<Table>().ElementAtOrDefault(3);
-        //    var table8 = body.Elements<Table>().ElementAtOrDefault(4);
-        //    if (table7 != null)
-        //    {
-        //        var cells = table7.Descendants<TableCell>().ToList();
-        //        ReplaceCellText(cells[1], sch104record?.Remark1 ?? "");
-        //    }
-
-        //    if (table8 != null)
-        //    {
-        //        var cells = table8.Descendants<TableCell>().ToList();
-        //        ReplaceCellText(cells[1], sch104record?.Remark2 ?? "");
-        //    }
-
-        //}
-
-        //private string GetInformantDisplay(Sch104Record sch104record)
-        //{
-        //    if (sch104record == null || string.IsNullOrEmpty(sch104record.InfSrl))
-        //        return "";
-
-        //    if (sch104record.InfSrl.Trim() == "99")
-        //        return "99 - Not a Household Member";
-
-        //    if (!int.TryParse(sch104record.InfSrl?.Trim(), out int infSrlInt))
-        //        return sch104record.InfSrl;
-
-        //    var member = sch104record.HouseholdMemberData?
-        //        .FirstOrDefault(x => x.Srl == infSrlInt);
-
-        //    if (member != null && !string.IsNullOrEmpty(member.PName))
-        //    {
-        //        return $"{member.Srl} - {member.PName}";
-        //    }
-
-        //    return sch104record.InfSrl;
-        //}
-
-        //private void FillListOfMember(Body body, Sch104Record sch104record)
-        //{
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(5);
-        //    List<MemberDetails> members = new List<MemberDetails>();
-        //    members = sch104record.HouseholdMemberData ?? new List<MemberDetails>();
-        //    int HouseholdCount = members.Count;
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        ReplaceCellText(cells[2], sch104record?.HhdSize ?? "");
-        //        ReplaceCellText(cells[4], HouseholdCount > 0 ? HouseholdCount.ToString() : "");
-
-        //        if (members != null && members.Count > 0)
-        //        {
-        //            int startIndex = 7;
-        //            int existingCellCount = cells.Count;
-        //            for (var i = 0; i < members.Count; i++)
-        //            {
-        //                int baseIndex = startIndex + i * 2;
-        //                if (baseIndex + 1 < existingCellCount)
-        //                {
-        //                    ReplaceCellText(cells[baseIndex], members[i]?.Srl.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 1], members[i]?.PName.ToString() ?? "");
-        //                }
-        //                else
-        //                {
-        //                    var row = new TableRow();
-        //                    row.Append(
-        //                        CreateTextCell(members[i]?.Srl.ToString() ?? ""),
-        //                        CreateTextCell(members[i]?.PName.ToString() ?? "")
-        //                       );
-        //                    table.AppendChild(row);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private void FillBlock4(Body body, Sch104Record record)
-        //{
-        //    List<MemberDetails> Memberdata = new();
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(6);
-        //    Memberdata = record?.HouseholdMemberData ?? new();
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        //var array = record.Households;
-        //        if (Memberdata != null && Memberdata.Count > 0)
-        //        {
-        //            int startIndex = 62;
-        //            int existingCellCount = cells.Count;
-        //            for (var i = 0; i < Memberdata.Count; i++)
-        //            {
-        //                int baseIndex = startIndex + i * 18;
-        //                if (baseIndex + 17 < existingCellCount)
-        //                {
-        //                    ReplaceCellText(cells[baseIndex], Memberdata[i]?.Srl.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.PName.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 2], Memberdata[i].StillMember.ToString());
-        //                    ReplaceCellText(cells[baseIndex + 3], Memberdata[i]?.Rela.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 4], Memberdata[i]?.Gender ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 5], Memberdata[i].Age.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 6], Memberdata[i]?.Marital.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 7], Memberdata[i]?.Edu.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 8], Memberdata[i]?.TEdu.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 9], Memberdata[i]?.Grade.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 10], Memberdata[i]?.YrsBeforeI.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 11], Memberdata[i]?.YrsAfterGrade.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 12], Memberdata[i]?.IfLastYr.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 13], Memberdata[i]?.Months.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 14], Memberdata[i]?.CurrAtt.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 15], Memberdata[i]?.Secondary.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 16], Memberdata[i]?.AnyVocational.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 17], Memberdata[i]?.AnyTraining.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 18], Memberdata[i]?.TrainingCompleted.ToString() ?? "");
-        //                }
-        //                else
-        //                {
-        //                    var row = new TableRow();
-        //                    row.Append(
-        //                        CreateTextCell(Memberdata[i]?.Srl.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.PName.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.StillMember ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Rela?.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Gender ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Age.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Marital.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Edu.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.TEdu.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Grade.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.YrsBeforeI.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.YrsAfterGrade.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.IfLastYr.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Months.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.CurrAtt.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Secondary.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.AnyVocational.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.AnyTraining.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.TrainingCompleted.ToString() ?? "")
-        //                    );
-        //                    table.AppendChild(row);
-        //                }
-        //            }
-
-        //        }
-
-        //    }
-
-        //}
-
-        //private void FillBlock41(Body body, Sch104Record record)
-        //{
-        //    List<MemberDetails> Memberdata = new();
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(7);
-        //    Memberdata = record?.HouseholdMemberData ?? new();
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        //var array = record.Households;
-        //        if (Memberdata != null && Memberdata.Count > 0)
-        //        {
-        //            int startIndex = 15;
-        //            int existingCellCount = cells.Count;
-        //            var filteredMembers = Memberdata.FindAll(x => (x.Age.ToInt() >= 12 && x.Age.ToInt() <= 59 && x.AnyVocational.ToInt() == 1 && x.TrainingCompleted.ToInt() != 1));
-        //            for (var i = 0; i < filteredMembers.Count; i++)
-        //            {
-        //                int baseIndex = startIndex + i * 7;
-        //                if (baseIndex + 6 < existingCellCount)
-        //                {
-        //                    ReplaceCellText(cells[baseIndex], Memberdata[i]?.Srl.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.Age.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 2], Memberdata[i]?.Field.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 3], Memberdata[i]?.Duration.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 4], Memberdata[i]?.TypeTraining.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 5], Memberdata[i]?.SourceFund.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 6], Memberdata[i]?.TrainingEntity.ToString() ?? "");
-        //                }
-        //                else
-        //                {
-        //                    var row = new TableRow();
-
-        //                    row.Append(
-        //                        CreateTextCell(Memberdata[i]?.Srl.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Age?.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Field.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Duration.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.TypeTraining.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.SourceFund.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.TrainingEntity.ToString() ?? "")
-        //                    );
-        //                    table.AppendChild(row);
-        //                }
-        //            }
-
-        //        }
-
-        //    }
-
-        //}
-
-        //private void FillBlock5A(Body body, Sch104Record record)
-        //{
-        //    List<MemberDetails> Memberdata = new();
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(8);
-        //    Memberdata = record?.HouseholdMemberData ?? new();
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        //var array = record.Households;
-        //        if (Memberdata != null && Memberdata.Count > 0)
-        //        {
-        //            int startIndex = 83;
-        //            int existingCellCount = cells.Count;
-        //            for (var i = 0; i < Memberdata.Count; i++)
-        //            {
-        //                int baseIndex = startIndex + i * 16;
-        //                if (baseIndex + 16 < existingCellCount)
-        //                {
-        //                    ReplaceCellText(cells[baseIndex], Memberdata[i]?.Srl.ToString() ?? "");
-        //                    //ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.PName.ToString() ?? "");                            
-        //                    ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.Age.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 2], Memberdata[i]?.Pas ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 3], Memberdata[i]?.NICDescPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 4], Memberdata[i]?.NICPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 5], Memberdata[i]?.NCOPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 6], Memberdata[i]?.HasSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 7], Memberdata[i]?.LocPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 8], Memberdata[i]?.EntypPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 9], Memberdata[i]?.WrkrPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 10], Memberdata[i]?.JobPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 11], Memberdata[i]?.LeavePas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 12], Memberdata[i]?.SSecPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 13], Memberdata[i]?.DestProdPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 14], Memberdata[i]?.Block5_1col_15.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 15], Memberdata[i]?.Block5_1col_16.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 16], Memberdata[i]?.Block5_1col_17.ToString() ?? "");
-        //                }
-        //                else
-        //                {
-        //                    var row = new TableRow();
-        //                    row.Append(
-        //                        CreateTextCell(Memberdata[i]?.Srl.ToString() ?? ""),
-        //                        //CreateTextCell(Memberdata[i]?.PName.ToString() ?? ""),                              
-        //                        CreateTextCell(Memberdata[i]?.Age?.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Pas ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.NICDescPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.NICPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.NCOPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.HasSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.LocPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.EntypPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.WrkrPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.JobPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.LeavePas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.SSecPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.DestProdPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_1col_15.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_1col_16.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_1col_17.ToString() ?? "")
-        //                    );
-        //                    table.AppendChild(row);
-        //                }
-        //            }
-
-        //        }
-
-        //    }
-        //}
-
-        //private void FillBlock5B(Body body, Sch104Record record)
-        //{
-        //    List<MemberDetails> Memberdata = new();
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(9);
-        //    Memberdata = record?.HouseholdMemberData ?? new();
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        //var array = record.Households;
-        //        if (Memberdata != null && Memberdata.Count > 0)
-        //        {
-        //            int startIndex = 56;
-        //            int existingCellCount = cells.Count;
-        //            var filteredMembers = Memberdata.Where(x => x.HasSas.ToInt() == 1).ToList();
-        //            for (var i = 0; i < filteredMembers.Count; i++)
-        //            {
-        //                int baseIndex = startIndex + i * 16;
-        //                if (baseIndex + 15 < existingCellCount)
-        //                {
-        //                    ReplaceCellText(cells[baseIndex], Memberdata[i]?.Srl.ToString() ?? "");
-        //                    //ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.PName.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.Age.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 2], Memberdata[i]?.Sas ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 3], Memberdata[i]?.NICDescSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 4], Memberdata[i]?.NICSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 5], Memberdata[i]?.NCOSas.ToString() ?? "");
-        //                    //ReplaceCellText(cells[baseIndex + 7], Memberdata[i]?.HasSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 6], Memberdata[i]?.LocSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 7], Memberdata[i]?.EntypSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 8], Memberdata[i]?.WrkrSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 9], Memberdata[i]?.JobSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 10], Memberdata[i]?.LeaveSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 11], Memberdata[i]?.SSecSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 12], Memberdata[i]?.DestProdSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 13], Memberdata[i]?.Block5_2col_14.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 14], Memberdata[i]?.Block5_2col_15.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 15], Memberdata[i]?.Block5_2col_16.ToString() ?? "");
-        //                }
-        //                else
-        //                {
-        //                    var row = new TableRow();
-        //                    row.Append(
-        //                        CreateTextCell(Memberdata[i]?.Srl.ToString() ?? ""),
-        //                        //CreateTextCell(Memberdata[i]?.PName.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Age?.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Sas ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.NICDescSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.NICSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.NCOSas.ToString() ?? ""),
-        //                        //CreateTextCell(Memberdata[i]?.HasSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.LocSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.EntypSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.WrkrSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.JobSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.LeaveSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.SSecSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.DestProdSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_2col_14.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_2col_15.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_2col_16.ToString() ?? "")
-        //                    );
-        //                    table.AppendChild(row);
-        //                }
-        //            }
-
-        //        }
-
-        //    }
-
-        //}
-
-        //private void FillBlock5C(Body body, Sch104Record record)
-        //{
-        //    List<MemberDetails> Memberdata = new();
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(10);
-        //    Memberdata = record?.HouseholdMemberData ?? new();
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        //var array = record.Households;
-        //        if (Memberdata != null && Memberdata.Count > 0)
-        //        {
-        //            int startIndex = 34;
-        //            int existingCellCount = cells.Count;
-        //            var filteredMembers = Memberdata.Where(x => x.Age.ToInt() >= 5).ToList();
-        //            for (var i = 0; i < filteredMembers.Count; i++)
-        //            {
-        //                int baseIndex = startIndex + i * 12;
-        //                if (baseIndex + 11 < existingCellCount)
-        //                {
-        //                    ReplaceCellText(cells[baseIndex], Memberdata[i]?.Srl.ToString() ?? "");
-        //                    //ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.PName.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.Age.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 2], Memberdata[i]?.Pas ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 3], Memberdata[i]?.Sas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 4], Memberdata[i]?.EverWorked1151.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 5], Memberdata[i]?.DurPas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 6], Memberdata[i]?.DurSas.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 7], Memberdata[i]?.ToSearchWork.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 8], Memberdata[i]?.SpellUnemp.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 9], Memberdata[i]?.EverWorked8197.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 10], Memberdata[i]?.ReasonNotWorking.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 11], Memberdata[i]?.MainReason.ToString() ?? "");
-        //                }
-        //                else
-        //                {
-        //                    var row = new TableRow();
-        //                    row.Append(
-        //                        CreateTextCell(Memberdata[i]?.Srl.ToString() ?? ""),
-        //                        //CreateTextCell(Memberdata[i]?.PName.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Age?.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Pas ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Sas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.EverWorked1151.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.DurPas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.DurSas.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.ToSearchWork.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.SpellUnemp.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.EverWorked8197.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.ReasonNotWorking.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.MainReason.ToString() ?? "")
-        //                    );
-        //                    table.AppendChild(row);
-        //                }
-        //            }
-
-        //        }
-
-        //    }
-
-        //}
-
-        //private void FillBlock5D(Body body, Sch104Record record)
-        //{
-        //    List<MemberDetails> Memberdata = new();
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(11);
-        //    Memberdata = record?.HouseholdMemberData ?? new();
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        //var array = record.Households;
-        //        if (Memberdata != null && Memberdata.Count > 0)
-        //        {
-        //            int startIndex = 34;
-        //            int existingCellCount = cells.Count;
-        //            var filteredMembers = Memberdata.Where(x => x.Age.ToInt() >= 5 && ((x.Block5_1col_15 == "1" || x.Block5_1col_16 == "1") || (x.Block5_2col_14 == "1" || x.Block5_2col_15 == "1"))).ToList();
-        //            for (var i = 0; i < filteredMembers.Count; i++)
-        //            {
-        //                int baseIndex = startIndex + i * 11;
-        //                if (baseIndex + 10 < existingCellCount)
-        //                {
-        //                    ReplaceCellText(cells[baseIndex], Memberdata[i]?.Srl.ToString() ?? "");
-        //                    //ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.PName.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 1], Memberdata[i]?.Age.ToString() ?? "");
-        //                    if ((Memberdata[i].Block5_1col_15 == "1" || Memberdata[i].Block5_1col_16 == "1") && !string.IsNullOrEmpty(Memberdata[i].Pas))
-        //                    {
-        //                        ReplaceCellText(cells[baseIndex + 2], Memberdata[i]?.Pas ?? "");
-        //                    }
-        //                    if ((Memberdata[i].Block5_2col_14 == "1" || Memberdata[i].Block5_2col_15 == "1") && (Memberdata[i].Block5_1col_15 != "1" && Memberdata[i].Block5_1col_16 != "1") && !string.IsNullOrEmpty(Memberdata[i].Sas))
-        //                    {
-        //                        ReplaceCellText(cells[baseIndex + 3], Memberdata[i]?.Sas.ToString() ?? "");
-        //                    }
-        //                    if ((Memberdata[i].Block5_1col_15 == "1" || Memberdata[i].Block5_1col_16 == "1") && !string.IsNullOrEmpty(Memberdata[i].Pas))
-        //                    {
-        //                        ReplaceCellText(cells[baseIndex + 4], Memberdata[i]?.NICPas.ToString() ?? "");
-        //                    }
-        //                    if ((Memberdata[i].Block5_2col_14 == "1" || Memberdata[i].Block5_2col_15 == "1") && (Memberdata[i].Block5_1col_15 != "1" && Memberdata[i].Block5_1col_16 != "1") && string.IsNullOrEmpty(Memberdata[i].NICPas) && !string.IsNullOrEmpty(Memberdata[i].Sas))
-        //                    {
-        //                        ReplaceCellText(cells[baseIndex + 5], Memberdata[i]?.NICSas.ToString() ?? "");
-        //                    }
-        //                    ReplaceCellText(cells[baseIndex + 6], Memberdata[i]?.Block5_4col_5.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 7], Memberdata[i]?.Block5_4col_6.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 8], Memberdata[i]?.Block5_4col_7.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 9], Memberdata[i]?.Block5_4col_8.ToString() ?? "");
-        //                    ReplaceCellText(cells[baseIndex + 10], Memberdata[i]?.Block5_4col_9.ToString() ?? "");
-        //                }
-        //                else
-        //                {
-        //                    var row = new TableRow();
-        //                    TableCell pasCell;
-        //                    TableCell sasCell;
-        //                    TableCell nicPasCell;
-        //                    TableCell nicSasCell;
-        //                    if ((Memberdata[i].Block5_1col_15 == "1" || Memberdata[i].Block5_1col_16 == "1") && !string.IsNullOrEmpty(Memberdata[i].Pas))
-        //                    {
-        //                        pasCell = CreateTextCell(Memberdata[i]?.Pas ?? "");
-        //                    }
-        //                    else
-        //                    {
-        //                        pasCell = CreateTextCell("");
-        //                    }
-
-        //                    if ((Memberdata[i].Block5_2col_14 == "1" || Memberdata[i].Block5_2col_15 == "1") && (Memberdata[i].Block5_1col_15 != "1" && Memberdata[i].Block5_1col_16 != "1") && !string.IsNullOrEmpty(Memberdata[i].Sas))
-        //                    {
-        //                        sasCell = CreateTextCell(Memberdata[i]?.Sas ?? "");
-        //                    }
-        //                    else
-        //                    {
-        //                        sasCell = CreateTextCell("");
-        //                    }
-
-        //                    if ((Memberdata[i].Block5_1col_15 == "1" || Memberdata[i].Block5_1col_16 == "1") && !string.IsNullOrEmpty(Memberdata[i].Pas))
-        //                    {
-        //                        nicPasCell = CreateTextCell(Memberdata[i]?.NICPas ?? "");
-        //                    }
-        //                    else
-        //                    {
-        //                        nicPasCell = CreateTextCell("");
-        //                    }
-
-        //                    if ((Memberdata[i].Block5_2col_14 == "1" || Memberdata[i].Block5_2col_15 == "1") && (Memberdata[i].Block5_1col_15 != "1" && Memberdata[i].Block5_1col_16 != "1") && string.IsNullOrEmpty(Memberdata[i].NICPas) && !string.IsNullOrEmpty(Memberdata[i].Sas))
-        //                    {
-        //                        nicSasCell = CreateTextCell(Memberdata[i]?.NICSas ?? "");
-        //                    }
-        //                    else
-        //                    {
-        //                        nicSasCell = CreateTextCell("");
-        //                    }
-        //                    row.Append(
-        //                        CreateTextCell(Memberdata[i]?.Srl.ToString() ?? ""),
-        //                        //CreateTextCell(Memberdata[i]?.PName.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Age?.ToString() ?? ""),
-        //                        pasCell,
-        //                        sasCell,
-        //                        nicPasCell,
-        //                        nicSasCell,
-        //                        CreateTextCell(Memberdata[i]?.Block5_4col_5.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_4col_6.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_4col_7.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_4col_8.ToString() ?? ""),
-        //                        CreateTextCell(Memberdata[i]?.Block5_4col_9.ToString() ?? "")
-        //                    );
-        //                    table.AppendChild(row);
-        //                }
-        //            }
-
-        //        }
-
-        //    }
-
-        //}
-
-        //private void FillBlock3(Body body, Sch104Record sch104record)
-        //{
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(12);
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        ReplaceCellText(cells[3], sch104record?.HhdSizeFrame ?? "");
-        //        ReplaceCellText(cells[6], sch104record?.HhdType ?? "");   // need data
-        //        ReplaceCellText(cells[9], sch104record?.Religion ?? "");
-        //        ReplaceCellText(cells[12], sch104record?.SocGrp ?? "");
-        //        ReplaceCellText(cells[18], sch104record?.Purchase ?? "");
-        //        ReplaceCellText(cells[21], sch104record?.HomeGrown ?? "");
-        //        ReplaceCellText(cells[24], sch104record?.KindWage ?? "");
-        //        ReplaceCellText(cells[27], sch104record?.ClothFootwear ?? "");
-        //        ReplaceCellText(cells[30], sch104record?.DurableGoods ?? "");
-        //        ReplaceCellText(cells[33], sch104record?.MCE ?? "");
-        //        ReplaceCellText(cells[36], sch104record?.Lposs ?? "");
-        //        ReplaceCellText(cells[39], sch104record?.Llout ?? "");
-        //        //ReplaceCellText(cells[39], sch104record?.ReasonCode ?? "");              
-
-        //    }
-
-        //}
-
-        //private void FillIdentification1(Body body, Sch104Record sch104record)
-        //{
-        //    var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("state/u.t."));
-        //    var table = body.Elements<Table>().ElementAtOrDefault(13);
-        //    if (table != null)
-        //    {
-        //        var cells = table.Descendants<TableCell>().ToList();
-        //        ReplaceCellText(cells[7], sch104record?.Mobile ?? "");
-        //        ReplaceCellText(cells[11], sch104record?.Mobile2 ?? "");   // need data
-        //        ReplaceCellText(cells[15], sch104record?.Landline ?? "");
-        //    }
-        //}
-
-        //private void FillBlock6(Body body, Sch104Record sch104record)
-        //{
-        //    var members = sch104record?.HouseholdMemberData ?? new List<MemberDetails>();
-        //    if (!members.Any())
-        //        return;
-
-        //    var templateTable = body.Elements<Table>().ElementAtOrDefault(14);
-        //    if (templateTable == null)
-        //        return;
-
-        //    templateTable.Remove();
-
-        //    var filteredMembers = sch104record?.Visit.ToInt() == 1
-        //        ? members.Where(x => x.Age.ToInt() > 4).ToList()
-        //        : members.Where(x => new int[] { 1, 2, 3 }.Contains(x.StillMember.ToInt()) && x.Age.ToInt() > 4).ToList();
-
-        //    foreach (var member in filteredMembers)
-        //    {
-
-
-
-        //        Table block6Table = (Table)templateTable.CloneNode(true);
-        //        var cells = block6Table.Descendants<TableCell>().ToList();
-
-        //        if (!string.IsNullOrEmpty(sch104record?.DateOfWeekend) && DateTime.TryParseExact(sch104record.DateOfWeekend, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
-        //        {
-        //            ReplaceCellText(cells[2], parsedDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture));
-        //        }
-        //        else
-        //        {
-        //            ReplaceCellText(cells[2], sch104record?.DateOfWeekend ?? "");
-        //        }
-        //        ReplaceCellText(cells[11], member.Srl.ToString());
-        //        ReplaceCellText(cells[14], member.Age ?? "");
-        //        // < !--Day7-- >
-        //        ReplaceCellText(cells[37], member.Das17 ?? "");
-        //        ReplaceCellText(cells[38], member.Ind17 ?? "");
-        //        ReplaceCellText(cells[39], member.Hrs17 ?? "");
-        //        ReplaceCellText(cells[40], member.Hr7 ?? "");
-        //        ReplaceCellText(cells[41], member.AHr7 ?? "");
-        //        ReplaceCellText(cells[42], member.Ern17 ?? "");
-        //        ReplaceCellText(cells[46], member.Das27 ?? "");
-        //        ReplaceCellText(cells[47], member.Ind27 ?? "");
-        //        ReplaceCellText(cells[48], member.Hrs27 ?? "");
-        //        ReplaceCellText(cells[51], member.Ern27 ?? "");
-
-        //        // < !--Day6-- >
-        //        ReplaceCellText(cells[55], member.Das16 ?? "");
-        //        ReplaceCellText(cells[56], member.Ind16 ?? "");
-        //        ReplaceCellText(cells[57], member.Hrs16 ?? "");
-        //        ReplaceCellText(cells[58], member.Hr6 ?? "");
-        //        ReplaceCellText(cells[59], member.AHr6 ?? "");
-        //        ReplaceCellText(cells[60], member.Ern16 ?? "");
-        //        ReplaceCellText(cells[64], member.Das26 ?? "");
-        //        ReplaceCellText(cells[65], member.Ind26 ?? "");
-        //        ReplaceCellText(cells[66], member.Hrs26 ?? "");
-        //        ReplaceCellText(cells[69], member.Ern26 ?? "");
-
-        //        // < !--Day5-- >
-        //        ReplaceCellText(cells[73], member.Das15 ?? "");
-        //        ReplaceCellText(cells[74], member.Ind15 ?? "");
-        //        ReplaceCellText(cells[75], member.Hrs15 ?? "");
-        //        ReplaceCellText(cells[76], member.Hr5 ?? "");
-        //        ReplaceCellText(cells[77], member.AHr5 ?? "");
-        //        ReplaceCellText(cells[78], member.Ern15 ?? "");
-        //        ReplaceCellText(cells[82], member.Das25 ?? "");
-        //        ReplaceCellText(cells[83], member.Ind25 ?? "");
-        //        ReplaceCellText(cells[84], member.Hrs25 ?? "");
-        //        ReplaceCellText(cells[87], member.Ern25 ?? "");
-
-        //        // < !--Day4-- >
-        //        ReplaceCellText(cells[91], member.Das14 ?? "");
-        //        ReplaceCellText(cells[92], member.Ind14 ?? "");
-        //        ReplaceCellText(cells[93], member.Hrs14 ?? "");
-        //        ReplaceCellText(cells[94], member.Hr4 ?? "");
-        //        ReplaceCellText(cells[95], member.AHr4 ?? "");
-        //        ReplaceCellText(cells[96], member.Ern14 ?? "");
-        //        ReplaceCellText(cells[100], member.Das24 ?? "");
-        //        ReplaceCellText(cells[101], member.Ind24 ?? "");
-        //        ReplaceCellText(cells[102], member.Hrs24 ?? "");
-        //        ReplaceCellText(cells[105], member.Ern24 ?? "");
-
-        //        // < !--Day3-- >
-        //        ReplaceCellText(cells[109], member.Das13 ?? "");
-        //        ReplaceCellText(cells[110], member.Ind13 ?? "");
-        //        ReplaceCellText(cells[111], member.Hrs13 ?? "");
-        //        ReplaceCellText(cells[112], member.Hr3 ?? "");
-        //        ReplaceCellText(cells[113], member.AHr3 ?? "");
-        //        ReplaceCellText(cells[114], member.Ern13 ?? "");
-        //        ReplaceCellText(cells[118], member.Das23 ?? "");
-        //        ReplaceCellText(cells[119], member.Ind23 ?? "");
-        //        ReplaceCellText(cells[120], member.Hrs23 ?? "");
-        //        ReplaceCellText(cells[123], member.Ern23 ?? "");
-
-        //        //// < !--Day2-- >
-        //        ReplaceCellText(cells[127], member.Das12 ?? "");
-        //        ReplaceCellText(cells[128], member.Ind12 ?? "");
-        //        ReplaceCellText(cells[129], member.Hrs12 ?? "");
-        //        ReplaceCellText(cells[130], member.Hr2 ?? "");
-        //        ReplaceCellText(cells[131], member.AHr2 ?? "");
-        //        ReplaceCellText(cells[132], member.Ern12 ?? "");
-        //        ReplaceCellText(cells[136], member.Das22 ?? "");
-        //        ReplaceCellText(cells[137], member.Ind22 ?? "");
-        //        ReplaceCellText(cells[138], member.Hrs22 ?? "");
-        //        ReplaceCellText(cells[141], member.Ern22 ?? "");
-
-        //        //// < !--Day1-- >
-        //        ReplaceCellText(cells[145], member.Das11 ?? "");
-        //        ReplaceCellText(cells[146], member.Ind11 ?? "");
-        //        ReplaceCellText(cells[147], member.Hrs11 ?? "");
-        //        ReplaceCellText(cells[148], member.Hr1 ?? "");
-        //        ReplaceCellText(cells[149], member.AHr1 ?? "");
-        //        ReplaceCellText(cells[150], member.Ern11 ?? "");
-        //        ReplaceCellText(cells[154], member.Das21 ?? "");
-        //        ReplaceCellText(cells[155], member.Ind21 ?? "");
-        //        ReplaceCellText(cells[156], member.Hrs21 ?? "");
-        //        ReplaceCellText(cells[159], member.Ern21 ?? "");
-
-        //        ReplaceCellText(cells[162], member.TotalHours ?? "");
-        //        ReplaceCellText(cells[163], member.TotalAvgHours ?? "");
-        //        ReplaceCellText(cells[168], member.CWS ?? "");
-        //        ReplaceCellText(cells[172], member.NICCWS ?? "");
-        //        ReplaceCellText(cells[176], member.NCOCWS ?? "");
-        //        ReplaceCellText(cells[180], member.NICDescCWS ?? "");
-        //        ReplaceCellText(cells[183], member.EarningsRegular ?? "");
-        //        ReplaceCellText(cells[186], member.EarningsSelf ?? "");
-
-        //        body.AppendChild(block6Table);
-        //    }
-        //}
-
         private void ReplaceCellText(TableCell cell, string newText)
         {
             cell.RemoveAllChildren<Paragraph>();
@@ -961,6 +185,1106 @@ namespace Income.Common
             var paragraph = new Paragraph(run);
             cell.AppendChild(paragraph);
         }
+        private void FillBlock0_1(Body body, Tbl_Sch_0_0_Block_0_1 block01)
+        {
+            void SafeReplace(List<TableRow> rows, int index, string value)
+            {
+                if (rows.Count > index)
+                    ReplaceCellText(GetLastCell(rows[index]), value ?? "");
+            }
+
+            // ---------- BLOCK [0] ----------
+            var table0 = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[0]"));
+
+            if (table0 != null)
+            {
+                var rows0 = table0.Elements<TableRow>().ToList();
+
+                SafeReplace(rows0, 2, block01?.Block_0_1);
+                SafeReplace(rows0, 3, block01?.Block_0_2);
+                SafeReplace(rows0, 4, block01?.Block_0_3);
+                SafeReplace(rows0, 5, block01?.Block_0_4);
+                SafeReplace(rows0, 6, block01?.Block_0_5);
+                SafeReplace(rows0, 7, block01?.Block_0_6);
+            }
+
+            // ---------- BLOCK [1] ----------
+            var table1 = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[1]"));
+
+            if (table1 != null)
+            {
+                var rows1 = table1.Elements<TableRow>().ToList();
+
+                SafeReplace(rows1, 2, (block01?.Block_1_1 ?? ""));
+                SafeReplace(rows1, 3, (block01?.Block_1_2 ?? 0).ToString());
+                SafeReplace(rows1, 4, block01?.Block_1_3);
+                SafeReplace(rows1, 5, (block01?.Block_1_4 ?? 0).ToString());
+                SafeReplace(rows1, 6, (block01?.Block_1_5 ?? 0).ToString());
+                SafeReplace(rows1, 7, block01?.Block_1_6);
+                SafeReplace(rows1, 8, block01?.Block_1_7);
+                SafeReplace(rows1, 9, block01?.Block_1_8);
+                SafeReplace(rows1, 10, block01?.Block_1_9);
+                SafeReplace(rows1, 11, (block01?.Block_1_10 ?? 0).ToString());
+                SafeReplace(rows1, 12, block01?.Block_1_11);
+                SafeReplace(rows1, 13, (block01?.Block_1_12 ?? 0).ToString());
+                SafeReplace(rows1, 14, (block01?.Block_1_13 ?? 0).ToString());
+                SafeReplace(rows1, 15, (block01?.Block_1_14 ?? 0).ToString());
+                SafeReplace(rows1, 16, (block01?.Block_1_15 ?? 0).ToString());
+                SafeReplace(rows1, 17, (block01?.Block_1_16 ?? 0).ToString());
+                SafeReplace(rows1, 18, (block01?.Block_1_17 ?? 0).ToString());
+                SafeReplace(rows1, 19, block01?.remarks);
+            }
+
+            // ---------- BLOCK [9] ----------
+            var table9 = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower()
+                    .Contains("[9] remarks by field enumerator"));
+
+            if (table9 != null)
+            {
+                var rows9 = table9.Elements<TableRow>().ToList();
+                SafeReplace(rows9, 1, block01?.EnumeratorRemarks);
+            }
+
+            // ---------- BLOCK [10] ----------
+            var table10 = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower()
+                    .Contains("[10] remarks by field supervisor"));
+
+            if (table10 != null)
+            {
+                var rows10 = table10.Elements<TableRow>().ToList();
+                SafeReplace(rows10, 1, block01?.SupervisorRemarks);
+            }
+
+        }//Block0_1...
+
+        private void FillBlock2_1_And_2_2(Body body, List<Tbl_Sch_0_0_Block_2_1> block21, List<Tbl_Sch_0_0_Block_2_2> block22)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[2.1]"));
+
+            if (table == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+            TableRow templateRow = rows[3];
+            for (int i = rows.Count - 3; i >= 3; i--)
+                rows[i].Remove();
+
+            int maxRows = Math.Max(block21?.Count ?? 0, block22?.Count ?? 0);
+
+            for (int i = 0; i < maxRows; i++)
+            {
+                var row = (TableRow)templateRow.CloneNode(true);
+                var cells = row.Elements<TableCell>().ToList();
+
+                // ---------- 2.1 ----------
+                if (block21 != null && i < block21.Count)
+                {
+                    ReplaceCellText(cells[0], block21[i].serial_no?.ToString() ?? "");
+                    ReplaceCellText(cells[1], block21[i].hamlet_name ?? "");
+                    ReplaceCellText(cells[2], block21[i].percentage?.ToString() ?? "");
+                }
+                else
+                {
+                    ReplaceCellText(cells[0], "");
+                    ReplaceCellText(cells[1], "");
+                    ReplaceCellText(cells[2], "");
+                }
+
+                // ---------- 2.2 ----------
+                if (block22 != null && i < block22.Count)
+                {
+                    ReplaceCellText(cells[3], block22[i].serial_number?.ToString() ?? "");
+                    ReplaceCellText(cells[4], block22[i].serial_no_of_hamlets_in_su ?? "");
+                    ReplaceCellText(cells[5], block22[i].Percentage?.ToString() ?? "");
+                    ReplaceCellText(cells[6], block22[i].IsChecked ? "✔" : "");
+                }
+                else
+                {
+                    ReplaceCellText(cells[3], "");
+                    ReplaceCellText(cells[4], "");
+                    ReplaceCellText(cells[5], "");
+                    ReplaceCellText(cells[6], "");
+                }
+
+                table.AppendChild(row);
+            }
+            // ---------- BLOCK [2] REMARKS (2.1 & 2.2) ----------
+            var rowsAfter = table.Elements<TableRow>().ToList();
+            var remarksRow = rowsAfter.Last();
+            var remarkCells = remarksRow.Elements<TableCell>().ToList();
+
+            // Left side → Block 2.1 remarks
+            if (remarkCells.Count >= 1)
+            {
+                ReplaceCellText(remarkCells[0], block_0_1?.remarks_block_2_1 ?? "");
+            }
+
+            // Right side → Block 2.2 remarks
+            if (remarkCells.Count >= 2)
+            {
+                ReplaceCellText(remarkCells.Last(), block_0_1?.remarks_block_2_2 ?? "");
+            }
+        }
+        private void FillBlock4(Body body, Tbl_Sch_0_0_Block_4? block4)
+        {
+            if (block4 == null)
+                return;
+
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[4]"));
+
+            if (table == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            ReplaceCellText(rows[2].Elements<TableCell>().Last(), block4.sample_su_number?.ToString() ?? "");
+
+            ReplaceCellText(rows[3].Elements<TableCell>().Last(), block4.approximate_population_su?.ToString() ?? "");
+
+            ReplaceCellText(rows[4].Elements<TableCell>().Last(), block4.number_of_sub_division_of_su_to_be_formed?.ToString() ?? "");
+
+            ReplaceCellText(GetLastCell(rows.Last()), block_0_1?.remarks_block_4 ?? "");
+        }
+
+        //private void FillBlock5(Body body, List<Tbl_Sch_0_0_Block_5> list)
+        //{
+        //    var table = body.Elements<Table>()
+        //        .FirstOrDefault(t => t.InnerText.ToLower().Contains("[5]"));
+
+        //    if (table == null || list == null || !list.Any())
+        //        return;
+
+        //    var rows = table.Elements<TableRow>().ToList();
+
+        //    // Row index 3 = first data row (based on your template)
+        //    TableRow templateRow = rows[3];
+
+        //    // Remove existing data rows (keep header, total, remarks)
+        //    for (int i = rows.Count - 3; i >= 3; i--)
+        //        rows[i].Remove();
+
+        //    foreach (var item in list)
+        //    {
+        //        var newRow = (TableRow)templateRow.CloneNode(true);
+        //        var cells = newRow.Elements<TableCell>().ToList();
+
+        //        ReplaceCellText(cells[0], item.serial_number?.ToString() ?? "");
+        //        ReplaceCellText(cells[1], item.Percentage?.ToString() ?? "");
+        //        ReplaceCellText(cells[2], item.IsChecked == true ? "✔" : "");
+
+        //        table.AppendChild(newRow);
+        //    }
+        //    // ---------- BLOCK [5] REMARKS ----------
+        //    var rowsAfter = table.Elements<TableRow>().ToList();
+        //    var remarksRow = rowsAfter.Last();
+
+        //    ReplaceCellText(GetLastCell(remarksRow), block_0_1?.remarks_block_5 ?? "");
+
+        //}
+
+        private void FillBlock5(Body body, List<Tbl_Sch_0_0_Block_5> list)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[5]"));
+
+            if (table == null || list == null || !list.Any())
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+            var templateRow = rows[3];
+            var remarksRow = rows.Last();
+
+            // Remove old data rows (keep remarks)
+            for (int i = rows.Count - 2; i >= 3; i--)
+                rows[i].Remove();
+
+            foreach (var item in list)
+            {
+                var newRow = (TableRow)templateRow.CloneNode(true);
+                var cells = newRow.Elements<TableCell>().ToList();
+
+                ReplaceCellText(cells[0], item.serial_number?.ToString() ?? "");
+                ReplaceCellText(cells[1], item.Percentage?.ToString() ?? "");
+                ReplaceCellText(cells[2], item.IsChecked == true ? "✔" : "");
+
+                table.InsertBefore(newRow, remarksRow);
+            }
+
+            // Set remarks
+            ReplaceCellText(
+                GetLastCell(remarksRow),
+                block_0_1?.remarks_block_5 ?? ""
+            );
+        }
+
+
+        private void FillBlock7(Body body, List<Tbl_Sch_0_0_Block_7> list)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[7]"));
+
+            if (table == null || list == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            // Template row (first data row)
+            TableRow templateRow = rows[3];
+
+            // ✅ FIXED: remarks row ko pehle hi pakad lo
+            TableRow remarksRow = rows.Last();
+
+            // ✅ REMOVE old data rows (remarks ko chhod ke)
+            for (int i = rows.Count - 2; i >= 3; i--)
+                rows[i].Remove();
+
+            int serial = 1;
+
+            foreach (var item in list)
+            {
+                var row = (TableRow)templateRow.CloneNode(true);
+                var cells = row.Elements<TableCell>().ToList();
+
+                ReplaceCellText(cells[0], serial.ToString());
+                ReplaceCellText(cells[1], item.Block_7_2 ?? "");
+                ReplaceCellText(cells[2], item.is_household?.ToString() ?? "");
+                ReplaceCellText(cells[3], item.Block_7_3?.ToString() ?? "");
+                ReplaceCellText(cells[4], item.Block_7_4 ?? "");
+                ReplaceCellText(cells[5], item.Block_7_5?.ToString() ?? "");
+                ReplaceCellText(cells[6], item.Block_7_6?.ToString() ?? "");
+                ReplaceCellText(cells[7], item.Block_7_7?.ToString() ?? "");
+                ReplaceCellText(cells[8], item.Block_7_8?.ToString() ?? "");
+                ReplaceCellText(cells[9], item.Block_7_9?.ToString() ?? "");
+                ReplaceCellText(cells[10], item.SSS.ToString());
+                ReplaceCellText(cells[11], item.isSelected ? "✔" : "");
+
+                table.InsertBefore(row, remarksRow);
+
+                serial++;
+            }
+
+            ReplaceCellText(
+                GetLastCell(remarksRow),
+                block_0_1?.remarks_block_7 ?? ""
+            );
+        }
+
+        private void FillBlock0_8(Body body, List<Tbl_Sch_0_0_Block_7> block0_8)
+        {
+            int population = 0;
+
+            int sss_11_listed_hhd = 0;
+            int sss_12_listed_hhd = 0;
+            int sss_21_listed_hhd = 0;
+            int sss_22_listed_hhd = 0;
+            int sss_31_listed_hhd = 0;
+            int sss_32_listed_hhd = 0;
+            int sss_40_listed_hhd = 0;
+            int sss_90_listed_hhd = 0;
+
+            int sss_11_selected_hhd = 0;
+            int sss_12_selected_hhd = 0;
+            int sss_21_selected_hhd = 0;
+            int sss_22_selected_hhd = 0;
+            int sss_31_selected_hhd = 0;
+            int sss_32_selected_hhd = 0;
+            int sss_40_selected_hhd = 0;
+            int sss_90_selected_hhd = 0;
+
+            int sss_11_originally_selected_hhd = 0;
+            int sss_12_originally_selected_hhd = 0;
+            int sss_21_originally_selected_hhd = 0;
+            int sss_22_originally_selected_hhd = 0;
+            int sss_31_originally_selected_hhd = 0;
+            int sss_32_originally_selected_hhd = 0;
+            int sss_40_originally_selected_hhd = 0;
+            int sss_90_originally_selected_hhd = 0;
+
+            int sss_11_substituted_hhd = 0;
+            int sss_12_substituted_hhd = 0;
+            int sss_21_substituted_hhd = 0;
+            int sss_22_substituted_hhd = 0;
+            int sss_31_substituted_hhd = 0;
+            int sss_32_substituted_hhd = 0;
+            int sss_40_substituted_hhd = 0;
+            int sss_90_substituted_hhd = 0;
+
+            int sss_11_col_8_total_hhd = 0;
+            int sss_12_col_8_total_hhd = 0;
+            int sss_21_col_8_total_hhd = 0;
+            int sss_22_col_8_total_hhd = 0;
+            int sss_31_col_8_total_hhd = 0;
+            int sss_32_col_8_total_hhd = 0;
+            int sss_40_col_8_total_hhd = 0;
+            int sss_90_col_8_total_hhd = 0;
+
+            int sss_11_casualty_hhd = 0;
+            int sss_12_casualty_hhd = 0;
+            int sss_21_casualty_hhd = 0;
+            int sss_22_casualty_hhd = 0;
+            int sss_31_casualty_hhd = 0;
+            int sss_32_casualty_hhd = 0;
+            int sss_40_casualty_hhd = 0;
+            int sss_90_casualty_hhd = 0;
+
+            int total_listed = 0;
+            int total_selected = 0;
+            int total_originally_selected = 0;
+            int total_substituted = 0;
+            int total_col_8_total = 0;
+            int total_casualty = 0;
+
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[8]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(10);
+            if (table != null)
+            {
+                var cells = table.Descendants<TableCell>().ToList();
+
+                if (block0_8 != null && block0_8.Count > 0)
+                {
+                    population = block0_8.Sum(x => x.Block_7_5.GetValueOrDefault());
+                    int sector = SessionStorage.FSU_Sector;
+                    ReplaceCellText(cells[31], population.ToString());
+                    if (SessionStorage.FSU_Sector == 1)
+                    {
+                        ReplaceCellText(cells[30], "HIS - Rural Sector\n(Feb 2026 - Jan 2027)");
+                        ReplaceCellText(cells[32], "11");
+                        ReplaceCellText(cells[41], "12");
+                        ReplaceCellText(cells[50], "21");
+                        ReplaceCellText(cells[59], "22");
+                        ReplaceCellText(cells[68], "31");
+                        ReplaceCellText(cells[77], "32");
+                        ReplaceCellText(cells[86], "40");
+                        ReplaceCellText(cells[95], "90");
+                    }
+                    else
+                    {
+                        ReplaceCellText(cells[30], "HIS - Urban Sector\n(Feb 2026 - Jan 2027))");
+                        ReplaceCellText(cells[32], "11");
+                        ReplaceCellText(cells[41], "121");
+                        ReplaceCellText(cells[50], "122");
+                        ReplaceCellText(cells[59], "21");
+                        ReplaceCellText(cells[68], "221");
+                        ReplaceCellText(cells[77], "222");
+                        ReplaceCellText(cells[86], "40");
+                        ReplaceCellText(cells[95], "90");
+                    }
+
+                    if (sector == 1)
+                    {
+                        var sss_11_total_hhd = block0_8.Where(x => x.SSS == 11);
+                        var sss_12_total_hhd = block0_8.Where(x => x.SSS == 12);
+                        var sss_21_total_hhd = block0_8.Where(x => x.SSS == 21);
+                        var sss_22_total_hhd = block0_8.Where(x => x.SSS == 22);
+                        var sss_31_total_hhd = block0_8.Where(x => x.SSS == 31);
+                        var sss_32_total_hhd = block0_8.Where(x => x.SSS == 32);
+                        var sss_40_total_hhd = block0_8.Where(x => x.SSS == 40);
+                        var sss_90_total_hhd = block0_8.Where(x => x.SSS == 90);
+
+
+                        sss_11_listed_hhd = sss_11_total_hhd?.Count() ?? 0;
+                        sss_12_listed_hhd = sss_12_total_hhd?.Count() ?? 0;
+                        sss_21_listed_hhd = sss_21_total_hhd?.Count() ?? 0;
+                        sss_22_listed_hhd = sss_22_total_hhd?.Count() ?? 0;
+                        sss_31_listed_hhd = sss_31_total_hhd?.Count() ?? 0;
+                        sss_32_listed_hhd = sss_32_total_hhd?.Count() ?? 0;
+                        sss_40_listed_hhd = sss_40_total_hhd?.Count() ?? 0;
+                        sss_90_listed_hhd = sss_90_total_hhd?.Count() ?? 0;
+
+                        sss_11_selected_hhd = sss_11_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_12_selected_hhd = sss_12_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_21_selected_hhd = sss_21_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_22_selected_hhd = sss_22_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_31_selected_hhd = sss_31_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_32_selected_hhd = sss_32_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_40_selected_hhd = sss_40_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_90_selected_hhd = sss_90_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+
+
+                        sss_11_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 11);
+                        sss_12_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 12);
+                        sss_21_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 21);
+                        sss_22_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 22);
+                        sss_31_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 31);
+                        sss_32_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 32);
+                        sss_40_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 40);
+                        sss_90_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 90);
+
+
+                        sss_11_substituted_hhd = GetFilteredSubstitution(block0_8, 11);
+                        sss_12_substituted_hhd = GetFilteredSubstitution(block0_8, 12);
+                        sss_21_substituted_hhd = GetFilteredSubstitution(block0_8, 21);
+                        sss_22_substituted_hhd = GetFilteredSubstitution(block0_8, 22);
+                        sss_31_substituted_hhd = GetFilteredSubstitution(block0_8, 31);
+                        sss_32_substituted_hhd = GetFilteredSubstitution(block0_8, 32);
+                        sss_40_substituted_hhd = GetFilteredSubstitution(block0_8, 40);
+                        sss_90_substituted_hhd = GetFilteredSubstitution(block0_8, 90);
+
+                        sss_11_col_8_total_hhd = sss_11_originally_selected_hhd + sss_11_substituted_hhd;
+                        sss_12_col_8_total_hhd = sss_12_originally_selected_hhd + sss_12_substituted_hhd;
+                        sss_21_col_8_total_hhd = sss_21_originally_selected_hhd + sss_21_substituted_hhd;
+                        sss_22_col_8_total_hhd = sss_22_originally_selected_hhd + sss_22_substituted_hhd;
+                        sss_31_col_8_total_hhd = sss_31_originally_selected_hhd + sss_31_substituted_hhd;
+                        sss_32_col_8_total_hhd = sss_32_originally_selected_hhd + sss_32_substituted_hhd;
+                        sss_40_col_8_total_hhd = sss_40_originally_selected_hhd + sss_40_substituted_hhd;
+                        sss_90_col_8_total_hhd = sss_90_originally_selected_hhd + sss_90_substituted_hhd;
+
+                        sss_11_casualty_hhd = sss_11_selected_hhd - sss_11_col_8_total_hhd;
+                        sss_12_casualty_hhd = sss_12_selected_hhd - sss_12_col_8_total_hhd;
+                        sss_21_casualty_hhd = sss_21_selected_hhd - sss_21_col_8_total_hhd;
+                        sss_22_casualty_hhd = sss_22_selected_hhd - sss_22_col_8_total_hhd;
+                        sss_31_casualty_hhd = sss_31_selected_hhd - sss_31_col_8_total_hhd;
+                        sss_32_casualty_hhd = sss_32_selected_hhd - sss_32_col_8_total_hhd;
+                        sss_40_casualty_hhd = sss_40_selected_hhd - sss_40_col_8_total_hhd;
+                        sss_90_casualty_hhd = sss_90_selected_hhd - sss_90_col_8_total_hhd;
+
+                        total_listed = sss_11_listed_hhd + sss_12_listed_hhd + sss_21_listed_hhd + sss_22_listed_hhd + sss_31_listed_hhd + sss_32_listed_hhd + sss_40_listed_hhd + sss_90_listed_hhd;
+                        total_selected = sss_11_selected_hhd + sss_12_selected_hhd + sss_21_selected_hhd + sss_22_selected_hhd + sss_31_selected_hhd + sss_32_selected_hhd + sss_40_selected_hhd + sss_90_selected_hhd;
+                        total_originally_selected = sss_11_originally_selected_hhd + sss_12_originally_selected_hhd + sss_21_originally_selected_hhd + sss_22_originally_selected_hhd + sss_31_originally_selected_hhd + sss_32_originally_selected_hhd + sss_40_originally_selected_hhd + sss_90_originally_selected_hhd;
+                        total_substituted = sss_11_substituted_hhd + sss_12_substituted_hhd + sss_21_substituted_hhd + sss_22_substituted_hhd + sss_31_substituted_hhd + sss_32_substituted_hhd + sss_40_substituted_hhd + sss_90_substituted_hhd;
+                        total_col_8_total = sss_11_col_8_total_hhd + sss_12_col_8_total_hhd + sss_21_col_8_total_hhd + sss_22_col_8_total_hhd + sss_31_col_8_total_hhd + sss_32_col_8_total_hhd + sss_40_col_8_total_hhd + sss_90_col_8_total_hhd;
+                        total_casualty = sss_11_casualty_hhd + sss_12_casualty_hhd + sss_21_casualty_hhd + sss_22_casualty_hhd + sss_31_casualty_hhd + sss_32_casualty_hhd + sss_40_casualty_hhd + sss_90_casualty_hhd;
+                    }
+
+                    else if (sector == 2)
+                    {
+                        var sss_11_total_hhd = block0_8.Where(x => x.SSS == 11);
+                        var sss_121_total_hhd = block0_8.Where(x => x.SSS == 121);
+                        var sss_122_total_hhd = block0_8.Where(x => x.SSS == 122);
+                        var sss_21_total_hhd = block0_8.Where(x => x.SSS == 21);
+                        var sss_221_total_hhd = block0_8.Where(x => x.SSS == 221);
+                        var sss_222_total_hhd = block0_8.Where(x => x.SSS == 222);
+                        var sss_40_total_hhd = block0_8.Where(x => x.SSS == 40);
+                        var sss_90_total_hhd = block0_8.Where(x => x.SSS == 90);
+                        sss_11_listed_hhd = sss_11_total_hhd?.Count() ?? 0;
+                        sss_12_listed_hhd = sss_121_total_hhd?.Count() ?? 0;
+                        sss_21_listed_hhd = sss_122_total_hhd?.Count() ?? 0;
+                        sss_22_listed_hhd = sss_21_total_hhd?.Count() ?? 0;
+                        sss_31_listed_hhd = sss_221_total_hhd?.Count() ?? 0;
+                        sss_32_listed_hhd = sss_222_total_hhd?.Count() ?? 0;
+                        sss_40_listed_hhd = sss_40_total_hhd?.Count() ?? 0;
+                        sss_90_listed_hhd = sss_90_total_hhd?.Count() ?? 0;
+
+                        sss_11_selected_hhd = sss_11_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_12_selected_hhd = sss_121_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_21_selected_hhd = sss_122_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_22_selected_hhd = sss_21_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_31_selected_hhd = sss_221_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_32_selected_hhd = sss_222_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_40_selected_hhd = sss_40_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+                        sss_90_selected_hhd = sss_90_total_hhd?.Where(x => x.isInitialySelected == true).Count() ?? 0;
+
+
+                        sss_11_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 11);
+                        sss_12_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 121);
+                        sss_21_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 122);
+                        sss_22_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 21);
+                        sss_31_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 221);
+                        sss_32_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 222);
+                        sss_40_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 40);
+                        sss_90_originally_selected_hhd = GetFilteredCountOnInitialySelected(block0_8, 90);
+
+
+                        sss_11_substituted_hhd = GetFilteredSubstitution(block0_8, 11);
+                        sss_12_substituted_hhd = GetFilteredSubstitution(block0_8, 121);
+                        sss_21_substituted_hhd = GetFilteredSubstitution(block0_8, 122);
+                        sss_22_substituted_hhd = GetFilteredSubstitution(block0_8, 21);
+                        sss_31_substituted_hhd = GetFilteredSubstitution(block0_8, 221);
+                        sss_32_substituted_hhd = GetFilteredSubstitution(block0_8, 222);
+                        sss_40_substituted_hhd = GetFilteredSubstitution(block0_8, 40);
+                        sss_90_substituted_hhd = GetFilteredSubstitution(block0_8, 90);
+
+                        sss_11_col_8_total_hhd = sss_11_originally_selected_hhd + sss_11_substituted_hhd;
+                        sss_12_col_8_total_hhd = sss_12_originally_selected_hhd + sss_12_substituted_hhd;
+                        sss_21_col_8_total_hhd = sss_21_originally_selected_hhd + sss_21_substituted_hhd;
+                        sss_22_col_8_total_hhd = sss_22_originally_selected_hhd + sss_22_substituted_hhd;
+                        sss_31_col_8_total_hhd = sss_31_originally_selected_hhd + sss_31_substituted_hhd;
+                        sss_32_col_8_total_hhd = sss_32_originally_selected_hhd + sss_32_substituted_hhd;
+                        sss_40_col_8_total_hhd = sss_40_originally_selected_hhd + sss_40_substituted_hhd;
+                        sss_90_col_8_total_hhd = sss_90_originally_selected_hhd + sss_90_substituted_hhd;
+
+                        sss_11_casualty_hhd = sss_11_selected_hhd - sss_11_col_8_total_hhd;
+                        sss_12_casualty_hhd = sss_12_selected_hhd - sss_12_col_8_total_hhd;
+                        sss_21_casualty_hhd = sss_21_selected_hhd - sss_21_col_8_total_hhd;
+                        sss_22_casualty_hhd = sss_22_selected_hhd - sss_22_col_8_total_hhd;
+                        sss_31_casualty_hhd = sss_31_selected_hhd - sss_31_col_8_total_hhd;
+                        sss_32_casualty_hhd = sss_32_selected_hhd - sss_32_col_8_total_hhd;
+                        sss_40_casualty_hhd = sss_40_selected_hhd - sss_40_col_8_total_hhd;
+                        sss_90_casualty_hhd = sss_90_selected_hhd - sss_90_col_8_total_hhd;
+
+                        total_listed = sss_11_listed_hhd + sss_12_listed_hhd + sss_21_listed_hhd + sss_22_listed_hhd + sss_31_listed_hhd + sss_32_listed_hhd + sss_40_listed_hhd + sss_90_listed_hhd;
+                        total_selected = sss_11_selected_hhd + sss_12_selected_hhd + sss_21_selected_hhd + sss_22_selected_hhd + sss_31_selected_hhd + sss_32_selected_hhd + sss_40_selected_hhd + sss_90_selected_hhd;
+                        total_originally_selected = sss_11_originally_selected_hhd + sss_12_originally_selected_hhd + sss_21_originally_selected_hhd + sss_22_originally_selected_hhd + sss_31_originally_selected_hhd + sss_32_originally_selected_hhd + sss_40_originally_selected_hhd + sss_90_originally_selected_hhd;
+                        total_substituted = sss_11_substituted_hhd + sss_12_substituted_hhd + sss_21_substituted_hhd + sss_22_substituted_hhd + sss_31_substituted_hhd + sss_32_substituted_hhd + sss_40_substituted_hhd + sss_90_substituted_hhd;
+                        total_col_8_total = sss_11_col_8_total_hhd + sss_12_col_8_total_hhd + sss_21_col_8_total_hhd + sss_22_col_8_total_hhd + sss_31_col_8_total_hhd + sss_32_col_8_total_hhd + sss_40_col_8_total_hhd + sss_90_col_8_total_hhd;
+                        total_casualty = sss_11_casualty_hhd + sss_12_casualty_hhd + sss_21_casualty_hhd + sss_22_casualty_hhd + sss_31_casualty_hhd + sss_32_casualty_hhd + sss_40_casualty_hhd + sss_90_casualty_hhd;
+                    }
+
+
+                    ReplaceCellText(cells[33], sss_11_listed_hhd.ToString());
+                    ReplaceCellText(cells[34], sss_11_selected_hhd.ToString());
+                    ReplaceCellText(cells[35], sss_11_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[36], sss_11_substituted_hhd.ToString());
+                    ReplaceCellText(cells[37], sss_11_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[38], sss_11_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[42], sss_12_listed_hhd.ToString());
+                    ReplaceCellText(cells[43], sss_12_selected_hhd.ToString());
+                    ReplaceCellText(cells[44], sss_12_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[45], sss_12_substituted_hhd.ToString());
+                    ReplaceCellText(cells[46], sss_12_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[47], sss_12_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[51], sss_21_listed_hhd.ToString());
+                    ReplaceCellText(cells[52], sss_21_selected_hhd.ToString());
+                    ReplaceCellText(cells[53], sss_21_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[54], sss_21_substituted_hhd.ToString());
+                    ReplaceCellText(cells[55], sss_21_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[56], sss_21_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[60], sss_22_listed_hhd.ToString());
+                    ReplaceCellText(cells[61], sss_22_selected_hhd.ToString());
+                    ReplaceCellText(cells[62], sss_22_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[63], sss_22_substituted_hhd.ToString());
+                    ReplaceCellText(cells[64], sss_22_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[65], sss_22_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[69], sss_31_listed_hhd.ToString());
+                    ReplaceCellText(cells[70], sss_31_selected_hhd.ToString());
+                    ReplaceCellText(cells[71], sss_31_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[72], sss_31_substituted_hhd.ToString());
+                    ReplaceCellText(cells[73], sss_31_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[74], sss_31_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[78], sss_32_listed_hhd.ToString());
+                    ReplaceCellText(cells[79], sss_32_selected_hhd.ToString());
+                    ReplaceCellText(cells[80], sss_32_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[81], sss_32_substituted_hhd.ToString());
+                    ReplaceCellText(cells[82], sss_32_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[83], sss_32_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[87], sss_40_listed_hhd.ToString());
+                    ReplaceCellText(cells[88], sss_40_selected_hhd.ToString());
+                    ReplaceCellText(cells[89], sss_40_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[90], sss_40_substituted_hhd.ToString());
+                    ReplaceCellText(cells[91], sss_40_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[92], sss_40_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[96], sss_90_listed_hhd.ToString());
+                    ReplaceCellText(cells[97], sss_90_selected_hhd.ToString());
+                    ReplaceCellText(cells[98], sss_90_originally_selected_hhd.ToString());
+                    ReplaceCellText(cells[99], sss_90_substituted_hhd.ToString());
+                    ReplaceCellText(cells[100], sss_90_col_8_total_hhd.ToString());
+                    ReplaceCellText(cells[101], sss_90_casualty_hhd.ToString());
+
+                    ReplaceCellText(cells[105], total_listed.ToString());
+                    ReplaceCellText(cells[106], total_selected.ToString());
+                    ReplaceCellText(cells[107], total_originally_selected.ToString());
+                    ReplaceCellText(cells[108], total_substituted.ToString());
+                    ReplaceCellText(cells[109], total_col_8_total.ToString());
+                    ReplaceCellText(cells[110], total_casualty.ToString());
+
+                }
+            }
+
+        }
+
+
+        #region Helper Methods
+        private static int GetFilteredSubstitution(List<Tbl_Sch_0_0_Block_7> list, int sss)
+        {
+            int counter = 0;
+            var initialSelectedList = list.Where(entry => entry.SSS == sss && entry.isInitialySelected == true && entry.SubstitutionCount != 0).ToList();
+            foreach (var item in initialSelectedList)
+            {
+                if (item.SubstitutionCount >= 1)
+                {
+                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID == item.Block_7_3);
+                    if (filteredData != null && filteredData.status == "SUBSTITUTE")
+                    {
+                        counter++;
+                    }
+                }
+            }
+            return initialSelectedList != null ? initialSelectedList.Count : 0;
+        }
+
+        private static int GetFilteredCountOnInitialySelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)
+        {
+            return list.Count(entry => entry.SSS == sss && entry.isInitialySelected == isInitialySelected && entry.SubstitutionCount == 0 && entry.status != "CASUALTY");
+        }
+
+        #endregion
+
+
+        //      private void CalculateBlock8(List<Tbl_Sch_0_0_Block_7> list, int sector,
+        //          out int population,
+        //          out int sss_11_listed, out int sss_12_listed, out int sss_21_listed, out int sss_22_listed,
+        //          out int sss_31_listed, out int sss_32_listed, out int sss_40_listed, out int sss_90_listed, out int total_listed,
+        //          out int sss_11_selected, out int sss_12_selected, out int sss_21_selected, out int sss_22_selected,
+        //          out int sss_31_selected, out int sss_32_selected, out int sss_40_selected, out int sss_90_selected, out int total_selected,
+        //          out int sss_11_orig, out int sss_12_orig, out int sss_21_orig, out int sss_22_orig,
+        //          out int sss_31_orig, out int sss_32_orig, out int sss_40_orig, out int sss_90_orig, out int total_orig,
+        //          out int sss_11_sub, out int sss_12_sub, out int sss_21_sub, out int sss_22_sub,
+        //          out int sss_31_sub, out int sss_32_sub, out int sss_40_sub, out int sss_90_sub, out int total_sub,
+        //          out int sss_11_total, out int sss_12_total, out int sss_21_total, out int sss_22_total,
+        //          out int sss_31_total, out int sss_32_total, out int sss_40_total, out int sss_90_total, out int total_total,
+        //          out int sss_11_cas, out int sss_12_cas, out int sss_21_cas, out int sss_22_cas,
+        //          out int sss_31_cas, out int sss_32_cas, out int sss_40_cas, out int sss_90_cas, out int total_cas)
+        //      {
+        //          population = list.Sum(x => x.Block_7_5 ?? 0);
+
+        //          int Count(int sss) => list.Count(x => x.SSS == sss);
+        //          int Selected(int sss) => list.Count(x => x.SSS == sss && x.isInitialySelected == true);
+        //          int Original(int sss) => list.Count(x =>
+        //              x.SSS == sss &&
+        //              x.isInitialySelected == true &&
+        //              x.SubstitutionCount == 0 &&
+        //              x.status != "CASUALTY");
+
+        //          int Substituted(int sss) => list.Count(x => x.SSS == sss && x.SubstitutionCount > 0);
+        //          int Total(int sss) => Original(sss) + Substituted(sss);
+        //          int Casualty(int sss) => Selected(sss) - Total(sss);
+
+        //          int[] rural = { 11, 12, 21, 22, 31, 32, 40, 90 };
+        //          int[] urban = { 11, 121, 122, 21, 221, 222, 40, 90 };
+        //          var sssList = sector == 1 ? rural : urban;
+
+        //          int[] listed = sssList.Select(Count).ToArray();
+        //          int[] selected = sssList.Select(Selected).ToArray();
+        //          int[] orig = sssList.Select(Original).ToArray();
+        //          int[] sub = sssList.Select(Substituted).ToArray();
+        //          int[] total = sssList.Select(Total).ToArray();
+        //          int[] cas = sssList.Select(Casualty).ToArray();
+
+        //          sss_11_listed = listed[0]; sss_12_listed = listed[1]; sss_21_listed = listed[2]; sss_22_listed = listed[3];
+        //          sss_31_listed = listed[4]; sss_32_listed = listed[5]; sss_40_listed = listed[6]; sss_90_listed = listed[7];
+        //          total_listed = listed.Sum();
+
+        //          sss_11_selected = selected[0]; sss_12_selected = selected[1]; sss_21_selected = selected[2]; sss_22_selected = selected[3];
+        //          sss_31_selected = selected[4]; sss_32_selected = selected[5]; sss_40_selected = selected[6]; sss_90_selected = selected[7];
+        //          total_selected = selected.Sum();
+
+        //          sss_11_orig = orig[0]; sss_12_orig = orig[1]; sss_21_orig = orig[2]; sss_22_orig = orig[3];
+        //          sss_31_orig = orig[4]; sss_32_orig = orig[5]; sss_40_orig = orig[6]; sss_90_orig = orig[7];
+        //          total_orig = orig.Sum();
+
+        //          sss_11_sub = sub[0]; sss_12_sub = sub[1]; sss_21_sub = sub[2]; sss_22_sub = sub[3];
+        //          sss_31_sub = sub[4]; sss_32_sub = sub[5]; sss_40_sub = sub[6]; sss_90_sub = sub[7];
+        //          total_sub = sub.Sum();
+
+        //          sss_11_total = total[0]; sss_12_total = total[1]; sss_21_total = total[2]; sss_22_total = total[3];
+        //          sss_31_total = total[4]; sss_32_total = total[5]; sss_40_total = total[6]; sss_90_total = total[7];
+        //          total_total = total.Sum();
+
+        //          sss_11_cas = cas[0]; sss_12_cas = cas[1]; sss_21_cas = cas[2]; sss_22_cas = cas[3];
+        //          sss_31_cas = cas[4]; sss_32_cas = cas[5]; sss_40_cas = cas[6]; sss_90_cas = cas[7];
+        //          total_cas = cas.Sum();
+        //      }
+
+        //      private void FillBlock8(
+        //    Body body,
+        //    int sector,
+        //    string scheduleName,
+        //    int population,
+        //    Dictionary<int, (int l, int s, int o, int sub, int t, int c)> data
+        //)
+        //      {
+        //          // 
+        //          var table = body.Elements<Table>()
+        //              .FirstOrDefault(t => t.InnerText.Contains("[8]"));
+
+        //          if (table == null)
+        //              return;
+
+        //          var rows = table.Elements<TableRow>().ToList();
+
+
+        //          foreach (var row in rows)
+        //          {
+        //              var cells = row.Elements<TableCell>().ToList();
+        //              if (cells.Count < 2) continue;
+
+        //              // T
+        //              if (cells[0].InnerText.Contains("HIS"))
+        //              {
+        //                  ReplaceCellText(cells[0], scheduleName);
+        //                  ReplaceCellText(cells[1], population.ToString());
+        //                  break;
+        //              }
+        //          }
+
+        //          foreach (var row in rows)
+        //          {
+        //              var cells = row.Elements<TableCell>().ToList();
+        //              if (cells.Count < 9)
+        //                  continue;
+
+        //              // Column-3 = SSS
+        //              string sssText = cells[2].InnerText
+        //                  .Replace("\r", "")
+        //                  .Replace("\n", "")
+        //                  .Trim();
+
+        //              int sss;
+
+        //              if (sssText.Equals("all (99)", StringComparison.OrdinalIgnoreCase))
+        //              {
+        //                  sss = 99;
+        //              }
+        //              else if (!int.TryParse(sssText, out sss))
+        //              {
+        //                  continue; // non-data row
+        //              }
+
+        //              if (!data.ContainsKey(sss))
+        //              {
+        //                  ReplaceCellText(cells[3], "0");
+        //                  ReplaceCellText(cells[4], "0");
+        //                  ReplaceCellText(cells[5], "0");
+        //                  ReplaceCellText(cells[6], "0");
+        //                  ReplaceCellText(cells[7], "0");
+        //                  ReplaceCellText(cells[8], "0");
+        //                  continue;
+        //              }
+        //              var v = data[sss];
+
+        //              ReplaceCellText(cells[3], v.l.ToString());   // Listed
+        //              ReplaceCellText(cells[4], v.s.ToString());   // Selected
+        //              ReplaceCellText(cells[5], v.o.ToString());   // Originally selected
+        //              ReplaceCellText(cells[6], v.sub.ToString()); // Substituted
+        //              ReplaceCellText(cells[7], v.t.ToString());   // Total
+        //              ReplaceCellText(cells[8], v.c.ToString());   // Casualty
+        //          }
+        //      }
+
+
+
+
+        private void FillBlock11(Body body, Tbl_Sch_0_0_FieldOperation? block11)
+        {
+            if (block11 == null)
+                return;
+
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[11]"));
+
+            if (table == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            // 1. Enumerator Name
+            ReplaceCellText(GetLastCell(rows[2]), block11.enumerator_name ?? "");
+
+            // 2.1 Date of start of field work
+            ReplaceCellText(GetLastCell(rows[3]), block11.field_work_start_date?.ToString("dd-MM-yyyy") ?? "");
+
+            // 2.2 Date of end of field work
+            ReplaceCellText(GetLastCell(rows[4]), block11.field_work_end_date?.ToString("dd-MM-yyyy") ?? "");
+
+            // 3. Total time taken (hours)
+            ReplaceCellText(GetLastCell(rows[5]), block11.time_taken?.ToString() ?? "");
+
+            // 4. Whether remark entered by JSO / SE / Supervisor
+            ReplaceCellText(GetLastCell(rows[6]), !string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks) ? "1" : "2");
+
+            // 5.1 (i) In Block 9 / 10
+            ReplaceCellText(GetLastCell(rows[7]), !string.IsNullOrWhiteSpace(block_0_1?.EnumeratorRemarks) || !string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks)
+                    ? "1"
+                    : "2"
+            );
+
+            // 5.2 (ii) Elsewhere in the schedule
+            ReplaceCellText(
+                GetLastCell(rows[8]), string.IsNullOrWhiteSpace(block_0_1?.EnumeratorRemarks) && string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks)
+                    ? "1"
+                    : "2"
+            );
+
+            // 6. Remarks
+            ReplaceCellText(GetLastCell(rows[9]), block_0_1?.remarks_block_11 ?? ""
+            );
+        }
+
+
+        public async Task<byte[]> FillDocument26(Stream sch26TemplateStream)
+        {
+            try
+            {
+                using var ms = new MemoryStream();
+                await sch26TemplateStream.CopyToAsync(ms);
+                ms.Position = 0;
+                var commonQueries = new CommonQueries();
+                var dbQueries = new DBQueries();
+                //int hhdId = SessionStorage.selected_hhd_id;
+                blockhis_1 = await dbQueries.Fetch_SCH_HIS_Block1(7);
+                blockhis_3 = await dbQueries.Fetch_SCH_HIS_Block3(7);
+                blockhis_4 = await dbQueries.Fetch_SCH_HIS_Block4(7);
+                blockhis_5 = await dbQueries.Fetch_SCH_HIS_Block5(7);
+                blockhis_6 = await dbQueries.Fetch_SCH_HIS_Block6(7);
+                blockhis_7a = await dbQueries.Fetch_SCH_HIS_Block7A(7);
+                blockhis_10 = await dbQueries.Fetch_SCH_HIS_Block10();
+                //using var ms = new MemoryStream(File.ReadAllBytes(templatePath));
+                using (var doc = WordprocessingDocument.Open(ms, true))
+                {
+                    var body = doc.MainDocumentPart.Document.Body;
+
+                    FillBlockHis1(body, blockhis_1);
+                    //FillBlockHis3(body, blockhis_3);
+                    FillBlockHis4(body, blockhis_4);
+                    //FillBlockHis5(body, blockhis_5);
+                    //FillBlockHis6(body, blockhis_6);
+                    //FillBlockHis7A(body, blockhis_7a);
+                    //FillBlockHis10(body, blockhis_10);
+                    //FillBlock5A(body, sch104record);
+                    //FillBlock5B(body, sch104record);
+                    //FillBlock5C(body, sch104record);
+                    //FillBlock5D(body, sch104record);
+                    //FillIdentification1(body, sch104record);
+                    //FillBlock6(body, sch104record);
+
+                    // Save explicitly (safe)
+                    doc.MainDocumentPart.Document.Save();
+                }
+
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error generating document: {ex.Message}");
+                return null;
+            }
+        }
+        private void SafeReplace(List<TableRow> rows, int rowIndex, int cellIndex, string value)
+        {
+            if (rows.Count > rowIndex)
+            {
+                var cells = rows[rowIndex].Elements<TableCell>().ToList();
+                if (cells.Count > cellIndex)
+                    ReplaceCellText(cells[cellIndex], value ?? "");
+            }
+        }
+        private void FillBlockHis1(Body body, Tbl_Block_1 block1)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[1]"));
+
+            if (table == null || block1 == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            SafeReplace(rows, 2, 2, block1.sector_name);             
+            SafeReplace(rows, 3, 2, block1.state_name);              
+            SafeReplace(rows, 4, 2, block1.district_name);           
+            SafeReplace(rows, 5, 2, $"{block1.sub_district_name}, {block1.town_name}");       
+            //SafeReplace(rows, 6, 2, block1.town_name);       
+            SafeReplace(rows, 6, 2, block1.village_name);            
+            SafeReplace(rows, 7, 2, block1.investigator_unit_no);            
+            SafeReplace(rows, 8, 2, block1.sample_su_number);        
+            SafeReplace(rows, 9, 2, block1.serial_number_sample_fsu);
+            SafeReplace(rows, 10, 2, block1.sample_sub_division_number?.ToString());
+            SafeReplace(rows, 11, 2, block1.sss_number?.ToString());
+            SafeReplace(rows, 12, 2, block1.sample_hhd_number?.ToString());
+            SafeReplace(rows, 13, 2, block1.survey_code?.ToString());
+            SafeReplace(rows, 14, 2, block1.substitution_reason?.ToString());
+            SafeReplace(rows, 15, 2, block1.block_1_remark);
+        }
+        //private void FillBlockHis3(Body body, List<Tbl_Block_3> members)
+        //{
+        //    var table = body.Elements<Table>()
+        //        .FirstOrDefault(t => t.InnerText.Contains("[3]"));
+
+        //    if (table == null || members == null || members.Count == 0)
+        //        return;
+
+        //    var rows = table.Elements<TableRow>().ToList();
+        //    var templateRow = rows[2];
+
+        //    for (int i = rows.Count - 1; i > 2; i--)
+        //        rows[i].Remove();
+
+        //    foreach (var m in members)
+        //    {
+        //        var row = (TableRow)templateRow.CloneNode(true);
+        //        var cells = row.Elements<TableCell>().ToList();
+
+        //        ReplaceCellText(cells[0], m.serial_no?.ToString());
+        //        ReplaceCellText(cells[1], m.item_2);
+        //        ReplaceCellText(cells[2], m.item_3?.ToString());
+        //        ReplaceCellText(cells[3], m.gender?.ToString());
+        //        ReplaceCellText(cells[4], m.age?.ToString());
+
+        //        table.AppendChild(row);
+        //    }
+        //}
+        private void FillBlockHis3(Body body, List<Tbl_Block_3> members)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[3]"));
+
+            if (table == null || members == null || members.Count == 0)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            int templateRowIndex = 2;
+            var templateRow = rows[templateRowIndex];
+
+            // 🔥 Remove old data rows
+            for (int i = rows.Count - 1; i > templateRowIndex; i--)
+                rows[i].Remove();
+
+            foreach (var m in members)
+            {
+                var row = (TableRow)templateRow.CloneNode(true);
+                table.AppendChild(row);
+
+                var cells = row.Elements<TableCell>().ToList();
+                int col = 0;
+
+                void Put(string value)
+                {
+                    if (col < cells.Count)
+                    {
+                        ReplaceCellText(cells[col], value);
+                        col++;
+                    }
+                }
+
+                // 🔐 Logical column mapping (MERGE SAFE)
+                Put(m.serial_no?.ToString());
+                Put(m.item_2);
+                Put(m.item_3?.ToString());
+                Put(m.gender?.ToString());
+                Put(m.age?.ToString());
+                Put(m.item_6?.ToString());
+                Put(m.item_7?.ToString());
+                Put(m.item_8?.ToString());
+                Put(m.item_9?.ToString());
+                Put(m.item_10?.ToString());
+                Put(m.item_11?.ToString());
+                Put(m.item_12?.ToString());
+            }
+        }
+
+
+
+
+        private void FillBlockHis4(Body body, Tbl_Block_4 block4)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[4]"));
+
+            if (table == null || block4 == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            SafeReplace(rows, 2, 1, block4.item_1?.ToString());
+            SafeReplace(rows, 3, 1, block4.item_2?.ToString());
+            SafeReplace(rows, 4, 1, block4.item_3?.ToString());
+            SafeReplace(rows, 5, 1, block4.item_6?.ToString());
+            SafeReplace(rows, 6, 1, block4.item_7?.ToString());
+            SafeReplace(rows, 7, 1, block4.item_11?.ToString());
+            SafeReplace(rows, 8, 1, block4.item_14?.ToString());
+            SafeReplace(rows, 9, 1, block4.remarks);
+        }
+        private void FillBlockHis5(Body body, List<Tbl_Block_5> list)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[5]"));
+
+            if (table == null || list == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+            var template = rows[2];
+
+            for (int i = rows.Count - 1; i > 2; i--)
+                rows[i].Remove();
+
+            foreach (var item in list)
+            {
+                var row = (TableRow)template.CloneNode(true);
+                var cells = row.Elements<TableCell>().ToList();
+
+                ReplaceCellText(cells[0], item.serial_number?.ToString());
+                ReplaceCellText(cells[1], item.item_1?.ToString());
+                ReplaceCellText(cells[2], item.item_2?.ToString());
+                ReplaceCellText(cells[3], item.item_11);
+
+                table.AppendChild(row);
+            }
+        }
+        private void FillBlockHis6(Body body, List<Tbl_Block_6> list)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[6]"));
+
+            if (table == null || list == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+            var template = rows[2];
+
+            for (int i = rows.Count - 1; i > 2; i--)
+                rows[i].Remove();
+
+            foreach (var item in list)
+            {
+                var row = (TableRow)template.CloneNode(true);
+                var cells = row.Elements<TableCell>().ToList();
+
+                ReplaceCellText(cells[0], item.serial_no?.ToString());
+                ReplaceCellText(cells[1], item.item_1?.ToString());
+                ReplaceCellText(cells[2], item.item_2?.ToString());
+                ReplaceCellText(cells[3], item.remarks);
+
+                table.AppendChild(row);
+            }
+        }
+
+        private void FillBlockHis7A(Body body, Tbl_Block_7a block)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[7A]"));
+
+            if (table == null || block == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            SafeReplace(rows, 2, 1, block.item_3?.ToString());
+            SafeReplace(rows, 3, 1, block.item_4?.ToString());
+            SafeReplace(rows, 4, 1, block.item_5?.ToString());
+            SafeReplace(rows, 5, 1, block.remarks);
+        }
+        private void FillBlockHis10(Body body, Tbl_Block_10 block10)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[10]"));
+
+            if (table == null || block10 == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            SafeReplace(rows, 2, 1, block10.item_1?.ToString());
+            SafeReplace(rows, 3, 1, block10.item_2?.ToString());
+            SafeReplace(rows, 4, 1, block10.item_3?.ToString());
+            SafeReplace(rows, 5, 1, block10.item_23?.ToString());
+        }
+
+
+
 
         string GetDocumentsPath()
         {
