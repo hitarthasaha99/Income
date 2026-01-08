@@ -120,10 +120,10 @@
                                 </div>
                             </div>
                             <h2>
-                                @if(top?.serial_number.GetValueOrDefault() > 0)
+                                @if(top?.running_serial_number.GetValueOrDefault() > 0)
                                 {
                                     <span class="sl-no-label">
-                                        <label>@(top?.serial_number)</label>
+                                        <label>@(top?.running_serial_number)</label>
                                         <small>SL No.</small>
                                     </span>
                                 }
@@ -424,7 +424,7 @@
             toastService.ShowError("Validation Failed, Please try again");
             return;
         }
-    
+
     }
 
 
@@ -536,6 +536,7 @@
     {
         try
         {
+            int srl = 1;
             if (Schedule == "0")
             {
                 WarningList = await Warning_VM.GetAllWarning("0");
@@ -543,6 +544,14 @@
             else
             {
                 WarningList = await Warning_VM.GetAllWarning();
+            }
+
+            foreach (var warning in WarningList)
+            {
+                if(warning != null && (warning.parent_comment_id == Guid.Empty || warning.parent_comment_id == null))
+                {
+                    warning.running_serial_number = srl++;
+                }
             }
             if (selectedFilter == "1")
             {

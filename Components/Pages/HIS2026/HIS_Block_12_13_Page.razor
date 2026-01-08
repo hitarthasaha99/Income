@@ -101,11 +101,17 @@
         StateHasChanged();
     }
 
-    async void GoBack()
+    void GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_B");
+        if(block_1 != null && block_1.survey_code is (1 or 2))
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_B");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block0_1");
+        }
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 

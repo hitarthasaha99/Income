@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Income.Database.Models.Common
@@ -26,5 +27,8 @@ namespace Income.Database.Models.Common
         public string? user_name { get; set; }
         public string? schedule { get; set; }
         public string? block_guid { get; set; }
+        [JsonIgnore]
+        [Ignore]
+        public int? running_serial_number { get; set; }
     }
 }

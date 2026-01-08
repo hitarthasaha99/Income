@@ -3842,7 +3842,7 @@ namespace Income.Database.Queries
             //}
             if (schedule == "0")
             {
-                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.schedule == "0" && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.schedule == "0" || x.schedule == "" || x.schedule == null) && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
             }
             else
             {
