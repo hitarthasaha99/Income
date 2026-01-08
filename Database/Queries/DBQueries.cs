@@ -2611,6 +2611,8 @@ namespace Income.Database.Queries
                 else
                 {
                     // insert new row
+                    tbl_block_5.survey_coordinates = SessionStorage.location;
+                    tbl_block_5.survey_timestamp = DateTime.UtcNow;
                     status = await _database.InsertAsync(tbl_block_5);
                 }
 
