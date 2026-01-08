@@ -120,18 +120,28 @@
                                 </div>
                             </div>
                             <h2>
-                                @if(top?.serial_number.GetValueOrDefault() > 0)
+                                @* @if(top?.serial_number.GetValueOrDefault() > 0)
                                 {
                                     <span class="sl-no-label">
                                         <label>@(top?.serial_number)</label>
                                         <small>SL No.</small>
                                     </span>
-                                }
-                                
+                                } *@
                                 <span class="title-dis ps-3">@(top?.warning_message)</span>
                             </h2>
                             <hr />
                             <div class="row stats other-info">
+                                <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">SL No.</h3>
+                                        <p class="text-info mb-0">
+                                           @if(top?.serial_number.GetValueOrDefault() > 0)
+                                            {
+                                                @(top?.serial_number)
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">SSS</h3>
@@ -151,7 +161,7 @@
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">Member Srl. No.</h3>
-                                        <p class="text-info mb-0">
+                                        <p class="text-warning mb-0">
                                             3
                                         </p>
                                     </div>
@@ -159,7 +169,7 @@
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">Block</h3>
-                                        <p class="text-warning mb-0">
+                                        <p class="text-info mb-0">
                                             @(top?.block)
                                         </p>
                                     </div>
@@ -301,7 +311,7 @@
                                                @bind="Warning_VM.warningcoment.remarks"
                                                disabled="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
                                                                              && top?.warning_status == 4)" />
-                                </div>
+                                    </div>
 
                                         <button type="button"
                                                 class="btn btn-primary"
