@@ -1074,6 +1074,14 @@
 					{
 						var parents = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
 						bool rejectedWarnings = parents.Any(x => x.warning_status == 3);
+						bool hasPendingWarning = parents.Any(x => x.warning_status == 2);
+
+						if (hasPendingWarning)
+						{
+							errors.Add("Please address all pending warnings");
+							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+                        }
+
 						if (!rejectedWarnings)
 						{
 							errors.Add("Need to have atleast one rejected warning to refer back");
@@ -1134,10 +1142,21 @@
 				if (warnings.Count > 0)
 				{
 					var parents = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
-					bool rejectedWarnings = parents.Any(x => x.warning_status == 3);
-					if (!rejectedWarnings)
+					bool hasRejectedWarning = parents.Any(x => x.warning_status == 3);
+					bool hasPendingWarning = parents.Any(x => x.warning_status == 4);
+
+					if (!hasRejectedWarning)
 					{
 						errors.Add("Need to have atleast one rejected warning to refer back");
+					}
+
+					if (hasPendingWarning)
+					{
+						errors.Add("Please address all pending warnings");
+					}
+
+					if (errors.Any())
+					{
 						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 					}
 				}
@@ -1259,7 +1278,7 @@
 		}
 		else if (name == CommonConstants.ROLE_NAME_DS)
 		{
-			if (data.hhdStatus == 31)
+			if (data.hhdStatus == 30 || data.hhdStatus == 31)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
 				SessionStorage.HHD_Submitted = true;

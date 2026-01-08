@@ -1,5 +1,6 @@
 ﻿@page "/dashboard/validate_page"
 @using Income.Database.Models.Common
+@using Income.Database.Models.SCH0_0
 @using Income.Viewmodels
 @layout Income.Components.Layout.DashboardLayout
 @inject PreloadService preloadService
@@ -11,8 +12,7 @@
 <div class="my-2">
     <CommonContentHeader 
     SelectedFsuId="@SelectedFsuId"
-    survey_time="@survey_time" 
-    />
+    ShowVisitedBlock=false/>
     <div class="d-flex align-items-center alert-info-popup mb-3">
         <div class="outerCircle outerWarning">
             <div class="innerCircle innerWarning"><i class="fi fi-rr-triangle-warning"></i></div>
@@ -120,23 +120,34 @@
                                 </div>
                             </div>
                             <h2>
+                                @* @if(top?.serial_number.GetValueOrDefault() > 0)
                                 @if(top?.running_serial_number.GetValueOrDefault() > 0)
                                 {
                                     <span class="sl-no-label">
                                         <label>@(top?.running_serial_number)</label>
                                         <small>SL No.</small>
                                     </span>
-                                }
-                                
+                                } *@
                                 <span class="title-dis ps-3">@(top?.warning_message)</span>
                             </h2>
                             <hr />
                             <div class="row stats other-info">
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
+                                        <h3 class="mb-0 me-2">SL No.</h3>
+                                        <p class="text-info mb-0">
+                                           @if(top?.running_serial_number.GetValueOrDefault() > 0)
+                                            {
+                                                @(top?.running_serial_number)
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">SSS</h3>
                                         <p class="text-danger mb-0">
-                               
+                                            @(top?.SSS)
                                         </p>
                                     </div>
                                 </div>
@@ -151,15 +162,15 @@
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">Member Srl. No.</h3>
-                                        <p class="text-info mb-0">
-                                            3
+                                        <p class="text-warning mb-0">
+                                            @(top?.serial_number.GetValueOrDefault() == 0 ? "-" : top?.serial_number)
                                         </p>
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">Block</h3>
-                                        <p class="text-warning mb-0">
+                                        <p class="text-info mb-0">
                                             @(top?.block)
                                         </p>
                                     </div>
@@ -298,10 +309,11 @@
                                         <input type="text"
                                                class="form-control"
                                                placeholder="Enter Remarks"
-                                               @bind="Warning_VM.warningcoment.remarks"
+                                               value="@GetRemarks(top.id)"
+                                               @oninput="e => SetRemarks(top.id, e.Value?.ToString())"
                                                disabled="@((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO)
                                                                              && top?.warning_status == 4)" />
-                                </div>
+                                    </div>
 
                                         <button type="button"
                                                 class="btn btn-primary"
@@ -367,6 +379,9 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public string? Schedule { get; set; }
+    private Dictionary<Guid, string> RemarksByWarningId = new();
+    private List<Tbl_Sch_0_0_Block_7> hhd_list = new();
+
     private Task OnAccept()
     {
         Warning_VM.Is_Accepted = true;
@@ -394,8 +409,24 @@
         }
     }
 
+    private string GetRemarks(Guid warningId)
+    {
+        return RemarksByWarningId.TryGetValue(warningId, out var value)
+            ? value
+            : string.Empty;
+    }
+
+    private void SetRemarks(Guid warningId, string? value)
+    {
+        RemarksByWarningId[warningId] = value ?? string.Empty;
+    }
+
+
     private async void Validate(Tbl_Warning topWarning)
     {
+        Warning_VM.warningcoment.remarks =
+        RemarksByWarningId.TryGetValue(topWarning.id, out var r) ? r : string.Empty;
+
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             if(!Warning_VM.Is_Accepted && !Warning_VM.IsRejected)
@@ -438,89 +469,87 @@
             {
                 case "1":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block0_1");
+                        NavigationManager.NavigateTo($"/dashboard/sch0.0/block0_1");
                         break;
                     }
                 case "2":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_2");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_2");
+                        break;
+                    }
+                case "2.2":
+                    {
+                        if (SessionStorage.FSU_Sector == 1)
+                        {
+                            NavigationManager.NavigateTo($"/dashboard/sch0.0/block_2_2R");
+                        }
+                        else
+                        {
+                            NavigationManager.NavigateTo($"/dashboard/sch0.0/block_2_2U");
+                        }
                         break;
                     }
                 case "3":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_3");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_3");
                         break;
                     }
-                case "4":
+                case "4_1":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_4");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_4_1");
                         break;
                     }
-                case "4.1":
+                case "4_3":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_4_2");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_4_3");
                         break;
                     }
-                case "4.2":
+
+                case "5":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_4_2");
+                        NavigationManager.NavigateTo($"/dashboard/sch0.0/block_5");
                         break;
                     }
-                case "5.1":
-                    {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block5_1");
-                        break;
-                    }
-                case "5.2":
-                    {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block5_2");
-                        break;
-                    }
-                case "6.1":
-                    {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block6_1");
-                        break;
-                    }
-                case "6.2":
-                    {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block6_2");
-                        break;
-                    }
+
                 case "7":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_7");
+                        NavigationManager.NavigateTo($"/dashboard/sch0.0/block_7");
                         break;
                     }
-                case "8.1":
+
+                case "7B":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_8_1");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_7b");
+                        break;
+                    }
+                case "7C":
+                    {
+                        NavigationManager.NavigateTo($"/dashboard/his/block_7c_3");
                         break;
                     }
                 case "8":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_8");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_8a");
                         break;
                     }
-                case "9.1":
+                case "9A":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block9_1");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_9a");
                         break;
                     }
-                case "9":
+                case "B":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_9");
+                        NavigationManager.NavigateTo($"/dashboard/his/block_B");
                         break;
                     }
-                case "10":
-                    {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_10");
-                        break;
-                    }
+
                 case "11":
                     {
-                        NavigationManager.NavigateTo($"/dashboard/sch25.0/block_10");
+                        NavigationManager.NavigateTo($"/dashboard/sch0.0/block_11");
                         break;
                     }
+
+
                 default:
                     toastService.ShowError("Navigation not possible");
                     break;

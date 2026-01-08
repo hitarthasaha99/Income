@@ -30,5 +30,8 @@ namespace Income.Database.Models.Common
         [JsonIgnore]
         [Ignore]
         public int? running_serial_number { get; set; }
+        [JsonIgnore]
+        [Ignore]
+        public int SSS { get; set; }
     }
 }

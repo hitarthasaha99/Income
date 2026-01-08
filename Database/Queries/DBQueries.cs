@@ -3828,28 +3828,74 @@ namespace Income.Database.Queries
 
 
 
-        
+
 
         public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "HIS")
         {
-            //if (SessionStorage.user_role == CommonConstants.USER_CODE_JSO)
-            //{
-            //    return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && (x.is_deleted == false || x.is_deleted == null) && x.warning_status == 1 && x.hhd_id == hhd_id).ToListAsync();
-            //}
-            //else
-            //{
-            //    return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && (x.is_deleted == false || x.is_deleted == null) && x.warning_status == 2 && x.hhd_id == hhd_id).ToListAsync();
-            //}
-            if (schedule == "0")
+            try
             {
-                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.schedule == "0" || x.schedule == "" || x.schedule == null) && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+                List<Tbl_Warning> warnings;
+
+                if (schedule == "0")
+                {
+                    warnings = await _database.Table<Tbl_Warning>()
+                        .Where(x =>
+                            x.fsu_id == SessionStorage.SelectedFSUId &&
+                            (x.schedule == "0" || x.schedule == "" || x.schedule == null) &&
+                            (x.is_deleted == false || x.is_deleted == null))
+                        .ToListAsync();
+                }
+                else
+                {
+                    warnings = await _database.Table<Tbl_Warning>()
+                        .Where(x =>
+                            x.fsu_id == SessionStorage.SelectedFSUId &&
+                            (x.is_deleted == false || x.is_deleted == null) &&
+                            x.hhd_id == hhd_id)
+                        .ToListAsync();
+                }
+
+                if (!warnings.Any())
+                    return warnings;
+
+                // Get distinct hhd_ids to map SSS
+                var hhdIds = warnings
+                    .Where(w => w.hhd_id > 0)
+                    .Select(w => w.hhd_id)
+                    .Distinct()
+                    .ToList();
+
+                // Fetch Block 7 rows (ignore null Block_7_3)
+                var block7Rows = await _database.Table<Tbl_Sch_0_0_Block_7>()
+    .Where(b =>
+        b.fsu_id == SessionStorage.SelectedFSUId &&
+        b.Block_7_3 != null)
+    .ToListAsync();
+
+                // Build lookup: hhd_id -> SSS
+                var sssLookup = block7Rows
+    .Where(b => hhdIds.Contains(b.Block_7_3!.Value))
+    .GroupBy(b => b.Block_7_3!.Value)
+    .ToDictionary(g => g.Key, g => g.First().SSS);
+
+                // Assign SSS to warnings
+                foreach (var warning in warnings)
+                {
+                    if (sssLookup.TryGetValue(warning.hhd_id.GetValueOrDefault(), out var sss))
+                    {
+                        warning.SSS = sss;
+                    }
+                }
+                return warnings;
+
             }
-            else
+            catch (Exception ex)
             {
-                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.is_deleted == false || x.is_deleted == null) && x.hhd_id == hhd_id).ToListAsync();
+                return new List<Tbl_Warning>();
             }
 
         }
+
 
         public async Task<List<Tbl_Warning>> GetWarningTableDataForSerial(int fsuId, int hddId, string block, int serial)
         {
