@@ -1,4 +1,4 @@
-﻿@page "/dashboard/his/block_12_"
+﻿@page "/dashboard/his/block_12_1"
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
@@ -15,11 +15,9 @@
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title m-0">
-                <span class="text-primary me-1">Block 12</span>Particulars of Total Income of the Household
+                <span class="text-primary me-1">Block 12: </span>Particulars of Total Income of the Household
             </h3>
-            <div class="card-tools">
-                <button class="btn btn-primary"><i class="fi fi-rr-plus me-1"></i>Add</button>
-            </div>
+            
         </div>
         <div class="card-header">
             <h3 class="card-title text-success">Information will be collected at household level in this block.</h3>
@@ -41,32 +39,22 @@
                                 <p>Total household income from all sources earned by all the members of the
                                     household during last financial year?
                                 </p>
-                                <ul>
-                                    <li>(Less than 1 lakh - 1,</li>
-                                    <li>1 lakh to 2 lakhs - 2,</li>
-                                    <li>2 lakhs to 4 lakhs - 3,</li>
-                                    <li>4 lakhs to 8 lakhs - 4,</li>
-                                    <li>8 lakhs to 12 lakhs - 5,</li>
-                                    <li>12 lakhs to 16 lakhs - 6,</li>
-                                    <li>16 lakhs to 20 lakhs - 7,</li>
-                                    <li>20 lakhs to 24 lakhs - 8,</li>
-                                    <li>24 lakhs to 30 lakhs - 9,</li>
-                                    <li>Above 30 lakhs - 10)</li>
-                                </ul>
                             </td>
                             <td>
-                               <select class="form-select form-select-sm">
+                                <select class="form-select form-select-sm" 
+                                        value="@block_1?.household_income"
+                                        @oninput="OnIncomeChanged">
                                     <option>Please Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
+                                    <option value="1">1 - Less than 1 lakh</option>
+                                    <option value="2">2 - 1 lakh to 2 lakhs</option>
+                                    <option value="3">3 - 2 lakhs to 4 lakhs</option>
+                                    <option value="4">4 - 4 lakhs to 8 lakhs</option>
+                                    <option value="5">5 - 8 lakhs to 12 lakhs</option>
+                                    <option value="6">6 - 12 lakhs to 16 lakhs</option>
+                                    <option value="7">7 - 16 lakhs to 20 lakhs</option>
+                                    <option value="8">8 - 20 lakhs to 24 lakhs</option>
+                                    <option value="9">9 - 24 lakhs to 30 lakhs</option>
+                                    <option value="10">10 - Above 30 lakhs</option>
                                </select>
                             </td>
                         </tr>
@@ -77,45 +65,138 @@
     </div>
 </div>
 <div class="footer">
-    <!-- Remarks textarea -->
+    @* Remarks Card *@
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">Remarks</h3>
         </div>
-        <div class="card-body">
-            <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter your remarks here..."></textarea>
-        </div>
+        <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
+            <div class="card-body">
+                <textarea type="text" class="form-control is_sso w-100" maxlength="500" placeholder="Enter your text here..." rows="2" @bind="remarks" oninput="validateRemarks(event)"></textarea>
+            </div>
+        </fieldset>
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <div class="d-flex">
-                <NavLink class="btn btn-outline-primary">
-                    <i class="fi fi-rr-angle-left me-1"></i>Back
-                </NavLink>
-            </div>
+            <button class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
         </div>
         <div class="col-sm-6">
-            <div class="d-flex align-items-center justify-content-end">               
-                <button class="btn btn-outline-primary me-2">
-                    <i class="fi fi-rr-disk me-1"></i>
-                    Save
-                </button>               
-                <NavLink class="btn btn-primary">
-                    Next
-                    <i class="fi fi-rr-angle-right ms-1"></i>
-                </NavLink>
+            <div class="d-flex justify-content-end">
+                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                {
+                    <button type="button" class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => Save(false))">
+                        <i class="fi fi-rr-disk me-1"></i>Save
+                    </button>
+                }
+                <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
         </div>
     </div>
 </div>
 
 @code {
-    [Parameter]
-    public int SelectedFsuId { get; set; }
-    [Parameter]
-    public DateTime? survey_time { get; set; }
-    [Parameter]
-    public string? page_name { get; set; } = string.Empty;
-    [Parameter]
-    public bool ShowVisitedBlock { get; set; } = true;
+    int SelectedFsuId = SessionStorage.SelectedFSUId;
+    DateTime survey_time = DateTime.Now;
+    CommonQueries commonQueries = new();
+    DBQueries dB = new();
+    bool is_error = false;
+    Tbl_Block_1? block_1;
+    string remarks = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
+        {
+            block_uri = "/dashboard/his/block_12_1",
+            block_title = "HIS Block 12",
+            block_code = CommonEnum.his_block_12_1.ToString(),
+        };
+        await commonQueries.InsertVisitedBlock(vb);
+        block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
+        if (block_1 != null)
+        {
+            remarks = block_1.block_12_1_remark ?? string.Empty;
+        }
+        StateHasChanged();
+    }
+
+    void GoBack()
+    {
+        NavigationManager.NavigateTo("/dashboard/his/block_11b");
+        return;
+    }
+
+    private void OnIncomeChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            var value = e.Value?.ToString();
+
+            if (string.IsNullOrEmpty(value))
+                block_1.household_income = null;
+            else
+            {
+                block_1.household_income = int.Parse(value);
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+        
+    }
+
+    async Task Save(bool go_next)
+    {
+        try
+        {
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                NavigationManager.NavigateTo("/dashboard/his/block_A");
+                return;
+            }
+            if (block_1 != null)
+            {
+                block_1.block_12_1_remark = remarks;
+                await dB.SaveAsync<Tbl_Block_1>(block_1);
+                if(!block_1.household_income.HasValue)
+                {
+                    toastService.ShowError("Please select total household income before saving");
+                    return;
+                }
+                else
+                {
+                    var insert = await dB.SaveAsync<Tbl_Block_1>(block_1);
+                    if (insert > 0)
+                    {
+                        toastService.ShowSuccess("Data saved successfully.");
+                        if (go_next)
+                        {
+                            NavigationManager.NavigateTo("/dashboard/his/block_A");
+                        }
+                    }
+                    else
+                    {
+                        toastService.ShowError("Failed to save data. Please try again.");
+                    }
+                }
+            }
+            else
+            {
+                toastService.ShowError("Failed to save data. Please try again.");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("An error occurred while saving the data. Please try again.");
+        }
+        finally
+        {
+
+        }
+    }
+
+
 }

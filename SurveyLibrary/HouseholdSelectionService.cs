@@ -168,6 +168,7 @@ namespace Income.SurveyLibrary
                     {
                         if (pool.Reserve(hh))
                         {
+                            //result.Messages[stratum] = $"Stratum {stratum}: {hh.Block_7_3} was reserved in SSS {hh.SSS}";
                             hh.isSelected = true;
                             hh.SelectedPostedSSS = firstSSS;
                             hh.SelectedFromSSS = hh.SSS;
@@ -179,7 +180,8 @@ namespace Income.SurveyLibrary
                     int shortfall = totalRequired - totalAvailable;
                     var compensationOrder = isRural ? RuralStratumCompensation[stratum] : UrbanStratumCompensation[stratum];
 
-                    CompensateShortfall(pool, compensationOrder, shortfall, firstSSS, result);
+                    CompensateShortfall(pool, compensationOrder, shortfall, firstSSS, result, allocation, isRural, stratum, availableInStratum);
+
                 }
                 else
                 {
@@ -228,7 +230,11 @@ namespace Income.SurveyLibrary
                             int shortfall = required - available;
                             var compensationOrder = isRural ? RuralSSSCompensation[sss] : UrbanSSSCompensation[sss];
 
-                            CompensateShortfall(pool, compensationOrder, shortfall, sss, result);
+                            // Get all households in the stratum for special case check
+                            var allInStratum = pool.GetAvailable(stratum: stratum);
+
+                            // For SSS-level compensation, use the unified method
+                            CompensateShortfall(pool, compensationOrder, shortfall, sss, result, allocation, isRural, stratum, allInStratum);
                         }
                     }
                 }
@@ -238,13 +244,36 @@ namespace Income.SurveyLibrary
         }
 
         private void CompensateShortfall(
-            SelectionPool pool,
-            List<int> compensationOrder,
-            int shortfall,
-            int postedSSS,
-            SelectionResult result)
+        SelectionPool pool,
+        List<int> compensationOrder,
+        int shortfall,
+        int postedSSS,
+        SelectionResult result,
+        Dictionary<int, Dictionary<int, int>> allocation,
+        bool isRural = true,
+        int stratum = 0,
+        List<Tbl_Sch_0_0_Block_7> allHouseholdsInStratum = null)
         {
             int compensated = 0;
+            int targetStratum = GetStratumFromSSS(postedSSS); // Get the stratum we're compensating for
+
+            // Check if urban special case applies for this stratum
+            bool isUrbanSpecialCase = false;
+            if (!isRural && allHouseholdsInStratum != null && (targetStratum == 10 || targetStratum == 20))
+            {
+                var allSSSInStratum = allHouseholdsInStratum.Select(h => h.SSS).Distinct().ToList();
+
+                if (targetStratum == 10)
+                {
+                    // Check if ALL households are 121 or 122 (no SSS 11)
+                    isUrbanSpecialCase = allSSSInStratum.All(s => s == 121 || s == 122);
+                }
+                else if (targetStratum == 20)
+                {
+                    // Check if ALL households are 221 or 222 (no SSS 21)
+                    isUrbanSpecialCase = allSSSInStratum.All(s => s == 221 || s == 222);
+                }
+            }
 
             foreach (int compensationSSS in compensationOrder)
             {
@@ -252,15 +281,30 @@ namespace Income.SurveyLibrary
 
                 // Find available households from this SSS or Stratum
                 var availableHouseholds = pool.GetAvailable(sss: compensationSSS);
+                bool isSSS = availableHouseholds.Count > 0;
 
                 // If no households found for SSS, try as stratum
-                if (availableHouseholds.Count == 0)
+                if (!isSSS)
                 {
                     availableHouseholds = pool.GetAvailable(stratum: compensationSSS);
                 }
 
+                if (availableHouseholds.Count == 0)
+                    continue;
+
+                // Calculate how many households can actually be spared
+                int canSpare = CalculateSpareableHouseholds(
+                    pool,
+                    compensationSSS,
+                    isSSS,
+                    allocation,
+                    availableHouseholds.Count);
+
+                if (canSpare <= 0)
+                    continue; // Can't spare any, move to next in compensation order
+
                 int needed = shortfall - compensated;
-                int toSelect = Math.Min(needed, availableHouseholds.Count);
+                int toSelect = Math.Min(needed, canSpare);
 
                 var selected = SelectRandomly(availableHouseholds, toSelect);
 
@@ -269,7 +313,47 @@ namespace Income.SurveyLibrary
                     if (pool.Reserve(hh))
                     {
                         hh.isSelected = true;
-                        hh.SelectedPostedSSS = postedSSS;
+
+                        // Determine SelectedPostedSSS based on stratum
+                        int hhStratum = GetStratumFromSSS(hh.SSS); // Get household's stratum
+
+                        if (hhStratum == targetStratum)
+                        {
+                            // Same stratum compensation
+                            // Check if this household qualifies for urban special case
+                            bool applySpecialCase = false;
+
+                            if (isUrbanSpecialCase)
+                            {
+                                // Special case applies to entire stratum
+                                // Keep household's original SSS if it's 121/122 or 221/222
+                                if (targetStratum == 10 && (hh.SSS == 121 || hh.SSS == 122))
+                                {
+                                    applySpecialCase = true;
+                                }
+                                else if (targetStratum == 20 && (hh.SSS == 221 || hh.SSS == 222))
+                                {
+                                    applySpecialCase = true;
+                                }
+                            }
+
+                            if (applySpecialCase)
+                            {
+                                // Urban special case: Keep household's original SSS
+                                hh.SelectedPostedSSS = hh.SSS;
+                            }
+                            else
+                            {
+                                // Normal same stratum: assign to posted SSS
+                                hh.SelectedPostedSSS = postedSSS;
+                            }
+                        }
+                        else
+                        {
+                            // Different stratum - keep the household's original SSS
+                            hh.SelectedPostedSSS = hh.SSS;
+                        }
+
                         hh.SelectedFromSSS = hh.SSS;
                         result.SelectedHouseholds.Add(hh);
                         compensated++;
@@ -280,6 +364,65 @@ namespace Income.SurveyLibrary
             if (compensated < shortfall)
             {
                 result.Messages[postedSSS * 1000] = $"WARNING: Could not fully compensate shortfall for SSS {postedSSS}. Shortfall: {shortfall}, Compensated: {compensated}";
+            }
+        }
+
+        private int GetStratumFromSSS(int sss)
+        {
+            if (sss >= 100)
+            {
+                // 3-digit SSS (Urban): 121, 122, 221, 222
+                return (sss / 100) * 10; // 121 -> 10, 221 -> 20
+            }
+            else
+            {
+                // 2-digit SSS (Rural and some Urban): 11, 12, 21, 22, 31, 32, 40, 90
+                return (sss / 10) * 10; // 11 -> 10, 21 -> 20, 40 -> 40
+            }
+        }
+
+        // Calculate how many households can be spared from a given SSS or Stratum
+        private int CalculateSpareableHouseholds(
+            SelectionPool pool,
+            int sssOrStratum,
+            bool isSSS,
+            Dictionary<int, Dictionary<int, int>> allocation,
+            int available)
+        {
+            if (isSSS)
+            {
+                // For SSS: Check if this SSS has its own requirement
+                int stratum = (sssOrStratum / 10) * 10; // Get parent stratum
+
+                if (!allocation.ContainsKey(stratum))
+                    return available; // No requirement for this stratum, can spare all
+
+                var sssAllocations = allocation[stratum];
+
+                if (!sssAllocations.ContainsKey(sssOrStratum))
+                    return available; // This SSS has no specific requirement, can spare all
+
+                int required = sssAllocations[sssOrStratum];
+                int spareable = available - required;
+
+                return Math.Max(0, spareable); // Can't be negative
+            }
+            else
+            {
+                // For Stratum: Check total stratum requirement
+                if (!allocation.ContainsKey(sssOrStratum))
+                    return available; // No requirement for this stratum, can spare all
+
+                var sssAllocations = allocation[sssOrStratum];
+                int totalRequired = sssAllocations.Values.Sum();
+
+                // Get total available in this stratum (not just the available passed in)
+                var allInStratum = pool.GetAvailable(stratum: sssOrStratum);
+                int totalAvailable = allInStratum.Count;
+
+                int spareable = totalAvailable - totalRequired;
+
+                return Math.Max(0, spareable); // Can't be negative
             }
         }
 

@@ -154,11 +154,25 @@
         var block_A = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>() ?? null;
 
 
-        B1 = block_10 != null ? block_10.item_23.GetValueOrDefault() : 0;
-        B2 = block_11a != null ? (block_11a.item_2.GetValueOrDefault() + (block_11a.item_5.GetValueOrDefault() + block_11a.item_6.GetValueOrDefault())/12) : 0;
-        B3 = block_11b != null && block_11b.Count > 0 ? block_11b.Sum(x => x.item_4.GetValueOrDefault())/12 : 0;
+        B1 = Math.Round(
+        block_10 != null ? block_10.item_23.GetValueOrDefault() : 0d,
+        2);
 
-        B4 = B1 + B2 + B3;
+        B2 = Math.Round(
+                block_11a != null
+                    ? block_11a.item_2.GetValueOrDefault()
+                      + (block_11a.item_5.GetValueOrDefault() + block_11a.item_6.GetValueOrDefault()) / 12
+                    : 0d,
+                2);
+
+        B3 = Math.Round(
+                block_11b != null && block_11b.Count > 0
+                    ? block_11b.Sum(x => x.item_4.GetValueOrDefault()) / 12
+                    : 0d,
+                2);
+
+        B4 = Math.Round(B1 + B2 + B3, 2);
+
         if(block_A != null && block_A.item_8 < (1.1 * B4))
         {
             warning = $"W085: Household's monthly income is less than monthly expenditure. Please check the entries and provide suitable clarifications";

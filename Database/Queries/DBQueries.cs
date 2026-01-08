@@ -530,7 +530,8 @@ namespace Income.Database.Queries
                     "Tbl_Block_11b",
                     "Tbl_Block_A",
                     "Tbl_Block_B",
-                    "Tbl_Block_FieldOperation"
+                    "Tbl_Block_FieldOperation",
+                    "Tbl_Warning"
                 };
 
                 // Execute delete for each table
@@ -3763,7 +3764,7 @@ namespace Income.Database.Queries
                 return;
 
             // If FSU is submitted → soft delete
-            if (SessionStorage.HHD_Submitted)
+            if (SessionStorage.HHD_Submitted || SessionStorage.FSU_Submitted)
             {
                 entry.is_deleted = true;
                 await _database.UpdateAsync(entry);
@@ -3815,6 +3816,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    warning.survey_coordinates = SessionStorage.location;
+                    warning.survey_timestamp = DateTime.Now;
                     await _database.InsertAsync(warning);
                     result++;
                 }
@@ -3839,7 +3842,7 @@ namespace Income.Database.Queries
             //}
             if (schedule == "0")
             {
-                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+                return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.schedule == "0" && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
             }
             else
             {

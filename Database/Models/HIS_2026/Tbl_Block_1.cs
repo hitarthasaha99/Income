@@ -48,7 +48,6 @@ namespace Income.Database.Models.HIS_2026
         public string? block_7d_remark { get; set; } = string.Empty;
         public string? block_8a_remark { get; set; } = string.Empty;
         public string? block_8b_remark { get; set; } = string.Empty;
-
         public string? block_9a_remark { get; set; } = string.Empty;
         public string? block_9b_remark { get; set; } = string.Empty;
         public string? block_10_remark { get; set; } = string.Empty;
@@ -58,5 +57,7 @@ namespace Income.Database.Models.HIS_2026
         public string? block_b_remark { get; set; } = string.Empty;
         public string? block_12_remark { get; set; } = string.Empty;
         public string? block_13_remark { get; set; } = string.Empty;
+        public string? block_12_1_remark { get; set; } = string.Empty;
+        public int? household_income { get; set; }
     }
 }

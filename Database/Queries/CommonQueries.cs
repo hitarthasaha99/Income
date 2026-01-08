@@ -185,6 +185,38 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task DeleteVisitedBlocksAsync(
+            int fsuId,
+            IEnumerable<string> blockTitles)
+        {
+            if (blockTitles == null || !blockTitles.Any())
+                return;
+
+            try
+            {
+                // Create (?, ?, ?, ...) placeholders for IN clause
+                var placeholders = string.Join(", ", blockTitles.Select(_ => "?"));
+
+                var query = $@"
+            DELETE FROM Tbl_Visited_Blocks
+            WHERE fsu_id = ?
+              AND block_code IN ({placeholders})";
+
+                // fsu_id must be the first parameter (order matters for '?')
+                var parameters = new List<object> { fsuId };
+                parameters.AddRange(blockTitles);
+
+                await _database.ExecuteAsync(query, parameters.ToArray());
+            }
+            catch (Exception)
+            {
+                // Log if needed
+                throw;
+            }
+        }
+
+
+
         public async Task DeleteSSUBlockAsync()
         {
             try
@@ -364,7 +396,7 @@ namespace Income.Database.Queries
                         // Soft delete → set is_deleted = 1
                         string query =
                             $"UPDATE {table.Name} SET is_deleted = 1 " +
-                            $"WHERE fsu_ref_id = ? AND hhd_id = ?";
+                            $"WHERE fsu_id = ? AND hhd_id = ?";
 
                         await _database.ExecuteAsync(query, fsuId, hhdId);
                     }
@@ -373,7 +405,7 @@ namespace Income.Database.Queries
                         // Hard delete → remove records
                         string query =
                             $"DELETE FROM {table.Name} " +
-                            $"WHERE fsu_ref_id = ? AND hhd_id = ?";
+                            $"WHERE fsu_id = ? AND hhd_id = ?";
 
                         await _database.ExecuteAsync(query, fsuId, hhdId);
                     }
