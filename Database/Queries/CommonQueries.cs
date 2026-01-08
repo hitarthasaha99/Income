@@ -186,8 +186,9 @@ namespace Income.Database.Queries
         }
 
         public async Task DeleteVisitedBlocksAsync(
-            int fsuId,
-            IEnumerable<string> blockTitles)
+    int fsuId,
+    IEnumerable<string> blockTitles,
+    int hhdId = 0)
         {
             if (blockTitles == null || !blockTitles.Any())
                 return;
@@ -200,10 +201,17 @@ namespace Income.Database.Queries
                 var query = $@"
             DELETE FROM Tbl_Visited_Blocks
             WHERE fsu_id = ?
+              AND (? = 0 OR hhd_id = ?)
               AND block_code IN ({placeholders})";
 
-                // fsu_id must be the first parameter (order matters for '?')
-                var parameters = new List<object> { fsuId };
+                // Order matters for '?' placeholders
+                var parameters = new List<object>
+        {
+            fsuId,
+            hhdId,  // for (? = 0 ...)
+            hhdId   // for hhd_id = ?
+        };
+
                 parameters.AddRange(blockTitles);
 
                 await _database.ExecuteAsync(query, parameters.ToArray());
@@ -214,6 +222,7 @@ namespace Income.Database.Queries
                 throw;
             }
         }
+
 
 
 
@@ -412,6 +421,37 @@ namespace Income.Database.Queries
                 }
 
                 await _database.ExecuteAsync("COMMIT");
+                await DeleteVisitedBlocksAsync(
+                SessionStorage.SelectedFSUId,
+                blockTitles: new[]
+                {
+                    CommonEnum.his_block_3.ToString(),
+                    CommonEnum.his_block_4_1.ToString(),
+                    CommonEnum.his_block_4_2.ToString(),
+                    CommonEnum.his_block_4_3.ToString(),
+                    CommonEnum.his_block_5.ToString(),
+                    CommonEnum.his_block_6.ToString(),
+                    CommonEnum.his_block_7a.ToString(),
+                    CommonEnum.his_block_7a_2.ToString(),
+                    CommonEnum.his_block_7b.ToString(),
+                    CommonEnum.his_block_7c.ToString(),
+                    CommonEnum.his_block_7c_2.ToString(),
+                    CommonEnum.his_block_7c_3.ToString(),
+                    CommonEnum.his_block_7d.ToString(),
+                    CommonEnum.his_block_8a.ToString(),
+                    CommonEnum.his_block_8b.ToString(),
+                    CommonEnum.his_block_9a.ToString(),
+                    CommonEnum.his_block_9b.ToString(),
+                    CommonEnum.his_block_10.ToString(),
+                    CommonEnum.his_block_11a.ToString(),
+                    CommonEnum.his_block_11b.ToString(),
+                    CommonEnum.his_block_A.ToString(),
+                    CommonEnum.his_block_B.ToString(),
+                    CommonEnum.his_block_12.ToString(),
+                    CommonEnum.his_block_12_1.ToString()
+                },
+                hhdId: hhdId
+            );
                 return 1;
             }
             catch (Exception ex)

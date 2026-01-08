@@ -17,7 +17,7 @@
 
 	<ConfirmDialog @ref="dialog" />
 	<ErrorPopup @ref="errorPopup" ErrorDict="errorDict"></ErrorPopup>
-
+	<CommonContentHeader SelectedFsuId="@SelectedFsuId" ShowVisitedBlock=false/>
 
 	<div class="card custom-card">
 		<div class="card-header">
@@ -55,7 +55,7 @@
 								{
 									<tr>
 										
-										@if (((SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO) && item.hhdStatus is not (21 or 22 or 31 or 32)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.hhdStatus == 31))
+										@if (((SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO) && item.hhdStatus is not (21 or 22 or 30 or 31 or 32)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && (item.hhdStatus == 31 || item.hhdStatus == 30)))
 										{
 											@if (item.status != "SUBSTITUTED" && item.hhdStatus != 32)
 											{
@@ -822,6 +822,11 @@
 						// 	errors.Add($"H045: Block 7b is applicable only when atleast one of Block 4.4 Sl. no. 3 - 6 are checked");
 						// }
 					}
+
+					if (!block_1.household_income.HasValue)
+					{
+                        errors.Add($"Block 12 : Household income slab has not been selected");
+					}
 				}
 
 
@@ -911,6 +916,8 @@
 					{
 						errors.Add($"Number of block 3 entries does not match the number of block 11b entries");
 					}
+
+					
 				}
 
 
@@ -1067,6 +1074,14 @@
 					{
 						var parents = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
 						bool rejectedWarnings = parents.Any(x => x.warning_status == 3);
+						bool hasPendingWarning = parents.Any(x => x.warning_status == 2);
+
+						if (hasPendingWarning)
+						{
+							errors.Add("Please address all pending warnings");
+							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+                        }
+
 						if (!rejectedWarnings)
 						{
 							errors.Add("Need to have atleast one rejected warning to refer back");
@@ -1127,10 +1142,21 @@
 				if (warnings.Count > 0)
 				{
 					var parents = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
-					bool rejectedWarnings = parents.Any(x => x.warning_status == 3);
-					if (!rejectedWarnings)
+					bool hasRejectedWarning = parents.Any(x => x.warning_status == 3);
+					bool hasPendingWarning = parents.Any(x => x.warning_status == 4);
+
+					if (!hasRejectedWarning)
 					{
 						errors.Add("Need to have atleast one rejected warning to refer back");
+					}
+
+					if (hasPendingWarning)
+					{
+						errors.Add("Please address all pending warnings");
+					}
+
+					if (errors.Any())
+					{
 						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 					}
 				}
@@ -1252,7 +1278,7 @@
 		}
 		else if (name == CommonConstants.ROLE_NAME_DS)
 		{
-			if (data.hhdStatus == 31)
+			if (data.hhdStatus == 30 || data.hhdStatus == 31)
 			{
 				SessionStorage.selected_hhd_id = data.Block_7_3.GetValueOrDefault();
 				SessionStorage.HHD_Submitted = true;
@@ -1402,7 +1428,7 @@
 				22 => "Referred back by DS",
 				31 => "Submitted by Supervisor",
 				32 => "Accepted by DS",
-				42 => "Referred back by CPG",
+				30 => "Referred back by CPG",
 				null => "",
 				_ => ""
 			};

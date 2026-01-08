@@ -1,11 +1,13 @@
 ﻿@page "/dashboard/sch0.0/block_5"
 @using Income.Database.Models.Common
 @using Income.Database.Models.SCH0_0
+@using Income.Viewmodels
 @layout Income.Components.Layout.DashboardLayout
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
 @inject ILoggingService Logger
+@inject Warning_VM warningVM
 
 
 <div class="main-content">
@@ -209,6 +211,9 @@
                 {
                     return;
                 }
+
+                warningVM.AddWarning("W017(iii): All the sub-units need to have more or less equal population", "0", "5", "3");
+                await warningVM.SaveWarningAsync("0", "5", 0);
             }
             Random num = new Random();
             int? from_val = block_5[0].serial_number;

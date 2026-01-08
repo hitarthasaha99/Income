@@ -831,7 +831,7 @@
             await SCH_0_0_Queries.ReserializeHHD();
             if (block_5_obj.Block_7_5 > 30)
             {
-                warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", block_5_obj.Block_7_3.GetValueOrDefault());
+                warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault());
                 await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_1.GetValueOrDefault());
             }
         }

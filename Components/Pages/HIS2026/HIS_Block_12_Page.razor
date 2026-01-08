@@ -41,7 +41,7 @@
                                 </p>
                             </td>
                             <td>
-                                <select class="form-select form-select-sm" 
+                                <select disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)" class="form-select form-select-sm" 
                                         value="@block_1?.household_income"
                                         @oninput="OnIncomeChanged">
                                     <option>Please Select</option>

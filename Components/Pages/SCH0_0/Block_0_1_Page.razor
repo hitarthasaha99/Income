@@ -191,7 +191,7 @@
                         <div class="col-sm-12">
                             <div class="mb-3" EditContext="EditContext">
                                 <label class="form-label"><span class="form-badge">16</span>Survey Code</label>
-                                <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
+                                <select disabled="@block_0_1_VM.DisableItem16" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_16" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
                                     <option value="">Select</option>
                                     @if (block_0_1_VM.survey_code_list != null && block_0_1_VM.survey_code_list.Count > 0)
                                     {
@@ -210,7 +210,7 @@
                                     <span class="form-badge">17</span>
                                     Reason for substitution of original sample (code)
                                 </label>
-                                <select disabled="@SessionStorage.hamlet_selection_done" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_17" @onchange="@((ChangeEventArgs e) => SubstitutionCodeSelectionChanged(e))">
+                                <select disabled="@block_0_1_VM.DisableItem16" class="form-select w-100" value="@block_0_1_VM.block_0_1.Block_1_17" @onchange="@((ChangeEventArgs e) => SubstitutionCodeSelectionChanged(e))">
                                     <option value="">Select</option>
                                     @if (block_0_1_VM.substitution_reason_list != null && block_0_1_VM.substitution_reason_list.Count > 0)
                                     {
@@ -230,7 +230,7 @@
                                     <span class="form-badge">17.1</span>
                                     Reason
                                 </label>
-                                <textarea maxlength="50" disabled="@SessionStorage.hamlet_selection_done" type="text" rows="2" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17" placeholder="Enter your remarks here..." oninput="validateRemarks(event)"></textarea>
+                                <textarea maxlength="50" disabled="@block_0_1_VM.DisableItem16" type="text" rows="2" class="form-control" @bind="block_0_1_VM.block_0_1.remarks_block_1_17" placeholder="Enter your remarks here..." oninput="validateRemarks(event)"></textarea>
                             </div>
                         </div>
                     </div>
@@ -306,7 +306,7 @@
         {
 
             Block_1_14_ErrorMessage = string.Empty;
-            if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_14.HasValue)
+            if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_14.HasValue && block_0_1_VM.block_0_1.Block_1_16.GetValueOrDefault() is (1 or 4))
             {
                 // Your existing logic
                 int sector = block_0_1_VM.block_0_1.Block_1_5 ?? 0;
@@ -456,7 +456,7 @@
 
             if (block_0_1_VM.block_0_1 != null && block_0_1_VM.block_0_1.Block_1_16.GetValueOrDefault() is not (1 or 4))
             {
-                
+
                 var hhd_data = await DBQueries.GetBlock7Data(SessionStorage.SelectedFSUId);
                 if (hhd_data != null && hhd_data.Count > 0)
                 {
@@ -558,6 +558,7 @@
         try
         {
             block_0_1_VM.SurveyCodeSelectionChanged(args);
+            CheckWarning();
             editContext?.NotifyFieldChanged(editContext.Field(nameof(block_0_1_VM.block_0_1.Block_1_16)));
             editContext?.NotifyFieldChanged(editContext.Field(nameof(block_0_1_VM.block_0_1.Block_1_14)));
         }

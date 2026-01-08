@@ -12,7 +12,7 @@
 
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SelectedFsuId"
+    <CommonContentHeader @ref="_header" SelectedFsuId="@SelectedFsuId"
                          survey_time="@survey_time" />
     <ConfirmDialog @ref="dialog" />
 
@@ -237,6 +237,8 @@
     private bool is_substitute = false;
     bool isAdd = false;
     CommentModal commentModal = default!;
+    private CommonContentHeader? _header;
+    int existingSurveyCode = 0;
 
     public void SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
@@ -297,7 +299,7 @@
         }
         var row = await dQ.GetSelectedSubUnit(SessionStorage.SelectedFSUId.ToString());
 
-        
+
         var response = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id) ?? new();
         if (response.id != Guid.Empty)
         {
@@ -316,6 +318,7 @@
                 SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
             }
             is_remarks_visible = block_1.substitution_reason == 9 ? true : false;
+            existingSurveyCode = block_1.survey_code.GetValueOrDefault();
         }
         else
         {
@@ -377,7 +380,7 @@
 
         if (block_1.survey_code == null)
         {
-            toastService.ShowError("Please select a survey code");
+            toastService.ShowError("H001: Please select a survey code");
             return;
         }
 
@@ -391,7 +394,7 @@
         {
             if(block_1.substitution_reason == null)
             {
-                toastService.ShowError("Please select a reason before proceeding");
+                toastService.ShowError("H002: Invalid Entry, please check Block-1, item-13");
                 return;
             }
             var block_3_exists = await dQ.Fetch_SCH_HIS_Block3(block_1.hhd_id.GetValueOrDefault());
@@ -436,6 +439,8 @@
                 await dQ.Update_SCH0_0_Block_7(nextHousehold);
                 await dQ.Save_SCH_HIS_Block1(block_1);
                 await commonQueries.DeleteBlockDataForCasulaty();
+                await _header?.ReloadVisitedBlocksAsync();
+
                 await service.ReassignSSSHouseholdIds(current_hhd.SSS);
                 NavigationManager.NavigateTo("/dashboard/his/ssu_page");
                 return;
@@ -446,7 +451,7 @@
         {
             if (block_1.substitution_reason == null)
             {
-                toastService.ShowError("Please select a reason before proceeding");
+                toastService.ShowError("H002: Invalid Entry, please check Block-1, item-13");
                 return;
             }
 
@@ -465,7 +470,7 @@
                     return;
                 }
             }
-            
+
             var service = new HouseholdSelectionService();
 
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
@@ -484,11 +489,23 @@
             await service.ReassignSSSHouseholdIds(current_hhd.SSS);
             toastService.ShowInfo("Household has been marked as casualty");
             await commonQueries.DeleteBlockDataForCasulaty();
+            await _header?.ReloadVisitedBlocksAsync();
         }
 
         if(block_1.survey_code == 1)
         {
             block_1.substitution_reason = null;
+            if(existingSurveyCode == 3)
+            {
+                await commonQueries.DeleteVisitedBlocksAsync(
+                SessionStorage.SelectedFSUId,
+                blockTitles: new[]
+                {
+                    CommonEnum.his_block_12.ToString(),
+                },
+                hhdId: SessionStorage.selected_hhd_id);
+                await _header?.ReloadVisitedBlocksAsync();
+            }
         }
 
         var response = await dQ.Save_SCH_HIS_Block1(block_1);

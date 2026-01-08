@@ -68,7 +68,7 @@ namespace Income.Viewmodels.SCH0_0
         public DBQueries SCH_0_0_Queries = new();
         public bool is_error = false;
         public bool DisablePopulation = false;
-        public bool EnableItem16 = false;
+        public bool DisableItem16 = false;
 
         [ObservableProperty]
         private string _block_1_4_Selected = string.Empty;
@@ -135,7 +135,7 @@ namespace Income.Viewmodels.SCH0_0
                     Block_1_16_Selected = null;
                     Block_1_17_Selected = null;
                     block_0_1.remarks = string.Empty;
-                    EnableItem16 = true;
+                    DisableItem16 = false;
                     DisablePopulation = false;
                     ShowItem17 = false;
                     //DisplayCoordinates = FormattedCoordinates;
@@ -156,7 +156,8 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
                 ShowItem17 = block_0_1.Block_1_17 != null;
                 ShowItem17RemarksField = ShowItem17 && block_0_1.Block_1_17.GetValueOrDefault() == 9;
-                if(block_0_1.Block_1_16.GetValueOrDefault() is (2 or 3 or 5 or 6 or 7))
+                DisableItem16 = SessionStorage.hamlet_selection_done || SessionStorage.subdivision_selection_done || SessionStorage.selection_done;
+                if (block_0_1.Block_1_16.GetValueOrDefault() is (2 or 3 or 5 or 6 or 7))
                 {
                     DisablePopulation = true;
                 }
