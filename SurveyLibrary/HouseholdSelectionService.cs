@@ -106,6 +106,15 @@ namespace Income.SurveyLibrary
                 ).ToList();
             }
 
+            public int GetReservedCount(int? stratum = null, int? sss = null)
+            {
+                return allHouseholds.Where(h =>
+                    reservedIds.Contains(h.id) &&
+                    (stratum == null || h.Stratum == stratum) &&
+                    (sss == null || h.SSS == sss)
+                ).Count();
+            }
+
             public bool Reserve(Tbl_Sch_0_0_Block_7 household)
             {
                 if (reservedIds.Contains(household.id))
@@ -162,7 +171,7 @@ namespace Income.SurveyLibrary
 
                     // Get the first SSS for this stratum
                     int firstSSS = sssAllocations.Keys.Min();
-
+            
                     // Select all available households from this stratum
                     foreach (var hh in availableInStratum)
                     {
@@ -180,7 +189,7 @@ namespace Income.SurveyLibrary
                     int shortfall = totalRequired - totalAvailable;
                     var compensationOrder = isRural ? RuralStratumCompensation[stratum] : UrbanStratumCompensation[stratum];
 
-                    CompensateShortfall(pool, compensationOrder, shortfall, firstSSS, result, allocation, isRural, stratum, availableInStratum);
+                    CompensateShortfall(pool, compensationOrder, shortfall, firstSSS, result, allocation, isRural, stratum, null);
 
                 }
                 else
@@ -382,6 +391,7 @@ namespace Income.SurveyLibrary
         }
 
         // Calculate how many households can be spared from a given SSS or Stratum
+        // Calculate how many households can be spared from a given SSS or Stratum
         private int CalculateSpareableHouseholds(
             SelectionPool pool,
             int sssOrStratum,
@@ -392,7 +402,7 @@ namespace Income.SurveyLibrary
             if (isSSS)
             {
                 // For SSS: Check if this SSS has its own requirement
-                int stratum = (sssOrStratum / 10) * 10; // Get parent stratum
+                int stratum = GetStratumFromSSS(sssOrStratum);
 
                 if (!allocation.ContainsKey(stratum))
                     return available; // No requirement for this stratum, can spare all
@@ -402,8 +412,30 @@ namespace Income.SurveyLibrary
                 if (!sssAllocations.ContainsKey(sssOrStratum))
                     return available; // This SSS has no specific requirement, can spare all
 
+                // CRITICAL: First check if the parent STRATUM has shortfall
+                // If stratum is in shortfall, SSS cannot spare any households
+                int stratumTotalRequired = sssAllocations.Values.Sum();
+                var allInStratum = pool.GetAvailable(stratum: stratum);
+                int stratumAlreadyReserved = pool.GetReservedCount(stratum: stratum);
+                int stratumTotalOriginal = allInStratum.Count + stratumAlreadyReserved;
+
+                if (stratumTotalOriginal < stratumTotalRequired)
+                {
+                    // Stratum is in shortfall - cannot spare any households
+                    return 0;
+                }
+
+                // Stratum is NOT in shortfall, now check if this SSS can spare
                 int required = sssAllocations[sssOrStratum];
-                int spareable = available - required;
+
+                // Count how many from this SSS have already been reserved
+                int alreadyReserved = pool.GetReservedCount(sss: sssOrStratum);
+
+                // Total originally available = current available + already reserved
+                int totalOriginal = available + alreadyReserved;
+
+                // Can spare = total - required - already reserved
+                int spareable = totalOriginal - required - alreadyReserved;
 
                 return Math.Max(0, spareable); // Can't be negative
             }
@@ -420,7 +452,14 @@ namespace Income.SurveyLibrary
                 var allInStratum = pool.GetAvailable(stratum: sssOrStratum);
                 int totalAvailable = allInStratum.Count;
 
-                int spareable = totalAvailable - totalRequired;
+                // Count how many from this stratum have already been reserved
+                int alreadyReserved = pool.GetReservedCount(stratum: sssOrStratum);
+
+                // Total originally available = current available + already reserved
+                int totalOriginal = totalAvailable + alreadyReserved;
+
+                // Can spare = total - required - already reserved
+                int spareable = totalOriginal - totalRequired - alreadyReserved;
 
                 return Math.Max(0, spareable); // Can't be negative
             }

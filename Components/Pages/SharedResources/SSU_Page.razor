@@ -55,7 +55,7 @@
 								{
 									<tr>
 										
-										@if (((SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO) && item.hhdStatus is not (21 or 22 or 31 or 32)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.hhdStatus == 31))
+										@if (((SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO) && item.hhdStatus is not (21 or 22 or 30 or 31 or 32)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO && (item.hhdStatus == 21 || item.hhdStatus == 22)) || (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && (item.hhdStatus == 31 || item.hhdStatus == 30)))
 										{
 											@if (item.status != "SUBSTITUTED" && item.hhdStatus != 32)
 											{
@@ -822,6 +822,11 @@
 						// 	errors.Add($"H045: Block 7b is applicable only when atleast one of Block 4.4 Sl. no. 3 - 6 are checked");
 						// }
 					}
+
+					if (!block_1.household_income.HasValue)
+					{
+                        errors.Add($"Block 12 : Household income slab has not been selected");
+					}
 				}
 
 
@@ -911,6 +916,8 @@
 					{
 						errors.Add($"Number of block 3 entries does not match the number of block 11b entries");
 					}
+
+					
 				}
 
 
@@ -1402,7 +1409,7 @@
 				22 => "Referred back by DS",
 				31 => "Submitted by Supervisor",
 				32 => "Accepted by DS",
-				42 => "Referred back by CPG",
+				30 => "Referred back by CPG",
 				null => "",
 				_ => ""
 			};
