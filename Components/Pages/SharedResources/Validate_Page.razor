@@ -100,12 +100,12 @@
                                 <div class="ms-auto">
                                     <ul class="stats other-info">
                                          <li>
-                                            @* <a onclick="@(() =>NavigateWarning(top) )"><i class="fi fi-rr-eye"></i></a> *@
+                                            <a onclick="@(() =>NavigateWarning(top) )"><i class="fi fi-rr-eye"></i></a>
                                             @*<h4 class="mb-0">@(top?.serial_number)</h4>*@                          
                                         </li> 
                                         <li class="d-flex align-items-center">
                                             <i class="fi fi-rr-calendar"></i>
-                                            <h4 class="mb-0">@(top?.created_on?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
+                                            <h4 class="mb-0">@(top?.survey_timestamp?.ToString("dd/MM/yy/HH:mm:ss"))</h4>
                                         </li>
                                         <li>
                                             <button class="accordion-button collapsed @buttonClass"
@@ -132,14 +132,14 @@
                             </h2>
                             <hr />
                             <div class="row stats other-info">
-                                @* <div class="col-sm-3">
+                                <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">SSS</h3>
                                         <p class="text-danger mb-0">
                                
                                         </p>
                                     </div>
-                                </div> *@
+                                </div>
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">HHD No.</h3>
@@ -148,14 +148,14 @@
                                         </p>
                                     </div>
                                 </div>
-                                @* <div class="col-sm-3">
+                                <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">Member Srl. No.</h3>
                                         <p class="text-info mb-0">
                                             3
                                         </p>
                                     </div>
-                                </div> *@
+                                </div>
                                 <div class="col-sm-3">
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">Block</h3>
@@ -331,7 +331,7 @@
                                             {
                                                 <tr>
                                                     <td>@item.serial_number</td>
-                                                    <td>@item.created_on</td>
+                                                    <td>@item.survey_timestamp</td>
                                                     <td>@item.user_name</td>
                                                     <td>
                                                         @(item.warning_status == 3 ? "Rejected" : "Accepted")

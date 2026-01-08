@@ -530,7 +530,8 @@ namespace Income.Database.Queries
                     "Tbl_Block_11b",
                     "Tbl_Block_A",
                     "Tbl_Block_B",
-                    "Tbl_Block_FieldOperation"
+                    "Tbl_Block_FieldOperation",
+                    "Tbl_Warning"
                 };
 
                 // Execute delete for each table
