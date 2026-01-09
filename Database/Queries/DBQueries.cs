@@ -1710,6 +1710,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_1.survey_timestamp = DateTime.Now;
+                    tbl_block_1.survey_coordinates = SessionStorage.location;
                     status = await _database.InsertAsync(tbl_block_1);
                     var hhd = await GetCurrentHHD(SessionStorage.SelectedFSUId, tbl_block_1.hhd_id.GetValueOrDefault());
                     if (hhd != null)
@@ -1813,6 +1815,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_3.survey_coordinates = SessionStorage.location;
+                    tbl_block_3.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_3);
                 }
                 return status;
@@ -2297,6 +2301,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_4.survey_coordinates = SessionStorage.location;
+                    tbl_block_4.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_4);
                 }
                 return status;
@@ -2390,6 +2396,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    obj.survey_coordinates = SessionStorage.location;
+                    obj.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(obj);
                 }
                 return status;
@@ -2576,7 +2584,9 @@ namespace Income.Database.Queries
 
                 if (response != null && response.Count > 0)
                 {
-                    return response.OrderBy(x => x.serial_member).ToList();
+                    return response
+                            .OrderBy(x => x.addedByUser == true) // false & null first, true last
+                            .ToList();
                 }
                 else
                 {
@@ -2612,7 +2622,7 @@ namespace Income.Database.Queries
                 {
                     // insert new row
                     tbl_block_5.survey_coordinates = SessionStorage.location;
-                    tbl_block_5.survey_timestamp = DateTime.UtcNow;
+                    tbl_block_5.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_5);
                 }
 
@@ -2635,12 +2645,13 @@ namespace Income.Database.Queries
                     .Where(x => x.fsu_id == SessionStorage.SelectedFSUId
                                 && x.hhd_id == hhd_id
                                 && (x.is_deleted == null || x.is_deleted == false))
-                    .OrderBy(x => x.serial_member)
                     .ToListAsync();
 
                 if (response != null)
                 {
-                    return response;
+                    return response
+                            .OrderBy(x => x.addedByUser == true) // false & null first, true last
+                            .ToList();
                 }
                 else
                 {
@@ -2700,6 +2711,7 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                   
                     status = await _database.InsertAsync(tbl_block_6);
                 }
                 return status;
@@ -2774,6 +2786,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_7a.survey_coordinates = SessionStorage.location;
+                    tbl_block_7a.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_7a);
                 }
                 return status;
@@ -2830,6 +2844,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    obj.survey_coordinates = SessionStorage.location;
+                    obj.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(obj);
                 }
                 return status;
@@ -2933,6 +2949,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_7b.survey_coordinates = SessionStorage.location;
+                    tbl_block_7b.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_7b);
                 }
                 return status;
@@ -2977,6 +2995,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_7c.survey_coordinates = SessionStorage.location;
+                    tbl_block_7c.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_7c);
                 }
                 return status;
@@ -3034,6 +3054,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    obj.survey_coordinates = SessionStorage.location;
+                    obj.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(obj);
                 }
                 return status;
@@ -3138,6 +3160,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    obj.survey_coordinates = SessionStorage.location;
+                    obj.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(obj);
                 }
                 return status;
@@ -3232,6 +3256,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    obj.survey_coordinates = SessionStorage.location;
+                    obj.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(obj);
                 }
                 return status;
@@ -3306,6 +3332,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_8.survey_coordinates = SessionStorage.location;
+                    tbl_block_8.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_8);
                 }
                 return status;
@@ -3350,6 +3378,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_8.survey_coordinates = SessionStorage.location;
+                    tbl_block_8.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_8);
                 }
                 return status;
@@ -3446,6 +3476,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_9a.survey_coordinates = SessionStorage.location;
+                    tbl_block_9a.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_9a);
                 }
                 return status;
@@ -3490,6 +3522,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_9b.survey_coordinates = SessionStorage.location;
+                    tbl_block_9b.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_9b);
                 }
                 return status;
@@ -3534,6 +3568,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_10.survey_coordinates = SessionStorage.location;
+                    tbl_block_10.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_10);
                 }
                 return status;
@@ -3578,6 +3614,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_block_11a.survey_coordinates = SessionStorage.location;
+                    tbl_block_11a.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_11a);
                 }
                 return status;
@@ -3625,6 +3663,8 @@ namespace Income.Database.Queries
                 else
                 {
                     tbl_block_11b.is_updated = false;
+                    tbl_block_11b.survey_coordinates = SessionStorage.location;
+                    tbl_block_11b.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_11b);
                 }
                 return status;

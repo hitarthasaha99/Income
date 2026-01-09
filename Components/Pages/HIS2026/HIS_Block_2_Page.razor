@@ -62,7 +62,7 @@
                         <div class="col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">
-                                    <span class="form-badge">2</span>@Loc["surveyinspection"]
+                                    <span class="form-badge">2(i)</span>@Loc["surveyinspection"]
                                 </label>
                                 <input type="text" class="form-control is_sso" value="@dateofsurvey" disabled>
                             </div>
@@ -72,7 +72,7 @@
                             <div class="col-sm-12">
                                 <div class="mb-3">
                                     <label class="form-label">
-                                        <span class="form-badge">1b</span>date of scrutiny
+                                        <span class="form-badge">2(iii)</span>date of scrutiny
                                     </label>
                                     <input type="text" class="form-control" value="@block_2?.date_of_scrutiny?.ToString("dd/MM/yy")" disabled>
                                 </div>
@@ -167,10 +167,7 @@
                                     {
                                         @foreach (var item in block_3)
                                         {
-                                            @if (item.age > 15)
-                                            {
-                                                <option value="@item.serial_no">@item.serial_no - @item.item_2</option>
-                                            }
+                                             <option value="@item.serial_no">@item.serial_no - @item.item_2</option>
                                         }
                                     }
                                     <option value="99">99 - others</option>
@@ -298,6 +295,10 @@
             editContext = new EditContext(block_2);
             messageStore = new ValidationMessageStore(editContext);
             editContext.OnFieldChanged += EditContext_OnFieldChanged;
+            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            {
+                survey_time = block_2.survey_timestamp.GetValueOrDefault();
+            }
             StateHasChanged();
         }
         catch (Exception ex)

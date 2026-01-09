@@ -745,7 +745,7 @@
         }
 
         newMember.isUpdated = true;
-        await dbq.Save_SCH_HIS_Block6(newMember);
+        await dbq.SaveAsync<Tbl_Block_6>(newMember);
         toastService.ShowSuccess("Member added successfully!");
         await AddModal.HideAsync();
         await LoadData();
