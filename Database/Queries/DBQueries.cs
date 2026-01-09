@@ -3196,6 +3196,27 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<List<Tbl_Block_7d>> PrintFetch_SCH_HIS_Block7D(int hhdid)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7d>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhdid && (x.is_deleted == null || x.is_deleted == false)).OrderBy(x => x.serial_number).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7d>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error while fetching Block 7D list: {ex.Message}");
+                return new List<Tbl_Block_7d>();
+            }
+        }
+
         public async Task<int?> Save_SCH_HIS_Block7D_List(Tbl_Block_7d obj)
         {
             try

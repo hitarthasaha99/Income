@@ -62,6 +62,7 @@ namespace Income.Common
         List<Tbl_Block_7c_NIC>? blockhis_7c_Nic = new();
         List<Tbl_Block_7c_Q10>? blockhis_7c_Q10 = new();
         Tbl_Block_7c? blockHis_7c = new();
+        List<Tbl_Block_7d>? blockhis_7d= new();
 
 
         //int hhdId = 0;
@@ -899,6 +900,13 @@ namespace Income.Common
                     blockHis_7c = await _dbQueries.Fetch_SCH_HIS_Block7C(item.Block_7_3 ?? 0);
                     blockhis_7c_Nic = await _dbQueries.Fetch_SCH_HIS_Block7_NICList();
                     blockhis_7c_Q10 = await _dbQueries.Fetch_SCH_HIS_Block7_Q10_List();
+                    //blockhis_7d = await _dbQueries.Fetch_SCH_HIS_Block7D();
+                    var fetchCropTask = _dbQueries.Fetch_SCH_HIS_Block7A_CodeList();
+                    var fetchNICTask = _dbQueries.Fetch_SCH_HIS_Block7_NICList();
+                    var fetchBlock4Task = _dbQueries.Fetch_SCH_HIS_Block4(item.Block_7_3 ?? 0);
+                    var fetchBlock7DTask = _dbQueries.PrintFetch_SCH_HIS_Block7D(item.Block_7_3 ?? 0);
+                    await Task.WhenAll(fetchCropTask, fetchNICTask, fetchBlock4Task, fetchBlock7DTask);
+                    blockhis_7d = fetchBlock7DTask.Result ?? new List<Tbl_Block_7d>();
                     blockhis_8 = await _dbQueries.Fetch_SCH_HIS_Block8(item.Block_7_3 ?? 0);
                     blockhis_8_Q6 = await _dbQueries.Fetch_SCH_HIS_Block8_6(item.Block_7_3 ?? 0);
                     blockhis_9a = await _dbQueries.Fetch_SCH_HIS_Block9a(item.Block_7_3 ?? 0);
@@ -933,6 +941,8 @@ namespace Income.Common
                         FillBlock7c_9(body, blockhis_7c_Nic);
                         FillBlock7c_10(body, blockhis_7c_Q10);
                         FillBlock7c_11_9_Remarks(body, blockHis_7c, blockhis_1?.block_7c_remark);
+                        FillBlock7d(body, blockhis_7d);
+                        FillBlock7dRemarks(body, blockhis_1?.block_7d_remark);
                         FillBlockHis8(body, blockhis_8);
                         FillBlockHis8_1(body, blockhis_8_Q6);
                         FillBlock8_1Remarks(body, blockhis_1?.block_8b_remark);
@@ -1544,7 +1554,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[9B_9.5] Income from "));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[9B_9.5]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(29);
+            var table = body.Elements<Table>().ElementAtOrDefault(30);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -1991,10 +2001,54 @@ namespace Income.Common
             templateRow.Remove();
         }
 
+        private void FillBlock7d(Body body,List<Tbl_Block_7d> list)
+        {
+            if (list == null || list.Count == 0)
+                return;
 
+            var table = body.Elements<Table>()
+                .First(t => t.InnerText.ToLower()
+                    .Contains("[7d] mode of operation"));
 
+            var rows = table.Elements<TableRow>().ToList();
 
+            // Last row assumed as template (blank)
+            TableRow templateRow = rows.Last();
 
+            foreach (var item in list)
+            {
+                var row = new TableRow();
+
+                // (1) S. no. of activity
+                row.Append(CreateTextCell(item.item_1?.ToString() ?? ""));
+
+                // (2) Description of activity
+                row.Append(CreateTextCell(item.item_2 ?? ""));
+
+                // (3) Mode of operation
+                row.Append(CreateTextCell(item.item_3?.ToString() ?? ""));
+
+                // (4) % shareholding
+                row.Append(CreateTextCell(item.item_4?.ToString() ?? ""));
+
+                table.AppendChild(row);
+            }
+
+            // Remove template row
+            templateRow.Remove();
+        }
+        private void FillBlock7dRemarks( Body body,string remarksFromBlock1)
+        {
+            var remarksTable = body.Elements<Table>()
+                .First(t => t.InnerText.ToLower()
+                    .Contains("[7d]remarks"));
+
+            var row = remarksTable.Elements<TableRow>().First();
+            var cells = row.Elements<TableCell>().ToList();
+
+            // second column = remarks value
+            ReplaceCellText(cells[1], remarksFromBlock1);
+        }
 
 
 
