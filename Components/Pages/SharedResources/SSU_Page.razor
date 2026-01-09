@@ -11,6 +11,7 @@
 @inject NetworkService networkService
 @inject Warning_VM warningVM
 @inject ILoggingService loggingService
+@inject PrintHelper PrintHelper
 
 
 <div class="main-content">
@@ -1506,8 +1507,9 @@
 
             preloadService.Show(SpinnerColor.Light, "Files printing in-progress... please wait!");
 
-            var helper = new PrintHelper();
-            var result = await helper.GenerateReportAsync(SessionStorage.SelectedFSUId);
+            //var helper = new PrintHelper();
+            //var result = await helper.GenerateReportAsync(SessionStorage.SelectedFSUId);
+			var result = await PrintHelper.GenerateReportAsync(SessionStorage.SelectedFSUId);
 
             if (result == 1)
             {
