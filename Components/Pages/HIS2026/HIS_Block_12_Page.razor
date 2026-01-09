@@ -19,9 +19,9 @@
             </h3>
             
         </div>
-        <div class="card-header">
+        @* <div class="card-header">
             <h3 class="card-title text-success">Information will be collected at household level in this block.</h3>
-        </div>
+        </div> *@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-bordered mb-0">
@@ -35,11 +35,7 @@
                     <tbody>
                         <tr>
                             <td class="align-middle text-center">12.1</td>
-                            <td>
-                                <p>Total household income from all sources earned by all the members of the
-                                    household during last financial year?
-                                </p>
-                            </td>
+                            <td>Total household income from all sources earned by all the members of the household <span class="fw-bold">during last financial year?</span></td>
                             <td>
                                 <select disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)" class="form-select form-select-sm" 
                                         value="@block_1?.household_income"

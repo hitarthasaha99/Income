@@ -24,9 +24,11 @@
 			<h3 class="card-title">
 				Selected Sampling Units list
 			</h3>
-			<button class="btn btn-sm btn-primary ms-auto" @onclick="HandlePrint">
-				<i class="bi bi-printer"></i> Print
-			</button>
+			<div class="card-tools">
+				<button class="btn btn-primary" @onclick="HandlePrint">
+					<i class="fi fi-rr-print me-1"></i> Print
+				</button>
+			</div>
 		</div>
 		<div class="card-body p-0">
 			<div class="table-responsive">
