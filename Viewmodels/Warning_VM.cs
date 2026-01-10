@@ -77,9 +77,20 @@ namespace Income.Viewmodels
                 // -----------------------------------------
                 // DELETE REMOVED WARNINGS (AND THEIR CHILD COMMENTS)
                 // -----------------------------------------
+                //var warningsToDelete = savedWarnings
+                //    .Where(w => !currentKeys.Contains($"{w.item_no}::{w.serial_number}"))
+                //    .ToList();
+
                 var warningsToDelete = savedWarnings
-                    .Where(w => !currentKeys.Contains($"{w.item_no}::{w.serial_number}"))
-                    .ToList();
+    .Where(saved =>
+        !_tempWarnings.Any(current =>
+            current.item_no == saved.item_no &&
+            current.schedule == saved.schedule
+        )
+    )
+    .ToList();
+
+
 
                 foreach (var warn in warningsToDelete)
                 {
