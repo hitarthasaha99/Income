@@ -380,7 +380,7 @@
             item_3_warning = string.Empty;
             if (block_1?.survey_code == 1 || block_1?.survey_code == 2)
             {
-                if(block_2?.total_time < 10 || block_2?.total_time > 90)
+                if(block_2?.total_time <= 10 || block_2?.total_time > 90)
                 {
                     item_3_warning = "W078(i): Invalid entry, please check item 12, block-1";
                 }
