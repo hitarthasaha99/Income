@@ -14,7 +14,7 @@ namespace Income.Common
    {
         CommonQueries commonQueries = new();
         DBQueries dQ = new();
-        private async Task GenerateBlockData()
+        public async Task<int> GenerateBlockData()
         {
             try
             {
@@ -24,13 +24,47 @@ namespace Income.Common
                 // Get Block 7 data for current household only
                 var block7List = await dQ.GetBlock7Data(SessionStorage.SelectedFSUId);
 
+                var block1 = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id);
+
+                if (block1 != null)
+                {
+                    var random = new Random();
+
+                    // Household income between 1 and 10
+                    block1.household_income = random.Next(1, 11);
+
+                    // Block-number–specific remarks
+                    block1.block_1_remark = "Remarks related to Block 1";
+                    block1.block_3_remark = "Remarks related to Block 3";
+                    block1.block_4_remark = "Remarks related to Block 4";
+                    block1.block_5_remark = "Remarks related to Block 5";
+                    block1.block_6_remark = "Remarks related to Block 6";
+                    block1.block_7a_remark = "Remarks related to Block 7A";
+                    block1.block_7b_remark = "Remarks related to Block 7B";
+                    block1.block_7c_remark = "Remarks related to Block 7C";
+                    block1.block_7d_remark = "Remarks related to Block 7D";
+                    block1.block_8a_remark = "Remarks related to Block 8A";
+                    block1.block_8b_remark = "Remarks related to Block 8B";
+                    block1.block_9a_remark = "Remarks related to Block 9A";
+                    block1.block_9b_remark = "Remarks related to Block 9B";
+                    block1.block_10_remark = "Remarks related to Block 10";
+                    block1.block_11a_remark = "Remarks related to Block 11A";
+                    block1.block_11b_remark = "Remarks related to Block 11B";
+                    block1.block_a_remark = "Remarks related to Block A";
+                    block1.block_b_remark = "Remarks related to Block B";
+                    block1.block_12_remark = "Remarks related to Block 12";
+                    block1.block_13_remark = "Remarks related to Block 13";
+                    block1.block_12_1_remark = "Remarks related to Block 12.1";
+                    await dQ.SaveAsync<Tbl_Block_1>(block1);
+                }
+
 
                 var currentHousehold = block7List
                     .FirstOrDefault(x => x.Block_7_3 == SessionStorage.selected_hhd_id && x.is_household == 2);
 
                 if (currentHousehold == null)
                 {
-                    return;
+                    return 0;
                 }
 
                 int serialNo = 1;
@@ -103,10 +137,11 @@ namespace Income.Common
                 await generateBlock11b();
                 await generateBlock2();
 
-
+                return 1;
             }
             catch (Exception ex)
             {
+                return 0;
             }
         }
 
@@ -180,14 +215,7 @@ namespace Income.Common
             }
 
             // 3. Define Mock NIC Codes (Only reached if q5Needed is true)
-            var dummyNicCodes = new[]
-            {
-        new { Id = 10, Title = "Retail sale of food" },
-        new { Id = 11, Title = "Manufacturing of textiles" },
-        new { Id = 12, Title = "Land transport" },
-        new { Id = 13, Title = "Construction of buildings" },
-        new { Id = 14, Title = "Food and beverage service activities" }
-    };
+            var dummyNicCodes = Block_4_Constants.NIC_CODES;
 
             Random rand = new Random();
 
@@ -206,8 +234,8 @@ namespace Income.Common
                     id = Guid.NewGuid(),
                     hhd_id = SessionStorage.selected_hhd_id,
                     SerialNumber = i + 1,
-                    ActivityName = nicItem.Title,
-                    NicCode = nicItem.Id,
+                    ActivityName = nicItem.title,
+                    NicCode = nicItem.id,
                     BusinessSeasonal = rand.Next(1, 3), // 1=Yes, 2=No
                     NumberOfMonths = rand.Next(1, 13)
                 };
@@ -1180,7 +1208,8 @@ namespace Income.Common
                     // RANDOM TAX DATA ?
                     item_3 = paidTax ? 1 : 2,           // Yes(1)/No(2)
                     item_4 = paidTax ? rand.Next(10000, 100001) : 0,  // Tax amount
-                                                                      // is_updated = true
+                    is_updated = true                                 // is_updated = true
+
                 };
 
                 await dQ.Save_SCH_HIS_Block11b(record);
@@ -1204,16 +1233,16 @@ namespace Income.Common
             // PURE RANDOM VALUES for ALL FIELDS ?
 
             // Names/Codes
-            block2.enumerator_name = $"Enumerator-{rand.Next(1001, 9999)}";
-            block2.enumerator_code = $"E{rand.Next(1001, 9999)}";
-            block2.supervisor_name = $"Supervisor-{rand.Next(1001, 9999)}";
-            block2.supervisor_code = $"S{rand.Next(1001, 9999)}";
+            block2.enumerator_name = SessionStorage.full_name;
+            block2.enumerator_code = SessionStorage.user_name;
+            //block2.supervisor_name = $"Supervisor-{rand.Next(1001, 9999)}";
+            //block2.supervisor_code = $"S{rand.Next(1001, 9999)}";
 
             // Dates (random recent dates)
-            block2.date_of_survey = DateTime.Now.AddDays(-rand.Next(1, 30));
-            block2.date_of_receipt = block2.date_of_survey.Value.AddDays(rand.Next(1, 5));
-            block2.date_of_scrutiny = block2.date_of_receipt.Value.AddDays(rand.Next(1, 10));
-            block2.date_of_despatch = block2.date_of_scrutiny.Value.AddDays(rand.Next(1, 7));
+            block2.date_of_survey = DateTime.Now;
+            //block2.date_of_receipt = block2.date_of_survey.Value.AddDays(rand.Next(1, 5));
+            //block2.date_of_scrutiny = block2.date_of_receipt.Value.AddDays(rand.Next(1, 10));
+            //block2.date_of_despatch = block2.date_of_scrutiny.Value.AddDays(rand.Next(1, 7));
 
             // Numbers
             block2.total_time = rand.Next(30, 121);              // 30-120 mins
@@ -1223,12 +1252,24 @@ namespace Income.Common
             block2.item_5_1_remarks = rand.Next(2) == 1;
             block2.item_5_2_remarks = rand.Next(2) == 1;
 
-            // Informant (random from 1-10, age>15 assumed)
-            block2.informant_serial = rand.Next(1, 11);
-            block2.informant_name = $"Informant-{rand.Next(1, 21)}";
-            block2.informant_mobile = $"9{rand.Next(100000000, 999999999)}"; // 10-digit
-            block2.informant_response_code = rand.Next(1, 5);        // 1-4
-            block2.fk_block_3 = Guid.NewGuid();
+            var block3 = await dQ.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
+
+            if (block3 != null && block3.Any())
+            {
+                // Pick one random Block 3 member as informant
+                var informant = block3[rand.Next(block3.Count)];
+
+                block2.informant_serial = informant.serial_no;
+                block2.fk_block_3 = informant.id;
+
+                // Informant name: "{serial_no}-{item_2}"
+                block2.informant_name = $"{informant.serial_no}-{informant.item_2}";
+
+                // Random mobile & response code
+                block2.informant_mobile = $"9{rand.Next(100000000, 999999999)}"; // 10-digit
+                block2.informant_response_code = rand.Next(1, 5); // 1–4
+            }
+
 
             // Save
             await dQ.SaveAsync<Tbl_Block_FieldOperation>(block2);
