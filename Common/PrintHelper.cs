@@ -854,19 +854,22 @@ namespace Income.Common
             ReplaceCellText(GetLastCell(rows[5]), block11.time_taken?.ToString() ?? "");
 
             // 4. Whether remark entered by JSO / SE / Supervisor
-            ReplaceCellText(GetLastCell(rows[6]), !string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks) ? "1" : "2");
+            ReplaceCellText(GetLastCell(rows[6]), !string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks) ? "Yes" : "No");
 
             // 5.1 (i) In Block 9 / 10
             ReplaceCellText(GetLastCell(rows[7]), !string.IsNullOrWhiteSpace(block_0_1?.EnumeratorRemarks) || !string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks)
-                    ? "1"
-                    : "2"
+                    ? "Yes"
+                    : "No"
             );
 
             // 5.2 (ii) Elsewhere in the schedule
             ReplaceCellText(
-                GetLastCell(rows[8]), string.IsNullOrWhiteSpace(block_0_1?.EnumeratorRemarks) && string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks)
-                    ? "1"
-                    : "2"
+                GetLastCell(rows[8]), /*string.IsNullOrWhiteSpace(block_0_1?.EnumeratorRemarks) && string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks)*/ !string.IsNullOrEmpty(block_0_1?.remarks_block_2_2) || !string.IsNullOrEmpty(block_0_1?.remarks_block_3) ||
+                                    !string.IsNullOrEmpty(block_0_1?.remarks_block_4) || !string.IsNullOrEmpty(block_0_1?.remarks_block_5) ||
+                                    !string.IsNullOrEmpty(block_0_1?.remarks_block_6) || !string.IsNullOrEmpty(block_0_1?.remarks_block_7) ||
+                                    !string.IsNullOrEmpty(block_0_1?.remarks_block_7_selection)
+                    ? "Yes"
+                    : "No"
             );
 
             // 6. Remarks
@@ -886,79 +889,107 @@ namespace Income.Common
                 //var dbQueries = new DBQueries();
                 var data = await _dbQueries.GetBlock7Data(SessionStorage.SelectedFSUId);
                 List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ThenBy(k => k.SSS_household_id).ToList();
-                foreach (var item in selected)
+                using (var doc = WordprocessingDocument.Open(ms, true))
                 {
-                    blockhis_1 = await _dbQueries.Fetch_SCH_HIS_Block1(item.Block_7_3 ?? 0);
-                    blockhis_3 = await _dbQueries.Fetch_SCH_HIS_Block3(item.Block_7_3 ?? 0);
-                    blockhis_4 = await _dbQueries.Fetch_SCH_HIS_Block4(item.Block_7_3 ?? 0);
-                    blockhis_4Q5 = await _dbQueries.Fetch_SCH_HIS_Block4_NICList();
-                    blockhis_5 = await _dbQueries.Fetch_SCH_HIS_Block5(item.Block_7_3 ?? 0);
-                    blockhis_6 = await _dbQueries.Fetch_SCH_HIS_Block6(item.Block_7_3 ?? 0);
-                    blockhis_7a_1= await _dbQueries.Fetch_SCH_HIS_Block7A_CodeList();
-                    blockHis_7a = await _dbQueries.Fetch_SCH_HIS_Block7A(item.Block_7_3 ?? 0);
-                    blockHis_7b = await _dbQueries.Fetch_SCH_HIS_Block7B(item.Block_7_3 ?? 0);
-                    blockHis_7c = await _dbQueries.Fetch_SCH_HIS_Block7C(item.Block_7_3 ?? 0);
-                    blockhis_7c_Nic = await _dbQueries.Fetch_SCH_HIS_Block7_NICList();
-                    blockhis_7c_Q10 = await _dbQueries.Fetch_SCH_HIS_Block7_Q10_List();
-                    //blockhis_7d = await _dbQueries.Fetch_SCH_HIS_Block7D();
-                    var fetchCropTask = _dbQueries.Fetch_SCH_HIS_Block7A_CodeList();
-                    var fetchNICTask = _dbQueries.Fetch_SCH_HIS_Block7_NICList();
-                    var fetchBlock4Task = _dbQueries.Fetch_SCH_HIS_Block4(item.Block_7_3 ?? 0);
-                    var fetchBlock7DTask = _dbQueries.PrintFetch_SCH_HIS_Block7D(item.Block_7_3 ?? 0);
-                    await Task.WhenAll(fetchCropTask, fetchNICTask, fetchBlock4Task, fetchBlock7DTask);
-                    blockhis_7d = fetchBlock7DTask.Result ?? new List<Tbl_Block_7d>();
-                    blockhis_8 = await _dbQueries.Fetch_SCH_HIS_Block8(item.Block_7_3 ?? 0);
-                    blockhis_8_Q6 = await _dbQueries.Fetch_SCH_HIS_Block8_6(item.Block_7_3 ?? 0);
-                    blockhis_9a = await _dbQueries.Fetch_SCH_HIS_Block9a(item.Block_7_3 ?? 0);
-                    blockhis_9b = await _dbQueries.Fetch_SCH_HIS_Block9B(item.Block_7_3 ?? 0);
-                    blockhis_10 = await _dbQueries.Fetch_SCH_HIS_Block10();
-                    block_11a = await _dbQueries.Fetch_SCH_HIS_Block11(item.Block_7_3 ?? 0);
-                    block_11b_list = await _dbQueries.Fetch_SCH_HIS_Block11b(item.Block_7_3 ?? 0);
-                    //blockHis_A = await dbQueries.();
-                    //blockHis_B = await dbQueries.();
-                    //using var ms = new MemoryStream(File.ReadAllBytes(templatePath));
-                    using (var doc = WordprocessingDocument.Open(ms, true))
+                    var body = doc.MainDocumentPart.Document.Body;
+
+                    var templateElements = body.Elements().ToList();
+
+                    var templateCloneList = templateElements.Select(e => e.CloneNode(true)).ToList();
+
+                    body.RemoveAllChildren();
+
+                    foreach (var item in selected)
                     {
-                        var body = doc.MainDocumentPart.Document.Body;
+                        var currentBlock = templateCloneList.Select(e => e.CloneNode(true)).ToList();
+                        var tempBody = new Body(currentBlock);
+                        blockhis_1 = await _dbQueries.Fetch_SCH_HIS_Block1(item.Block_7_3 ?? 0);
+                        blockhis_3 = await _dbQueries.Fetch_SCH_HIS_Block3(item.Block_7_3 ?? 0);
+                        blockhis_4 = await _dbQueries.Fetch_SCH_HIS_Block4(item.Block_7_3 ?? 0);
+                        blockhis_4Q5 = await _dbQueries.PrintFetch_SCH_HIS_Block4_NICList(item.Block_7_3 ?? 0);
+                        blockhis_5 = await _dbQueries.Fetch_SCH_HIS_Block5(item.Block_7_3 ?? 0);
+                        blockhis_6 = await _dbQueries.Fetch_SCH_HIS_Block6(item.Block_7_3 ?? 0);
+                        blockhis_7a_1 = await _dbQueries.PrintFetch_SCH_HIS_Block7A_CodeList(item.Block_7_3 ?? 0);
+                        blockHis_7a = await _dbQueries.Fetch_SCH_HIS_Block7A(item.Block_7_3 ?? 0);
+                        blockHis_7b = await _dbQueries.Fetch_SCH_HIS_Block7B(item.Block_7_3 ?? 0);
+                        blockHis_7c = await _dbQueries.Fetch_SCH_HIS_Block7C(item.Block_7_3 ?? 0);
+                        blockhis_7c_Nic = await _dbQueries.PrintFetch_SCH_HIS_Block7_NICList(item.Block_7_3 ?? 0);
+                        blockhis_7c_Q10 = await _dbQueries.PrintFetch_SCH_HIS_Block7_Q10_List(item.Block_7_3 ?? 0);
+                        //blockhis_7d = await _dbQueries.Fetch_SCH_HIS_Block7D();
+                        var fetchCropTask = _dbQueries.Fetch_SCH_HIS_Block7A_CodeList();
+                        var fetchNICTask = _dbQueries.Fetch_SCH_HIS_Block7_NICList();
+                        var fetchBlock4Task = _dbQueries.Fetch_SCH_HIS_Block4(item.Block_7_3 ?? 0);
+                        var fetchBlock7DTask = _dbQueries.PrintFetch_SCH_HIS_Block7D(item.Block_7_3 ?? 0);
+                        await Task.WhenAll(fetchCropTask, fetchNICTask, fetchBlock4Task, fetchBlock7DTask);
+                        blockhis_7d = fetchBlock7DTask.Result ?? new List<Tbl_Block_7d>();
+                        blockhis_8 = await _dbQueries.Fetch_SCH_HIS_Block8(item.Block_7_3 ?? 0);
+                        blockhis_8_Q6 = await _dbQueries.Fetch_SCH_HIS_Block8_6(item.Block_7_3 ?? 0);
+                        blockhis_9a = await _dbQueries.Fetch_SCH_HIS_Block9a(item.Block_7_3 ?? 0);
+                        blockhis_9b = await _dbQueries.Fetch_SCH_HIS_Block9B(item.Block_7_3 ?? 0);
+                        blockhis_10 = await _dbQueries.PrintFetch_SCH_HIS_Block10(item.Block_7_3 ?? 0);
+                        block_11a = await _dbQueries.Fetch_SCH_HIS_Block11(item.Block_7_3 ?? 0);
+                        block_11b_list = await _dbQueries.Fetch_SCH_HIS_Block11b(item.Block_7_3 ?? 0);
+                        blockHis_A = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncA(item.Block_7_3 ?? 0);
+                         blockHis_B = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncB(item.Block_7_3 ?? 0);
 
-                        FillBlockHis1(body, blockhis_1);
-                        FillBlockHis3(body, blockhis_3);
-                        FillBlock3Remarks(body, blockhis_1?.block_3_remark);
-                        FillBlockHis4_1(body, blockhis_4);
-                        FillBlockHis4_2(body, blockhis_4Q5);
-                        FillBlockHis4_3(body, blockhis_4);
-                        FillBlockHis5(body, blockhis_5, blockhis_3);
-                        FillBlock5Remarks(body, blockhis_1?.block_5_remark);
-                        FillBlockHis6(body, blockhis_6);
-                        FillBlock6Remarks(body, blockhis_1?.block_6_remark);
-                        FillBlock7a_1(body, blockhis_7a_1);
-                        FillBlock7a_1Remarks(body, blockhis_1?.block_7a_remark);
-                        FillBlock7a_2(body, blockHis_7a);
-                        FillBlock7a_3459(body, blockHis_7a, blockhis_1?.block_7a_remark);
-                        FillBlock7b_76(body, blockHis_7b);
-                        FillBlock7b_77(body, blockHis_7b);
-                        FillBlock7b_789(body, blockHis_7b, blockhis_1?.block_7b_remark);
-                        FillBlock7c_9(body, blockhis_7c_Nic);
-                        FillBlock7c_10(body, blockhis_7c_Q10);
-                        FillBlock7c_11_9_Remarks(body, blockHis_7c, blockhis_1?.block_7c_remark);
-                        FillBlock7d(body, blockhis_7d);
-                        FillBlock7dRemarks(body, blockhis_1?.block_7d_remark);
-                        FillBlockHis8(body, blockhis_8);
-                        FillBlockHis8_1(body, blockhis_8_Q6);
-                        FillBlock8_1Remarks(body, blockhis_1?.block_8b_remark);
-                        FillBlockHis9A(body, blockhis_9a);
-                        FillBlockHis9B(body, blockhis_9b);
-                        FillBlock9B_5(body, blockhis_9b);
-                        FillBlockHis10(body, blockhis_10);
-                        FillBlockHis11a(body, block_11a);
-                        FillBlockHis11b(body, block_11b_list);
-                        FillBlockHisA(body, blockHis_A);
-                        FillBlockHisB(body, blockHis_B);
+                        //using var ms = new MemoryStream(File.ReadAllBytes(templatePath))PrintFetchSingleForFsuAndHhdAsyncB
+                        //using (var doc = WordprocessingDocument.Open(ms, true))
+                        //{
+                        //    var body = doc.MainDocumentPart.Document.Body;
+
+                        FillBlockHis1(tempBody, blockhis_1);
+                        FillBlockHis3(tempBody, blockhis_3);
+                        FillBlock3Remarks(tempBody, blockhis_1?.block_3_remark);
+                        FillBlockHis4_1(tempBody, blockhis_4);
+                        FillBlockHis4_2(tempBody, blockhis_4Q5);
+                        FillBlockHis4_2_Remarks(tempBody, blockhis_1?.block_4_remark);
+                        FillBlockHis4_3(tempBody, blockhis_4);
+                        FillBlockHis5(tempBody, blockhis_5, blockhis_3);
+                        FillBlock5Remarks(tempBody, blockhis_1?.block_5_remark);
+                        FillBlockHis6(tempBody, blockhis_6);
+                        FillBlock6Remarks(tempBody, blockhis_1?.block_6_remark);
+                        FillBlock7a_1(tempBody, blockhis_7a_1);
+                        FillBlock7a_1Remarks(tempBody, blockhis_1?.block_7a_remark);
+                        FillBlock7a_2(tempBody, blockHis_7a);
+                        FillBlock7a_3459(tempBody, blockHis_7a, blockhis_1?.block_7a_remark);
+                        FillBlock7b_76(tempBody, blockHis_7b);
+                        FillBlock7b_77(tempBody, blockHis_7b);
+                        FillBlock7b_789(tempBody, blockHis_7b, blockhis_1?.block_7b_remark);
+                        FillBlock7c_9(tempBody, blockhis_7c_Nic);
+                        FillBlock9cRemarks(tempBody, blockhis_1?.block_7c_remark);
+                        FillBlock7c_10(tempBody, blockhis_7c_Q10);
+                        FillBlock7c_11_9_Remarks(tempBody, blockHis_7c, blockhis_1?.block_7c_remark);
+                        FillBlock7d(tempBody, blockhis_7d);
+                        FillBlock7dRemarks(tempBody, blockhis_1?.block_7d_remark);
+                        FillBlockHis8(tempBody, blockhis_8);
+                        FillBlockHis8_1(tempBody, blockhis_8_Q6);
+                        FillBlock8_1Remarks(tempBody, blockhis_1?.block_8b_remark);
+                        FillBlockHis9A(tempBody, blockhis_9a);
+                        FillBlockHis9B(tempBody, blockhis_9b);
+                        FillBlock9B_5(tempBody, blockhis_9b);
+                        FillBlockHis10(tempBody, blockhis_10);
+                        FillBlockHis11a(tempBody, block_11a);
+                        //FillBlockHis11b(body, block_11b_list);
+                        FillBlockHis11b(tempBody, block_11b_list, blockhis_1?.block_11b_remark);
+                        FillBlockHisA(tempBody, blockHis_A);
+                        FillBlockHisB(tempBody, blockHis_B);
 
 
-                        // Save explicitly (safe)
-                        doc.MainDocumentPart.Document.Save();
+                        //    // Save explicitly (safe)
+                        //    doc.MainDocumentPart.Document.Save();
+                        // }
+                        foreach (var el in currentBlock)
+                        {
+                            body.AppendChild(el.CloneNode(true));
+                        }
+
+                        if (item != selected.Last())
+                        {
+                            body.AppendChild(new Paragraph(new Run(new Break() { Type = BreakValues.Page })));
+                        }
+
                     }
+                    doc.MainDocumentPart.Document.Save();
                 }
                     return ms.ToArray();
             }
@@ -969,6 +1000,8 @@ namespace Income.Common
                 return null;
             }
         }
+
+
         private void SafeReplace(List<TableRow> rows, int rowIndex, int cellIndex, string value)
         {
             if (rows.Count > rowIndex)
@@ -1005,124 +1038,18 @@ namespace Income.Common
             SafeReplace(rows, 15, 2, block1.block_1_remark);
         }
         
-        //private void FillBlockHis3(Body body, List<Tbl_Block_3> members)
-        //{
-        //    var table = body.Elements<Table>()
-        //        .FirstOrDefault(t => t.InnerText.Contains("[3]"));
-
-        //    if (table == null || members == null || members.Count == 0)
-        //        return;
-
-        //    var rows = table.Elements<TableRow>().ToList();
-
-        //    int templateRowIndex = 4;
-        //    var templateRow = rows[templateRowIndex];
-
-         
-        //    for (int i = rows.Count - 1; i > templateRowIndex; i--)
-        //        rows[i].Remove();
-
-        //    foreach (var m in members)
-        //    {
-        //        var row = (TableRow)templateRow.CloneNode(true);
-        //        table.AppendChild(row);
-
-        //        var cells = row.Elements<TableCell>().ToList();
-        //        int col = 0;
-        //        void Put(string? value)
-        //        {
-        //            if (col < cells.Count)
-        //            {
-        //                ReplaceCellText(cells[col], value ?? "");
-        //                col++;
-        //            }
-        //        }
-
-        //        // ---- EXACT mapping as per template ----
-        //        Put(m.serial_no?.ToString());   // (1) S. no.
-        //        Put(m.item_2);                 // (2) Name of member
-        //        Put(m.item_3?.ToString());     // (3) Relation to head
-        //        Put(m.gender?.ToString());     // (4) Gender
-        //        Put(m.age?.ToString());        // (5) Age
-        //        Put(m.item_6?.ToString());     // (6) Marital statusm
-        //        Put(m.item_7?.ToString());     // (7) Education level
-        //        Put(m.item_8?.ToString());     // (8) 30 days - Primary
-        //        Put(m.item_9?.ToString());     // (9) 30 days - Secondary
-        //        Put(m.item_10?.ToString());    // (10) 365 days - Primary
-        //        Put(m.item_11?.ToString());    // (11) 365 days - Secondary
-        //        Put(m.item_12?.ToString());    // (12) Beneficiary
-        //    }
-        //    var remarksRow = table.Elements<TableRow>().Last();
-        //    ReplaceCellText(
-        //        GetLastCell(remarksRow),
-        //        blockhis_1?.block_3_remark ?? ""
-        //    );
-        //}
-
-        //private void FillBlockHis3(Body body, List<Tbl_Block_3> members)
-        //{
-        //    var table = body.Elements<Table>()
-        //        .FirstOrDefault(t => t.InnerText.Contains("[3]"));
-
-        //    if (table == null || members == null || members.Count == 0)
-        //        return;
-
-        //    var rows = table.Elements<TableRow>().ToList();
-
-        //    int templateRowIndex = 4;
-        //    var templateRow = rows[templateRowIndex];
-        //    var remarksRow = rows.Last();  
-
-            
-        //    for (int i = rows.Count - 2; i > templateRowIndex; i--)
-        //        rows[i].Remove();
-
-        //    foreach (var m in members)
-        //    {
-        //        var row = (TableRow)templateRow.CloneNode(true);
-        //        table.InsertBefore(row, remarksRow);
-
-        //        var cells = row.Elements<TableCell>().ToList();
-        //        int col = 0;
-
-        //        void Put(string? value)
-        //        {
-        //            if (col < cells.Count)
-        //            {
-        //                ReplaceCellText(cells[col], value ?? "");
-        //                col++;
-        //            }
-        //        }
-
-        //        // ---- EXACT mapping as per template ----
-        //        Put(m.serial_no?.ToString());   // (1) S. no.
-        //        Put(m.item_2);                 // (2) Name of member
-        //        Put(m.item_3?.ToString());     // (3) Relation to head
-        //        Put(m.gender?.ToString());     // (4) Gender
-        //        Put(m.age?.ToString());        // (5) Age
-        //        Put(m.item_6?.ToString());     // (6) Marital status
-        //        Put(m.item_7?.ToString());     // (7) Education level
-        //        Put(m.item_8?.ToString());     // (8) 30 days – Primary
-        //        Put(m.item_9?.ToString());     // (9) 30 days – Secondary
-        //        Put(m.item_10?.ToString());    // (10) 365 days – Primary
-        //        Put(m.item_11?.ToString());    // (11) 365 days – Secondary
-        //        Put(m.item_12?.ToString());    // (12) Beneficiary
-        //    }
-
-        //    // ✅ Remarks (always LAST row)
-        //    ReplaceCellText(
-        //        GetLastCell(remarksRow),
-        //        blockhis_1?.block_3_remark ?? ""
-        //    );
-        //}
+        
 
         private void FillBlockHis3(Body body,List<Tbl_Block_3> list)
         {
             if (list == null || list.Count == 0)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower().Contains("[3]"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower().Contains("[3] demographic"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[3]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(1);
+
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -1204,21 +1131,59 @@ namespace Income.Common
             );
         }
 
-        private void FillBlockHis4_2(Body body,List<Tbl_Block_4_Q5> activities)
+        //private void FillBlockHis4_2(Body body,List<Tbl_Block_4_Q5> activities)
+        //{
+        //    var table = body.Elements<Table>()
+        //        .FirstOrDefault(t => t.InnerText.Contains("[4.2]"));
+
+        //    if (table == null || activities == null)
+        //        return;
+
+        //    var rows = table.Elements<TableRow>().ToList();
+
+        //    TableRow templateRow = rows[3]; // first data row
+        //    TableRow remarksOrEndRow = rows.Last();
+
+        //    // clear old data rows
+        //    for (int i = rows.Count - 2; i >= 3; i--)
+        //        rows[i].Remove();
+
+        //    int serial = 1;
+
+        //    foreach (var act in activities)
+        //    {
+        //        var row = (TableRow)templateRow.CloneNode(true);
+        //        var cells = row.Elements<TableCell>().ToList();
+
+        //        ReplaceCellText(cells[0], serial.ToString());
+        //        ReplaceCellText(cells[1], act.ActivityName ?? "");
+        //        ReplaceCellText(cells[2], act.NicCode?.ToString() ?? "");
+        //        ReplaceCellText(cells[3], act.BusinessSeasonal?.ToString() ?? "");
+        //        ReplaceCellText(cells[4], act.NumberOfMonths?.ToString() ?? "");
+
+        //        table.InsertBefore(row, remarksOrEndRow);
+        //        serial++;
+        //    }
+        //    ReplaceCellText(
+        //       GetLastCell(remarksOrEndRow),
+        //       blockhis_1?.block_4_remark ?? ""
+        //   );
+        //}
+
+        private void FillBlockHis4_2(Body body, List<Tbl_Block_4_Q5> activities)
         {
             var table = body.Elements<Table>()
-                .FirstOrDefault(t => t.InnerText.Contains("[4.2]"));
+                .FirstOrDefault(t => t.InnerText.Contains("[4.2] Household Characteristics"));
 
-            if (table == null || activities == null)
+            if (table == null || activities == null || activities.Count == 0)
                 return;
 
             var rows = table.Elements<TableRow>().ToList();
 
-            TableRow templateRow = rows[2]; // first data row
-            TableRow remarksOrEndRow = rows.Last();
+            TableRow templateRow = rows[2];
 
-            // clear old data rows
-            for (int i = rows.Count - 2; i >= 2; i--)
+            // remove old data rows (keep header + (1)(2)(3)(4))
+            for (int i = rows.Count - 1; i > 3; i--)
                 rows[i].Remove();
 
             int serial = 1;
@@ -1228,23 +1193,30 @@ namespace Income.Common
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
 
-                if (cells.Count < 5)
-                    continue;
-
                 ReplaceCellText(cells[0], serial.ToString());
                 ReplaceCellText(cells[1], act.ActivityName ?? "");
                 ReplaceCellText(cells[2], act.NicCode?.ToString() ?? "");
                 ReplaceCellText(cells[3], act.BusinessSeasonal?.ToString() ?? "");
                 ReplaceCellText(cells[4], act.NumberOfMonths?.ToString() ?? "");
 
-                table.InsertBefore(row, remarksOrEndRow);
+                table.AppendChild(row);
                 serial++;
             }
-            ReplaceCellText(
-               GetLastCell(remarksOrEndRow),
-               blockhis_1?.block_4_remark ?? ""
-           );
         }
+        private void FillBlockHis4_2_Remarks(Body body, string remarks)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[4.2] remarks"));
+
+            if (table == null)
+                return;
+
+            var row = table.Elements<TableRow>().Last();
+            var cell = row.Elements<TableCell>().Last();
+
+            ReplaceCellText(cell, remarks);
+        }
+
 
         private void FillBlockHis4_3(Body body, Tbl_Block_4 block4)
         {
@@ -1256,13 +1228,13 @@ namespace Income.Common
 
             var rows = table.Elements<TableRow>().ToList();
 
-            SafeReplace(rows, 1, 2, block4.item_6?.ToString());   // Own land
-            SafeReplace(rows, 2, 2, block4.item_7?.ToString());   // Total land
-            SafeReplace(rows, 3, 2, block4.item_8);               // Use of land
-            SafeReplace(rows, 4, 2, block4.item_9?.ToString());   // Economic activity
-            SafeReplace(rows, 5, 2, block4.item_11?.ToString());  // Dwelling type
-            SafeReplace(rows, 6, 2, block4.item_12?.ToString());  // Carpet area
-            SafeReplace(rows, 7, 2, block4.item_15?.ToString());  // Loan outstanding
+            SafeReplace(rows, 2, 2, block4.item_6?.ToString());   // Own land
+            SafeReplace(rows, 3, 2, block4.item_7?.ToString());   // Total land
+            SafeReplace(rows, 4, 2, block4.item_8);               // Use of land
+            SafeReplace(rows, 5, 2, block4.item_9?.ToString());   // Economic activity
+            SafeReplace(rows, 6, 2, block4.item_11?.ToString());  // Dwelling type
+            SafeReplace(rows, 7, 2, block4.item_12?.ToString());  // Carpet area
+            SafeReplace(rows, 8, 2, block4.item_15?.ToString());  // Loan outstanding
 
             // Remarks row (always last)
             ReplaceCellText(
@@ -1380,11 +1352,11 @@ namespace Income.Common
             var rows = table.Elements<TableRow>().ToList();
 
             // Assumption: Code/Entry column index = 3
-            SafeReplace(rows, 1, 3, block8.item_1?.ToString()); // Q8.1
-            SafeReplace(rows, 2, 3, block8.item_2?.ToString()); // Q8.2
-            SafeReplace(rows, 3, 3, block8.item_3?.ToString()); // Q8.3
-            SafeReplace(rows, 4, 3, block8.item_4?.ToString()); // Q8.4
-            SafeReplace(rows, 5, 3, block8.item_5?.ToString()); // Q8.5
+            SafeReplace(rows, 2, 2, block8.item_1?.ToString()); // Q8.1
+            SafeReplace(rows, 3, 2, block8.item_2?.ToString()); // Q8.2
+            SafeReplace(rows, 4, 2, block8.item_3?.ToString()); // Q8.3
+            SafeReplace(rows, 5, 2, block8.item_4?.ToString()); // Q8.4
+            SafeReplace(rows, 6, 2, block8.item_5?.ToString()); // Q8.5
             var remarksRow = rows.Last();
             ReplaceCellText(
                 GetLastCell(remarksRow),
@@ -1399,7 +1371,7 @@ namespace Income.Common
 
             var table = body.Elements<Table>()
                 .First(t => t.InnerText.ToLower()
-                    .Contains("[8.1]"));
+                    .Contains("[8.Q8.6]"));
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -1482,7 +1454,7 @@ namespace Income.Common
         private void FillBlockHis9A(Body body, Tbl_Block_9a block9a)
         {
             var table = body.Elements<Table>()
-                .FirstOrDefault(t => t.InnerText.Contains("[9A_Q1]"));
+                .FirstOrDefault(t => t.InnerText.Contains("[9A_Q9.1]"));
 
             if (table == null || block9a == null)
                 return;
@@ -1553,7 +1525,7 @@ namespace Income.Common
             //var table = body.Elements<Table>()
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[9B_9.5] Income from "));
-            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[9B_9.5]"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[9B_Q9.5]"));
             var table = body.Elements<Table>().ElementAtOrDefault(30);
 
             var rows = table.Elements<TableRow>().ToList();
@@ -1643,44 +1615,92 @@ namespace Income.Common
                 blockhis_1?.block_11a_remark ?? ""
             );
         }
-        private void FillBlockHis11b(Body body,List<Tbl_Block_11b> list)
-        {
-            var table = body.Elements<Table>()
-                .FirstOrDefault(t => t.InnerText.Contains("[11b]"));
+        //private void FillBlockHis11b(Body body,List<Tbl_Block_11b> list)
+        //{
+        //    var table = body.Elements<Table>()
+        //        .FirstOrDefault(t => t.InnerText.Contains("[11b]"));
 
-            if (table == null || list == null)
+        //    if (table == null || list == null)
+        //        return;
+
+        //    var rows = table.Elements<TableRow>().ToList();
+
+        //    // header rows end at index 1, data template at index 2
+        //    TableRow templateRow = rows[3];
+        //    TableRow remarksRow = rows.Last();
+
+        //    // remove old data rows (keep header + remarks)
+        //    for (int i = rows.Count - 2; i >= 3; i--)
+        //        rows[i].Remove();
+
+        //    foreach (var item in list)
+        //    {
+        //        var row = (TableRow)templateRow.CloneNode(true);
+        //        var cells = row.Elements<TableCell>().ToList();
+        //        int c = cells.Count;
+
+        //        if (c > 0) ReplaceCellText(cells[0], item.item_1?.ToString() ?? "");
+        //        if (c > 1) ReplaceCellText(cells[1], item.item_2 ?? "");
+        //        if (c > 2) ReplaceCellText(cells[2], item.item_3?.ToString() ?? "");
+        //        if (c > 3) ReplaceCellText(cells[3], item.item_4?.ToString() ?? "");
+
+        //        table.InsertBefore(row, remarksRow);
+        //    }
+
+        //    // ✅ Remarks
+        //    ReplaceCellText(
+        //        GetLastCell(remarksRow),
+        //        blockhis_1?.block_11b_remark ?? ""
+        //    );
+        //}
+
+        private void FillBlockHis11b(Body body,List<Tbl_Block_11b> dataList,string remarksFromBlock1)
+        {
+            if (body == null || dataList == null)
+                return;
+
+            // ---------------- Main 11b Table ----------------
+            var table = body.Elements<Table>()
+               .FirstOrDefault(t => t.InnerText.Contains("[11b]"));
+
+            if (table == null)
                 return;
 
             var rows = table.Elements<TableRow>().ToList();
 
-            // header rows end at index 1, data template at index 2
-            TableRow templateRow = rows[3];
-            TableRow remarksRow = rows.Last();
+            // Data starts after header rows
+            int startRowIndex = 2;
 
-            // remove old data rows (keep header + remarks)
-            for (int i = rows.Count - 2; i >= 3; i--)
-                rows[i].Remove();
-
-            foreach (var item in list)
+            for (int i = 0; i < dataList.Count; i++)
             {
-                var row = (TableRow)templateRow.CloneNode(true);
-                var cells = row.Elements<TableCell>().ToList();
-                int c = cells.Count;
+                int rowIndex = startRowIndex + i;
+                if (rowIndex >= rows.Count)
+                    break;
 
-                if (c > 0) ReplaceCellText(cells[0], item.item_1?.ToString() ?? "");
-                if (c > 1) ReplaceCellText(cells[1], item.item_2 ?? "");
-                if (c > 2) ReplaceCellText(cells[2], item.item_3?.ToString() ?? "");
-                if (c > 3) ReplaceCellText(cells[3], item.item_4?.ToString() ?? "");
+                var data = dataList[i];
 
-                table.InsertBefore(row, remarksRow);
+                SafeReplace(rows, rowIndex, 0, data.item_1?.ToString()); // S. no
+                SafeReplace(rows, rowIndex, 1, data.item_2);             // Name
+                SafeReplace(rows, rowIndex, 2, data.item_3?.ToString()); // Yes / No
+                SafeReplace(rows, rowIndex, 3, data.item_4?.ToString()); // Amount
             }
 
-            // ✅ Remarks
-            ReplaceCellText(
-                GetLastCell(remarksRow),
-                blockhis_1?.block_11b_remark ?? ""
-            );
+            // ---------------- 11b Remarks (from Block-1) ----------------
+           
+                var remarksTable = body.Elements<Table>()
+                    .FirstOrDefault(t => t.InnerText.Contains("11b")
+                                      && t.InnerText.ToLower().Contains("remarks"));
+
+                if (remarksTable != null)
+                {
+                    var remarkRows = remarksTable.Elements<TableRow>().ToList();
+
+                    // usually: [ Remarks | <value> ]
+                    SafeReplace(remarkRows, 0, 1, remarksFromBlock1);
+                }
+           
         }
+
 
         private void FillBlockHisA(Body body, Tbl_Block_A blockA)
         {
@@ -1740,7 +1760,7 @@ namespace Income.Common
 
             var table = body.Elements<Table>()
                 .First(t => t.InnerText.ToLower()
-                    .Contains("[7a_1] income from self-employment"));
+                    .Contains("[7a_Q7.1] income from self-employment"));
 
             var rows = table.Elements<TableRow>().ToList();
             var templateRow = rows.FirstOrDefault(r =>
@@ -1800,10 +1820,12 @@ namespace Income.Common
             if (data == null)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7a_2] list of households"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7a_Q7.2] list of households"));
 
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[[7a_Q7.2] list of households"));
+            var table = body.Elements<Table>().ElementAtOrDefault(13);
             var rows = table.Elements<TableRow>().ToList();
 
             SafeReplace(rows, 2, 2, data.item_2_1?.ToString());   // 01
@@ -1825,9 +1847,11 @@ namespace Income.Common
             if (data == null)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7a_3459]"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7a_Q7.3Q7.4Q7.5Q7.9]"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7a_Q7.3Q7.4Q7.5Q7.9]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(14);
 
             var rows = table.Elements<TableRow>().ToList();
             SafeReplace(rows, 1, 2, data.item_3?.ToString());
@@ -1842,57 +1866,63 @@ namespace Income.Common
         {
             if (data == null) return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7b_7.6]"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7b_Q7.6]"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7b_Q7.6]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(15);
 
             var rows = table.Elements<TableRow>().ToList();
 
-            SafeReplace(rows, 1, 2, data.item_6_1?.ToString());
-            SafeReplace(rows, 2, 2, data.item_6_2?.ToString());
-            SafeReplace(rows, 3, 2, data.item_6_3?.ToString());
-            SafeReplace(rows, 4, 2, data.item_6_4?.ToString());
-            SafeReplace(rows, 5, 2, data.item_6_5?.ToString());
-            SafeReplace(rows, 6, 2, data.item_6_6?.ToString());
-            SafeReplace(rows, 7, 2, data.item_6_7?.ToString());
-            SafeReplace(rows, 8, 2, data.item_6_8?.ToString());
-            SafeReplace(rows, 9, 2, data.item_6_9?.ToString());
-            SafeReplace(rows, 10, 2, data.item_6_10?.ToString());
-            SafeReplace(rows, 11, 2, data.item_6_11?.ToString());
-            SafeReplace(rows, 12, 2, data.item_6_12?.ToString());
+            SafeReplace(rows, 2, 2, data.item_6_1?.ToString());
+            SafeReplace(rows, 3, 2, data.item_6_2?.ToString());
+            SafeReplace(rows, 4, 2, data.item_6_3?.ToString());
+            SafeReplace(rows, 5, 2, data.item_6_4?.ToString());
+            SafeReplace(rows, 6, 2, data.item_6_5?.ToString());
+            SafeReplace(rows, 7, 2, data.item_6_6?.ToString());
+            SafeReplace(rows, 8, 2, data.item_6_7?.ToString());
+            SafeReplace(rows, 9, 2, data.item_6_8?.ToString());
+            SafeReplace(rows, 10, 2, data.item_6_9?.ToString());
+            SafeReplace(rows, 11, 2, data.item_6_10?.ToString());
+            SafeReplace(rows, 12, 2, data.item_6_11?.ToString());
+            SafeReplace(rows, 13, 2, data.item_6_12?.ToString());
         }
         private  void FillBlock7b_77(Body body,Tbl_Block_7b data)
         {
             if (data == null) return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7b.7.7]"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7b.Q7.7]"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7b.Q7.7]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(16);
 
             var rows = table.Elements<TableRow>().ToList();
 
-            SafeReplace(rows, 1, 2, data.item_7_1?.ToString());
-            SafeReplace(rows, 2, 2, data.item_7_2?.ToString());
-            SafeReplace(rows, 3, 2, data.item_7_3?.ToString());
-            SafeReplace(rows, 4, 2, data.item_7_4?.ToString());
-            SafeReplace(rows, 5, 2, data.item_7_5?.ToString());
-            SafeReplace(rows, 6, 2, data.item_7_6?.ToString());
-            SafeReplace(rows, 7, 2, data.item_7_7?.ToString());
-            SafeReplace(rows, 8, 2, data.item_7_8?.ToString());
-            SafeReplace(rows, 9, 2, data.item_7_9?.ToString());
-            SafeReplace(rows, 10, 2, data.item_7_10?.ToString());
-            SafeReplace(rows, 11, 2, data.item_7_11?.ToString());
-            SafeReplace(rows, 12, 2, data.item_7_12?.ToString());
-            SafeReplace(rows, 13, 2, data.item_7_13?.ToString()); // total
+            SafeReplace(rows, 2, 2, data.item_7_1?.ToString());
+            SafeReplace(rows, 3, 2, data.item_7_2?.ToString());
+            SafeReplace(rows, 4, 2, data.item_7_3?.ToString());
+            SafeReplace(rows, 5, 2, data.item_7_4?.ToString());
+            SafeReplace(rows, 6, 2, data.item_7_5?.ToString());
+            SafeReplace(rows, 7, 2, data.item_7_6?.ToString());
+            SafeReplace(rows, 8, 2, data.item_7_7?.ToString());
+            SafeReplace(rows, 9, 2, data.item_7_8?.ToString());
+            SafeReplace(rows, 10, 2, data.item_7_9?.ToString());
+            SafeReplace(rows, 11, 2, data.item_7_10?.ToString());
+            SafeReplace(rows, 12, 2, data.item_7_11?.ToString());
+            SafeReplace(rows, 13, 2, data.item_7_12?.ToString());
+            SafeReplace(rows, 14, 2, data.item_7_13?.ToString()); // total
         }
         private  void FillBlock7b_789(Body body,Tbl_Block_7b data,string remarksFromBlock1)
         {
             if (data == null)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7b.7.87.9]"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7b.Q7.8Q7.9]"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7b.Q7.8Q7.9]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(17);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -1915,11 +1945,11 @@ namespace Income.Common
             if (data == null)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7c.11]"));
-            //var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7c.11]"));
-            //var table = body.Elements<Table>().ElementAtOrDefault(22);
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7c.11]"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7c.Q7.11Q7c.9]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(21);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -1938,10 +1968,12 @@ namespace Income.Common
             if (list == null || list.Count == 0)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7c_9]"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7c_Q7.9]"));
 
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7c_Q7.9]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(18);
             var rows = table.Elements<TableRow>().ToList();
 
             // last row = blank template row
@@ -1964,14 +1996,29 @@ namespace Income.Common
             templateRow.Remove();
         }
 
+        private void FillBlock9cRemarks(Body body, string remarksFromBlock1)
+        {
+            var remarksTable = body.Elements<Table>()
+                .First(t => t.InnerText.ToLower()
+                    .Contains("[7_c]remarks"));
+
+            var row = remarksTable.Elements<TableRow>().First();
+            var cells = row.Elements<TableCell>().ToList();
+
+            // second column = remarks value
+            ReplaceCellText(cells[1], remarksFromBlock1);
+        }
+
         private  void FillBlock7c_10(Body body,List<Tbl_Block_7c_Q10> list)
         {
             if (list == null || list.Count == 0)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7c.10]"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7c.Q7.10]"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7c.Q7.10]"));
+            var table = body.Elements<Table>().ElementAtOrDefault(19);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -2006,9 +2053,11 @@ namespace Income.Common
             if (list == null || list.Count == 0)
                 return;
 
-            var table = body.Elements<Table>()
-                .First(t => t.InnerText.ToLower()
-                    .Contains("[7d] mode of operation"));
+            //var table = body.Elements<Table>()
+            //    .First(t => t.InnerText.ToLower()
+            //        .Contains("[7d_Q7.12] mode of operation"));
+            var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7d_Q7.12] mode of operation"));
+            var table = body.Elements<Table>().ElementAtOrDefault(22);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -2020,7 +2069,7 @@ namespace Income.Common
                 var row = new TableRow();
 
                 // (1) S. no. of activity
-                row.Append(CreateTextCell(item.item_1?.ToString() ?? ""));
+                row.Append(CreateTextCell(item.display_serial_number?.ToString() ?? ""));
 
                 // (2) Description of activity
                 row.Append(CreateTextCell(item.item_2 ?? ""));
