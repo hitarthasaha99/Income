@@ -23,22 +23,21 @@
     <ConfirmDialog @ref="dialog" />
      @* 7.1 *@
     <div class="card custom-card">
-        <div class="card-header">
-            <h5 class="card-title">
-                <span class="text-primary me-2">Block 7a</span>
-                 Income from Self-employment - Crop cultivation
+        <div class="px-3 pt-3 d-flex justify-content-between">
+            <h5 class="text-dark mb-2">
+                <span class="text-primary me-1">Block 7:</span> Income from Self-employment
             </h5>
-
             @if (!SessionStorage.FSU_Submitted)
             {
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
-                    
-                <div class="card-tools">
-                    <button class="btn btn-primary" @onclick="@(() => OnShowModalClick("ADD"))"><i class="fi fi-rr-plus me-1"></i>Add</button>
-                </div>
+
+                    <div class="card-tools pb-2">
+                        <button class="btn btn-primary" @onclick="@(() => OnShowModalClick("ADD"))"><i class="fi fi-rr-plus me-1"></i>Add</button>
+                    </div>
                 }
             }
+
             @* add comment *@
             @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
             {
@@ -47,6 +46,12 @@
                     <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
                 </div>
             }
+        </div>
+        <div class="card-header border border-secondary-subtle">
+            <h5 class="card-title">
+                <span class="text-primary me-2">Block 7a</span>
+                 Income from Self-employment - Crop cultivation
+            </h5>           
         </div>
         <div class="row px-3 py-2 border-bottom">
             <div class="col">

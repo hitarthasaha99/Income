@@ -20,17 +20,23 @@
             <div class="main-content">
                 <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
                 <div class="card custom-card">
-                    <div class="card-header">
+                <div class="px-3 pt-3 d-flex justify-content-between align-items-center">
+                    <h5 class="text-dark mb-2">
+                        <span class="text-primary me-1">Block 10:</span> Information on expenditure incurred on various food and non-food items by the household.
+                    </h5>
+                    @* add comment *@
+                    @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+                    {
+                        <div class="card-tools d-flex justify-content-end align-items-end p-2">
+                            <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
+                        </div>
+                    }
+                </div>
+                <div class="card-header border border-secondary-subtle">
                         <h3 class="card-title">
                             <span class="text-primary me-1">Block 10:</span>Expenditure details
                         </h3>
-                        @* add comment *@
-                        @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-                        {
-                            <div class="card-tools d-flex justify-content-end align-items-end p-2">
-                                <NavLink class="btn btn-primary" onclick="@(() => commentModal.Open())"><i class="fi fi-rr-comment-alt me-2"></i>Comment</NavLink>
-                            </div>
-                        }
+                       
                     </div>
 
                     <fieldset disabled="@((SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO) || SessionStorage.FSU_Submitted)">

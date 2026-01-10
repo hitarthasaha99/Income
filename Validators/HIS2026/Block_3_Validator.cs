@@ -34,7 +34,9 @@ namespace Income.Validators.HIS2026
             RuleFor(x => x.item_10).NotNull().WithMessage("H010(i): Invalid Entry, Please check the entry").InclusiveBetween(1, 15).WithMessage("H010(i): Invalid Entry, Please check the entry");
             RuleFor(x => x.item_11).Must((model, item11) => item11 != model.item_10).When(x => x.item_11 != null && x.item_10 != null).WithMessage("H011(iii): Please recheck entries recorded against cols. 10 & 11.");
             // 2. Age > 15 → item_12 required (must be 1 or 2)
-            RuleFor(x => x.item_12).NotNull().WithMessage("H012(ii): Invalid Entry, Please check the entry").InclusiveBetween(1, 2).WithMessage("H012(ii): Invalid Entry, Please check the entry");
+            //RuleFor(x => x.item_12).NotNull().WithMessage("H012(ii): Invalid Entry, Please check the entry").InclusiveBetween(1, 2).WithMessage("H012(ii): Invalid Entry, Please check the entry");
+            // item_12 mandatory only when age >= 15
+            RuleFor(x => x.item_12).NotNull().WithMessage("H012(ii): Invalid Entry, Please check the entry").InclusiveBetween(1, 2).WithMessage("H012(ii): Invalid Entry, Please check the entry").When(x => x.age >= 15);
         }
     }
 }
