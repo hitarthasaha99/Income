@@ -2265,6 +2265,27 @@ namespace Income.Database.Queries
                 return new List<Tbl_Block_4_Q5>();
             }
         }
+        public async Task<List<Tbl_Block_4_Q5>> PrintFetch_SCH_HIS_Block4_NICList(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id &&  (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_4_Q5>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 4 NICLIST: {ex.Message}");
+                return new List<Tbl_Block_4_Q5>();
+            }
+           
+        }
 
         public async Task<Tbl_Block_4?> Fetch_SCH_HIS_Block4(int hhd_id)
         {
@@ -2819,6 +2840,26 @@ namespace Income.Database.Queries
                 return new List<Tbl_Block_7a_1>();
             }
         }
+        public async Task<List<Tbl_Block_7a_1>> PrintFetch_SCH_HIS_Block7A_CodeList(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7a_1>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7a_1>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7 code list: {ex.Message}");
+                return new List<Tbl_Block_7a_1>();
+            }
+        }
 
         public async Task<int?> Save_SCH_HIS_Block7A_CodeList(Tbl_Block_7a_1 obj)
         {
@@ -3029,6 +3070,27 @@ namespace Income.Database.Queries
                 return new List<Tbl_Block_7c_NIC>();
             }
         }
+        public async Task<List<Tbl_Block_7c_NIC>> PrintFetch_SCH_HIS_Block7_NICList(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                   
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7c_NIC>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7 NICLIST: {ex.Message}");
+                return new List<Tbl_Block_7c_NIC>();
+            }
+        }
 
         public async Task<int?> Save_SCH_HIS_Block7_NICList(Tbl_Block_7c_NIC obj)
         {
@@ -3147,6 +3209,27 @@ namespace Income.Database.Queries
                 return new List<Tbl_Block_7c_Q10>();
             }
         }
+        public async Task<List<Tbl_Block_7c_Q10>> PrintFetch_SCH_HIS_Block7_Q10_List(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                if (response != null)
+                {
+                   
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7c_Q10>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 7 NICLIST: {ex.Message}");
+                return new List<Tbl_Block_7c_Q10>();
+            }
+        }
 
         public async Task<int?> Save_SCH_HIS_Block7_Q10_List(Tbl_Block_7c_Q10 obj)
         {
@@ -3228,6 +3311,27 @@ namespace Income.Database.Queries
             try
             {
                 var response = await _database.Table<Tbl_Block_7d>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).OrderBy(x => x.serial_number).ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return new List<Tbl_Block_7d>();
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error while fetching Block 7D list: {ex.Message}");
+                return new List<Tbl_Block_7d>();
+            }
+        }
+
+        public async Task<List<Tbl_Block_7d>> PrintFetch_SCH_HIS_Block7D(int hhdid)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_7d>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhdid && (x.is_deleted == null || x.is_deleted == false)).OrderBy(x => x.serial_number).ToListAsync();
                 if (response != null && response.Count > 0)
                 {
                     return response;
@@ -3555,6 +3659,26 @@ namespace Income.Database.Queries
                 return null;
             }
         }
+        public async Task<Tbl_Block_10?> PrintFetch_SCH_HIS_Block10(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_10>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block 10: {ex.Message}");
+                return null;
+            }
+        }
 
         public async Task<int> Save_SCH_HIS_Block10(Tbl_Block_10 tbl_block_10)
         {
@@ -3732,7 +3856,46 @@ namespace Income.Database.Queries
 
             return await query.FirstOrDefaultAsync();
         }
-
+        public async Task<Tbl_Block_A?> PrintFetchSingleForFsuAndHhdAsyncA(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_A>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block Field Op: {ex.Message}");
+                return null;
+            }
+        }
+        public async Task<Tbl_Block_B?> PrintFetchSingleForFsuAndHhdAsyncB(int hhd_id)
+        {
+            try
+            {
+                var response = await _database.Table<Tbl_Block_B>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return response;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowError($"Error While fetching Block Field Op: {ex.Message}");
+                return null;
+            }
+        }
 
         public async Task<List<T>> FetchListAsync<T>(
     DeleteFilter filter = DeleteFilter.ExcludeDeleted)
