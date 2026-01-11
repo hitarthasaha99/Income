@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using BootstrapBlazor.Components;
+﻿using BootstrapBlazor.Components;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using Income.Common;
 using Income.Database.Models.Common;
 using Income.Database.Models.SCH0_0;
 using Income.Database.Queries;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Income.Viewmodels
 {
@@ -206,7 +207,7 @@ namespace Income.Viewmodels
         public async Task<int> ValidateWarning(Tbl_Warning warning)
         {
             int result = 0;
-            List <Tbl_Warning> List = new List<Tbl_Warning>();
+            List <Tbl_Warning> list = new List<Tbl_Warning>();
             try
             {
                 if (warning != null)
@@ -224,33 +225,58 @@ namespace Income.Viewmodels
                             child_srl = childComments.Max(x => x.serial_number.GetValueOrDefault()) + 1;
                         }
 
+                        int status =
+            SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO ? 2 :
+            SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO ? (Is_Accepted ? 4 : 3) :
+            (Is_Accepted ? 5 : 3);
                         // Update parent warning
                         warning.warning_status =
                             SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO ? 2 :
                             SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO ? Is_Accepted ? 4 : 3 :
                             Is_Accepted ? 5 : 3;
-                        List.Add(warning);
 
-                            // Create child warning
-                            Tbl_Warning tbl_Warning = new Tbl_Warning();
-                            tbl_Warning.id = Guid.NewGuid();
-                            tbl_Warning.block = warning.block;
-                            tbl_Warning.remarks = warningcoment.remarks;
-                        tbl_Warning.warning_status =
-                            SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO ? 2 :
-                            SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO ? Is_Accepted ? 4 : 3 :
-                            Is_Accepted ? 5 : 3;
-                        tbl_Warning.parent_comment_id = warning.id;
-                            tbl_Warning.hhd_id = warning.hhd_id;
-                           tbl_Warning.role_code = SessionStorage.user_role;
-                           tbl_Warning.user_name = SessionStorage.user_name;
-                        if(tbl_Warning.serial_number.GetValueOrDefault() == 0)
+                        list.Add(warning);
+
+                        Tbl_Warning? lastChild = childComments?
+            .OrderByDescending(x => x.serial_number)
+            .FirstOrDefault();
+
+                        bool updateSameUser =
+                            lastChild != null &&
+                            lastChild.user_name == SessionStorage.user_name &&
+                            lastChild.role_code == SessionStorage.user_role;
+
+                        if (updateSameUser && lastChild != null)
                         {
-                            tbl_Warning.serial_number = child_srl;
+                            // 🔁 UPDATE existing child
+                            lastChild.remarks = warningcoment.remarks;
+                            lastChild.warning_status = status;
+                            lastChild.survey_timestamp = DateTime.Now;
+
+                            list.Add(lastChild);
                         }
-                        List.Add(tbl_Warning);
-                        
-                        result = await dQ.UpsertWarningAsync(List);
+                        else
+                        {
+                            // ➕ INSERT new child
+                            int child_serial = lastChild?.serial_number.GetValueOrDefault() + 1 ?? 1;
+
+                            Tbl_Warning child = new Tbl_Warning
+                            {
+                                id = Guid.NewGuid(),
+                                parent_comment_id = warning.id,
+                                block = warning.block,
+                                remarks = warningcoment.remarks,
+                                warning_status = status,
+                                hhd_id = warning.hhd_id,
+                                role_code = SessionStorage.user_role,
+                                user_name = SessionStorage.user_name,
+                                serial_number = child_srl
+                            };
+
+                            list.Add(child);
+                        }
+
+                        result = await dQ.UpsertWarningAsync(list);
                         if (result>0)
                         {
                             Is_Accepted = false;

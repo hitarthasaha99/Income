@@ -82,6 +82,8 @@
     string location = SessionStorage.location;
     [Parameter]
     public string Time { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback OnGoBack { get; set; }
     CommonFunction funcs = new();
 
     protected override async Task OnParametersSetAsync()
@@ -97,6 +99,11 @@
 
     async Task GoBack()
     {
+        if (OnGoBack.HasDelegate)
+        {
+            await OnGoBack.InvokeAsync();
+            return;
+        }
         if (string.IsNullOrEmpty(page_name))
         {
             await JSRuntime.InvokeVoidAsync("__handleGoBack");
