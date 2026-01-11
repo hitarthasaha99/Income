@@ -49,6 +49,11 @@ namespace Income.Viewmodels
                     block
                 );
 
+                if (serial != 0)
+                {
+                    savedWarnings = savedWarnings.Where(w => w.serial_number == serial).ToList();
+                }
+
                 // Convert lists to comparison keys
                 var currentKeys = _tempWarnings
                     .Select(w => $"{w.item_no}::{w.serial_number}")
@@ -78,19 +83,18 @@ namespace Income.Viewmodels
                 // -----------------------------------------
                 // DELETE REMOVED WARNINGS (AND THEIR CHILD COMMENTS)
                 // -----------------------------------------
-                //var warningsToDelete = savedWarnings
-                //    .Where(w => !currentKeys.Contains($"{w.item_no}::{w.serial_number}"))
-                //    .ToList();
-
                 var warningsToDelete = savedWarnings
-    .Where(saved =>
-        !_tempWarnings.Any(current =>
-            current.item_no == saved.item_no &&
-            current.schedule == saved.schedule
-        )
-    )
-    .ToList();
+                    .Where(w => !currentKeys.Contains($"{w.item_no}::{w.serial_number}"))
+                    .ToList();
 
+                //            var warningsToDelete = savedWarnings
+                //.Where(saved =>
+                //    !_tempWarnings.Any(current =>
+                //        current.item_no == saved.item_no &&
+                //        current.schedule == saved.schedule
+                //    )
+                //)
+                //.ToList();
 
 
                 foreach (var warn in warningsToDelete)

@@ -91,6 +91,7 @@ namespace Income.Viewmodels.SCH0_0
                         }
                     }
                 }
+                total = Math.Round(total, 2);
                 data_set.Percentage = total;
                 tbl_Sch_0_0_Block_2_2.FirstOrDefault(x => x.id == data_set.id).Percentage = total;
                 CalculateTotalPercentage();
@@ -126,6 +127,7 @@ namespace Income.Viewmodels.SCH0_0
                     total += item.Percentage.GetValueOrDefault();
                 }
             }
+            total = Math.Round(total, 2);
             Total_population_percentage = total;
         }
 
@@ -247,6 +249,7 @@ namespace Income.Viewmodels.SCH0_0
             try
             {
                 double total = tbl_Sch_0_0_Block_2_2.Sum(row => row.Percentage.GetValueOrDefault());
+                total = Math.Round(total, 2);
                 if (total != 100)
                     result.Errors.Add("Total percentage must be equal to 100.");
 

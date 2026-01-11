@@ -262,6 +262,12 @@
 				toastService.ShowError("Please select atleast one household before proceeding");
 				return;
 			}
+			if (selected_for_submission.Any(x => x.hhdStatus == 12 && x.needDownload != 0))
+			{
+				toastService.ShowError("Please Sync all selected households before proceeding");
+				return;
+			}
+			
 			warningVM.selected_HHdList = [];
 			warningVM.selected_HHdList.AddRange(selected_for_submission);
 			NavigationManager.NavigateTo($"/dashboard/validate_page?schedule={"HIS"}");
@@ -837,7 +843,7 @@
 
 					if (!block_1.household_income.HasValue)
 					{
-                        errors.Add($"Block 12 : Household income slab has not been selected");
+						errors.Add($"Block 12 : Household income slab has not been selected");
 					}
 				}
 
@@ -929,7 +935,7 @@
 						errors.Add($"Number of block 3 entries does not match the number of block 11b entries");
 					}
 
-					
+
 				}
 
 
@@ -1042,6 +1048,19 @@
 
 			var block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>();
 			var block_2 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_FieldOperation>();
+			if (block_2 != null && role == SessionStorage.UserRole.SSO)
+			{
+				if (string.IsNullOrEmpty(block_2.supervisor_name))
+				{
+					block_2.supervisor_name = SessionStorage.full_name;
+					block_2.supervisor_code = SessionStorage.user_name;
+				}
+
+				if (block_2.date_of_scrutiny == null || block_2.date_of_scrutiny == DateTime.MinValue)
+				{
+					block_2.date_of_scrutiny = DateTime.Now;
+                }
+			}
 			var warnings = await dQ.FetchListAsync<Tbl_Warning>(DBQueries.DeleteFilter.IncludeAll) ?? new();
 
 			SCH_HIS_Model model = new()
