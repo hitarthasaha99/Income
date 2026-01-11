@@ -564,6 +564,13 @@ namespace Income.Database.Queries
                     if (option == 1)
                     {
                         await _database.Table<Tbl_Sch_0_0_Block_0_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var tbl_Sch_0_0_FieldOperation = await FetchBlock2();
+                        if (tbl_Sch_0_0_FieldOperation != null)
+                        {
+                            tbl_Sch_0_0_FieldOperation.field_work_start_date = null;
+                            tbl_Sch_0_0_FieldOperation.field_work_end_date = null;
+                            await SaveBlock2(tbl_Sch_0_0_FieldOperation);
+                        }
                     }
 
                     if (option == 1 || option == 2)
@@ -598,10 +605,14 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_10>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
-                        await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        //await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var tbl_Sch_0_0_FieldOperation = await FetchBlock2();
+                        if (tbl_Sch_0_0_FieldOperation != null)
+                        {
+                            tbl_Sch_0_0_FieldOperation.field_work_end_date = null;
+                            await SaveBlock2(tbl_Sch_0_0_FieldOperation);
+                        }
 
-
-                        await _database.Table<Tbl_Sch_0_0_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
@@ -650,7 +661,6 @@ namespace Income.Database.Queries
                         }
                     }
 
-
                     // If all operations succeed, return 1
                     return 1;
                 }
@@ -661,6 +671,13 @@ namespace Income.Database.Queries
                     if (option == 1)
                     {
                         await _database.Table<Tbl_Sch_0_0_Block_0_1>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var tbl_Sch_0_0_FieldOperation = await FetchBlock2();
+                        if (tbl_Sch_0_0_FieldOperation != null)
+                        {
+                            tbl_Sch_0_0_FieldOperation.field_work_start_date = null;
+                            tbl_Sch_0_0_FieldOperation.field_work_end_date = null;
+                            await SaveBlock2(tbl_Sch_0_0_FieldOperation);
+                        }
                     }
 
                     if (option == 1 || option == 2)
@@ -697,8 +714,12 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
 
-
-                        await _database.Table<Tbl_Sch_0_0_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var tbl_Sch_0_0_FieldOperation = await FetchBlock2();
+                        if (tbl_Sch_0_0_FieldOperation != null)
+                        {
+                            tbl_Sch_0_0_FieldOperation.field_work_end_date = null;
+                            await SaveBlock2(tbl_Sch_0_0_FieldOperation);
+                        }
                         await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
@@ -795,7 +816,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_2_1> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_1>("SELECT * FROM Tbl_Sch_0_0_Block_2_1 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                List<Tbl_Sch_0_0_Block_2_1> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_1>("SELECT * FROM Tbl_Sch_0_0_Block_2_1 WHERE fsu_id = ? AND tenant_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return data_set;
             }
             catch (Exception ex)
@@ -843,7 +864,7 @@ namespace Income.Database.Queries
             try
             {
                 fsu_id = fsu_id == 0 ? SessionStorage.SelectedFSUId : fsu_id;
-                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = ?", fsu_id);
+                List<Tbl_Sch_0_0_Block_2_2> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_2_2>("SELECT * FROM Tbl_Sch_0_0_Block_2_2 WHERE fsu_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", fsu_id);
                 return data_set;
             }
             catch (Exception ex)
@@ -881,7 +902,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_4>("SELECT * FROM Tbl_Sch_0_0_Block_4 WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_4>("SELECT * FROM Tbl_Sch_0_0_Block_4 WHERE fsu_id = ? AND tenant_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 return response != null && response.Count > 0 ? response.FirstOrDefault() : null;
             }
             catch (Exception ex)
@@ -975,7 +996,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                List<Tbl_Sch_0_0_Block_5> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_5>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ?", SessionStorage.SelectedFSUId);
+                List<Tbl_Sch_0_0_Block_5> data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_5>("SELECT * FROM Tbl_Sch_0_0_Block_5 WHERE fsu_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId);
                 return data_set;
             }
             catch (Exception ex)
@@ -1016,7 +1037,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_0_1>("SELECT * FROM Tbl_Sch_0_0_Block_0_1 WHERE fsu_id = ?", SessionStorage.SelectedFSUId);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_Block_0_1>("SELECT * FROM Tbl_Sch_0_0_Block_0_1 WHERE fsu_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", SessionStorage.SelectedFSUId);
                 if (response != null && response.Count > 0)
                 {
                     return response.FirstOrDefault();
@@ -1058,7 +1079,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.QueryAsync<Tbl_Sch_0_0_FieldOperation>("SELECT * FROM Tbl_Sch_0_0_FieldOperation WHERE fsu_id = ? AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
+                var response = await _database.QueryAsync<Tbl_Sch_0_0_FieldOperation>("SELECT * FROM Tbl_Sch_0_0_FieldOperation WHERE fsu_id = ? AND (is_deleted IS NULL OR is_deleted = 0) AND tenant_id = ?", SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                 if (response != null && response.Count > 0)
                 {
                     return response.FirstOrDefault();
@@ -1087,6 +1108,7 @@ namespace Income.Database.Queries
                 }
                 else
                 {
+                    tbl_Sch_0_0_FieldOperation.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_Sch_0_0_FieldOperation);
                 }
                 return status;
