@@ -204,7 +204,7 @@
                     <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
                     @if (SessionStorage.env == SessionStorage.Environment.Development)
                     {
-                        <button class="btn btn-primary" @onclick="@(() => Generate())">Generate<i class="fi fi-rr-settings me-1"></i></button>
+                        <button class="btn btn-primary me-2" @onclick="@(() => Generate())">Generate<i class="fi fi-rr-settings ms-1"></i></button>
                     }
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
@@ -552,6 +552,7 @@
         if (generate > 0)
         {
             toastService.ShowSuccess("Data generated successfully");
+            block_1 = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id);
         }
         else
         {
