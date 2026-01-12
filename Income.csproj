@@ -45,6 +45,7 @@
       <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
       <ApplicationVersion>3</ApplicationVersion>
       <PublishTrimmed>False</PublishTrimmed>
+      <RunAOTCompilation>False</RunAOTCompilation>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
