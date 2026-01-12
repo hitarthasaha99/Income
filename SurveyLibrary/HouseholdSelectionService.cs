@@ -3,6 +3,7 @@ using Income.Database.Models.SCH0_0;
 using Income.Database.Queries;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -307,7 +308,8 @@ namespace Income.SurveyLibrary
                     compensationSSS,
                     isSSS,
                     allocation,
-                    availableHouseholds.Count);
+                    availableHouseholds.Count,
+                    targetStratum);
 
                 if (canSpare <= 0)
                     continue; // Can't spare any, move to next in compensation order
@@ -392,25 +394,36 @@ namespace Income.SurveyLibrary
 
         // Calculate how many households can be spared from a given SSS or Stratum
         // Calculate how many households can be spared from a given SSS or Stratum
+        // Calculate how many households can be spared from a given SSS or Stratum
         private int CalculateSpareableHouseholds(
             SelectionPool pool,
             int sssOrStratum,
             bool isSSS,
             Dictionary<int, Dictionary<int, int>> allocation,
-            int available)
+            int available,
+            int currentProcessingStratum = 0)
         {
+            Console.WriteLine($"[DEBUG] CalculateSpareableHouseholds: sssOrStratum={sssOrStratum}, isSSS={isSSS}, available={available}, currentProcessingStratum={currentProcessingStratum}");
+
             if (isSSS)
             {
                 // For SSS: Check if this SSS has its own requirement
                 int stratum = GetStratumFromSSS(sssOrStratum);
+                Console.WriteLine($"[DEBUG]   SSS {sssOrStratum} belongs to Stratum {stratum}");
 
                 if (!allocation.ContainsKey(stratum))
-                    return available; // No requirement for this stratum, can spare all
+                {
+                    Console.WriteLine($"[DEBUG]   Stratum {stratum} not in allocation, can spare all {available}");
+                    return available;
+                }
 
                 var sssAllocations = allocation[stratum];
 
                 if (!sssAllocations.ContainsKey(sssOrStratum))
-                    return available; // This SSS has no specific requirement, can spare all
+                {
+                    Console.WriteLine($"[DEBUG]   SSS {sssOrStratum} has no specific requirement, can spare all {available}");
+                    return available;
+                }
 
                 // CRITICAL: First check if the parent STRATUM has shortfall
                 // If stratum is in shortfall, SSS cannot spare any households
@@ -419,10 +432,25 @@ namespace Income.SurveyLibrary
                 int stratumAlreadyReserved = pool.GetReservedCount(stratum: stratum);
                 int stratumTotalOriginal = allInStratum.Count + stratumAlreadyReserved;
 
+                Console.WriteLine($"[DEBUG]   Stratum {stratum} check: totalOriginal={stratumTotalOriginal}, totalRequired={stratumTotalRequired}");
+
                 if (stratumTotalOriginal < stratumTotalRequired)
                 {
-                    // Stratum is in shortfall - cannot spare any households
+                    Console.WriteLine($"[DEBUG]   Stratum {stratum} is in SHORTFALL, cannot spare any");
                     return 0;
+                }
+
+                // REFINED CHECK: If compensating for an earlier stratum from a LATER stratum,
+                // the later stratum can only spare if it has SURPLUS (not just equal)
+                if (currentProcessingStratum > 0 && stratum > currentProcessingStratum)
+                {
+                    // Later stratum - can only spare if it has surplus
+                    if (stratumTotalOriginal <= stratumTotalRequired)
+                    {
+                        Console.WriteLine($"[DEBUG]   Stratum {stratum} has no surplus (total={stratumTotalOriginal}, required={stratumTotalRequired}), cannot spare to earlier stratum");
+                        return 0;
+                    }
+                    Console.WriteLine($"[DEBUG]   Stratum {stratum} has surplus, can spare to earlier stratum");
                 }
 
                 // Stratum is NOT in shortfall, now check if this SSS can spare
@@ -434,16 +462,32 @@ namespace Income.SurveyLibrary
                 // Total originally available = current available + already reserved
                 int totalOriginal = available + alreadyReserved;
 
-                // Can spare = total - required - already reserved
-                int spareable = totalOriginal - required - alreadyReserved;
+                // IMPORTANT FIX: When compensating within same stratum, we need to check
+                // if there are enough households LEFT (available now) to meet our own needs
+                // The formula should be: can spare = available - (required - already used for self)
+
+                // How many has this SSS already provided for its own requirement?
+                // This is trickier - we need to know how many were selected FOR this SSS specifically
+                // For now, let's use a simpler approach:
+                // Can spare = current available - remaining needed for self
+
+                int remainingNeededForSelf = Math.Max(0, required - alreadyReserved);
+                int spareable = available - remainingNeededForSelf;
+
+                Console.WriteLine($"[DEBUG]   SSS {sssOrStratum}: available={available}, required={required}, alreadyReserved={alreadyReserved}, remainingNeededForSelf={remainingNeededForSelf}, spareable={spareable}");
 
                 return Math.Max(0, spareable); // Can't be negative
             }
             else
             {
                 // For Stratum: Check total stratum requirement
+                Console.WriteLine($"[DEBUG]   Checking STRATUM {sssOrStratum}");
+
                 if (!allocation.ContainsKey(sssOrStratum))
-                    return available; // No requirement for this stratum, can spare all
+                {
+                    Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum} not in allocation, can spare all {available}");
+                    return available;
+                }
 
                 var sssAllocations = allocation[sssOrStratum];
                 int totalRequired = sssAllocations.Values.Sum();
@@ -458,8 +502,24 @@ namespace Income.SurveyLibrary
                 // Total originally available = current available + already reserved
                 int totalOriginal = totalAvailable + alreadyReserved;
 
+                Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum}: totalOriginal={totalOriginal}, totalRequired={totalRequired}, alreadyReserved={alreadyReserved}");
+
+                // REFINED CHECK: Similar to SSS check - later strata can only spare if they have surplus
+                if (currentProcessingStratum > 0 && sssOrStratum > currentProcessingStratum)
+                {
+                    // Later stratum - can only spare if it has surplus
+                    if (totalOriginal <= totalRequired)
+                    {
+                        Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum} has no surplus (total={totalOriginal}, required={totalRequired}), cannot spare to earlier stratum");
+                        return 0;
+                    }
+                    Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum} has surplus, can spare to earlier stratum");
+                }
+
                 // Can spare = total - required - already reserved
                 int spareable = totalOriginal - totalRequired - alreadyReserved;
+
+                Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum} can spare: {spareable}");
 
                 return Math.Max(0, spareable); // Can't be negative
             }

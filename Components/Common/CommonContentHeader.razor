@@ -82,12 +82,14 @@
     string location = SessionStorage.location;
     [Parameter]
     public string Time { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback OnGoBack { get; set; }
     CommonFunction funcs = new();
 
     protected override async Task OnParametersSetAsync()
     {
         // No change needed here for this problem
-        Time = survey_time.HasValue
+        Time = survey_time.HasValue && survey_time.Value != DateTime.MinValue
         ? survey_time.Value.ToString("dd-MM-yyyy HH:mm:ss")
         : string.Empty;
 
@@ -97,6 +99,11 @@
 
     async Task GoBack()
     {
+        if (OnGoBack.HasDelegate)
+        {
+            await OnGoBack.InvokeAsync();
+            return;
+        }
         if (string.IsNullOrEmpty(page_name))
         {
             await JSRuntime.InvokeVoidAsync("__handleGoBack");

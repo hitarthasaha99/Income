@@ -13,27 +13,27 @@ namespace Income.Validators.HIS2026
         public Block_2_Validator()
         {
             RuleFor(x => x.total_time)
-            .NotNull().WithMessage("H000: Invalid entry, please check the entry.")
-            .NotEqual(0).WithMessage("H000: Invalid entry, please check the entry.");
+            .NotNull().WithMessage("H078: Invalid entry, please check the entry.")
+            .NotEqual(0).WithMessage("H078: Invalid entry, please check the entry.");
 
             RuleFor(x => x.number_of_enumerators)
-                .NotNull().WithMessage("H001: Invalid entry, please check the entry.")
-                .InclusiveBetween(1, 4).WithMessage("H001: Invalid entry, please check the entry.");
+                .NotNull().WithMessage("H079: Invalid entry, please check the entry.")
+                .InclusiveBetween(1, 4).WithMessage("H079: Invalid entry, please check the entry.");
 
             RuleFor(x => x.informant_serial)
-                .NotNull().WithMessage("H002: Invalid entry, please check the entry.")
-                .NotEqual(0).WithMessage("H002: Invalid entry, please check the entry.");
+                .NotNull().WithMessage("H082: Invalid entry, please check the entry.")
+                .NotEqual(0).WithMessage("H082: Invalid entry, please check the entry.");
 
             RuleFor(x => x.informant_mobile)
-                .NotNull().WithMessage("H003: Invalid entry, please check the entry.")
+                .NotNull().WithMessage("H083 (ii): Invalid entry, please check the entry.")
                 .Must(m => !string.IsNullOrWhiteSpace(m) &&
                            (m.StartsWith("9") || m.StartsWith("8") || m.StartsWith("7") || m.StartsWith("6")))
-                .WithMessage("H003: Invalid entry, please check the entry.");
+                .WithMessage("H083 (ii): Invalid entry, please check the entry.");
 
             RuleFor(x => x.informant_response_code)
-                .NotNull().WithMessage("H004: Invalid entry, please check the entry.")
+                .NotNull().WithMessage("H084: Invalid entry, please check the entry.")
                 .Must(code => code != null && ((code >= 1 && code <= 4) || code == 9))
-                .WithMessage("H004: Invalid entry, please check the entry.");
+                .WithMessage("H084: Invalid entry, please check the entry.");
         }
     }
 }

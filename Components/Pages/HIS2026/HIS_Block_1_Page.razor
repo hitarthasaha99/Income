@@ -202,6 +202,10 @@
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
                     <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
+                    @if (SessionStorage.env == SessionStorage.Environment.Development)
+                    {
+                        <button class="btn btn-primary me-2" @onclick="@(() => Generate())">Generate<i class="fi fi-rr-settings ms-1"></i></button>
+                    }
                 }
                 <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
             </div>
@@ -239,6 +243,7 @@
     CommentModal commentModal = default!;
     private CommonContentHeader? _header;
     int existingSurveyCode = 0;
+    DataGenerator dataGenerator = new DataGenerator();
 
     public void SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
@@ -370,12 +375,13 @@
         {
             if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
             {
-                NavigationManager.NavigateTo("/dashboard/his/block_10");
+                NavigationManager.NavigateTo("/dashboard/his/block_12");
             }
             else
             {
                 NavigationManager.NavigateTo("/dashboard/his/block_3");
             }
+            return;
         }
 
         if (block_1.survey_code == null)
@@ -532,5 +538,25 @@
         }
         return;
 
+    }
+
+    public async Task Generate()
+    {
+        var block1 = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id);
+        if (block1 == null)
+        {
+            toastService.ShowError("Please save first");
+            return;
+        }
+        var generate = await dataGenerator.GenerateBlockData();
+        if (generate > 0)
+        {
+            toastService.ShowSuccess("Data generated successfully");
+            block_1 = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id);
+        }
+        else
+        {
+            toastService.ShowSuccess("Could not generate data");
+        }
     }
 }
