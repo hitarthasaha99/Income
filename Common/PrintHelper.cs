@@ -174,8 +174,8 @@ namespace Income.Common
                 block_2_2 = await _dbQueries.FetchSCH0Block2_2Data();
                 block_4 = await _dbQueries.GetBlock4();
                 block_5 = await _dbQueries.FetchSCH0Block5Data();
-                //block_7 = await dbQueries.GetBlock7Data();
-                block_7 = await _dbQueries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+                block_7 = await _dbQueries.GetBlock7Data();
+                //block_7 = await _dbQueries.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
                 block_11 = await _dbQueries.FetchBlock2();
 
 
@@ -334,7 +334,7 @@ namespace Income.Common
 
             int serial = 1;
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x => x.serial_no))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -434,7 +434,7 @@ namespace Income.Common
             for (int i = rows.Count - 2; i >= 3; i--)
                 rows[i].Remove();
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x=>x.serial_number))
             {
                 var newRow = (TableRow)templateRow.CloneNode(true);
                 var cells = newRow.Elements<TableCell>().ToList();
@@ -468,7 +468,7 @@ namespace Income.Common
 
             int serial = 1;
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x=>x.Block_7_1))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -1088,7 +1088,7 @@ namespace Income.Common
 
             int serial = 1;
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x=>x.serial_no))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -1218,7 +1218,7 @@ namespace Income.Common
 
             int serial = 1;
 
-            foreach (var act in activities)
+            foreach (var act in activities.OrderBy(x=>x.SerialNumber))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -1290,7 +1290,7 @@ namespace Income.Common
             // last row = blank template row (safe)
             TableRow templateRow = rows.Last();
             
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x=>x.serial_number))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -1344,7 +1344,7 @@ namespace Income.Common
             // last row = blank template row
             TableRow templateRow = rows.Last();
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x => x.serial_number))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -1413,7 +1413,7 @@ namespace Income.Common
             // last row = blank template row (safe for Word merge)
             TableRow templateRow = rows.Last();
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x => x.serial_number))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -1826,7 +1826,7 @@ namespace Income.Common
                  .FirstOrDefault()?.InnerText.Trim()
                  .Equals("total", StringComparison.OrdinalIgnoreCase) == true);
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x => x.serial_number))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -2031,7 +2031,7 @@ namespace Income.Common
             // last row = blank template row
             TableRow templateRow = rows.Last();
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x=>x.SerialNumber))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -2076,7 +2076,7 @@ namespace Income.Common
 
             TableRow templateRow = rows.Last();
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x => x.serial_number))
             {
                 var row = (TableRow)templateRow.CloneNode(true);
                 var cells = row.Elements<TableCell>().ToList();
@@ -2116,7 +2116,7 @@ namespace Income.Common
             // Last row assumed as template (blank)
             TableRow templateRow = rows.Last();
 
-            foreach (var item in list)
+            foreach (var item in list.OrderBy(x => x.serial_number))
             {
                 var row = new TableRow();
 
