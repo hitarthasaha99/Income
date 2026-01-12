@@ -286,8 +286,8 @@ namespace Income.Common
                 SafeReplace(rows1, 16, (block01?.Block_1_15 ?? 0).ToString());
                 SafeReplace(rows1, 17, (block01?.Block_1_16 ?? 0).ToString());
                 SafeReplace(rows1, 18, (block01?.Block_1_17 ?? 0).ToString());
-                SafeReplace(rows1, 18, (block01?.remarks_block_1_17));
-                SafeReplace(rows1, 19, block01?.remarks);
+                SafeReplace(rows1, 19, (block01?.remarks_block_1_17));
+                SafeReplace(rows1, 20, block01?.remarks);
             }
 
             // ---------- BLOCK [9] ----------
@@ -350,7 +350,7 @@ namespace Income.Common
             // ✅ remarks taken from existing block_0_1 field
             ReplaceCellText(
                 GetLastCell(remarksRow),
-                block_0_1?.remarks ?? ""
+                block_0_1?.remarks_block_2_1 ?? ""
             );
         }
 
@@ -382,7 +382,7 @@ namespace Income.Common
                 ReplaceCellText(cells[0], item.serial_number.ToString()!);
                 ReplaceCellText(cells[1], item.serial_no_of_hamlets_in_su ?? "");
                 ReplaceCellText(cells[2], item.Percentage?.ToString() ?? "");
-                ReplaceCellText(cells[3], item.is_selected ? "✔" : "");
+                ReplaceCellText(cells[3], item.IsChecked ? "✔" : "");
 
                 table.InsertBefore(row, remarksRow);
                 serial++;
@@ -391,7 +391,7 @@ namespace Income.Common
             // ✅ remarks from Block-0.1 (no parameter needed)
             ReplaceCellText(
                 GetLastCell(remarksRow),
-                block_0_1?.remarks ?? ""
+                block_0_1?.remarks_block_2_2 ?? ""
             );
         }
 
@@ -835,24 +835,18 @@ namespace Income.Common
         private static int GetFilteredSubstitution(List<Tbl_Sch_0_0_Block_7> list, int sss)
         {
             int counter = 0;
-            var initialSelectedList = list.Where(entry => entry.SSS == sss && entry.isInitialySelected == true && entry.SubstitutionCount != 0).ToList();
-            foreach (var item in initialSelectedList)
-            {
-                if (item.SubstitutionCount >= 1)
-                {
-                    var filteredData = list.SingleOrDefault(entry => entry.isSelected == true && entry.OriginalHouseholdID == item.Block_7_3 && entry.SubstitutedForID == item.Block_7_3);
-                    if (filteredData != null && filteredData.status == "SUBSTITUTE")
-                    {
-                        counter++;
-                    }
-                }
-            }
-            return initialSelectedList != null ? initialSelectedList.Count : 0;
+            var initialSelectedList = list.Where(entry => entry.SSS == sss && entry.isSelected == true).ToList();
+            counter = initialSelectedList.Count(x => x.status == "SUBSTITUTE");
+            return initialSelectedList != null ? counter : 0;
         }
 
         private static int GetFilteredCountOnInitialySelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)
         {
             return list.Count(entry => entry.SSS == sss && entry.isInitialySelected == isInitialySelected && entry.SubstitutionCount == 0 && entry.status != "CASUALTY");
+        }
+        private static int GetFilteredCountOnSelected(List<Tbl_Sch_0_0_Block_7> list, int sss, bool isInitialySelected = true)
+        {
+            return list.Count(entry => entry.SSS == sss && entry.isInitialySelected == isInitialySelected);
         }
 
         #endregion
@@ -894,7 +888,7 @@ namespace Income.Common
 
             // 5.2 (ii) Elsewhere in the schedule
             ReplaceCellText(
-                GetLastCell(rows[8]), /*string.IsNullOrWhiteSpace(block_0_1?.EnumeratorRemarks) && string.IsNullOrWhiteSpace(block_0_1?.SupervisorRemarks)*/ !string.IsNullOrEmpty(block_0_1?.remarks_block_2_2) || !string.IsNullOrEmpty(block_0_1?.remarks_block_3) ||
+                GetLastCell(rows[8]), !string.IsNullOrEmpty(block_0_1?.remarks) || !string.IsNullOrEmpty(block_0_1?.remarks_block_2_1)|| !string.IsNullOrEmpty(block_0_1?.remarks_block_2_2) || !string.IsNullOrEmpty(block_0_1?.remarks_block_3) ||
                                     !string.IsNullOrEmpty(block_0_1?.remarks_block_4) || !string.IsNullOrEmpty(block_0_1?.remarks_block_5) ||
                                     !string.IsNullOrEmpty(block_0_1?.remarks_block_6) || !string.IsNullOrEmpty(block_0_1?.remarks_block_7) ||
                                     !string.IsNullOrEmpty(block_0_1?.remarks_block_7_selection)
@@ -919,6 +913,7 @@ namespace Income.Common
                 //var dbQueries = new DBQueries();
                 var data = await _dbQueries.GetBlock7Data(SessionStorage.SelectedFSUId);
                 List<Tbl_Sch_0_0_Block_7> selected = data.Where(k => k.isSelected == true).OrderBy(k => k.SSS).ThenBy(k => k.SSS_household_id).ToList();
+
                 using (var doc = WordprocessingDocument.Open(ms, true))
                 {
                     var body = doc.MainDocumentPart.Document.Body;
@@ -960,8 +955,12 @@ namespace Income.Common
                         block_11a = await _dbQueries.Fetch_SCH_HIS_Block11(item.Block_7_3 ?? 0);
                         block_11b_list = await _dbQueries.Fetch_SCH_HIS_Block11b(item.Block_7_3 ?? 0);
                         blockHis_A = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncA(item.Block_7_3 ?? 0);
-                         blockHis_B = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncB(item.Block_7_3 ?? 0);
-
+                        blockHis_B = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncB(item.Block_7_3 ?? 0);
+                        var block_2 = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncBlock2(item.Block_7_3 ?? 0);
+                        if (block_2 == null)
+                        {
+                            continue;
+                        }
                         //using var ms = new MemoryStream(File.ReadAllBytes(templatePath))PrintFetchSingleForFsuAndHhdAsyncB
                         //using (var doc = WordprocessingDocument.Open(ms, true))
                         //{
@@ -1065,7 +1064,8 @@ namespace Income.Common
             SafeReplace(rows, 12, 2, block1.sample_hhd_number?.ToString());
             SafeReplace(rows, 13, 2, block1.survey_code?.ToString());
             SafeReplace(rows, 14, 2, block1.substitution_reason?.ToString());
-            SafeReplace(rows, 15, 2, block1.block_1_remark);
+            SafeReplace(rows, 15, 2, block1.substitution_reason_remark);
+            SafeReplace(rows, 16, 2, block1.block_1_remark);
         }
         
         
@@ -1272,7 +1272,7 @@ namespace Income.Common
             // Remarks row (always last)
             ReplaceCellText(
                 GetLastCell(rows.Last()),
-                blockhis_1?.block_6_remark ?? ""
+                blockhis_1?.block_4_remark ?? ""
             );
         }
 
