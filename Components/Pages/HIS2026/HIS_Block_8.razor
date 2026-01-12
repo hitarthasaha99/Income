@@ -94,10 +94,10 @@
                                             <input type="number" class="form-control form-control-sm no-spinner" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)" 
                                             value=@model.item_3 @oninput="e => UpdateFieldAndValidate(() => model.item_3, e)"/>
                                             <ValidationMessage For="() => model.item_3" />
-                                            @if (!string.IsNullOrEmpty(item_3_warning))
+                                            @if (!string.IsNullOrEmpty(item_2_warning))
                                             {
                                                 <div class="form-text text-success">
-                                                    @item_3_warning
+                                                    @item_2_warning
                                                 </div>
                                             }
                                         </td>
@@ -212,15 +212,15 @@
             item_1_warning = "W057: Invalid Entry, please check the entry recorded in Q8.1";
         }
         //W058
-        if (!isItem2Blank && MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_2.GetValueOrDefault() <= 0))
+        if (!isItem2Blank && MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_2.GetValueOrDefault() <= 0 && model?.item_3.GetValueOrDefault() <= 0))
         {
-            item_2_warning = "W058: Invalid Entry, please check the entry recorded in Q8.2";
+            item_2_warning = "Invalid Entry, please check the entry recorded in Q8.2 or Q8.3";
         }
-        //W058
-        if (!isItem3Blank && MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_3.GetValueOrDefault() <= 0))
-        {
-            item_3_warning = "W058: Invalid Entry, please check the entry recorded in Q8.3";
-        }
+        // //W058
+        // if (!isItem3Blank && MemberList.Any(x => x.item_8 == 12 || x.item_9 == 12 || x.item_10 == 12 || x.item_11 == 12) && (model?.item_3.GetValueOrDefault() <= 0))
+        // {
+        //     item_3_warning = "W058: Invalid Entry, please check the entry recorded in Q8.3";
+        // }
 
     }
 
@@ -348,10 +348,7 @@
             {
                 warningVM.AddWarning(item_2_warning, "HIS", "8", "2", SessionStorage.selected_hhd_id);
             }
-            if (!string.IsNullOrEmpty(item_3_warning))
-            {
-                warningVM.AddWarning(item_3_warning, "HIS", "8", "3", SessionStorage.selected_hhd_id);
-            }
+            
             await warningVM.SaveWarningAsync("HIS", "8");
 
             if (!is_go_next)
