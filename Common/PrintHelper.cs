@@ -63,6 +63,7 @@ namespace Income.Common
         List<Tbl_Block_7c_Q10>? blockhis_7c_Q10 = new();
         Tbl_Block_7c? blockHis_7c = new();
         List<Tbl_Block_7d>? blockhis_7d= new();
+        Tbl_Block_FieldOperation? blockHis_11 = new();
 
         string reportType { get; set; } = string.Empty;
         byte[]? generatedDoc2026 = null;
@@ -956,6 +957,7 @@ namespace Income.Common
                         block_11b_list = await _dbQueries.Fetch_SCH_HIS_Block11b(item.Block_7_3 ?? 0);
                         blockHis_A = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncA(item.Block_7_3 ?? 0);
                         blockHis_B = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncB(item.Block_7_3 ?? 0);
+                        blockHis_11 = await _dbQueries.Fetch_SCH_HIS_Block2(item.Block_7_3 ?? 0);
                         var block_2 = await _dbQueries.PrintFetchSingleForFsuAndHhdAsyncBlock2(item.Block_7_3 ?? 0);
                         if (block_2 == null)
                         {
@@ -1002,6 +1004,8 @@ namespace Income.Common
                         FillBlockHis11b(tempBody, block_11b_list, blockhis_1?.block_11b_remark);
                         FillBlockHisA(tempBody, blockHis_A);
                         FillBlockHisB(tempBody, blockHis_B);
+                        FillBlockHis11(tempBody, blockHis_11);
+                        FillBlockHis12_1(tempBody, blockhis_1);
 
 
                         //    // Save explicitly (safe)
@@ -1066,9 +1070,34 @@ namespace Income.Common
             SafeReplace(rows, 14, 2, block1.substitution_reason?.ToString());
             SafeReplace(rows, 15, 2, block1.substitution_reason_remark);
             SafeReplace(rows, 16, 2, block1.block_1_remark);
+
+            // ---------- BLOCK [12] ----------
+            var table12 = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower()
+                    .Contains("[12]"));
+
+            if (table12 != null)
+            {
+                var rows12 = table12.Elements<TableRow>().ToList();
+                SafeReplace(rows12, 1, 2, block1?.block_12_remark);
+            }
+
+            // ---------- BLOCK [10] ----------
+            var table13 = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower()
+                    .Contains("[13] "));
+            //var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[13]"));
+            //var table10 = body.Elements<Table>().ElementAtOrDefault(11);
+
+            if (table13 != null)
+            {
+                var rows13 = table13.Elements<TableRow>().ToList();
+                SafeReplace(rows13, 1, 2, block1?.block_13_remark);
+            }
+
         }
-        
-        
+
+
 
         private void FillBlockHis3(Body body,List<Tbl_Block_3> list)
         {
@@ -1555,7 +1584,26 @@ namespace Income.Common
                blockhis_1?.block_9b_remark ?? ""
             );
         }
+        private void FillBlockHis12_1(Body body, Tbl_Block_1 b1)
+        {
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.Contains("[12_1]"));
 
+            if (table == null || b1 == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            SafeReplace(rows, 3, 4, b1.household_income?.ToString());
+
+          
+            // ---------- Remarks ----------
+            var remarksRow = rows.Last();
+            ReplaceCellText(
+                GetLastCell(remarksRow),
+               blockhis_1?.block_12_1_remark ?? ""
+            );
+        }
         private  void FillBlock9B_5(Body body,Tbl_Block_9b data)
         {
             if (data == null)
@@ -2150,6 +2198,60 @@ namespace Income.Common
             // second column = remarks value
             ReplaceCellText(cells[1], remarksFromBlock1);
         }
+
+        private void FillBlockHis11(Body body, Tbl_Block_FieldOperation? block11)
+        {
+            if (block11 == null)
+                return;
+
+            var table = body.Elements<Table>()
+                .FirstOrDefault(t => t.InnerText.ToLower().Contains("[2]"));
+
+            if (table == null)
+                return;
+
+            var rows = table.Elements<TableRow>().ToList();
+
+            // 1. Enumerator Name
+            ReplaceCellText(GetLastCell(rows[2]), block11.enumerator_name ?? "");
+
+            // 2.1 Date 
+         
+
+            ReplaceCellText(GetLastCell(rows[3]), block11.date_of_receipt?.ToString("dd-MM-yyyy") ?? "");
+
+            // 2.2 Date 
+            ReplaceCellText(GetLastCell(rows[4]), block11.date_of_scrutiny?.ToString("dd-MM-yyyy") ?? "");
+            //2.3
+            ReplaceCellText(GetLastCell(rows[5]), block11.date_of_despatch?.ToString("dd-MM-yyyy") ?? "");
+
+            // 3. Total time taken (hours)
+            ReplaceCellText(GetLastCell(rows[6]), block11.total_time?.ToString() ?? "");
+            //4 Number of enumerators (SE/JSO) in the team who canvassed the schedule
+            ReplaceCellText(GetLastCell(rows[7]), block11.number_of_enumerators?.ToString() ?? "");
+
+            // 5.1 
+            ReplaceCellText(
+                 GetLastCell(rows[8]), block11.item_5_1_remarks == true ? "Yes"
+                     : "No");
+
+            // 5.2 (ii) Elsewhere in the schedule
+            ReplaceCellText(
+                GetLastCell(rows[9]), block11.item_5_2_remarks == true ? "Yes"
+                    : "No");
+                   
+            
+
+            // 6. name of informant:
+            ReplaceCellText(GetLastCell(rows[10]), block11.informant_name?.ToString() ?? "");
+            //Mobile number of informant/any other household member who can be contacted
+            ReplaceCellText(GetLastCell(rows[11]), block11.informant_mobile?.ToString() ?? "");
+            //Response code of the informant as assessed by SE/JSO
+            ReplaceCellText(GetLastCell(rows[12]), block11.informant_response_code?.ToString() ?? "");
+
+            
+        }
+
 
 
 
