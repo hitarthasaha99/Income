@@ -51,9 +51,9 @@
             const el = e.target;
             let value = el.value;
 
-            // If first character is NOT a letter → remove it (typing + paste)
-            if (value.length > 0 && !/^[a-zA-Z]/.test(value)) {
-                el.value = value.replace(/^[^a-zA-Z]+/, '');
+            // If first character is NOT alphanumeric → remove it (typing + paste)
+            if (value.length > 0 && !/^[a-zA-Z0-9]/.test(value)) {
+                el.value = value.replace(/^[^a-zA-Z0-9]+/, '');
             }
         }
 
