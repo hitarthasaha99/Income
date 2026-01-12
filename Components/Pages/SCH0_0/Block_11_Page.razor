@@ -11,6 +11,7 @@
 @inject NetworkService networkService
 @inject ILoggingService loggingService
 @inject PreloadService preloadService
+@inject PrintHelper PrintHelper
 
 
 <div class="main-content">
@@ -32,6 +33,9 @@
                     <Button class="btn btn-primary is_sso action" @onclick="@(() => OpenValidatePage())"><i class="fi fi-rr-memo-circle-check me-1"></i>Validate</Button>
                 </div>
             }
+            <button class="btn btn-sm btn-primary ms-auto" @onclick="HandlePrint">
+                <i class="bi bi-printer"></i> Print
+            </button>
 
         </div>
         <div class="card-body">
@@ -353,6 +357,32 @@
             NavigationManager.NavigateTo("/dashboard/sch0.0/block0_1");
         }
         return;
+    }
+
+    private async Task HandlePrint()
+    {
+        try
+        {
+            preloadService.Show(SpinnerColor.Light, "Files printing in-progress... please wait!");
+
+            var result = await PrintHelper.GenerateReportAsync(SessionStorage.SelectedFSUId,"Sch00");
+
+            if (result == 1)
+            {
+                toastService.ShowSuccess($"Files printed successfully");
+            }
+            else
+            {
+                toastService.ShowError($"Failed to print files");
+            }
+
+            preloadService.Hide();
+        }
+        catch (Exception ex)
+        {
+            preloadService.Hide();
+            toastService.ShowError($"Error while printing: {ex.Message}");
+        }
     }
 
     private void TimeTakenChanged(ChangeEventArgs e)
