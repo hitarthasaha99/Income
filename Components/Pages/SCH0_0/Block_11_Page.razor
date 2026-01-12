@@ -314,9 +314,16 @@
             }
             else
             {
-                if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.FSU_Submitted)
+                if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
-                    tbl_Sch_0_0_FieldOperation.field_work_end_date = DateTime.Now;
+                    if (tbl_Sch_0_0_FieldOperation.field_work_start_date == null)
+                    {
+                        tbl_Sch_0_0_FieldOperation.field_work_start_date = DateTime.Now;
+                    }
+                    if(tbl_Sch_0_0_FieldOperation.field_work_end_date == null)
+                    {
+                        tbl_Sch_0_0_FieldOperation.field_work_end_date = DateTime.Now;
+                    }
                 }
                 if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                 {
