@@ -1014,7 +1014,7 @@
     <comment>number of enumerator (SE/JSO) in the team who canvassed the schedule </comment>
   </data>
   <data name="whether23" xml:space="preserve">
-    <value>Whether any remark has been entered by SE/JSO/SS/SSO In block 12/13 (yes -1, no -2)</value>
+    <value>Whether any remark has been entered by SE/JSO/SS/SSO In block 13/14 (yes -1, no -2)</value>
     <comment>Whether any remark has been entered by SE/JSO/SS/SSO </comment>
   </data>
   <data name="Whether24" xml:space="preserve">

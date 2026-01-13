@@ -44,13 +44,14 @@
       <AndroidPackageFormat>apk</AndroidPackageFormat>
       <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
       <ApplicationVersion>3</ApplicationVersion>
-      <PublishTrimmed>False</PublishTrimmed>
-      <RunAOTCompilation>False</RunAOTCompilation>
+      <PublishTrimmed>True</PublishTrimmed>
+      <RunAOTCompilation>True</RunAOTCompilation>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
       <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
       <ApplicationVersion>3</ApplicationVersion>
+      <RunAOTCompilation>True</RunAOTCompilation>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
