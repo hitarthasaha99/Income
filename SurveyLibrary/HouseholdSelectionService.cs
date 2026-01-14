@@ -356,7 +356,7 @@ namespace Income.SurveyLibrary
                             else
                             {
                                 // Normal same stratum: assign to posted SSS
-                                hh.SelectedPostedSSS = postedSSS;
+                                hh.SelectedPostedSSS = hh.SSS;
                             }
                         }
                         else
@@ -444,10 +444,11 @@ namespace Income.SurveyLibrary
                 // the later stratum can only spare if it has SURPLUS (not just equal)
                 if (currentProcessingStratum > 0 && stratum > currentProcessingStratum)
                 {
-                    // Later stratum - can only spare if it has surplus
-                    if (stratumTotalOriginal <= stratumTotalRequired)
+                    int stratumCurrentSpareable = stratumTotalOriginal - stratumTotalRequired - stratumAlreadyReserved;
+
+                    if (stratumCurrentSpareable <= 0)
                     {
-                        Console.WriteLine($"[DEBUG]   Stratum {stratum} has no surplus (total={stratumTotalOriginal}, required={stratumTotalRequired}), cannot spare to earlier stratum");
+                        Console.WriteLine($"[DEBUG]   Stratum {stratum} has no surplus remaining (original={stratumTotalOriginal}, required={stratumTotalRequired}, alreadyReserved={stratumAlreadyReserved}, spareable={stratumCurrentSpareable}), cannot spare to earlier stratum");
                         return 0;
                     }
                     Console.WriteLine($"[DEBUG]   Stratum {stratum} has surplus, can spare to earlier stratum");
@@ -507,10 +508,12 @@ namespace Income.SurveyLibrary
                 // REFINED CHECK: Similar to SSS check - later strata can only spare if they have surplus
                 if (currentProcessingStratum > 0 && sssOrStratum > currentProcessingStratum)
                 {
-                    // Later stratum - can only spare if it has surplus
-                    if (totalOriginal <= totalRequired)
+                    // Later stratum - check current spareable
+                    int currentSpareable = totalOriginal - totalRequired - alreadyReserved;
+
+                    if (currentSpareable <= 0)
                     {
-                        Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum} has no surplus (total={totalOriginal}, required={totalRequired}), cannot spare to earlier stratum");
+                        Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum} has no surplus remaining (original={totalOriginal}, required={totalRequired}, alreadyReserved={alreadyReserved}, spareable={currentSpareable}), cannot spare to earlier stratum");
                         return 0;
                     }
                     Console.WriteLine($"[DEBUG]   Stratum {sssOrStratum} has surplus, can spare to earlier stratum");
