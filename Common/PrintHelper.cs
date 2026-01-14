@@ -1299,7 +1299,7 @@ namespace Income.Common
             SafeReplace(rows, 9, 2, block4.item_13?.ToString());  // Carpet area
             SafeReplace(rows, 10, 2, block4.item_14?.ToString());  // Carpet area
             SafeReplace(rows, 11, 2, block4.item_15?.ToString());  // Carpet area
-            SafeReplace(rows, 12, 2, block4.item_16?.ToString());  // Loan outstanding
+            SafeReplace(rows, 12, 2, block4.item_17?.ToString());  // Loan outstanding
 
             // Remarks row (always last)
             ReplaceCellText(
