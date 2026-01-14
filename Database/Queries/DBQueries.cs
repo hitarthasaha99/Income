@@ -3096,7 +3096,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == SessionStorage.selected_hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                var response = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null)
                 {
                    
