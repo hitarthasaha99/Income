@@ -59,5 +59,8 @@ namespace Income.Database.Models.HIS_2026
         public string? block_13_remark { get; set; } = string.Empty;
         public string? block_12_1_remark { get; set; } = string.Empty;
         public int? household_income { get; set; }
+        public DateTime? Block12Timestamp { get; set; }
+        public DateTime? Block13_14Timestamp { get; set; }
+
     }
 }

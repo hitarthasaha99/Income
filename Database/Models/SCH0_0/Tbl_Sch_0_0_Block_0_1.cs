@@ -103,5 +103,6 @@ namespace Income.Database.Models.SCH0_0
         //Remarks across different blocks
         public string? EnumeratorRemarks { get; set; } = string.Empty;
         public string? SupervisorRemarks { get; set; } = string.Empty;
+        public DateTime? Block9_10Timestamp { get; set; }
     }
 }
