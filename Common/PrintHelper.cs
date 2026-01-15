@@ -129,7 +129,9 @@ namespace Income.Common
                 }
                
                 string fsuId = SessionStorage.SelectedFSUId.ToString();
-                string datePart = DateTime.Now.ToString("ddMMMyyyy", CultureInfo.InvariantCulture);
+                string datePart = DateTime.Now.ToString("ddMMMyyyy_HH.mm", CultureInfo.InvariantCulture);
+                //string datePart = DateTime.Now.ToString("ddMMMyyyy_HHmmss", CultureInfo.InvariantCulture);
+
                 string SCH00fileName = $"Income_Sch 00_{fsuId}_{datePart}.docx";
                 string SCH2026fileName = $"Income_Sch 2026_{fsuId}_{datePart}.docx";
 #if WINDOWS
@@ -140,19 +142,28 @@ namespace Income.Common
 #else
                 downloadsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 #endif
-                printDir = Path.Combine(downloadsDir, "Print");
+                //printDir = Path.Combine(downloadsDir, "Print");
+                //if (!Directory.Exists(printDir))
+                //    Directory.CreateDirectory(printDir);
+
+                string baseDir = GetDocumentsPath();
+                printDir = Path.Combine(baseDir, "Print");
+
                 if (!Directory.Exists(printDir))
                     Directory.CreateDirectory(printDir);
 
-                string targetPath00 = Path.Combine(printDir, SCH00fileName);
-                //string targetPath2026 = Path.Combine(printDir, SCH2026fileName);
+                //string targetPath00 = Path.Combine(printDir, SCH00fileName);
+                //await File.WriteAllBytesAsync(targetPath00, generatedDoc00);
+                string targetPath00 = GetUniqueFilePath(printDir, SCH00fileName);
                 await File.WriteAllBytesAsync(targetPath00, generatedDoc00);
                 if (reportType != "Sch00")
                 {
-                    string targetPath2026 = Path.Combine(printDir, SCH2026fileName);
+                    //string targetPath2026 = Path.Combine(printDir, SCH2026fileName);
+                    //await File.WriteAllBytesAsync(targetPath2026, generatedDoc2026);
+                    string targetPath2026 = GetUniqueFilePath(printDir, SCH2026fileName);
                     await File.WriteAllBytesAsync(targetPath2026, generatedDoc2026);
                 }
-                //await File.WriteAllBytesAsync(targetPath2026, generatedDoc2026);
+
                 return 1;
             }
             catch (Exception ex)
@@ -161,6 +172,30 @@ namespace Income.Common
                 return 0;
             }
         }
+
+        private static string GetUniqueFilePath(string directory, string fileName)
+        {
+            string fullPath = Path.Combine(directory, fileName);
+            if (!File.Exists(fullPath))
+                return fullPath;
+
+            string name = Path.GetFileNameWithoutExtension(fileName);
+            string ext = Path.GetExtension(fileName);
+
+            int count = 1;
+            string newPath;
+
+            do
+            {
+                newPath = Path.Combine(directory, $"{name}_v{count}{ext}");
+                count++;
+            }
+            while (File.Exists(newPath));
+
+            return newPath;
+        }//for version 
+
+
 
         public async Task<byte[]> FillDocument00(Stream templatePath00)
         {
@@ -1658,7 +1693,7 @@ namespace Income.Common
             SafeReplace(rows, 5, 3, block10.item_3?.ToString());   // Q10.3
             SafeReplace(rows, 6, 3, block10.item_4?.ToString());   // Q10.4
             SafeReplace(rows, 7, 3, block10.item_5?.ToString());   // Q10.5
-            SafeReplace(rows, 8, 3, "");                           // Q10.91
+            SafeReplace(rows, 8, 3, block10.item_10_91?.ToString());// Q10.91
 
             // row 10 = section header (skip)
 
@@ -1672,7 +1707,7 @@ namespace Income.Common
             SafeReplace(rows, 16, 3, block10.item_12?.ToString()); // Q10.12
             SafeReplace(rows, 17, 3, block10.item_13?.ToString()); // Q10.13
             SafeReplace(rows, 18, 3, block10.item_14?.ToString()); // Q10.14
-            SafeReplace(rows, 19, 3, "");                           // Q10.92
+            SafeReplace(rows, 19, 3, block10.item_10_92?.ToString());// Q10.92
 
             // row 21 = section header (skip)
 
@@ -1685,7 +1720,8 @@ namespace Income.Common
             SafeReplace(rows, 26, 3, block10.item_20?.ToString()); // Q10.20
             SafeReplace(rows, 27, 3, block10.item_21?.ToString()); // Q10.21
             SafeReplace(rows, 28, 3, block10.item_22?.ToString()); // Q10.22
-            SafeReplace(rows, 29, 3, block10.item_23?.ToString()); // Q10.23
+            SafeReplace(rows, 29, 3, block10.item_10_93?.ToString()); // Q10.93
+            SafeReplace(rows, 30, 3, block10.item_23?.ToString()); // Q10.23
 
             // ✅ Remarks (last row, last cell)
             var remarksRow = rows.Last();
@@ -2292,16 +2328,29 @@ namespace Income.Common
 
 
 
+//        string GetDocumentsPath()
+//        {
+//#if WINDOWS
+//    return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);//C:\Users\User\Documents
+//#elif ANDROID
+//            return Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;///storage/emulated/0
+//#else
+//            return FileSystem.AppDataDirectory;
+//#endif
+//        }
         string GetDocumentsPath()
         {
 #if WINDOWS
-    return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);//C:\Users\User\Documents
 #elif ANDROID
-            return Android.OS.Environment.ExternalStorageDirectory.AbsolutePath;
+            return Android.OS.Environment
+                .GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)
+                ?.AbsolutePath ?? FileSystem.AppDataDirectory;///storage/emulated/0/Documents
 #else
-            return FileSystem.AppDataDirectory;
+                return FileSystem.AppDataDirectory;
 #endif
         }
+
         private TableCell CreateTextCell(string text)
         {
             return new TableCell(
