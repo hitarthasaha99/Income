@@ -22,6 +22,7 @@ namespace Income.Database.Models.HIS_2026
         public int? item_4 { get; set; }
         //Q10.5 
         public int? item_5 { get; set; }
+        
         //Q10.6 
         public int? item_6 { get; set; }
         //Q10.7 
@@ -40,6 +41,7 @@ namespace Income.Database.Models.HIS_2026
         public int? item_13 { get; set; }
         //Q10.14 
         public int? item_14 { get; set; }
+        
         //Q10.15 
         public int? item_15 { get; set; }
         //Q10.16 
@@ -58,5 +60,11 @@ namespace Income.Database.Models.HIS_2026
         public int? item_22 { get; set; }
         //Q10.23 
         public double? item_23 { get; set; }
+        //Q10.91
+        public int? item_10_91 { get; set; }
+        //Q10.92
+        public int? item_10_92 { get; set; }
+        //Q10.93
+        public int? item_10_93 { get; set; }
     }
 }

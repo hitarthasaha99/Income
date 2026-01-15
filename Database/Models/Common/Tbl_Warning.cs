@@ -14,6 +14,7 @@ namespace Income.Database.Models.Common
     {
         public string? warning_message { get; set; }
         public int? warning_type { get; set; }
+        public string? warning_code { get; set; }
         public int? warning_status { get; set; }     // 1 => warning created ||  2 => warning resolved ||  3=> warning rejected  ||  4 => warning Accepted by sso || 5 => accepeted by DS
         public int? hhd_id { get; set; } = SessionStorage.selected_hhd_id;
         public string? block { get; set; }
