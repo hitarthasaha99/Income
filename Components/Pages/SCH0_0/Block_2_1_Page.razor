@@ -180,7 +180,10 @@
         remarks = block_0_1?.remarks_block_2_1;
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            survey_time = block_2_1_VM.tbl_Sch_0_0_block_2_1.FirstOrDefault()?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+            survey_time = block_2_1_VM.tbl_Sch_0_0_block_2_1
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
         }
         StateHasChanged();
     }

@@ -632,7 +632,7 @@
 
             if (confirmation)
             {
-                warningVM.AddWarning(firstWarning, "0", "7", "0");
+                warningVM.AddWarning(firstWarning, "0", "7", "0", warningCode: "W025(i)");
                 await warningVM.SaveWarningAsync("0", "7", 0);
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             }
@@ -831,7 +831,7 @@
             await SCH_0_0_Queries.ReserializeHHD();
             if (block_5_obj.Block_7_5 > 30)
             {
-                warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault());
+                warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W024(ii)");
                 await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_1.GetValueOrDefault());
             }
         }

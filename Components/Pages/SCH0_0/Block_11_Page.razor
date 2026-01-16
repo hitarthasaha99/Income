@@ -499,7 +499,7 @@
                 }
                 if (WarningsPresent())
                 {
-                    warningVM.AddWarning(StatusMessage, "0", "11", "3");
+                    warningVM.AddWarning(StatusMessage, "0", "11", "3", warningCode: "W011(vi)");
                 }
                 var res = await DBQueries.SaveBlock2(tbl_Sch_0_0_FieldOperation);
                 if (res.GetValueOrDefault() > 0)

@@ -887,6 +887,7 @@
                             "HIS",
                             "4_3",
                             "8",
+                            warningCode: warning.Split(':')[0].Trim(),
                             SessionStorage.selected_hhd_id
                         );
                     }
@@ -904,6 +905,7 @@
                             "HIS",
                             "4_3",
                             "10",
+                            warningCode: warning.Split(':')[0].Trim(),
                             SessionStorage.selected_hhd_id
                         );
                     }
@@ -911,12 +913,12 @@
 
                 if (!string.IsNullOrEmpty(Item14WarningMessage))
                 {
-                    warningVM.AddWarning(Item14WarningMessage, "HIS", "4_3", "14", SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(Item14WarningMessage, "HIS", "4_3", "14", warningCode: "W026" ,SessionStorage.selected_hhd_id);
                 }
 
                 if (!string.IsNullOrEmpty(Item16WarningMessage))
                 {
-                    warningVM.AddWarning(Item16WarningMessage, "HIS", "4_3", "16", SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(Item16WarningMessage, "HIS", "4_3", "16", warningCode: "W028(ii)", SessionStorage.selected_hhd_id);
                 }
                 await warningVM.SaveWarningAsync("HIS", "4_3");
                 int save = await dQ.Save_SCH_HIS_Block4(block_4);

@@ -323,7 +323,7 @@
                 CheckWarnings();
                 if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
                 {
-                    warningVM.AddWarning(Block_4_1_ErrorMessage, "HIS", "4_1", "1" ,SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(Block_4_1_ErrorMessage, "HIS", "4_1", "1" , warningCode:"W013(ii)" ,SessionStorage.selected_hhd_id);
                 }
                 await warningVM.SaveWarningAsync("HIS", "4_1");
                 var saved = await dQ.Save_SCH_HIS_Block4(block_4);

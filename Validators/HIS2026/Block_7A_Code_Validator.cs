@@ -40,6 +40,16 @@ namespace Income.Validators.HIS2026
             // Conditional validations (ONLY when whetherCropSold = 2)
             // ---------------------------------------------------------
 
+            RuleFor(x => x.item_8)
+                    .NotNull().WithMessage("H040: Invalid entry, please check the entry")
+                    .GreaterThanOrEqualTo(0)
+                    .WithMessage("H040: Invalid entry, please check the entry");
+
+            RuleFor(x => x.item_9)
+                .NotNull().WithMessage("H040: Invalid entry, please check the entry")
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("H040: Invalid entry, please check the entry");
+
             When(x => x.whetherCropSold == 2, () =>
             {
                 RuleFor(x => x.unit)
@@ -67,16 +77,7 @@ namespace Income.Validators.HIS2026
                     .GreaterThanOrEqualTo(0)
                     .WithMessage("H040: Invalid entry, please check the entry");
 
-                RuleFor(x => x.item_8)
-                    .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                    .GreaterThanOrEqualTo(0)
-                    .WithMessage("H040: Invalid entry, please check the entry");
-
-                RuleFor(x => x.item_9)
-                    .NotNull().WithMessage("H040: Invalid entry, please check the entry")
-                    .GreaterThanOrEqualTo(0)
-                    .WithMessage("H040: Invalid entry, please check the entry");
-
+                
                 // ---------------------------------------------------------
                 // Cross-field validations (H040 sub-rules)
                 // ---------------------------------------------------------

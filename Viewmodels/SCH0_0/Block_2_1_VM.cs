@@ -194,7 +194,8 @@ namespace Income.Viewmodels.SCH0_0
             try
             {
                 var non_deleted = tbl_Sch_0_0_block_2_1.Where(x => x.is_deleted != true).ToList();
-                double total = non_deleted.Sum(row => row.percentage.GetValueOrDefault());
+                double total = non_deleted.Sum(x => Math.Round(x.percentage.GetValueOrDefault(), 1));
+                total = Math.Round(total, 1, MidpointRounding.AwayFromZero);
                 if (total != 100)
                     result.Errors.Add("Total percentage must be equal to 100");
 

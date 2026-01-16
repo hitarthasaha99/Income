@@ -170,7 +170,10 @@
         }
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
-            survey_time = block_5.FirstOrDefault()?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
+            survey_time = block_5
+                .OrderByDescending(x => x.survey_timestamp)
+                .Select(x => (DateTime?)x.survey_timestamp)
+                .FirstOrDefault().GetValueOrDefault();
         }
         return;
     }
@@ -212,7 +215,7 @@
                     return;
                 }
 
-                warningVM.AddWarning("W017(iii): All the sub-units need to have more or less equal population", "0", "5", "3");
+                warningVM.AddWarning("W017(iii): All the sub-units need to have more or less equal population", "0", "5", "3", warningCode: "W017(iii)");
                 await warningVM.SaveWarningAsync("0", "5", 0);
             }
             Random num = new Random();
@@ -326,7 +329,8 @@
 
     public double? CalculateTotalPopulationPercentage(List<Tbl_Sch_0_0_Block_5> data_set)
     {
-        double? total_population_percentage = data_set.Sum(x => x.Percentage ?? 0);
+        double? total_population_percentage = data_set.Sum(x => Math.Round(x.Percentage.GetValueOrDefault(), 1));
+        total_population_percentage = Math.Round(total_population_percentage.GetValueOrDefault(), 1, MidpointRounding.AwayFromZero);
         return total_population_percentage;
     }
 }

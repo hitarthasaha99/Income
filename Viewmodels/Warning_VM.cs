@@ -14,7 +14,7 @@ namespace Income.Viewmodels
         public List<Tbl_Warning> WarningList = [];
 
         public List<Tbl_Warning> _tempWarnings = [];
-        public void AddWarning(string warningMsg, string schedule, string blockNumber, string item, int hhdNo = 0, int serial = 0)
+        public void AddWarning(string warningMsg, string schedule, string blockNumber, string item, string warningCode = "", int hhdNo = 0, int serial = 0)
         {
             Tbl_Warning tbl_Warning = new();
             tbl_Warning.block = blockNumber;
@@ -27,6 +27,7 @@ namespace Income.Viewmodels
             tbl_Warning.warning_message = warningMsg;
             tbl_Warning.schedule = schedule;
             tbl_Warning.serial_number = serial;
+            tbl_Warning.warning_code = warningCode;
             _tempWarnings.Add(tbl_Warning);
         }
 

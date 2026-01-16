@@ -794,6 +794,9 @@ namespace Income.Database.Queries
                         }
                         else
                         {
+                            // insert new row
+                            item.survey_coordinates = SessionStorage.location;
+                            item.survey_timestamp = DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -841,6 +844,9 @@ namespace Income.Database.Queries
                         }
                         else
                         {
+                            // insert new row
+                            item.survey_coordinates = SessionStorage.location;
+                            item.survey_timestamp = DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -974,6 +980,8 @@ namespace Income.Database.Queries
                         }
                         else
                         {
+                            item.survey_coordinates = SessionStorage.location;
+                            item.survey_timestamp = DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -1109,6 +1117,7 @@ namespace Income.Database.Queries
                 else
                 {
                     tbl_Sch_0_0_FieldOperation.survey_timestamp = DateTime.Now;
+                    tbl_Sch_0_0_FieldOperation.survey_coordinates = SessionStorage.location;
                     status = await _database.InsertAsync(tbl_Sch_0_0_FieldOperation);
                 }
                 return status;
@@ -1173,6 +1182,8 @@ namespace Income.Database.Queries
                         await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("DELETE FROM Tbl_Sch_0_0_Block_3 WHERE block_name = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", file.block_name, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
                         file.id = file.id == Guid.Empty ?  Guid.NewGuid() : file.id;
                         file.is_deleted = false;
+                        file.survey_timestamp = DateTime.Now;
+                        file.survey_coordinates = SessionStorage.location;
                         status = await _database.InsertAsync(file);
                     }
                 }
@@ -1260,6 +1271,8 @@ namespace Income.Database.Queries
                     }
                     else
                     {
+                        tbl_Sch_0_0_Block_5.survey_coordinates = SessionStorage.location;
+                        tbl_Sch_0_0_Block_5.survey_timestamp = DateTime.Now;
                         await _database.InsertAsync(tbl_Sch_0_0_Block_5);
                     }
 
@@ -2754,7 +2767,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                   
+                    tbl_block_6.survey_coordinates = SessionStorage.location;
+                    tbl_block_6.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_6);
                 }
                 return status;

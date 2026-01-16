@@ -544,15 +544,15 @@
                 toastService.ShowSuccess("Data saved successfully");
                 if (!string.IsNullOrEmpty(item_3_warning))
                 {
-                    warningVM.AddWarning(item_3_warning, "HIS", "2", "3", SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(item_3_warning, "HIS", "2", "3", warningCode: item_3_warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id);
                 }
                 if (!string.IsNullOrEmpty(item_6_warning))
                 {
-                    warningVM.AddWarning(item_6_warning, "HIS", "2", "6", SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(item_6_warning, "HIS", "2", "6", warningCode: item_6_warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id);
                 }
                 if (!string.IsNullOrEmpty(item_7_warning))
                 {
-                    warningVM.AddWarning(item_7_warning, "HIS", "2", "7", SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(item_7_warning, "HIS", "2", "7", warningCode: item_7_warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id);
                 }
                 await warningVM.SaveWarningAsync("HIS", "2");
                 warningVM._tempWarnings.Clear();

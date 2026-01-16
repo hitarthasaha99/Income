@@ -1,6 +1,7 @@
 ﻿@page "/dashboard/sch0.0/block_3/{is_sub_unit:bool}"
 @using Income.Database.Models.Common
 @using Income.Database.Models.SCH0_0
+@using SkiaSharp
 @layout Income.Components.Layout.DashboardLayout
 @inject IJSRuntime JSRuntime
 @inject IToastService toastService
@@ -91,6 +92,7 @@
     string? remarks = string.Empty;
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     private ConfirmDialog dialog = default!;
+    SKBitmap sKBitmap = new SKBitmap();
     async void GoBack()
     {
         // await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -175,24 +177,18 @@
                     file = new();
                     var stream = await photo.OpenReadAsync();
                     long fileSize = stream.Length;
-                    if (fileSize > CommonConstants.MAX_FILE_SIZE)
-                    {
-                        toastService.ShowError("File Size exceeds allowed file size. (5MB)");
-                        return;
-                    }
+                    
                     file.id = Guid.NewGuid();
                     file.block_name = CommonEnum.sch_0_0_block_3.ToString();
                     file.file_name = photo.FileName;
                     file.file_type = photo.ContentType;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        await stream.CopyToAsync(ms);  //Copy the stream to the memory stream
-                        file.file_byte = ms.ToArray();     // Convert memory stream to byte array
-                        ms.Seek(0, SeekOrigin.Begin);
-                        var base64string = Convert.ToBase64String(file.file_byte);
-                        //Now create ImageSource from the stream again
-                        file.file_image_source = $"data:{file.file_type};base64,{base64string}"; //Provide a fresh MemoryStream each time
-                    }
+                    file.file_byte = CompressImageAsync(stream);
+
+                    file.file_type = "image/jpeg";
+                    file.file_name = Path.ChangeExtension(file.file_name, ".jpg");
+
+                    var base64string = Convert.ToBase64String(file.file_byte);
+                    file.file_image_source = $"data:image/jpeg;base64,{base64string}";
                 }
                 StateHasChanged();
                 return;
@@ -208,24 +204,18 @@
                     file = new();
                     var stream = await photo.OpenReadAsync();
                     long fileSize = stream.Length;
-                    if (fileSize > CommonConstants.MAX_FILE_SIZE)
-                    {
-                        toastService.ShowError("File Size exceeds allowed file size. (5MB)");
-                        return;
-                    }
+                    
                     file.id = Guid.NewGuid();
                     file.block_name = CommonEnum.sch_0_0_block_3.ToString();
                     file.file_name = photo.FileName;
                     file.file_type = photo.ContentType;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        await stream.CopyToAsync(ms);  //Copy the stream to the memory stream
-                        file.file_byte = ms.ToArray();     // Convert memory stream to byte array
-                        ms.Seek(0, SeekOrigin.Begin);
-                        var base64string = Convert.ToBase64String(file.file_byte);
-                        //Now create ImageSource from the stream again
-                        file.file_image_source = $"data:{file.file_type};base64,{base64string}"; //Provide a fresh MemoryStream each time
-                    }
+                    file.file_byte = CompressImageAsync(stream);
+
+                    file.file_type = "image/jpeg";
+                    file.file_name = Path.ChangeExtension(file.file_name, ".jpg");
+
+                    var base64string = Convert.ToBase64String(file.file_byte);
+                    file.file_image_source = $"data:image/jpeg;base64,{base64string}";
                 }
                 StateHasChanged();
                 return;
@@ -238,6 +228,61 @@
             return;
         }
     }
+
+    private byte[] CompressImageAsync(
+    Stream inputStream,
+    int maxSizeBytes = 1 * 1024 * 1024)
+    {
+        inputStream.Position = 0;
+
+        using var managedStream = new SKManagedStream(inputStream);
+        using var codec = SKCodec.Create(managedStream);
+
+        if (codec == null)
+            throw new InvalidOperationException("Unable to decode image.");
+
+        var info = codec.Info;
+        using var bitmap = new SKBitmap(info);
+        codec.GetPixels(info, bitmap.GetPixels());
+
+        int quality = 90;
+        int width = info.Width;
+        int height = info.Height;
+
+        var sampling = new SKSamplingOptions(
+            SKFilterMode.Linear,
+            SKMipmapMode.None);
+
+        while (true)
+        {
+            using var resizedBitmap = bitmap.Resize(
+                new SKImageInfo(width, height),
+                sampling);
+
+            using var image = SKImage.FromBitmap(resizedBitmap);
+            using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
+
+            if (data.Size <= maxSizeBytes)
+                return data.ToArray();
+
+            // 1️⃣ Reduce quality first
+            if (quality > 40)
+            {
+                quality -= 10;
+            }
+            // 2️⃣ Then reduce dimensions
+            else
+            {
+                width = (int)(width * 0.85);
+                height = (int)(height * 0.85);
+
+                if (width < 600 || height < 600)
+                    return data.ToArray(); // final safe fallback
+            }
+        }
+    }
+
+
 
     async Task HandleSubmit(string type)
     {
@@ -293,6 +338,9 @@
             return;
         }
     }
+
+    
+
 
     async Task DeleteFile()
     {

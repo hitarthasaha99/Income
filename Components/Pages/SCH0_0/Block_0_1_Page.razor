@@ -488,7 +488,7 @@
             toastService.ShowSuccess("Data successfully validated and saved");
             if(!string.IsNullOrEmpty(Block_1_14_ErrorMessage))
             {
-                warningVM.AddWarning(Block_1_14_ErrorMessage, "0", "1", "14");
+                warningVM.AddWarning(Block_1_14_ErrorMessage, "0", "1", "14", warningCode: "W006");
             }
             await warningVM.SaveWarningAsync("0", "1", 0);
             warningVM._tempWarnings.Clear();
