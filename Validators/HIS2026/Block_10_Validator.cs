@@ -35,6 +35,10 @@ namespace Income.Validators.HIS2026
             RuleFor(x => x.item_21).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
             RuleFor(x => x.item_22).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
             RuleFor(x => x.item_23).NotNull().WithMessage("H069(i): Invalid entry, please check the entry").GreaterThan(0).WithMessage("H069(i): Invalid entry, please check the entry");
+            RuleFor(x => x.item_10_91).NotNull().WithMessage("Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("Invalid entry, please check the entry");
+            RuleFor(x => x.item_10_92).NotNull().WithMessage("Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("Invalid entry, please check the entry");
+            RuleFor(x => x.item_10_93).NotNull().WithMessage("Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("Invalid entry, please check the entry");
+
         }
     }
 }

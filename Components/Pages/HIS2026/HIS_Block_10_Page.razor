@@ -146,6 +146,24 @@
                                                 <ValidationMessage For="@(() => model.item_5)" />
                                             </td>
                                         </tr>
+                                        @* Q10.91 Field *@
+                                        <tr class="row-light-blue">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.91</span>
+                                                </label>
+                                            </td>
+                                        <td>other food products</td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_10_91"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_10_91, e); handleCalculate(); }" />
+
+                                                <ValidationMessage For="@(() => model.item_10_91)" />
+                                            </td>
+                                        </tr>
                                         @* Non - Food Items – Consumable Services *@
                                         <tr style="border-bottom:1px solid #2471DD;">
                                             <td colspan="8" class="text-center">
@@ -305,6 +323,27 @@
                                                 <ValidationMessage For="@(() => model.item_14)" />
                                             </td>
                                         </tr>
+                                        @* Q10.92 Field *@
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.92</span>
+                                                </label>
+                                            </td>
+                                        <td>
+                                            other services (excluding medical and educational expenses or any
+                                            items mentioned above)
+                                        </td>
+                                            <td>Last 30 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_10_92"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_10_92, e); handleCalculate(); }" />
+
+                                                <ValidationMessage For="@(() => model.item_10_92)" />
+                                            </td>
+                                        </tr>
                                         @* Non-Food Items – Durable Goods *@
                                         <tr style="border-bottom:1px solid #bc1ed6;">
                                             <td colspan="8" class="text-center">
@@ -447,13 +486,35 @@
                                                     <ValidationMessage For="@(() => model.item_22)" />
                                             </td>
                                         </tr>
+                                        @* Q10.93 Field *@
+                                        <tr class="row-light-pink">
+                                            <td>
+                                                <label class="form-label mb-0">
+                                                    <span class="form-badge me-0">Q10.93</span>
+                                                </label>
+                                            </td>
+                                        <td>other durable goods</td>
+                                            <td>Last 365 days</td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm no-spinner"
+                                                        value="@model.item_10_93"
+                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_10_93, e); handleCalculate(); }" />
+
+                                                    <ValidationMessage For="@(() => model.item_10_93)" />
+                                            </td>
+                                        </tr>
                                         <tr>
                                             <td>
                                                 <label class="form-label mb-0">
                                                     <span class="form-badge me-0">Q10.23</span>
                                                 </label>
                                             </td>
-                                            <td>Total expenditure = sum (Q10.1: 10.2) /7×30 + sum (Q10.3: Q10.12) + sum (Q10.13: Q10.22)/365×30</td>
+                                        <td>
+                                            Total expenditure = sum (Q10.1: 10.2) /7×30 + {sum (Q10.3:
+                                            Q10.12) + Q10.91 + Q10.92} + {sum (Q10.13: Q10.22) +
+                                            Q10.93}/365×30
+                                        </td>
                                             <td class="text-center">-</td>
                                             @* <td>
                                                 <input type="number" class="form-control form-control-sm text-end" value="@model.item_23?.ToString("F2")" readonly />
@@ -656,56 +717,53 @@
 
     }
 
-    // private void handleCalculate()
-    // {
-    //     Weekly items (convert to monthly)
-    //     decimal weeklySum = (model.item_1 ?? 0) + (model.item_2 ?? 0);
-    //     decimal weeklyToMonthly = weeklySum / 7m * 30m;
-
-    //     Monthly items (use as-is)
-    //     decimal monthlySum = (model.item_3 ?? 0) + (model.item_4 ?? 0) +
-    //                         (model.item_5 ?? 0) + (model.item_6 ?? 0) +
-    //                         (model.item_7 ?? 0) + (model.item_8 ?? 0) +
-    //                         (model.item_9 ?? 0) + (model.item_10 ?? 0) +
-    //                         (model.item_11 ?? 0) + (model.item_12 ?? 0);
-
-    //     Annual items (convert to monthly)
-    //     decimal annualSum = (model.item_13 ?? 0) + (model.item_14 ?? 0) +
-    //                        (model.item_15 ?? 0) + (model.item_16 ?? 0) +
-    //                        (model.item_17 ?? 0) + (model.item_18 ?? 0) +
-    //                        (model.item_19 ?? 0) + (model.item_20 ?? 0) +
-    //                        (model.item_21 ?? 0) + (model.item_22 ?? 0);
-    //     decimal annualToMonthly = annualSum / 365m * 30m;
-
-    //     Total expenditure
-    //     model.item_23 = Math.Round((double)(weeklyToMonthly + monthlySum + annualToMonthly), 2);
-    //     StateHasChanged(); Ensure UI updates
-    // }
+    
     public void handleCalculate()
     {
         // 1. Weekly Items (Q10.1 - Q10.2) -> Normalize to 30 days
-        // Cast to decimal for precision during division
-        decimal weeklySum = (decimal)(model.item_1 ?? 0) + (decimal)(model.item_2 ?? 0);
+        decimal weeklySum =
+            (decimal)(model.item_1 ?? 0) +
+            (decimal)(model.item_2 ?? 0);
+
         decimal weeklyToMonthly = (weeklySum / 7m) * 30m;
 
-        // 2. Monthly Items (Q10.3 - Q10.12) -> Use as-is
-        decimal monthlySum = (decimal)(model.item_3 ?? 0) + (decimal)(model.item_4 ?? 0) +
-                             (decimal)(model.item_5 ?? 0) + (decimal)(model.item_6 ?? 0) +
-                             (decimal)(model.item_7 ?? 0) + (decimal)(model.item_8 ?? 0) +
-                             (decimal)(model.item_9 ?? 0) + (decimal)(model.item_10 ?? 0) +
-                             (decimal)(model.item_11 ?? 0) + (decimal)(model.item_12 ?? 0);
+        // 2. Monthly Items (Q10.3 - Q10.12) + Q10.91 + Q10.92
+        decimal monthlySum =
+            (decimal)(model.item_3 ?? 0) +
+            (decimal)(model.item_4 ?? 0) +
+            (decimal)(model.item_5 ?? 0) +
+            (decimal)(model.item_6 ?? 0) +
+            (decimal)(model.item_7 ?? 0) +
+            (decimal)(model.item_8 ?? 0) +
+            (decimal)(model.item_9 ?? 0) +
+            (decimal)(model.item_10 ?? 0) +
+            (decimal)(model.item_11 ?? 0) +
+            (decimal)(model.item_12 ?? 0) +
+            (decimal)(model.item_10_91 ?? 0) +
+            (decimal)(model.item_10_92 ?? 0);
 
-        // 3. Annual Items (Q10.13 - Q10.22) -> Normalize to 30 days
-        decimal annualSum = (decimal)(model.item_13 ?? 0) + (decimal)(model.item_14 ?? 0) +
-                            (decimal)(model.item_15 ?? 0) + (decimal)(model.item_16 ?? 0) +
-                            (decimal)(model.item_17 ?? 0) + (decimal)(model.item_18 ?? 0) +
-                            (decimal)(model.item_19 ?? 0) + (decimal)(model.item_20 ?? 0) +
-                            (decimal)(model.item_21 ?? 0) + (decimal)(model.item_22 ?? 0);
+        // 3. Annual Items (Q10.13 - Q10.22) + Q10.93 -> Normalize to 30 days
+        decimal annualSum =
+            (decimal)(model.item_13 ?? 0) +
+            (decimal)(model.item_14 ?? 0) +
+            (decimal)(model.item_15 ?? 0) +
+            (decimal)(model.item_16 ?? 0) +
+            (decimal)(model.item_17 ?? 0) +
+            (decimal)(model.item_18 ?? 0) +
+            (decimal)(model.item_19 ?? 0) +
+            (decimal)(model.item_20 ?? 0) +
+            (decimal)(model.item_21 ?? 0) +
+            (decimal)(model.item_22 ?? 0) +
+            (decimal)(model.item_10_93 ?? 0);
+
         decimal annualToMonthly = (annualSum / 365m) * 30m;
 
-        // 4. Final Total assigned to item_23
-        // Cast back to double because item_23 is defined as 'double?'
-        this.model.item_23 = (double)Math.Round(weeklyToMonthly + monthlySum + annualToMonthly, 2);
+        // 4. Final Total → Q10.23
+        model.item_23 = (double)Math.Round(
+            weeklyToMonthly + monthlySum + annualToMonthly,
+            2
+        );
     }
+
 
 }

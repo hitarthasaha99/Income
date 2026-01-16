@@ -53,7 +53,7 @@ namespace Income.Common
                     block1.block_a_remark = "Remarks related to Block A";
                     block1.block_b_remark = "Remarks related to Block B";
                     block1.block_12_remark = "Remarks related to Block 12";
-                    block1.block_13_remark = "Remarks related to Block 13";
+                    //block1.block_13_remark = "Remarks related to Block 13";
                     block1.block_12_1_remark = "Remarks related to Block 12.1";
                     await dQ.SaveAsync<Tbl_Block_1>(block1);
                 }
@@ -1116,7 +1116,7 @@ namespace Income.Common
                               fsu_id = SessionStorage.SelectedFSUId
                           };
 
-            // Fill all fields with random values
+            // 1️⃣ Generate random values
             block10.item_1 = rand.Next(0, 10001);
             block10.item_2 = rand.Next(0, 10001);
             block10.item_3 = rand.Next(0, 50001);
@@ -1139,11 +1139,60 @@ namespace Income.Common
             block10.item_20 = rand.Next(0, 500001);
             block10.item_21 = rand.Next(0, 500001);
             block10.item_22 = rand.Next(0, 500001);
-            block10.item_23 = (double)rand.Next(50000, 2000001);
+            block10.item_10_91 = rand.Next(0, 500001);
+            block10.item_10_92 = rand.Next(0, 500001);
+            block10.item_10_93 = rand.Next(0, 500001);
 
-            // Save using correct method
+            // 2️⃣ SAME calculation as handleCalculate()
+
+            // Weekly (Q10.1–Q10.2)
+            decimal weeklySum =
+                (decimal)(block10.item_1 ?? 0) +
+                (decimal)(block10.item_2 ?? 0);
+
+            decimal weeklyToMonthly = (weeklySum / 7m) * 30m;
+
+            // Monthly (Q10.3–Q10.12 + Q10.91 + Q10.92)
+            decimal monthlySum =
+                (decimal)(block10.item_3 ?? 0) +
+                (decimal)(block10.item_4 ?? 0) +
+                (decimal)(block10.item_5 ?? 0) +
+                (decimal)(block10.item_6 ?? 0) +
+                (decimal)(block10.item_7 ?? 0) +
+                (decimal)(block10.item_8 ?? 0) +
+                (decimal)(block10.item_9 ?? 0) +
+                (decimal)(block10.item_10 ?? 0) +
+                (decimal)(block10.item_11 ?? 0) +
+                (decimal)(block10.item_12 ?? 0) +
+                (decimal)(block10.item_10_91 ?? 0) +
+                (decimal)(block10.item_10_92 ?? 0);
+
+            // Annual (Q10.13–Q10.22 + Q10.93)
+            decimal annualSum =
+                (decimal)(block10.item_13 ?? 0) +
+                (decimal)(block10.item_14 ?? 0) +
+                (decimal)(block10.item_15 ?? 0) +
+                (decimal)(block10.item_16 ?? 0) +
+                (decimal)(block10.item_17 ?? 0) +
+                (decimal)(block10.item_18 ?? 0) +
+                (decimal)(block10.item_19 ?? 0) +
+                (decimal)(block10.item_20 ?? 0) +
+                (decimal)(block10.item_21 ?? 0) +
+                (decimal)(block10.item_22 ?? 0) +
+                (decimal)(block10.item_10_93 ?? 0);
+
+            decimal annualToMonthly = (annualSum / 365m) * 30m;
+
+            // 3️⃣ Final total (Q10.23)
+            block10.item_23 = (double)Math.Round(
+                weeklyToMonthly + monthlySum + annualToMonthly,
+                2
+            );
+
+            // 4️⃣ Save
             await dQ.Save_SCH_HIS_Block10(block10);
         }
+
 
         private async Task generateBlock11a()
         {
