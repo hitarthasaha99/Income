@@ -373,6 +373,12 @@
     {
         try
         {
+            var sch00block2 = await DBQueries.FetchBlock2();
+            if (sch00block2 == null)
+            {
+                toastService.ShowError("Please save before printing");
+                return;
+            }
             preloadService.Show(SpinnerColor.Light, "Files printing in-progress... please wait!");
 
             var result = await PrintHelper.GenerateReportAsync(SessionStorage.SelectedFSUId,"Sch00");
