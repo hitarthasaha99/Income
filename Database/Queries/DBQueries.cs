@@ -3279,6 +3279,8 @@ namespace Income.Database.Queries
                 var check_existence = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
+                    obj.survey_coordinates ??= SessionStorage.location;
+                    obj.survey_timestamp ??= DateTime.Now;
                     status = await _database.UpdateAsync(obj);
                 }
                 else
