@@ -42,26 +42,26 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
       <AndroidPackageFormat>apk</AndroidPackageFormat>
-      <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
-      <ApplicationVersion>3</ApplicationVersion>
-      <PublishTrimmed>True</PublishTrimmed>
-      <RunAOTCompilation>True</RunAOTCompilation>
+      <ApplicationDisplayVersion>1.0.25</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
+      <PublishTrimmed>False</PublishTrimmed>
+      <RunAOTCompilation>False</RunAOTCompilation>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
-      <ApplicationVersion>3</ApplicationVersion>
-      <RunAOTCompilation>True</RunAOTCompilation>
+      <ApplicationDisplayVersion>1.0.25</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
+      <RunAOTCompilation>False</RunAOTCompilation>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
-      <ApplicationVersion>3</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.25</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
-      <ApplicationVersion>3</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.25</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
     </PropertyGroup>
 
     <ItemGroup>
