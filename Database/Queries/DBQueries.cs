@@ -612,8 +612,10 @@ namespace Income.Database.Queries
                             tbl_Sch_0_0_FieldOperation.field_work_end_date = null;
                             await SaveBlock2(tbl_Sch_0_0_FieldOperation);
                         }
-
-                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        if (option == 3)
+                        {
+                            await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID && x.is_sub_unit == false);
+                        }
                         await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Warning>().DeleteAsync(x => x.fsu_id == fsuID);
@@ -795,8 +797,8 @@ namespace Income.Database.Queries
                         else
                         {
                             // insert new row
-                            item.survey_coordinates = SessionStorage.location;
-                            item.survey_timestamp = DateTime.Now;
+                            item.survey_coordinates ??= SessionStorage.location;
+                            item.survey_timestamp ??= DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -845,8 +847,8 @@ namespace Income.Database.Queries
                         else
                         {
                             // insert new row
-                            item.survey_coordinates = SessionStorage.location;
-                            item.survey_timestamp = DateTime.Now;
+                            item.survey_coordinates ??= SessionStorage.location;
+                            item.survey_timestamp ??= DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -893,6 +895,8 @@ namespace Income.Database.Queries
                 else
                 {
                     tbl_Sch_0_0_Block_4.id = tbl_Sch_0_0_Block_4.id == Guid.Empty ? Guid.NewGuid() : tbl_Sch_0_0_Block_4.id;
+                    tbl_Sch_0_0_Block_4.survey_coordinates ??= SessionStorage.location;
+                    tbl_Sch_0_0_Block_4.survey_timestamp ??= DateTime.Now;
                     status = await _database.InsertAsync(tbl_Sch_0_0_Block_4);
                 }
                 return status;
@@ -980,8 +984,8 @@ namespace Income.Database.Queries
                         }
                         else
                         {
-                            item.survey_coordinates = SessionStorage.location;
-                            item.survey_timestamp = DateTime.Now;
+                            item.survey_coordinates ??= SessionStorage.location;
+                            item.survey_timestamp ??= DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -1116,8 +1120,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                    tbl_Sch_0_0_FieldOperation.survey_timestamp = DateTime.Now;
-                    tbl_Sch_0_0_FieldOperation.survey_coordinates = SessionStorage.location;
+                    tbl_Sch_0_0_FieldOperation.survey_timestamp ??= DateTime.Now;
+                    tbl_Sch_0_0_FieldOperation.survey_coordinates ??= SessionStorage.location;
                     status = await _database.InsertAsync(tbl_Sch_0_0_FieldOperation);
                 }
                 return status;
@@ -1271,8 +1275,8 @@ namespace Income.Database.Queries
                     }
                     else
                     {
-                        tbl_Sch_0_0_Block_5.survey_coordinates = SessionStorage.location;
-                        tbl_Sch_0_0_Block_5.survey_timestamp = DateTime.Now;
+                        tbl_Sch_0_0_Block_5.survey_coordinates ??= SessionStorage.location;
+                        tbl_Sch_0_0_Block_5.survey_timestamp ??= DateTime.Now;
                         await _database.InsertAsync(tbl_Sch_0_0_Block_5);
                     }
 

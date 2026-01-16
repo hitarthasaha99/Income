@@ -203,7 +203,7 @@
                 if (currentFSU != null)
                 {
 
-                    var fsuHouses = currentFSU.fsuHouses;
+                    var fsuHouses = currentFSU.fsuHouses.Where(x => x.is_deleted == false);
                     var validStatuses = new HashSet<int> { 12, 21, 22, 31, 32 };
 
                     var hhdIdsToDelete = fsuHouses?

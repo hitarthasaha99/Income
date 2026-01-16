@@ -64,5 +64,6 @@ namespace Income.Database.Models.Common
         public int hhd_id { get; set; }
         public Guid survey_id { get; set; }
         public int lookup_submit_status { get; set; }
+        public bool? is_deleted { get; set; } = false;
     }
 }
