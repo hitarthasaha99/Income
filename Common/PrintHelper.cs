@@ -1094,7 +1094,8 @@ namespace Income.Common
             SafeReplace(rows, 2, 2, block1.sector_name);             
             SafeReplace(rows, 3, 2, block1.state_name);              
             SafeReplace(rows, 4, 2, block1.district_name);           
-            SafeReplace(rows, 5, 2, $"{block1.sub_district_name}, {block1.town_name}");       
+            //SafeReplace(rows, 5, 2, $"{block1.sub_district_name}, {block1.town_name}");       
+            SafeReplace(rows, 5, 2, block1.town_name);       
             //SafeReplace(rows, 6, 2, block1.town_name);       
             SafeReplace(rows, 6, 2, block1.village_name);            
             SafeReplace(rows, 7, 2, block1.investigator_unit_no);            
@@ -1269,7 +1270,7 @@ namespace Income.Common
         private void FillBlockHis4_2(Body body, List<Tbl_Block_4_Q5> activities)
         {
             var table = body.Elements<Table>()
-                .FirstOrDefault(t => t.InnerText.Contains("[4.2] Household Characteristics"));
+                .FirstOrDefault(t => t.InnerText.Contains("[4.5] Household Characteristics"));
 
             if (table == null || activities == null || activities.Count == 0)
                 return;
@@ -1474,7 +1475,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[8.Q8.6]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[8.Q8.6]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(25);
+            var table = body.Elements<Table>().ElementAtOrDefault(24);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -1562,7 +1563,7 @@ namespace Income.Common
             //var table = body.Elements<Table>()
             //    .FirstOrDefault(t => t.InnerText.Contains("[9A_Q9.1]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[9A_Q9.1]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(27);
+            var table = body.Elements<Table>().ElementAtOrDefault(26);
 
             if (table == null || block9a == null)
                 return;
@@ -1605,7 +1606,7 @@ namespace Income.Common
             //var table = body.Elements<Table>()
             //    .FirstOrDefault(t => t.InnerText.Contains("[9B]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[9A]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(28);
+            var table = body.Elements<Table>().ElementAtOrDefault(27);
             if (table == null || block9b == null)
                 return;
 
@@ -1655,7 +1656,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[9B_9.5] Income from "));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[9B_Q9.5]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(29);
+            var table = body.Elements<Table>().ElementAtOrDefault(28);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -1875,7 +1876,7 @@ namespace Income.Common
             //var table = body.Elements<Table>()
             //    .FirstOrDefault(t => t.InnerText.Contains("Block B"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[Block B]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(35);
+            var table = body.Elements<Table>().ElementAtOrDefault(34);
             if (table == null || blockB == null)
                 return;
 
@@ -1904,7 +1905,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7a_Q7.1] income from self-employment"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7a_Q7.1]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(11);
+            var table = body.Elements<Table>().ElementAtOrDefault(10);
 
             var rows = table.Elements<TableRow>().ToList();
             //var templateRow = rows.FirstOrDefault(r =>
@@ -1930,8 +1931,8 @@ namespace Income.Common
                     continue;
 
                 ReplaceCellText(cells[0], item.serial_number.ToString());
-                ReplaceCellText(cells[1], (item.whetherCropSold == 1 ? "Yes" : "No"));
-                ReplaceCellText(cells[2], item.code?.ToString() ?? "");
+                ReplaceCellText(cells[1], item.code?.ToString() ?? "");
+                ReplaceCellText(cells[2], (item.whetherCropSold == 1 ? "Yes" : "No"));
                 ReplaceCellText(cells[3], item.unit?.ToString() ?? "");
                 ReplaceCellText(cells[4], item.item_4?.ToString() ?? "");
                 ReplaceCellText(cells[5], item.item_5?.ToString() ?? "");
@@ -1970,7 +1971,7 @@ namespace Income.Common
             //        .Contains("[7a_Q7.2] list of households"));
 
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[[7a_Q7.2] list of households"));
-            var table = body.Elements<Table>().ElementAtOrDefault(13);
+            var table = body.Elements<Table>().ElementAtOrDefault(12);
             var rows = table.Elements<TableRow>().ToList();
 
             SafeReplace(rows, 2, 2, data.item_2_1?.ToString());   // 01
@@ -1996,7 +1997,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7a_Q7.3Q7.4Q7.5Q7.9]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7a_Q7.3Q7.4Q7.5Q7.9]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(14);
+            var table = body.Elements<Table>().ElementAtOrDefault(13);
 
             var rows = table.Elements<TableRow>().ToList();
             SafeReplace(rows, 1, 2, data.item_3?.ToString());
@@ -2016,7 +2017,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7b_Q7.6]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7b_Q7.6]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(15);
+            var table = body.Elements<Table>().ElementAtOrDefault(14);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -2041,7 +2042,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7b.Q7.7]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7b.Q7.7]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(16);
+            var table = body.Elements<Table>().ElementAtOrDefault(15);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -2068,7 +2069,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7b.Q7.8Q7.9]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7b.Q7.8Q7.9]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(17);
+            var table = body.Elements<Table>().ElementAtOrDefault(16);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -2095,7 +2096,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7c.11]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7c.Q7.11Q7c.9]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(21);
+            var table = body.Elements<Table>().ElementAtOrDefault(20);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -2119,7 +2120,7 @@ namespace Income.Common
             //        .Contains("[7c_Q7.9]"));
 
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7c_Q7.9]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(18);
+            var table = body.Elements<Table>().ElementAtOrDefault(17);
             var rows = table.Elements<TableRow>().ToList();
 
             // last row = blank template row
@@ -2164,7 +2165,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7c.Q7.10]"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7c.Q7.10]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(20);
+            var table = body.Elements<Table>().ElementAtOrDefault(19);
 
             var rows = table.Elements<TableRow>().ToList();
 
@@ -2203,7 +2204,7 @@ namespace Income.Common
             //    .First(t => t.InnerText.ToLower()
             //        .Contains("[7d_Q7.12] mode of operation"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[7d_Q7.12] mode of operation"));
-            var table = body.Elements<Table>().ElementAtOrDefault(22);
+            var table = body.Elements<Table>().ElementAtOrDefault(21);
 
             var rows = table.Elements<TableRow>().ToList();
 
