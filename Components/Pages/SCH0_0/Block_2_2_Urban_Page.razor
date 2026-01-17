@@ -192,7 +192,7 @@
                 {
                     preloadService.Show(SpinnerColor.Light, "Processing, please wait");
                     block_2_2_VM.DoSelection();
-                    warningVM.AddWarning("W014(iii): All the sub-units need to have more or less equal population", "0", "2.2", "4");
+                    warningVM.AddWarning("W014(iii): All the sub-units need to have more or less equal population", "0", "2.2", "4", warningCode: "W014(iii)");
                     await warningVM.SaveWarningAsync("0", "2.2", 0);
                     toastService.ShowSuccess("SU selection done successfully");
                     preloadService.Hide();

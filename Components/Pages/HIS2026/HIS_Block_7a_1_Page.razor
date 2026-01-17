@@ -293,7 +293,7 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">9</span> Value of pre-harvested sale (Rs.)
                             </label>
-                              <input disabled="@(block_7_1?.whetherCropSold == 1)" type="number" class="form-control no-spinner" value="@block_7_1?.item_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input type="number" class="form-control no-spinner" value="@block_7_1?.item_8" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_8, e);
@@ -306,7 +306,7 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">10</span> Value of by-products (Rs.)
                             </label>
-                              <input disabled="@(block_7_1?.whetherCropSold == 1)" type="number" class="form-control no-spinner" value="@block_7_1?.item_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                              <input type="number" class="form-control no-spinner" value="@block_7_1?.item_9" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                         @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.item_9, e);

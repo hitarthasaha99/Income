@@ -154,7 +154,7 @@ namespace Income.Database.Queries
                             var block_7D = hhd.IncomeBlock7D;
                             var block_8 = hhd.IncomeBlock8;
                             var block_8Q6 = hhd.IncomeBlock8Q6;
-                            var block_9a = hhd.IncomeBlock9A; 
+                            var block_9a = hhd.IncomeBlock9A;
                             var block_9b = hhd.IncomeBlock9B;
                             var block_10 = hhd.IncomeBlock10;
                             var block_11a = hhd.IncomeBlock11A;
@@ -163,7 +163,7 @@ namespace Income.Database.Queries
                             var block_b = hhd.IncomeBlockB;
                             var block_warning = hhd.IncomeWarningList;
 
-                            if(block_1 != null)
+                            if (block_1 != null)
                             {
                                 await SaveAsync<Tbl_Block_1>(block_1);
                             }
@@ -175,7 +175,7 @@ namespace Income.Database.Queries
 
                             if (block_3 != null && block_3.Count > 0)
                             {
-                                foreach(var item in block_3)
+                                foreach (var item in block_3)
                                 {
                                     await SaveAsync<Tbl_Block_3>(item);
                                 }
@@ -556,7 +556,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                if(SessionStorage.FSU_Submitted)
+                if (SessionStorage.FSU_Submitted)
                 {
                     //Should we soft-delete or just delete
                     //1 - nukes all entries in all tables related to the FSU
@@ -612,8 +612,10 @@ namespace Income.Database.Queries
                             tbl_Sch_0_0_FieldOperation.field_work_end_date = null;
                             await SaveBlock2(tbl_Sch_0_0_FieldOperation);
                         }
-
-                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        if (option == 3)
+                        {
+                            await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID && x.is_sub_unit == false);
+                        }
                         await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Warning>().DeleteAsync(x => x.fsu_id == fsuID);
@@ -794,6 +796,9 @@ namespace Income.Database.Queries
                         }
                         else
                         {
+                            // insert new row
+                            item.survey_coordinates ??= SessionStorage.location;
+                            item.survey_timestamp ??= DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -841,6 +846,9 @@ namespace Income.Database.Queries
                         }
                         else
                         {
+                            // insert new row
+                            item.survey_coordinates ??= SessionStorage.location;
+                            item.survey_timestamp ??= DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -887,6 +895,8 @@ namespace Income.Database.Queries
                 else
                 {
                     tbl_Sch_0_0_Block_4.id = tbl_Sch_0_0_Block_4.id == Guid.Empty ? Guid.NewGuid() : tbl_Sch_0_0_Block_4.id;
+                    tbl_Sch_0_0_Block_4.survey_coordinates ??= SessionStorage.location;
+                    tbl_Sch_0_0_Block_4.survey_timestamp ??= DateTime.Now;
                     status = await _database.InsertAsync(tbl_Sch_0_0_Block_4);
                 }
                 return status;
@@ -974,6 +984,8 @@ namespace Income.Database.Queries
                         }
                         else
                         {
+                            item.survey_coordinates ??= SessionStorage.location;
+                            item.survey_timestamp ??= DateTime.Now;
                             await _database.InsertAsync(item);
                         }
                     }
@@ -1108,7 +1120,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                    tbl_Sch_0_0_FieldOperation.survey_timestamp = DateTime.Now;
+                    tbl_Sch_0_0_FieldOperation.survey_timestamp ??= DateTime.Now;
+                    tbl_Sch_0_0_FieldOperation.survey_coordinates ??= SessionStorage.location;
                     status = await _database.InsertAsync(tbl_Sch_0_0_FieldOperation);
                 }
                 return status;
@@ -1171,8 +1184,10 @@ namespace Income.Database.Queries
                     {
                         file.block_name = file.is_sub_unit == true ? CommonEnum.sch_0_0_block_3.ToString() : CommonEnum.sch_0_0_block_3_1.ToString();
                         await _database.QueryAsync<Tbl_Sch_0_0_Block_3>("DELETE FROM Tbl_Sch_0_0_Block_3 WHERE block_name = ? AND is_deleted = false AND fsu_id = ? AND tenant_id = ?", file.block_name, SessionStorage.SelectedFSUId, SessionStorage.tenant_id);
-                        file.id = file.id == Guid.Empty ?  Guid.NewGuid() : file.id;
+                        file.id = file.id == Guid.Empty ? Guid.NewGuid() : file.id;
                         file.is_deleted = false;
+                        file.survey_timestamp = DateTime.Now;
+                        file.survey_coordinates = SessionStorage.location;
                         status = await _database.InsertAsync(file);
                     }
                 }
@@ -1260,6 +1275,8 @@ namespace Income.Database.Queries
                     }
                     else
                     {
+                        tbl_Sch_0_0_Block_5.survey_coordinates ??= SessionStorage.location;
+                        tbl_Sch_0_0_Block_5.survey_timestamp ??= DateTime.Now;
                         await _database.InsertAsync(tbl_Sch_0_0_Block_5);
                     }
 
@@ -1325,9 +1342,9 @@ namespace Income.Database.Queries
 
                     int hhdSrl = 1;
 
-                    foreach(var hhd in allOrdered)
+                    foreach (var hhd in allOrdered)
                     {
-                        if(hhd.is_household == 2)
+                        if (hhd.is_household == 2)
                         {
                             hhd.Block_7_3 = hhdSrl++;
                         }
@@ -1573,7 +1590,7 @@ namespace Income.Database.Queries
                         }
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -1930,7 +1947,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                if(newBlock3 != null)
+                if (newBlock3 != null)
                 {
                     if (!HasDependencyFieldsChanged(oldBlock3, newBlock3))
                         return;
@@ -2291,7 +2308,7 @@ namespace Income.Database.Queries
         {
             try
             {
-                var response = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id &&  (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
+                var response = await _database.Table<Tbl_Block_4_Q5>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null)
                 {
                     return response;
@@ -2306,7 +2323,7 @@ namespace Income.Database.Queries
                 toastService.ShowError($"Error While fetching Block 4 NICLIST: {ex.Message}");
                 return new List<Tbl_Block_4_Q5>();
             }
-           
+
         }
 
         public async Task<Tbl_Block_4?> Fetch_SCH_HIS_Block4(int hhd_id)
@@ -2754,7 +2771,8 @@ namespace Income.Database.Queries
                 }
                 else
                 {
-                   
+                    tbl_block_6.survey_coordinates = SessionStorage.location;
+                    tbl_block_6.survey_timestamp = DateTime.Now;
                     status = await _database.InsertAsync(tbl_block_6);
                 }
                 return status;
@@ -3099,7 +3117,7 @@ namespace Income.Database.Queries
                 var response = await _database.Table<Tbl_Block_7c_NIC>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null)
                 {
-                   
+
                     return response;
                 }
                 else
@@ -3168,7 +3186,7 @@ namespace Income.Database.Queries
                         int deleted = await _database.DeleteAsync(exists);
                     }
                     var block_7d = await Fetch_SCH_HIS_Block7D();
-                    if(block_7d != null)
+                    if (block_7d != null)
                     {
                         var item = block_7d.FirstOrDefault(x => x.block_7c_id == id);
                         if (item != null)
@@ -3238,7 +3256,7 @@ namespace Income.Database.Queries
                 var response = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.fsu_id == SessionStorage.SelectedFSUId && x.hhd_id == hhd_id && (x.is_deleted == null || x.is_deleted == false)).ToListAsync();
                 if (response != null)
                 {
-                   
+
                     return response;
                 }
                 else
@@ -3261,6 +3279,8 @@ namespace Income.Database.Queries
                 var check_existence = await _database.Table<Tbl_Block_7c_Q10>().Where(x => x.id == obj.id).FirstOrDefaultAsync();
                 if (check_existence != null)
                 {
+                    obj.survey_coordinates ??= SessionStorage.location;
+                    obj.survey_timestamp ??= DateTime.Now;
                     status = await _database.UpdateAsync(obj);
                 }
                 else
@@ -4155,6 +4175,11 @@ namespace Income.Database.Queries
             return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && x.schedule == schedule && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.block == block && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
         }
 
+        public async Task<List<Tbl_Warning>> GetWarningTableDataForWarningCode(int fsuId, int hddId, string schedule, string code)
+        {
+            return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && x.schedule == schedule && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.warning_code == code && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+        }
+
         public async Task<List<Tbl_Warning>> GetChildCommentsAsync(Guid parentId)
         {
             return await _database.Table<Tbl_Warning>()
@@ -4163,28 +4188,48 @@ namespace Income.Database.Queries
         }
 
 
-        public Task<int> DeleteWarningTableDataForSerial(int fsuId, int hddId, string block, int serial, Guid id)
+        public async Task<int> DeleteWarningAsync(Guid id)
         {
-            var data = _database.QueryAsync<Tbl_Warning>($"SELECT * FROM Tbl_Warning WHERE fsu_id == {fsuId} AND hhd_id == {hddId}  AND warning_status == 1");
-            if (data.Result.Count != 0)
+            try
             {
-                var result = _database.ExecuteAsync($"DELETE FROM Tbl_Warning WHERE fsu_id == {fsuId} AND hhd_id == {hddId}");
-                if (result?.Result > 0)
-                {//Delete child
-                    _database.ExecuteAsync($"DELETE FROM Tbl_Warning WHERE fsu_id == {fsuId} AND hhd_id == {hddId} AND parent_id == {id}");
-                }
-                return result;
-            }
-            else
-            {
-                var result = _database.ExecuteAsync($"UPDATE Tbl_Warning SET is_deleted = true WHERE fsu_id == {fsuId} AND hhd_id == {hddId} AND id == {id}");
-                if (result?.Result > 0)
-                {//Delete child
-                    _database.ExecuteAsync($"UPDATE Tbl_Warning SET is_deleted = true WHERE fsu_id == {fsuId} AND hhd_id == {hddId} AND parent_id == {id}");
-                }
-                return result;
-            }
+                var warning = await _database.Table<Tbl_Warning>().Where(x => x.id == id).FirstOrDefaultAsync();
+                if (warning != null)
+                {
+                    var childComments = await GetChildCommentsAsync(warning.id);
 
+                    foreach (var child in childComments)
+                    {
+                        if (SessionStorage.FSU_Submitted == true)
+                        {
+                            child.is_deleted = true;
+                            child.updated_at = DateTime.Now;
+                            await SaveAsync<Tbl_Warning>(child);
+                        }
+                        else
+                        {
+                            await DeleteEntryAsync<Tbl_Warning>(child.id);
+                        }
+                    }
+                    if (SessionStorage.FSU_Submitted == true)
+                    {
+                        warning.is_deleted = true;
+                        warning.updated_at = DateTime.Now;
+                        await SaveAsync<Tbl_Warning>(warning);
+                    }
+                    else
+                    {
+                        await DeleteEntryAsync<Tbl_Warning>(warning.id);
+                    }
+
+                    return 1;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while deleting warning: {ex.Message}");
+                return 0;
+            }
         }
     }
 }

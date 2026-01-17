@@ -9,7 +9,7 @@
 
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="null" />
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
     @* Enumerator Comments *@
     <div class="card custom-card">
         <div class="card-header">
@@ -101,6 +101,11 @@
             SupervisorRemarks = tbl_Sch_0_0_Block_0_1.SupervisorRemarks ?? string.Empty;
         }
 
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && tbl_Sch_0_0_Block_0_1 != null)
+        {
+            survey_time = tbl_Sch_0_0_Block_0_1.Block9_10Timestamp.GetValueOrDefault();
+        }
+
         if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
         {
             ShowSaveButton = !SessionStorage.FSU_Submitted;
@@ -142,6 +147,7 @@
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_11");
                 return;
             }
+            tbl_Sch_0_0_Block_0_1.Block9_10Timestamp ??= DateTime.Now;
             int update = await SCH_0_0_Queries.SaveBlock1(tbl_Sch_0_0_Block_0_1) ?? 0;
             if (update > 0)
             {

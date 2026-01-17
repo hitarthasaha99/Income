@@ -1464,13 +1464,13 @@
         if (!string.IsNullOrEmpty(spouceWarning))
         {
             toastService.ShowError(spouceWarning); 
-            warningVM.AddWarning(spouceWarning, "HIS", "3", "3", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(spouceWarning, "HIS", "3", "3", warningCode:"" , SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
             return;  
         }
         if (!string.IsNullOrEmpty(neverMarredWarn))
         {
             toastService.ShowError(neverMarredWarn);
-            warningVM.AddWarning(neverMarredWarn, "HIS", "3", "3", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(neverMarredWarn, "HIS", "3", "3", warningCode: "", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
             return;  
         }
 
@@ -1488,47 +1488,47 @@
 
         if(!string.IsNullOrEmpty(genderWarning))
         {
-            warningVM.AddWarning(genderWarning, "HIS", "3", "4", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(genderWarning, "HIS", "3", "4", warningCode: "W005(ii)", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(ageWarning))
         {
-            warningVM.AddWarning(ageWarning, "HIS", "3", "4", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(ageWarning, "HIS", "3", "4", warningCode: "W006(i)" ,SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(ageRelationWarning))
         {
-            warningVM.AddWarning(ageRelationWarning, "HIS", "3", "5", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(ageRelationWarning, "HIS", "3", "5", warningCode: ageRelationWarning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(singleUserWarning))
         {
-            warningVM.AddWarning(singleUserWarning, "HIS", "3", "5", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(singleUserWarning, "HIS", "3", "5", warningCode: singleUserWarning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(maritalStatusWarning))
         {
-            warningVM.AddWarning(maritalStatusWarning, "HIS", "3", "6", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(maritalStatusWarning, "HIS", "3", "6", warningCode: maritalStatusWarning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(item_7Warning))
         {
-            warningVM.AddWarning(item_7Warning, "HIS", "3", "7", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(item_7Warning, "HIS", "3", "7", warningCode: item_7Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(item_8Warning))
         {
-            warningVM.AddWarning(item_8Warning, "HIS", "3", "8", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(item_8Warning, "HIS", "3", "8", warningCode: item_8Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(item_9Warning))
         {
-            warningVM.AddWarning(item_9Warning, "HIS", "3", "9", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(item_9Warning, "HIS", "3", "9", warningCode: item_9Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(item_10Warning))
         {
-            warningVM.AddWarning(item_10Warning, "HIS", "3", "10", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(item_10Warning, "HIS", "3", "10", warningCode: item_10Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(item_11Warning))
         {
-            warningVM.AddWarning(item_11Warning, "HIS", "3", "11", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(item_11Warning, "HIS", "3", "11", warningCode: item_11Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         if (!string.IsNullOrEmpty(item_12Warning))
         {
-            warningVM.AddWarning(item_12Warning, "HIS", "3", "12", SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+            warningVM.AddWarning(item_12Warning, "HIS", "3", "12", warningCode: item_12Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
         await warningVM.SaveWarningAsync("HIS", "3", newMember.serial_no.GetValueOrDefault());
 

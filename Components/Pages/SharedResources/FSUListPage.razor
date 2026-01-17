@@ -203,7 +203,7 @@
                 if (currentFSU != null)
                 {
 
-                    var fsuHouses = currentFSU.fsuHouses;
+                    var fsuHouses = currentFSU.fsuHouses.Where(x => x.is_deleted == false);
                     var validStatuses = new HashSet<int> { 12, 21, 22, 31, 32 };
 
                     var hhdIdsToDelete = fsuHouses?
@@ -494,7 +494,7 @@
             var fsuDetails = await commonQueries.FetchFsuByFsuId(fsu_id);
             if (data == null || (data != null && data.Count == 0))
             {
-                toastService.ShowError($"Please ensure the Selection Done and the data is downloaded Sucessfully for fsu id {fsu_id}");
+                toastService.ShowError($"Please ensure the selection done and the data is downloaded sucessfully for FSUID: {fsu_id}");
                 return;
             }
 

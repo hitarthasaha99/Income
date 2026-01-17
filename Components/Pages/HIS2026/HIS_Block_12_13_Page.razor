@@ -10,7 +10,7 @@
 
 
 <div class="main-content">
-    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="null"/>
+    <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time"/>
     @* Enumerator Comments *@
     <div class="card custom-card">
         <div class="card-header">
@@ -98,6 +98,10 @@
             EnumeratorRemarks = block_1.block_12_remark ?? string.Empty;
             SupervisorRemarks = block_1.block_13_remark ?? string.Empty;
         }
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && block_1 != null)
+        {
+            survey_time = block_1.Block13_14Timestamp.GetValueOrDefault();
+        }
         StateHasChanged();
     }
 
@@ -132,6 +136,7 @@
                 NavigationManager.NavigateTo("/dashboard/his/block_2");
                 return;
             }
+            block_1!.Block13_14Timestamp ??= DateTime.Now;
             int update = await dB.SaveAsync<Tbl_Block_1>(block_1);
             if (update > 0)
             {

@@ -272,7 +272,17 @@
                 .ThenBy(x => SafeParseDisplaySerial(x.display_serial_number).Minor)
                 .ThenBy(x => x.id) // deterministic tie-breaker
                 .ToList();
-                RowList = Block7DList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
+
+                if (Block7DList != null && Block7DList.Count > 0)
+                {
+                    survey_time = Block7DList
+                            .OrderByDescending(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();  
+                            
+                    RowList = Block7DList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
+                }
+
             }
 
 
