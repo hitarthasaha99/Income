@@ -588,9 +588,10 @@
                 lowerLimit = 0.95 * block_4.approximate_population_su.GetValueOrDefault();
                 upperLimit = 1.05 * block_4.approximate_population_su.GetValueOrDefault();
                 isWithin5Percent = total_listed_population >= lowerLimit && total_listed_population <= upperLimit;
+                var pop = Math.Round(block_4.approximate_population_su.GetValueOrDefault());
                 if(!isWithin5Percent)
                 {
-                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {block_4.approximate_population_su.GetValueOrDefault()}.\n\n";
+                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {pop}.\n\n";
                 }
             }
         }
@@ -606,7 +607,10 @@
                 {
                     selectedSubDPercentage = selectedSubD.Percentage.GetValueOrDefault();
                 }
-                var sDPop = block_4.approximate_population_su.GetValueOrDefault() * (selectedSubDPercentage / 100);
+                var sDPop = Math.Round(
+                    block_4.approximate_population_su.GetValueOrDefault() * (selectedSubDPercentage / 100.0)
+                );
+
                 lowerLimit = 0.95 * sDPop;
                 upperLimit = 1.05 * sDPop;
                 isWithin5Percent = total_listed_population >= lowerLimit && total_listed_population <= upperLimit;
@@ -617,7 +621,7 @@
             }
         }
 
-        
+
         // If message exists, show confirm dialog
         if (!string.IsNullOrWhiteSpace(firstWarning))
         {
@@ -632,13 +636,45 @@
 
             if (confirmation)
             {
-                warningVM.AddWarning(firstWarning, "0", "7", "0", warningCode: "W025(i)");
-                await warningVM.SaveWarningAsync("0", "7", 0);
+                
+                var savedWarnings = await SCH_0_0_Queries.GetWarningTableDataForWarningCode(
+                    SessionStorage.SelectedFSUId,
+                    SessionStorage.selected_hhd_id,
+                    "0",
+                    "W025(i)"
+                );
+                if (savedWarnings != null && savedWarnings.Count > 0)
+                {
+                    foreach (var warn in savedWarnings)
+                    {
+                        warn.warning_message = firstWarning;
+                    }
+                    await SCH_0_0_Queries.UpsertWarningAsync(savedWarnings);
+
+                }
+                else
+                {
+                    warningVM.AddWarning(firstWarning, "0", "7", "0", warningCode: "W025(i)");
+                    await warningVM.SaveWarningAsync("0", "7", 0);
+                }
                 NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             }
         }
         else
         {
+            var savedWarnings = await SCH_0_0_Queries.GetWarningTableDataForWarningCode(
+                    SessionStorage.SelectedFSUId,
+                    SessionStorage.selected_hhd_id,
+                    "0",
+                    "W025(i)"
+                );
+            if (savedWarnings != null && savedWarnings.Count > 0)
+            {
+                foreach (var warn in savedWarnings)
+                {
+                    await SCH_0_0_Queries.DeleteWarningAsync(warn.id);
+                }
+            }
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
         }
     }
@@ -832,7 +868,23 @@
             if (block_5_obj.Block_7_5 > 30)
             {
                 warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W024(ii)");
-                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_1.GetValueOrDefault());
+                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_3.GetValueOrDefault());
+            }
+            else
+            {
+                var savedWarnings = await SCH_0_0_Queries.GetWarningTableDataForWarningCode(
+                    SessionStorage.SelectedFSUId,
+                    block_5_obj.Block_7_3.GetValueOrDefault(),
+                    "0",
+                    "W024(ii)"
+                );
+                if (savedWarnings != null && savedWarnings.Count > 0)
+                {
+                    foreach (var warn in savedWarnings)
+                    {
+                        await SCH_0_0_Queries.DeleteWarningAsync(warn.id);
+                    }
+                }
             }
         }
         await AddModal.HideAsync();
