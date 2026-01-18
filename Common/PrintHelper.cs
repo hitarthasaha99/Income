@@ -1876,7 +1876,7 @@ namespace Income.Common
             //var table = body.Elements<Table>()
             //    .FirstOrDefault(t => t.InnerText.Contains("Block B"));
             var TableList = body.Elements<Table>().Where(t => t.InnerText.ToLower().Contains("[Block B]"));
-            var table = body.Elements<Table>().ElementAtOrDefault(34);
+            var table = body.Elements<Table>().ElementAtOrDefault(35);
             if (table == null || blockB == null)
                 return;
 
@@ -1933,7 +1933,7 @@ namespace Income.Common
                 ReplaceCellText(cells[0], item.serial_number.ToString());
                 ReplaceCellText(cells[1], item.code?.ToString() ?? "");
                 ReplaceCellText(cells[2], (item.whetherCropSold == 1 ? "Yes" : "No"));
-                ReplaceCellText(cells[3], item.unit?.ToString() ?? "");
+                ReplaceCellText(cells[3], (item.unit == 1 ? "Kg" : "No."));
                 ReplaceCellText(cells[4], item.item_4?.ToString() ?? "");
                 ReplaceCellText(cells[5], item.item_5?.ToString() ?? "");
                 ReplaceCellText(cells[6], item.item_6?.ToString() ?? "");
@@ -2312,6 +2312,7 @@ namespace Income.Common
             // second column = remarks value
             SafeReplace(rows, 1, 0, remarksFromBlock1 ?? "");
             //ReplaceCellText(cell, remarksFromBlock1 ?? "");
+
         }
         private void FillBlock14Remarks(Body body, string remarksFromBlock1)
         {
