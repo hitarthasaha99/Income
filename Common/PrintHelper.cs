@@ -1249,7 +1249,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             // 2nd column = remarks text
-            ReplaceCellText(cells[1], remarks);
+            ReplaceCellTextWithLineBreak(cells[1], remarks);
         }
         private void FillBlockHis4_1(Body body, Tbl_Block_4 block4)
         {
@@ -1369,7 +1369,7 @@ namespace Income.Common
             var row = table.Elements<TableRow>().Last();
             var cell = row.Elements<TableCell>().Last();
 
-            ReplaceCellText(cell, remarks);
+            ReplaceCellTextWithLineBreak(cell, remarks);
         }
 
 
@@ -1397,7 +1397,7 @@ namespace Income.Common
             SafeReplace(rows, 12, 2, block4.item_17?.ToString());  // Loan outstanding
 
             // Remarks row (always last)
-            ReplaceCellText(
+            ReplaceCellTextWithLineBreak(
                 GetLastCell(rows.Last()),
                 blockhis_1?.block_4_remark ?? ""
             );
@@ -1454,7 +1454,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             // 2nd column = remarks value
-            ReplaceCellText(cells[1], remarks);
+            ReplaceCellTextWithLineBreak(cells[1], remarks);
         }
 
         private void FillBlockHis6( Body body,List<Tbl_Block_6> list)
@@ -1499,7 +1499,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             // 2nd column = remarks text
-            ReplaceCellText(cells[1], remarks);
+            ReplaceCellTextWithLineBreak(cells[1], remarks);
         }
 
         private void FillBlockHis8(Body body,Tbl_Block_8 block8)
@@ -1569,7 +1569,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             // 2nd column = remarks text
-            ReplaceCellText(cells[1], remarks);
+            ReplaceCellTextWithLineBreak(cells[1], remarks);
         }
 
 
@@ -2017,7 +2017,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             if (cells.Count > 1)
-                ReplaceCellText(cells[1], remarks);
+                ReplaceCellTextWithLineBreak(cells[1], remarks);
         }
 
         private void FillBlock7a_2(Body body,Tbl_Block_7a data)
@@ -2212,7 +2212,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             // second column = remarks value
-            ReplaceCellText(cells[1], remarksFromBlock1);
+            ReplaceCellTextWithLineBreak(cells[1], remarksFromBlock1);
         }
 
         private  void FillBlock7c_10(Body body,List<Tbl_Block_7c_Q10> list)
@@ -2302,7 +2302,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             // second column = remarks value
-            ReplaceCellText(cells[1], remarksFromBlock1);
+            ReplaceCellTextWithLineBreak(cells[1], remarksFromBlock1);
         }
 
         private void FillBlockHis2(Body body, Tbl_Block_FieldOperation? block11)
