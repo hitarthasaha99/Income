@@ -21,6 +21,7 @@ using FontSize = DocumentFormat.OpenXml.Wordprocessing.FontSize;
 using Income.Database.Queries;
 using BootstrapBlazor.Components;
 using Income.Common.HIS2026;
+using DocumentFormat.OpenXml;
 
 namespace Income.Common
 {
@@ -274,6 +275,39 @@ namespace Income.Common
             var paragraph = new Paragraph(run);
             cell.AppendChild(paragraph);
         }
+        private void ReplaceCellTextWithLineBreak(TableCell cell, string newText)
+        {
+            cell.RemoveAllChildren<Paragraph>();
+
+            var paragraph = new Paragraph();
+
+            var run = new Run(
+                new RunProperties(
+                    new FontSize() { Val = "20" },
+                    new RunFonts() { Ascii = "Calibri" },
+                    new Color() { Val = "000000" }
+                )
+            );
+
+            var lines = (newText ?? "")
+                .Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                run.Append(new Text(lines[i])
+                {
+                    Space = SpaceProcessingModeValues.Preserve
+                });
+
+                if (i < lines.Length - 1)
+                    run.Append(new Break());
+            }
+
+            paragraph.Append(run);
+            cell.Append(paragraph);
+        }
+
+
         private void FillBlock0_1(Body body, Tbl_Sch_0_0_Block_0_1 block01)
         {
             void SafeReplace(List<TableRow> rows, int index, string value)
@@ -1072,15 +1106,39 @@ namespace Income.Common
         }
 
 
+        //private void SafeReplace(List<TableRow> rows, int rowIndex, int cellIndex, string value)
+        //{
+        //    if (rows.Count > rowIndex)
+        //    {
+        //        var cells = rows[rowIndex].Elements<TableCell>().ToList();
+        //        if (cells.Count > cellIndex)
+        //            ReplaceCellText(cells[cellIndex], value ?? "");
+        //    }
+        //}
+
         private void SafeReplace(List<TableRow> rows, int rowIndex, int cellIndex, string value)
         {
-            if (rows.Count > rowIndex)
+            if (rows.Count <= rowIndex)
+                return;
+
+            var cells = rows[rowIndex].Elements<TableCell>().ToList();
+            if (cells.Count <= cellIndex)
+                return;
+
+            var cell = cells[cellIndex];
+            var text = value ?? "";
+
+            // 🔑 CONDITION: does the text contain a new line?
+            if (text.Contains("\n") || text.Contains("\r"))
             {
-                var cells = rows[rowIndex].Elements<TableCell>().ToList();
-                if (cells.Count > cellIndex)
-                    ReplaceCellText(cells[cellIndex], value ?? "");
+                ReplaceCellTextWithLineBreak(cell, text);
+            }
+            else
+            {
+                ReplaceCellText(cell, text);
             }
         }
+
         private void FillBlockHis1(Body body, Tbl_Block_1 block1)
         {
             var table = body.Elements<Table>()
@@ -1334,7 +1392,8 @@ namespace Income.Common
             SafeReplace(rows, 8, 2, block4.item_12?.ToString());  // Carpet area
             SafeReplace(rows, 9, 2, block4.item_13?.ToString());  // Carpet area
             SafeReplace(rows, 10, 2, block4.item_14?.ToString());  // Carpet area
-            SafeReplace(rows, 11, 2, block4.item_15?.ToString());  // Carpet area
+            //SafeReplace(rows, 11, 2, block4.item_15?.ToString());  // Carpet area
+            SafeReplace(rows, 11, 2, (Block_4_Constants.Q4_15.First(x => x.id == block4.item_15).title));  // Carpet area
             SafeReplace(rows, 12, 2, block4.item_17?.ToString());  // Loan outstanding
 
             // Remarks row (always last)
@@ -2288,9 +2347,18 @@ namespace Income.Common
                     : "No");
                    
             
-
-            // 6. name of informant:
-            ReplaceCellText(GetLastCell(rows[9]), block11.informant_name?.ToString() ?? "");
+            if(block11.informant_serial==99)
+            {
+                // 6. name of informant:
+                ReplaceCellText(GetLastCell(rows[9]),  "Not a household member");
+            }
+            else
+            {
+                // 6. name of informant:
+                ReplaceCellText(GetLastCell(rows[9]), block11.informant_name?.ToString() ?? "");
+            }
+               
+             
             //Mobile number of informant/any other household member who can be contacted
             ReplaceCellText(GetLastCell(rows[10]), block11.informant_mobile?.ToString() ?? "");
             //Response code of the informant as assessed by SE/JSO
@@ -2310,8 +2378,8 @@ namespace Income.Common
 
 
             // second column = remarks value
-            SafeReplace(rows, 1, 0, remarksFromBlock1 ?? "");
-            //ReplaceCellText(cell, remarksFromBlock1 ?? "");
+             SafeReplace(rows, 1, 0, remarksFromBlock1 ?? "");
+            //ReplaceCellText(, remarksFromBlock1 ?? "");
 
         }
         private void FillBlock14Remarks(Body body, string remarksFromBlock1)
