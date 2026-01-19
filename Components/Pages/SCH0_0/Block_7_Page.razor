@@ -30,9 +30,13 @@
                 </h3>
                 <div class="card-tools" hidden="@SessionStorage.selection_done">
                     <div class="d-flex align-items-center" hidden="@SessionStorage.selection_done">
-                        @* <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
-                            <i class="fi fi-rr-settings me-1"></i>Generate
-                        </button> *@
+                        @if (SessionStorage.user_name == "ENM.DDN.36" || SessionStorage.env == SessionStorage.Environment.Development)
+                        {
+                            <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
+                                <i class="fi fi-rr-settings me-1"></i>Generate
+                            </button> 
+                        }
+                        
                         <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                             <i class="fi fi-rr-plus me-1"></i>Add
                         </button>

@@ -42,14 +42,17 @@
                             <button class="btn btn-primary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
                                 <i class="fi fi-rr-checkbox me-1"></i>Selection
                             </button>
+                            @if(SessionStorage.user_name == "ENM.DDN.36" || SessionStorage.env == SessionStorage.Environment.Development)
+                            {
+                                <button class="btn btn-outline-primary btn-sm me-2" @onclick="@(() => ResetSelection())">
+                                    <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection
+                                </button>
 
-                            @* <button class="btn btn-outline-primary btn-sm me-2" @onclick="@(() => ResetSelection())">
-                                <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection
-                            </button>
-
-                            <button class="btn btn-primary btn-sm" @onclick="@(() => DeleteAllHHDS())">
-                                <i class="fi fi-rr-rotate-left me-1"></i>Delete All Households
-                            </button> *@
+                                <button class="btn btn-primary btn-sm" @onclick="@(() => DeleteAllHHDS())">
+                                    <i class="fi fi-rr-rotate-left me-1"></i>Delete All Households
+                                </button>
+                            }
+                            
                         </div>
                     </div>
                 }

@@ -384,6 +384,12 @@
             return;
         }
 
+        if (existingSurveyCode == 3 && block_1.survey_code == 3)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_12");
+            return;
+        }
+
         if (block_1.survey_code == null)
         {
             toastService.ShowError("H001: Please select a survey code");
