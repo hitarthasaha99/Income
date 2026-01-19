@@ -312,9 +312,24 @@ namespace Income.Common
         {
             void SafeReplace(List<TableRow> rows, int index, string value)
             {
-                if (rows.Count > index)
-                    ReplaceCellText(GetLastCell(rows[index]), value ?? "");
+                if (rows.Count <= index)
+                    return;
+
+                var cell = GetLastCell(rows[index]);
+                var text = value ?? "";
+
+               
+                if (text.Contains("\n") || text.Contains("\r"))
+                {
+                    ReplaceCellTextWithLineBreak(cell, text);
+                }
+                else
+                {
+                    ReplaceCellText(cell, text);
+                }
+
             }
+
 
             // ---------- BLOCK [0] ----------
             var table0 = body.Elements<Table>()
@@ -418,7 +433,7 @@ namespace Income.Common
                 serial++;
             }
 
-            ReplaceCellText(
+            ReplaceCellTextWithLineBreak(
                 GetLastCell(remarksRow),
                 block_0_1?.remarks_block_2_1 ?? ""
             );
@@ -459,7 +474,7 @@ namespace Income.Common
             }
 
             // ✅ remarks from Block-0.1 (no parameter needed)
-            ReplaceCellText(
+            ReplaceCellTextWithLineBreak(
                 GetLastCell(remarksRow),
                 block_0_1?.remarks_block_2_2 ?? ""
             );
@@ -484,7 +499,7 @@ namespace Income.Common
 
             ReplaceCellText(rows[4].Elements<TableCell>().Last(), block4.number_of_sub_division_of_su_to_be_formed?.ToString() ?? "");
 
-            ReplaceCellText(GetLastCell(rows.Last()), block_0_1?.remarks_block_4 ?? "");
+            ReplaceCellTextWithLineBreak(GetLastCell(rows.Last()), block_0_1?.remarks_block_4 ?? "");
         }
 
 
@@ -517,7 +532,7 @@ namespace Income.Common
             }
 
             // Set remarks
-            ReplaceCellText(
+            ReplaceCellTextWithLineBreak(
                 GetLastCell(remarksRow),
                 block_0_1?.remarks_block_5 ?? ""
             );
@@ -577,7 +592,7 @@ namespace Income.Common
             var cells = row.Elements<TableCell>().ToList();
 
             // 2nd column = remarks value
-            ReplaceCellText(cells[1], remarks);
+            ReplaceCellTextWithLineBreak(cells[1], remarks);
         }
 
         private void FillBlock0_8(Body body, List<Tbl_Sch_0_0_Block_7> block0_8)
@@ -967,7 +982,7 @@ namespace Income.Common
             );
 
             // 6. Remarks
-            ReplaceCellText(GetLastCell(rows[9]), block_0_1?.remarks_block_11 ?? ""
+            ReplaceCellTextWithLineBreak(GetLastCell(rows[9]), block_0_1?.remarks_block_11 ?? ""
             );
         }
 
