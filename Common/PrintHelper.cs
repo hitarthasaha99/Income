@@ -1452,8 +1452,20 @@ namespace Income.Common
                 ReplaceCellText(cells[10], item.item_7?.ToString() ?? "");
                 ReplaceCellText(cells[11], item.item_8?.ToString() ?? "");
                 ReplaceCellText(cells[12], item.item_9?.ToString() ?? "");
+                ReplaceCellText(cells[13], item.item_10 switch
+                {
+                    1 => "a. Retired recently but pension is not started",
+                    2 => "b. Recently joined the service and salary not received",
+                    3 => "c. Recently resigned / terminated from the service / job",
+                    4 => "d. Leave without pay",
+                    5 => "e. Others (please specify)",
+                    _ => ""
+                });
+                ReplaceCellText(cells[14], item.item_11?.ToString() ?? "");
+                
 
-                table.AppendChild(row);
+
+                    table.AppendChild(row);
             }
 
             // remove original blank template row
@@ -1497,6 +1509,17 @@ namespace Income.Common
                 ReplaceCellText(cells[3], item.item_2?.ToString() ?? "");
                 ReplaceCellText(cells[4], item.item_3?.ToString() ?? "");
                 ReplaceCellText(cells[5], item.item_4?.ToString() ?? "");
+                ReplaceCellText(cells[6], item.item_5 switch
+                {
+                    1 => "a. Did not work in the reference period due to illness",
+                    2 => "b. Did not get work during the reference period",
+                    3 => "c. Did not work in the reference period due to personal work",
+                    4 => "d. Others (please specify)",
+                    _ => ""
+                });
+                ReplaceCellText(cells[7], item.remarks?.ToString() ?? "");
+                
+
 
                 table.AppendChild(row);
             }
@@ -2078,7 +2101,18 @@ namespace Income.Common
             SafeReplace(rows, 2, 2, data.item_4?.ToString());
             SafeReplace(rows, 3, 2, data.item_5?.ToString());
             SafeReplace(rows, 4, 2, data.item_6?.ToString());
-            SafeReplace(rows, 5, 2, data.item_7?.ToString());
+            SafeReplace(rows, 5, 2, data.item_7 switch
+            {
+                1 => "a. Crop damage / failure",
+                2 => "b. Crop not harvested",
+                3 => "c. Crop production is not started",
+                4 => "d. Crop left at field due to low market price",
+                5 => "e. Others (specify in text box)",
+                _ => ""
+
+            });
+            SafeReplace(rows, 6, 2, data.remarks?.ToString());
+            
             SafeReplace(rows, rows.Count - 1, 1, remarksFromBlock1);
             
         }
@@ -2153,7 +2187,17 @@ namespace Income.Common
 
             // Q7b.9 Gross Profit / Loss
             SafeReplace(rows, 2, 2, data.item_9?.ToString());
+             SafeReplace(rows, 3, 2, data.item_10 switch
+             {
+                 1 => "a. Produces are damaged",
+                 2 => "b. Product is not harvested",
+                 3 => "c. Production is not started ",
+                 4 => "d. Others (specify in text box)",
+                 _ => ""
 
+             });
+             SafeReplace(rows, 4, 2, data.remarks?.ToString());
+            
             // Remarks (from Block-1)
             if (!string.IsNullOrWhiteSpace(remarksFromBlock1))
             {
@@ -2176,9 +2220,18 @@ namespace Income.Common
 
             SafeReplace(rows, 1, 2, data.item_7_11?.ToString());
             SafeReplace(rows, 2, 2, data.item_7_12?.ToString());
-            //SafeReplace(rows, 3, 2, data.item_7_12?.ToString());
+            SafeReplace(rows, 3, 2, data.item_7_13 switch
+            {
+                1 => "a. Production not yet started",
+                2 => "b. Seasonal activity",
+                3 => "c. No operation is carried out during the reference period",
+                4 => "d. Others (specify in text box)",
+                _ => ""
+            });
+            SafeReplace(rows, 4, 2, data.remarks?.ToString());
+            
 
-          
+
             if (!string.IsNullOrWhiteSpace(remarksFromBlock1))
             {
                 SafeReplace(rows, rows.Count - 1, 1, remarksFromBlock1);
