@@ -103,7 +103,7 @@
                             <tr>
                                 <td class="col-1">
                                     @if (!SessionStorage.FSU_Submitted)
-                                    {
+                                {
                                         @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                                         {
 
@@ -117,7 +117,17 @@
                                 <td class="col-2">@item.serial_number</td>
                                 <td>@item.code</td>
                                 <td>@(item.whetherCropSold == 1 ? "Yes" : "No")</td>
-                                <td>@(item.unit == 1 ? "Kg" : "No.")</td>
+                                <td>
+                                    @(
+                                        item.unit switch
+                                        {
+                                            1 => "Kg",
+                                            2 => "No.",
+                                            _ => ""
+                                        }
+                                     )
+                                </td>
+
                                 <td>@item.item_4</td>
                                 <td>@item.item_5</td>
                                 <td>@item.item_6</td>

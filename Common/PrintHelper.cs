@@ -2030,7 +2030,7 @@ namespace Income.Common
                 ReplaceCellText(cells[0], item.serial_number.ToString());
                 ReplaceCellText(cells[1], item.code?.ToString() ?? "");
                 ReplaceCellText(cells[2], (item.whetherCropSold == 1 ? "Yes" : "No"));
-                ReplaceCellText(cells[3], (item.unit == 1 ? "Kg" : "No."));
+                ReplaceCellText(cells[3], (item.unit == 1? "Kg" : item.unit == 2 ? "No." : ""));
                 ReplaceCellText(cells[4], item.item_4?.ToString() ?? "");
                 ReplaceCellText(cells[5], item.item_5?.ToString() ?? "");
                 ReplaceCellText(cells[6], item.item_6?.ToString() ?? "");

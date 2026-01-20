@@ -97,15 +97,17 @@
                         {
                             <tr>
                                 <td class="col-1">
-                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                    {
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <button class="btn btn-link me-3 fs-6"
-                                                    hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleModal("UPDATE", member))">
-                                                <i class="fi fi-rr-pencil"></i>
-                                            </button>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <button class="btn btn-link me-3 fs-6"
+                                                @onclick="@(() => HandleModal("UPDATE", member))">
+                                            <i class="fi @(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO
+                                                                   ? "fi-rr-pencil"
+                                                                   : "fi-rr-eye")"></i>
+                                        </button>
 
+
+                                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+                                        {
                                             @if (CanDeleteEntry(member))
                                             {
                                                 <button class="btn btn-link fs-6 text-danger"
@@ -114,8 +116,8 @@
                                                     <i class="fi fi-rr-trash"></i>
                                                 </button>
                                             }
-                                        </div>
-                                    }
+                                        }
+                                    </div>
 
                                 </td>
                                 <td class="text-center col-2">@member.serial_member</td>
@@ -186,15 +188,26 @@
        Size="ModalSize.ExtraLarge">
 
     <HeaderTemplate>
-        <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
+        <h5 class="modal-title">
+            @(
+                        isAdd
+                        ? "Add Member"
+                        : (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO
+                        ? "Update Member"
+                        : "View Member")
+                        )
+        </h5>
     </HeaderTemplate>
+
 
     <BodyTemplate>
         @if (editContext != null)
         {
             <EditForm EditContext="editContext">
                 <FluentValidationValidator />
-                <div class="row">
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+
+                    <div class="row">
 
                     <div class="col-sm-12">
                         <div class="mb-3">
@@ -549,6 +562,7 @@
                     </div>                    
                     }
                 </div>
+                </fieldset>
             </EditForm>
         }
         
@@ -559,11 +573,14 @@
                 @onclick="(() => HandleModal())">
             Close
         </button>
-
-        <button class="btn btn-primary"
-                @onclick="HandleAddMember">
-            @((isAdd ? "Save" : "Update"))
-        </button>
+        @if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        {
+            <button class="btn btn-primary"
+                    @onclick="HandleAddMember">
+                @((isAdd ? "Save" : "Update"))
+            </button>
+        }
+        
 
     </FooterTemplate>
 

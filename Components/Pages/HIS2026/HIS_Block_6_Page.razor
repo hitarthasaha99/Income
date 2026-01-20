@@ -84,25 +84,27 @@
                         {
                             <tr>
                                 <td class="col-1">
-                                    @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
-                                    {
-
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <button class="btn btn-link fs-6"
-                                                hidden="@SessionStorage.FSU_Submitted"
+                                        <button class="btn btn-link me-3 fs-6"
                                                 @onclick="@(() => HandleModal("UPDATE", member))">
-                                            <i class="fi fi-rr-pencil"></i>
-                                        </button>
-                                        @if (CanDeleteEntry(member))
+                                            <i class="fi @(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO
+                                                                                                                  ? "fi-rr-pencil"
+                                                                                                                  : "fi-rr-eye")"></i>
+                                    </button>
+
+                                        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                                         {
-                                            <button class="btn btn-link fs-6 text-danger"
-                                                    hidden="@SessionStorage.FSU_Submitted"
-                                                    @onclick="@(() => HandleDelete(member))">
-                                                <i class="fi fi-rr-trash"></i>
-                                            </button>
+                                            @if (CanDeleteEntry(member))
+                                            {
+                                                <button class="btn btn-link fs-6 text-danger"
+                                                        hidden="@SessionStorage.FSU_Submitted"
+                                                        @onclick="@(() => HandleDelete(member))">
+                                                    <i class="fi fi-rr-trash"></i>
+                                                </button>
+                                            }
                                         }
-                                        </div>
-                                }
+                                        
+                                    </div>
                                 </td>
                                 <td class="text-center col-2">@member.serial_member</td>
                                 <td>@(block3Members.FirstOrDefault(x => x.id == member.fk_block_3)?.item_2 ?? "")</td>
@@ -161,179 +163,193 @@
 </div>
 <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
     <HeaderTemplate>
-        <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
+        <h5 class="modal-title">
+            @(
+                        isAdd
+                        ? "Add Member"
+                        : (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO
+                        ? "Update Member"
+                        : "View Member")
+                        )
+        </h5>
     </HeaderTemplate>
     <BodyTemplate>
         @if (editContext != null)
         {
             <EditForm EditContext="editContext">
-                <div class="row">
-                    <!-- Sl no input (readonly) -->
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                Serial number of the member
-                            </label>
-                            <select class="form-select"
-                                    value="@newMember?.fk_block_3"
-                                    @onchange="@SetSerialNumber"
-                                    disabled="@( !isAdd )">
-                                <option value="">Select Member</option>
-                                @foreach (var member in block3Members)
-                                {
-                                    <option value="@member.id">
-                                        @member.serial_no - @member.item_2
-                                    </option>
-                                }
-                            </select>
-                            @if (!string.IsNullOrEmpty(SerialMemberError))
-                            {
-                                <div class="form-text text-danger" style="white-space: pre-line;">
-                                    @SerialMemberError
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                Name of the member
-                            </label>
-                            <input value="@(block3Members.FirstOrDefault(x => x.id == newMember?.fk_block_3)?.item_2 ?? "")"
-                                   class="form-control no-spinner"
-                                   disabled>
-                        </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">Q6.1</span>Number of days worked in last month (no.) (Last month)
-                            </label>
-                            <InputNumber @bind-Value="newMember.item_1"
-                                            class="form-control no-spinner"
-                                            autocomplete="off"
-                                            autocorrect="off"
-                                            autocapitalize="off"
-                                            spellcheck="false"
-                                            min="1"
-                                            max="31"
-                                            maxlength="2"
-                                            @oninput="item1OnInput"
-                                         onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
-                                         onkeypress="if (this.value.length >= 2) return false; return event.key >= '0' && event.key <= '9';">
-                            </InputNumber>
-                            <ValidationMessage For="@(() => newMember.item_1)" />
-                        </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">Q6.2</span>Average daily wage earned in all mode except in-kind (in whole number of Rs.) (Last month)
-                            </label> 
-                            <InputNumber @bind-Value="newMember.item_2"
-                                            class="form-control no-spinner"
-                                            autocomplete="off"
-                                            onkeypress="return event.key >= '0' && event.key <= '9'"
-                                            autocorrect="off"
-                                            autocapitalize="off"
-                                            spellcheck="false"
-                                            @oninput="item2OnInput">
-                            </InputNumber>
-                            <ValidationMessage For="@(() => newMember.item_2)" />
-                        </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <span class="form-badge">Q6.3</span>Bonuses/tips received  (Last 365 days)
-                            </label>
-                            <InputNumber @bind-Value="newMember.item_3"
-                                            class="form-control no-spinner"
-                                            autocomplete="off"
-                                            onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
-                                            onkeypress="return event.key >= '0' && event.key <= '9'"
-                                            autocorrect="off"
-                                            autocapitalize="off"
-                                            spellcheck="false"
-                                            @oninput="item3OnInput">
-
-                            </InputNumber>
-                            <ValidationMessage For="@(() => newMember.item_3)" />
-                        </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <div>
-                            <label class="form-label fw-bolder">
-                                <span class="form-badge">Q6.4</span> Total monthly income (Q6.1×Q6.2) + Q6.3/12
-                            </label>
-                            <InputNumber @bind-Value="newMember.item_4"
-                                         class="form-control no-spinner"
-                                         autocomplete="off"
-                                         onkeypress="return event.key >= '0' && event.key <= '9'"
-                                         autocorrect="off"
-                                         autocapitalize="off"
-                                         spellcheck="false"
-                                         readonly>
-                            </InputNumber>
-                            @* <ValidationMessage For="@(() => newMember.item_4)" /> *@
-                            @if (!string.IsNullOrEmpty(item_4_warning))
-                            {
-                                <div class="form-text text-danger" style="white-space: pre-line;">
-                                    @item_4_warning
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    @* new after value 0 *@
-                    @if (isItemEnable)
-                    {                       
-                    <div class="col-sm-12">
-                        <div>
-                            <label class="form-label">
-                                <span class="form-badge">Q6.4.1 </span> Please check the entries and provide suitable clarifications in following codes.
-                            </label>
-                                <select class="form-select" value="@newMember.item_5" @onchange="OnDroupdownChanged">
-                                <option value="">-Select-</option>
-                                <option value="1">a. Did not work in the reference period due to illness</option>
-                                <option value="2">b. Did not get work during the reference period</option>
-                                <option value="3">c. Did not work in the reference period due to personal work  </option>                               
-                                <option value="4">d. Others (please specify)</option>
-                            </select>
-                                @if (!string.IsNullOrEmpty(droupdown_warning))
+                <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
+                    <div class="row">
+                        <!-- Sl no input (readonly) -->
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Serial number of the member
+                                </label>
+                                <select class="form-select"
+                                        value="@newMember?.fk_block_3"
+                                        @onchange="@SetSerialNumber"
+                                        disabled="@( !isAdd )">
+                                    <option value="">Select Member</option>
+                                    @foreach (var member in block3Members)
+                                    {
+                                        <option value="@member.id">
+                                            @member.serial_no - @member.item_2
+                                        </option>
+                                    }
+                                </select>
+                                @if (!string.IsNullOrEmpty(SerialMemberError))
                                 {
                                     <div class="form-text text-danger" style="white-space: pre-line;">
-                                        @droupdown_warning
+                                        @SerialMemberError
                                     </div>
                                 }
-                                @if (isselectOther)
-                                {
-
-                                    <div>
-                                        <textarea class="form-control mt-2"
-                                                  rows="2"
-                                                  maxlength="50"
-                                                  placeholder="Please specify here..." @bind="newMember.remarks" @oninput="OnRemarksClear">
-            </textarea>
-                                        @if (!string.IsNullOrEmpty(droupdown_remarks))
-                                        {
-                                            <div class="form-text text-danger" style="white-space: pre-line;">
-                                                @droupdown_remarks
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                            @* <ValidationMessage For="@(() => newMember.item_4)" /> *@
+                            </div>
                         </div>
+
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Name of the member
+                                </label>
+                                <input value="@(block3Members.FirstOrDefault(x => x.id == newMember?.fk_block_3)?.item_2 ?? "")"
+                                       class="form-control no-spinner"
+                                       disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="form-badge">Q6.1</span>Number of days worked in last month (no.) (Last month)
+                                </label>
+                                <InputNumber @bind-Value="newMember.item_1"
+                                             class="form-control no-spinner"
+                                             autocomplete="off"
+                                             autocorrect="off"
+                                             autocapitalize="off"
+                                             spellcheck="false"
+                                             min="1"
+                                             max="31"
+                                             maxlength="2"
+                                             @oninput="item1OnInput"
+                                             onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
+                                             onkeypress="if (this.value.length >= 2) return false; return event.key >= '0' && event.key <= '9';">
+                                </InputNumber>
+                                <ValidationMessage For="@(() => newMember.item_1)" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="form-badge">Q6.2</span>Average daily wage earned in all mode except in-kind (in whole number of Rs.) (Last month)
+                                </label>
+                                <InputNumber @bind-Value="newMember.item_2"
+                                             class="form-control no-spinner"
+                                             autocomplete="off"
+                                             onkeypress="return event.key >= '0' && event.key <= '9'"
+                                             autocorrect="off"
+                                             autocapitalize="off"
+                                             spellcheck="false"
+                                             @oninput="item2OnInput">
+                                </InputNumber>
+                                <ValidationMessage For="@(() => newMember.item_2)" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="form-badge">Q6.3</span>Bonuses/tips received  (Last 365 days)
+                                </label>
+                                <InputNumber @bind-Value="newMember.item_3"
+                                             class="form-control no-spinner"
+                                             autocomplete="off"
+                                             onbeforeinput="if (event.data && /[^0-9]/.test(event.data)) { event.preventDefault(); }"
+                                             onkeypress="return event.key >= '0' && event.key <= '9'"
+                                             autocorrect="off"
+                                             autocapitalize="off"
+                                             spellcheck="false"
+                                             @oninput="item3OnInput">
+
+                                </InputNumber>
+                                <ValidationMessage For="@(() => newMember.item_3)" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div>
+                                <label class="form-label fw-bolder">
+                                    <span class="form-badge">Q6.4</span> Total monthly income (Q6.1×Q6.2) + Q6.3/12
+                                </label>
+                                <InputNumber @bind-Value="newMember.item_4"
+                                             class="form-control no-spinner"
+                                             autocomplete="off"
+                                             onkeypress="return event.key >= '0' && event.key <= '9'"
+                                             autocorrect="off"
+                                             autocapitalize="off"
+                                             spellcheck="false"
+                                             readonly>
+                                </InputNumber>
+                                @* <ValidationMessage For="@(() => newMember.item_4)" /> *@
+                                @if (!string.IsNullOrEmpty(item_4_warning))
+                                {
+                                    <div class="form-text text-danger" style="white-space: pre-line;">
+                                        @item_4_warning
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @* new after value 0 *@
+                        @if (isItemEnable)
+                        {
+                            <div class="col-sm-12">
+                                <div>
+                                    <label class="form-label">
+                                        <span class="form-badge">Q6.4.1 </span> Please check the entries and provide suitable clarifications in following codes.
+                                    </label>
+                                    <select class="form-select" value="@newMember.item_5" @onchange="OnDroupdownChanged">
+                                        <option value="">-Select-</option>
+                                        <option value="1">a. Did not work in the reference period due to illness</option>
+                                        <option value="2">b. Did not get work during the reference period</option>
+                                        <option value="3">c. Did not work in the reference period due to personal work  </option>
+                                        <option value="4">d. Others (please specify)</option>
+                                    </select>
+                                    @if (!string.IsNullOrEmpty(droupdown_warning))
+                                    {
+                                        <div class="form-text text-danger" style="white-space: pre-line;">
+                                            @droupdown_warning
+                                        </div>
+                                    }
+                                    @if (isselectOther)
+                                    {
+
+                                        <div>
+                                            <textarea class="form-control mt-2"
+                                                      rows="2"
+                                                      maxlength="50"
+                                                      placeholder="Please specify here..." @bind="newMember.remarks" @oninput="OnRemarksClear">
+                        </textarea>
+                                            @if (!string.IsNullOrEmpty(droupdown_remarks))
+                                            {
+                                                <div class="form-text text-danger" style="white-space: pre-line;">
+                                                    @droupdown_remarks
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    @* <ValidationMessage For="@(() => newMember.item_4)" /> *@
+                                </div>
+                            </div>
+                        }
                     </div>
-                    }
-                </div>
+
+                </fieldset>
             </EditForm>
         }      
     </BodyTemplate>
     <FooterTemplate>
         <button class="btn btn-outline-secondary me-auto" @onclick="@(() => HandleModal("CLOSE"))">Close</button>
-        <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
+        @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
+        {
+            <button type="submit" @onclick="@(() => HandleAddMember())" class="btn btn-primary" form="YourEditFormId">@((isAdd ? "Save" : "Update"))</button>
+        }
     </FooterTemplate>
 </Modal>
 
@@ -558,7 +574,7 @@
             isItemEnable = false;
             if (newMember != null && newMember.item_4 == 0)
             {
-                item_4_warning = "Improper data reported in Q. 5.9. Please Choose an option.";
+                item_4_warning = "Improper data reported in Q. 6.4. Please Choose an option.";
                 isItemEnable = true;
             }
 
@@ -710,8 +726,8 @@
         {
             if (newMember.item_5 == null)
             {
-                droupdown_warning = "Please choose an option for Q5.9.1";
-                toastService.ShowError("Please select clarification for Q5.9.1");
+                droupdown_warning = "Please choose an option for Q6.4.1";
+                toastService.ShowError("Please select clarification for Q6.4.1");
                 return;
             }
 

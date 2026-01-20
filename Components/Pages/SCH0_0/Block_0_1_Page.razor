@@ -252,7 +252,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="d-flex align-items-center justify-content-end">
-                        <button class="btn btn-outline-primary me-2" hidden="@(!(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && !SessionStorage.hamlet_selection_done))" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</button>
+                        <button class="btn btn-outline-primary me-2" hidden="@(block_0_1_VM.DisableItem16)" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</button>
                         <NavLink class="btn btn-primary" @onclick="@(() => HandleSubmit(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
                     </div>
                 </div>
@@ -390,7 +390,7 @@
         try
         {
 
-            if(goNext && SessionStorage.hamlet_selection_done)
+            if(goNext && (SessionStorage.hamlet_selection_done || SessionStorage.FSU_Submitted))
             {
                 await Navigate();
                 return;
