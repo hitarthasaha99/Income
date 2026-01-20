@@ -1105,26 +1105,30 @@
 					if (warnings.Count > 0)
 					{
 						var parents = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
+
 						bool rejectedWarnings = parents.Any(x => x.warning_status == 3);
 						bool hasPendingWarning = parents.Any(x => x.warning_status == 2);
 
 						if (hasPendingWarning)
 						{
 							errors.Add("Please address all pending warnings");
-							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
-                        }
+						}
 
 						if (!rejectedWarnings)
 						{
 							errors.Add("Need to have atleast one rejected warning to refer back");
-							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 						}
 					}
 					else
 					{
 						errors.Add("Need to have atleast one rejected warning to refer back");
-						errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
 					}
+
+					if (errors.Count > 0)
+					{
+						errorDict[hhd.Block_7_3.GetValueOrDefault()] = errors;
+					}
+
 				}
 				if (submissionMode == SubmissionMode.sso_to_ds)
 				{
