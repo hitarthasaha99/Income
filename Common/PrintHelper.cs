@@ -1348,7 +1348,7 @@ namespace Income.Common
         private void FillBlockHis4_2(Body body, List<Tbl_Block_4_Q5> activities)
         {
             var table = body.Elements<Table>()
-                .FirstOrDefault(t => t.InnerText.Contains("[4.5] Household Characteristics"));
+                .FirstOrDefault(t => t.InnerText.Contains("[Q4.5] Household Characteristics"));
 
             if (table == null || activities == null || activities.Count == 0)
                 return;
@@ -1396,7 +1396,7 @@ namespace Income.Common
         private void FillBlockHis4_3(Body body, Tbl_Block_4 block4)
         {
             var table = body.Elements<Table>()
-                .FirstOrDefault(t => t.InnerText.Contains("[4.3]"));
+                .FirstOrDefault(t => t.InnerText.Contains("[Q4.6_Q4.16]"));
 
             if (table == null || block4 == null)
                 return;
@@ -1732,7 +1732,7 @@ namespace Income.Common
         private void FillBlockHis12_1(Body body, Tbl_Block_1 b1)
         {
             var table = body.Elements<Table>()
-                .FirstOrDefault(t => t.InnerText.Contains("[12_1]"));
+                .FirstOrDefault(t => t.InnerText.Contains("[12]"));
 
             if (table == null || b1 == null)
                 return;
