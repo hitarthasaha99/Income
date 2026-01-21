@@ -415,7 +415,7 @@ namespace Income.Common
             TableRow remarksRow = rows.Last();
 
             // clear previous data rows
-            for (int i = rows.Count - 2; i >= 2; i--)
+            for (int i = rows.Count - 2; i >= 3; i--)
                 rows[i].Remove();
 
             int serial = 1;
@@ -454,7 +454,7 @@ namespace Income.Common
             TableRow remarksRow = rows.Last();
 
             // remove existing data rows
-            for (int i = rows.Count - 2; i >= 2; i--)
+            for (int i = rows.Count - 2; i >= 3; i--)
                 rows[i].Remove();
 
             int serial = 1;
@@ -547,9 +547,14 @@ namespace Income.Common
                 .First(t => t.InnerText.ToLower().Contains("[7] list of households"));
 
             var rows = table.Elements<TableRow>().ToList();
+            var templateRow = rows[3];
+            var remarksRow = rows.Last();
 
-            // ✅ template row is ALWAYS the last row
-            TableRow templateRow = rows.Last();
+            // Remove old data rows (keep remarks)
+            for (int i = rows.Count - 2; i > 3; i--)
+                rows[i].Remove();
+
+            //TableRow templateRow = rows.Last();
 
             int serial = 1;
 
