@@ -625,7 +625,7 @@
 				var deserialized = JsonConvert.DeserializeObject<Upsert_Model>(response);
 				if (deserialized != null)
 				{
-					var received_data = JsonConvert.DeserializeObject<Submission_Model>(deserialized.submitted_json_data);
+					var received_data = networkService.DecompressAndDeserialize<Submission_Model>(deserialized.submitted_json_data);
 					if (received_data != null && received_data.IncomeSch00block0 != null)
 					{
 						var hhdDTo = received_data.IncomeSchHISDto;

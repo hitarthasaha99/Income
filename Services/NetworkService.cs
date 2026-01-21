@@ -3,10 +3,13 @@ using Income.Database.Models.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Income.Services
@@ -267,5 +270,102 @@ namespace Income.Services
                 return null;
             }
         }
+
+        private static readonly JsonSerializerOptions DefaultJsonOptions = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = false
+            // NOTE: No PropertyNamingPolicy here to avoid breaking existing JSON structure
+        };
+        #region Public API - string (Base64) helpers – ideal for NVARCHAR columns
+        /// <summary>
+        /// Decompress a Base64 string and deserialize JSON back to object.
+        /// </summary>
+        public T? DecompressAndDeserialize<T>(
+            string? compressedBase64,
+            JsonCompressionAlgorithm algorithm = JsonCompressionAlgorithm.GZip,
+            JsonSerializerOptions? jsonOptions = null)
+        {
+            if (string.IsNullOrWhiteSpace(compressedBase64))
+                return default;
+
+            byte[] compressedBytes;
+            try
+            {
+                compressedBytes = Convert.FromBase64String(compressedBase64);
+            }
+            catch
+            {
+                // If data in DB is still old plain JSON, try deserializing directly
+                var options = jsonOptions ?? DefaultJsonOptions;
+                return System.Text.Json.JsonSerializer.Deserialize<T>(compressedBase64, options);
+            }
+
+            // 1. Decompress
+            byte[] jsonBytes = Decompress(compressedBytes, algorithm);
+            var jsonText = Encoding.UTF8.GetString(jsonBytes);
+            //jsonText = JsonConvert.DeserializeObject<string>(jsonText);
+
+            var finalOptions = jsonOptions ?? DefaultJsonOptions;
+            try
+            {
+                var json = JsonConvert.DeserializeObject<T>(jsonText);
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+            return default;
+        }
+        #endregion
+        #region Public API - byte[] helpers – ideal for VARBINARY columns
+        /// <summary>
+        /// Decompress raw byte[] and deserialize JSON back to object.
+        /// </summary>
+        public T? DecompressBytesAndDeserialize<T>(
+            byte[]? compressedBytes,
+            JsonCompressionAlgorithm algorithm = JsonCompressionAlgorithm.GZip,
+            JsonSerializerOptions? jsonOptions = null)
+        {
+            if (compressedBytes == null || compressedBytes.Length == 0)
+                return default;
+
+            byte[] jsonBytes = Decompress(compressedBytes, algorithm);
+            var options = jsonOptions ?? DefaultJsonOptions;
+            return System.Text.Json.JsonSerializer.Deserialize<T>(jsonBytes, options);
+        }
+
+        #endregion
+        #region Internal compression helpers
+        public enum JsonCompressionAlgorithm
+        {
+            GZip = 1,
+            Brotli = 2
+        }
+        private static byte[] Decompress(byte[] compressedData, JsonCompressionAlgorithm algorithm)
+        {
+            if (compressedData == null || compressedData.Length == 0)
+                return compressedData ?? Array.Empty<byte>();
+
+            using var input = new MemoryStream(compressedData);
+            using var output = new MemoryStream();
+
+            Stream decompressor = algorithm switch
+            {
+                JsonCompressionAlgorithm.GZip => new GZipStream(input, CompressionMode.Decompress, leaveOpen: true),
+                JsonCompressionAlgorithm.Brotli => new BrotliStream(input, CompressionMode.Decompress, leaveOpen: true),
+                _ => throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, "Unsupported compression algorithm.")
+            };
+
+            using (decompressor)
+            {
+                decompressor.CopyTo(output);
+            }
+
+            return output.ToArray();
+        }
+        #endregion
     }
 }

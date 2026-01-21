@@ -34,23 +34,23 @@ namespace Income.Common
 
 
         //Test
-        public static readonly string PostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/";
-        public static readonly string CommonAPIPostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APICommon/api/SURVEY/";
-        public static readonly string APIIncomeURL = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/";
-        public static readonly string APP_VERSION = "1.0.27";
+        //public static readonly string PostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/";
+        //public static readonly string CommonAPIPostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APICommon/api/SURVEY/";
+        //public static readonly string APIIncomeURL = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/";
+        //public static readonly string APP_VERSION = "1.0.27";
 
 
         //Staging
-        //public static readonly string PostAddress = "http://115.124.119.108:83/ApiIncome/";
-        //public static readonly string CommonAPIPostAddress = "http://115.124.119.108:83/ApiCommon/api/SURVEY/";
-        //public static readonly string APIIncomeURL = "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/";
-        //public static readonly string APP_VERSION = "1.0.4";
+        public static readonly string PostAddress = "http://115.124.119.108:83/ApiIncome/";
+        public static readonly string CommonAPIPostAddress = "http://115.124.119.108:83/ApiCommon/api/SURVEY/";
+        public static readonly string APIIncomeURL = "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/";
+        public static readonly string APP_VERSION = "1.0.4";
 
         //PROD
         //public static readonly string PostAddress = "https://esigma.mospi.gov.in/apIIncome/";
         //public static readonly string CommonAPIPostAddress = "https://esigma.mospi.gov.in/apIcOMMON/";
         //public static readonly string APIIncomeURL = "https://esigma.mospi.gov.in/apIIncome/api/SURVEY/v1/";
-        //public static readonly string APP_VERSION = "1.0.4";
+        //public static readonly string APP_VERSION = "1.0.0";
 
 
 
