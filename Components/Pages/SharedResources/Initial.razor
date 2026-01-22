@@ -17,6 +17,11 @@
         {
             SessionStorage.env = SessionStorage.Environment.Development;
         }
+        if (CommonConfig.APIIncomeURL == "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/")
+        {
+            SessionStorage.env = SessionStorage.Environment.Staging;
+        }
+
         var user_details = await CommonQueries.GetUserDetailsAsync()!;
         if (user_details == null)
         {
@@ -35,7 +40,7 @@
             SessionStorage.tenant_id = user_details.tenant_id;
             SessionStorage.user_name = user_details.username;
             SessionStorage.role_name = function.GetUserRoleName(SessionStorage.user_role);
-            
+
             preloadService.Hide();
 
             NavigationManager.NavigateTo("/dashboard/fsulist/");

@@ -30,7 +30,7 @@
                 </h3>
                 <div class="card-tools" hidden="@SessionStorage.selection_done">
                     <div class="d-flex align-items-center" hidden="@SessionStorage.selection_done">
-                        @if (SessionStorage.user_name == "ENM.DDN.36" || SessionStorage.env == SessionStorage.Environment.Development)
+                        @if (SessionStorage.ShowGenerateButton)
                         {
                             <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
                                 <i class="fi fi-rr-settings me-1"></i>Generate

@@ -36,6 +36,7 @@ namespace Income.Common
         public static bool HHD_Submitted = false;
         public static int sss = 0;
         public static string hhd_head = string.Empty;
+        public static bool ShowGenerateButton = false;
         public static Environment env;
         public static void ClearSession()
         {
@@ -62,6 +63,7 @@ namespace Income.Common
             sss = 0;
             hhd_head = string.Empty;
             HHD_Submitted = false;
+            ShowGenerateButton = false;
         }
 
         public static void ClearFSUFlags()
