@@ -3,7 +3,7 @@ using Android.Runtime;
 
 namespace Income
 {
-    [Application(UsesCleartextTraffic = true)]
+    [Application(UsesCleartextTraffic = false)]
     public class MainApplication : MauiApplication
     {
         public MainApplication(IntPtr handle, JniHandleOwnership ownership)

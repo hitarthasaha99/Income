@@ -652,7 +652,8 @@
                         tbl_Fsu_List = new();
                         temp_fsu_list = new();
                         foreach (var item in fsu_list)
-                        { 
+                        {
+                            item.fsuHouses = item.fsuHouses != null ? item.fsuHouses.Where(x => x.is_deleted == false).ToList() : new List<fsu_houses>();
                             var OldFsuData = await dB.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(item.fsu_id);
                             if(checkDownload)
                             {
