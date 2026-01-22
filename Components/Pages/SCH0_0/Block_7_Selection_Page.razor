@@ -42,7 +42,7 @@
                             <button class="btn btn-primary btn-sm me-2" hidden="@SessionStorage.selection_done" @onclick="@(() => DoSelection())">
                                 <i class="fi fi-rr-checkbox me-1"></i>Selection
                             </button>
-                            @if(SessionStorage.user_name == "ENM.DDN.36" || SessionStorage.env == SessionStorage.Environment.Development)
+                            @if (SessionStorage.ShowGenerateButton)
                             {
                                 <button class="btn btn-outline-primary btn-sm me-2" @onclick="@(() => ResetSelection())">
                                     <i class="fi fi-rr-rotate-left me-1"></i>Reset Selection

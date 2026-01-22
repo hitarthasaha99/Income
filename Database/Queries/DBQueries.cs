@@ -1433,6 +1433,7 @@ namespace Income.Database.Queries
                         item.SubstitutedForID = null;
                         item.OriginalHouseholdID = null;
                         item.SubstitutionCount = 0;
+                        item.hhdStatus = 0;
                         item.status = "";
                         item.SSS = 0;
                         item.Stratum = 0;
