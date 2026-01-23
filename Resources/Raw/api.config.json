@@ -1,0 +1,55 @@
+﻿{
+  "Environments": {
+
+    "QA": {
+      "BaseUrls": {
+        "Post": "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/",
+        "Income": "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/",
+        "Common": "https://stagesurvey1.esigma.mospi.gov.in/APICommon/api/SURVEY/"
+      },
+      "Routes": {
+        "Login": "v1/UtilityMaster/AuthenticateSurveyUserAsync",
+        "FetchFsuList": "IncomeSurvey/GetFsuListByUserId?v_userid=",
+        "FetchSavedResponses": "IncomeSurvey/GetIncomeResponseDetailsByFsuIdAndStatus/",
+        "SaveResponse": "UpSertIncomeResponseAsync",
+        "Logout": "v1/UtilityMaster/LogoutUser?v_userName=",
+        "UpdateListing": "RemoveIncomeCapiDetails"
+      },
+      "APP_VERSION": "1.0.28"
+    },
+
+    "Staging": {
+      "BaseUrls": {
+        "Post": "http://115.124.119.108:83/ApiIncome/",
+        "Income": "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/",
+        "Common": "http://115.124.119.108:83/ApiCommon/api/SURVEY/"
+      },
+      "Routes": {
+        "Login": "v1/UtilityMaster/AuthenticateSurveyUserAsync",
+        "FetchFsuList": "IncomeSurvey/GetFsuListByUserId?v_userid=",
+        "FetchSavedResponses": "IncomeSurvey/GetIncomeResponseDetailsByFsuIdAndStatus/",
+        "SaveResponse": "UpSertIncomeResponseAsync",
+        "Logout": "v1/UtilityMaster/LogoutUser?v_userName=",
+        "UpdateListing": "RemoveIncomeCapiDetails"
+      },
+      "APP_VERSION": "1.0.4"
+    },
+
+    "Production": {
+      "BaseUrls": {
+        "Post": "https://esigma.mospi.gov.in/apIIncome/",
+        "Income": "https://esigma.mospi.gov.in/apiIncome/api/SURVEY/v1/",
+        "Common": "https://esigma.mospi.gov.in/apiCommon/api/SURVEY/"
+      },
+      "Routes": {
+        "Login": "v1/UtilityMaster/AuthenticateSurveyUserAsync",
+        "FetchFsuList": "IncomeSurvey/GetFsuListByUserId?v_userid=",
+        "FetchSavedResponses": "IncomeSurvey/GetIncomeResponseDetailsByFsuIdAndStatus/",
+        "SaveResponse": "UpSertIncomeResponseAsync",
+        "Logout": "v1/UtilityMaster/LogoutUser?v_userName=",
+        "UpdateListing": "RemoveIncomeCapiDetails"
+      },
+      "APP_VERSION": "1.0.0"
+    }
+  }
+}

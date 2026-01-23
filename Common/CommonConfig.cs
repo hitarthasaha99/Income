@@ -1,4 +1,5 @@
 ﻿using Income.Database.Models.Common;
+using Income.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -32,39 +33,19 @@ namespace Income.Common
         }
         public List<Validation_Model> SCH_0_0_BLOCK_1_REQ_FIELDS { get; set; } = new();
 
-
-        //Test
-        //public static readonly string PostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/";
-        //public static readonly string CommonAPIPostAddress = "https://stagesurvey1.esigma.mospi.gov.in/APICommon/api/SURVEY/";
-        //public static readonly string APIIncomeURL = "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/";
-        //public static readonly string APP_VERSION = "1.0.27";
-
-
-        //Staging
-        public static readonly string PostAddress = "http://115.124.119.108:83/ApiIncome/";
-        public static readonly string CommonAPIPostAddress = "http://115.124.119.108:83/ApiCommon/api/SURVEY/";
-        public static readonly string APIIncomeURL = "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/";
-        public static readonly string APP_VERSION = "1.0.5";
-
-        //PROD
-        //public static readonly string PostAddress = "https://esigma.mospi.gov.in/apIIncome/";
-        //public static readonly string CommonAPIPostAddress = "https://esigma.mospi.gov.in/apIcOMMON/";
-        //public static readonly string APIIncomeURL = "https://esigma.mospi.gov.in/apIIncome/api/SURVEY/v1/";
-        //public static readonly string APP_VERSION = "1.0.4";
-
-
-
-        /// <summary>
-        /// Endpoints
-        /// </summary>
-        public const string LOGIN_API = "v1/UtilityMaster/AuthenticateSurveyUserAsync";
-        public const string FETCH_FSU_LIST_BY_USER_ID = "IncomeSurvey/GetFsuListByUserId?v_userid=";
-        public const string FETCH_SAVED_RESPONSES_BY_FSU_ID = "IncomeSurvey/GetIncomeResponseDetailsByFsuIdAndStatus/";
-        public const string SAVE_SUBMITTED_RESPONSE = "UpSertIncomeResponseAsync";
-        public static string CHECK_CAPI_VERSION = $"v1/UtilityMaster/GetCapiApkVersionByUsername?survey_id={SessionStorage.surveyId}";
-        public static string LOGOUT_API = "v1/UtilityMaster/LogoutUser?v_userName=";
         public static string BaseController = "IncomeSurvey";
-        public static string UpdateListingAction = "RemoveIncomeCapiDetails";
+
+        public static string PostAddress => ConfigService.Current.BaseUrls.Post;
+        public static string CommonAPIPostAddress => ConfigService.Current.BaseUrls.Common;
+        public static string APIIncomeURL => ConfigService.Current.BaseUrls.Income;
+        public static string APP_VERSION => ConfigService.Current.APP_Version;
+
+        public static string LOGIN_API => ConfigService.Current.Routes.Login;
+        public static string FETCH_FSU_LIST_BY_USER_ID => ConfigService.Current.Routes.FetchFsuList;
+        public static string FETCH_SAVED_RESPONSES_BY_FSU_ID => ConfigService.Current.Routes.FetchSavedResponses;
+        public static string SAVE_SUBMITTED_RESPONSE => ConfigService.Current.Routes.SaveResponse;
+        public static string UpdateListingAction => ConfigService.Current.Routes.UpdateListing;
+        public static string LOGOUT_API => ConfigService.Current.Routes.Logout;
 
     }
 }

@@ -13,6 +13,9 @@
     protected override async Task OnInitializedAsync()
     {
         preloadService.Show(SpinnerColor.Light, "We are setting up things ready for you.... Please Wait .........");
+
+        ConfigService.EnvironmentName = AppEnvironment.QA;
+        await ConfigService.LoadAsync();
         if (CommonConfig.APIIncomeURL == "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/")
         {
             SessionStorage.env = SessionStorage.Environment.Development;

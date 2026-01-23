@@ -3,6 +3,11 @@
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Income.Database.Models.SCH0_0
+@using System.Text.Json.Serialization
+@using System.Text.Json
+@using System.Text
+@using System.Diagnostics
+@using System.IO.Compression
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
 @inject PreloadService preloadService
@@ -110,6 +115,7 @@
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">NHIS</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
+
                                             @if (SessionStorage.env == SessionStorage.Environment.Development)
                                             {
                                                 <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
@@ -244,7 +250,8 @@
                         var received_data = JsonConvert.DeserializeObject<Upsert_Model>(sch00data);
                         if (received_data != null)
                         {
-                            var deserialized = JsonConvert.DeserializeObject<Submission_Model>(received_data.submitted_json_data);
+                            //var deserialized = JsonConvert.DeserializeObject<Submission_Model>(received_data.submitted_json_data);
+                            var deserialized = commonService.DecompressAndDeserialize<Submission_Model>(received_data.submitted_json_data);
                             if (deserialized != null && deserialized.IncomeSch00block0 != null)
                             {
                                 await dB.HardDeleteSCH00DataForFSUID(fsu.fsu_id);
@@ -274,11 +281,11 @@
                         else
                         {
                             //Delete household data only for households already submitted
+                            //var received_data = JsonConvert.DeserializeObject<Submission_Model>(list.submitted_json_data);
+                            var received_data = commonService.DecompressAndDeserialize<Submission_Model>(list.submitted_json_data);
 
-                            var received_data = JsonConvert.DeserializeObject<Submission_Model>(list.submitted_json_data);
                             if (received_data != null && received_data.IncomeSch00block0 != null)
                             {
-
                                 var success = await dB.SaveReceivedHISDataAsync(received_data);
                                 if (success > 0)
                                 {
@@ -645,7 +652,8 @@
                         tbl_Fsu_List = new();
                         temp_fsu_list = new();
                         foreach (var item in fsu_list)
-                        { 
+                        {
+                            item.fsuHouses = item.fsuHouses != null ? item.fsuHouses.Where(x => x.is_deleted == false).ToList() : new List<fsu_houses>();
                             var OldFsuData = await dB.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(item.fsu_id);
                             if(checkDownload)
                             {

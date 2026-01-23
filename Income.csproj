@@ -25,7 +25,7 @@
         <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
         <!--<WindowsPackageType>None</WindowsPackageType>-->
 
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">30.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <DefaultLanguage>en-US</DefaultLanguage>
@@ -42,26 +42,34 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
       <AndroidPackageFormat>apk</AndroidPackageFormat>
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
-      <PublishTrimmed>False</PublishTrimmed>
-      <RunAOTCompilation>False</RunAOTCompilation>
+      <ApplicationDisplayVersion>1.0.28</ApplicationDisplayVersion>
+      <ApplicationVersion>28</ApplicationVersion>
+      <PublishTrimmed>True</PublishTrimmed>
+      <RunAOTCompilation>True</RunAOTCompilation>
+		<AndroidLinkMode>SdkOnly</AndroidLinkMode>
+		<AndroidEnableProguard>true</AndroidEnableProguard>
+		<AndroidEnableR8>true</AndroidEnableR8>
+		<AndroidLinkTool>r8</AndroidLinkTool>
     </PropertyGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)'=='net9.0-android'">
+		<ProguardConfiguration Include="proguard-rules.pro" />
+	</ItemGroup>
+
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
-      <RunAOTCompilation>False</RunAOTCompilation>
+      <ApplicationDisplayVersion>1.0.28</ApplicationDisplayVersion>
+      <ApplicationVersion>28</ApplicationVersion>
+      <RunAOTCompilation>True</RunAOTCompilation>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.28</ApplicationDisplayVersion>
+      <ApplicationVersion>28</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.5</ApplicationDisplayVersion>
-      <ApplicationVersion>5</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.28</ApplicationDisplayVersion>
+      <ApplicationVersion>28</ApplicationVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -80,6 +88,10 @@
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Resources\Raw\api.config.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -119,5 +131,26 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </MauiAsset>
     </ItemGroup>
+
+	<Target Name="ObfuscateAfterPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'&#xD;&#xA;                AND '$(TargetFramework)'=='net9.0-windows10.0.19041.0'">
+
+		<!-- Run Obfuscar -->
+		<Exec Command="dotnet tool run obfuscar.console obfuscar.xml" ConsoleToMSBuild="true" StandardOutputImportance="High" StandardErrorImportance="High" />
+
+		<!-- Collect obfuscated files -->
+		<ItemGroup>
+			<ObfuscatedFiles Include="bin\Release\net9.0-windows10.0.19041.0\publish_obf\**\*" />
+		</ItemGroup>
+
+		<!-- Replace publish output -->
+		<RemoveDir Directories="$(PublishDir)" />
+
+		<Copy SourceFiles="@(ObfuscatedFiles)" DestinationFolder="$(PublishDir)\%(ObfuscatedFiles.RecursiveDir)" />
+	</Target>
+
+
+
+
+
 
 </Project>

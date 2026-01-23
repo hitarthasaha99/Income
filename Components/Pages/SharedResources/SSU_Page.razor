@@ -268,7 +268,7 @@
 				toastService.ShowError("Please Sync all selected households before proceeding");
 				return;
 			}
-			
+
 			warningVM.selected_HHdList = [];
 			warningVM.selected_HHdList.AddRange(selected_for_submission);
 			NavigationManager.NavigateTo($"/dashboard/validate_page?schedule={"HIS"}");
@@ -625,7 +625,7 @@
 				var deserialized = JsonConvert.DeserializeObject<Upsert_Model>(response);
 				if (deserialized != null)
 				{
-					var received_data = JsonConvert.DeserializeObject<Submission_Model>(deserialized.submitted_json_data);
+					var received_data = networkService.DecompressAndDeserialize<Submission_Model>(deserialized.submitted_json_data);
 					if (received_data != null && received_data.IncomeSch00block0 != null)
 					{
 						var hhdDTo = received_data.IncomeSchHISDto;
@@ -707,8 +707,8 @@
 				var currentFSU = fsu_list?.FirstOrDefault(x => x.fsu_id == SessionStorage.SelectedFSUId);
 				if (currentFSU != null)
 				{
-					var fsuHouseList = currentFSU.fsuHouses;
-					if (fsuHouseList != null && fsuHouseList.Count > 0)
+					var fsuHouseList = currentFSU.fsuHouses?.Where(x => x.is_deleted == null || x.is_deleted == false);
+					if (fsuHouseList != null && fsuHouseList.Count() > 0)
 					{
 						foreach (var item in fsuHouseList)
 						{
@@ -790,6 +790,28 @@
 					warnings = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
 				}
 
+				//Sync FSU House - see if data for this HHD already exists
+				var fsu_response = await networkService.GetAsync(CommonConfig.APIIncomeURL, $"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
+				if (fsu_response != null)
+				{
+					var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(fsu_response);
+
+					var currentFSU = fsu_list?.FirstOrDefault(x => x.fsu_id == SessionStorage.SelectedFSUId);
+					if (currentFSU != null)
+					{
+						var fsuHouseList = currentFSU.fsuHouses?.Where(x => x.is_deleted == null || x.is_deleted == false);
+						if (fsuHouseList != null && fsuHouseList.Count() > 0)
+						{
+							bool hhd_exists = fsuHouseList.Any(x => x.hhd_id == hhd.Block_7_3);
+							if (hhd_exists && hhd.hhdStatus != 12)
+							{
+                                errors.Add("Data for this household already exists on server. Please download again to update the current status.");
+							}
+						}
+					}
+				}
+
+
 				if (hhd.hhdStatus == 12 && hhd.needDownload != 0)
 				{
 					errors.Add("Please Sync before submission");
@@ -811,6 +833,7 @@
 					{
 						errors.Add($"No Block 3 entries found for HHD Serial {hhd.Block_7_3}");
 					}
+
 
 					if (block_4 == null)
 					{
@@ -949,6 +972,18 @@
 				if (warnings != null && warnings.Count > 0 && warnings.Any(x => x.warning_status == 3))
 				{
 					errors.Add("Rejected warnings need to be addressed before submission");
+				}
+
+				if(block_2 != null)
+				{
+					if (block_2.total_time == null)
+					{
+						errors.Add("H078: Total time not entered in Block 2");
+					}
+					if (block_2.informant_serial == null)
+					{
+						errors.Add("Informant serial is empty");
+					}
 				}
 
 				errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);

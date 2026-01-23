@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Obfuscator>
+
+	<!-- Publish folder -->
+	<Var name="InPath"
+		 value="bin/Release/net9.0-windows10.0.19041.0/win10-x64/publish" />
+
+	<Var name="OutPath"
+		 value="bin/Release/net9.0-windows10.0.19041.0/win10-x64/publish_obf" />
+
+	<!-- IMPORTANT: use InPath here -->
+	<Module file="$(InPath)\Income.dll">
+		<SkipType name="Microsoft.*" />
+		<SkipType name="System.*" />
+		<SkipType name="Newtonsoft.*" />
+	</Module>
+
+	<RenameProperties>true</RenameProperties>
+	<RenameFields>true</RenameFields>
+	<RenameMethods>true</RenameMethods>
+	<HideStrings>true</HideStrings>
+
+</Obfuscator>

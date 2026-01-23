@@ -516,6 +516,26 @@
                     CommonEnum.his_block_12.ToString(),
                 },
                 hhdId: SessionStorage.selected_hhd_id);
+                var currentHHD = await dQ.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+                if (currentHHD != null)
+                {
+                    currentHHD.status = "";
+                    await dQ.Update_SCH0_0_Block_7(currentHHD);
+                }
+                if (block_1 != null)
+                {
+                    block_1.Block13_14Timestamp = null;
+                    block_1.block_12_remark = string.Empty;
+                    block_1.block_13_remark = string.Empty;
+                }
+                var block_2 = await dQ.Fetch_SCH_HIS_Block2(SessionStorage.selected_hhd_id);
+                if (block_2 != null)
+                {
+                    block_2.total_time = null;
+                    block_2.informant_serial = null;
+                    block_2.informant_name = null;
+                    await dQ.SaveAsync<Tbl_Block_FieldOperation>(block_2);
+                }
                 await _header?.ReloadVisitedBlocksAsync();
             }
         }
