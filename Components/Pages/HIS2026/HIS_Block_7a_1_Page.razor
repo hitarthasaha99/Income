@@ -175,7 +175,13 @@
     </div>  
 </div>
 
-<Modal @ref="modal" title="@((isAdd ? "Add Details" : "Update Details"))" IsVerticallyCentered="true" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
+<Modal @ref="modal" IsVerticallyCentered="true" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
+     <HeaderTemplate>
+        <h5 class="modal-title">
+            <span class="text-primary me-1">[Block 7a - item - 7.1]</span>
+            @(isAdd ? "Add Details" : "Update Details")
+        </h5>
+    </HeaderTemplate>
     <BodyTemplate>
         @if (editContext != null)
         {
