@@ -189,7 +189,7 @@
 
 <Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
     <HeaderTemplate>
-        <h5 class="modal-title">@((isAdd ? "Add Member" : "Update Member"))</h5>
+        <h5 class="modal-title"><span class="text-primary me-1">[Block 3]</span>@((isAdd ? "Add Member" : "Update Member"))</h5>
     </HeaderTemplate>
     <BodyTemplate>
         @if (editContext != null)
