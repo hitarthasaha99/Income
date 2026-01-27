@@ -250,7 +250,7 @@
         editContext = new EditContext(fields);
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
-        
+
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             survey_time = fields.survey_timestamp.GetValueOrDefault();
@@ -348,7 +348,7 @@
                 isselectOther = fields?.item_7_13 == 4;
 
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -362,6 +362,10 @@
         if (int.TryParse(e.Value?.ToString(), out var v))
         {
             fields.item_7_13 = v;
+            if (fields.item_7_13 != 4)
+            {
+                fields.remarks = null;
+            }
             item_9_warning = string.Empty;
         }
         else

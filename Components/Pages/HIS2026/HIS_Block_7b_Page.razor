@@ -713,6 +713,10 @@
         if (int.TryParse(e.Value?.ToString(), out var v))
         {
             block_7B.item_10 = v;
+            if(block_7B.item_10 != 4)
+            {
+                block_7B.remarks = null;
+            }
             item_9_warning = string.Empty;
         }
         else
