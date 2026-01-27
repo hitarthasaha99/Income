@@ -565,6 +565,8 @@
         if (block_1_obj.id != Guid.Empty)
             await SCH_0_0_Queries.SaveBlock1(block_1_obj);
 
+        Debug.WriteLine($"FSU Submitted: {SessionStorage.FSU_Submitted}, Selection Done: {SessionStorage.selection_done}");
+
         if(SessionStorage.FSU_Submitted || SessionStorage.selection_done)
         {
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
