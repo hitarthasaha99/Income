@@ -202,7 +202,7 @@
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
                     <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
-                    @if (SessionStorage.env == SessionStorage.Environment.Development)
+                    @if (SessionStorage.env == SessionStorage.Environment.Development || (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.BBS.20")))
                     {
                         <button class="btn btn-primary me-2" @onclick="@(() => Generate())">Generate<i class="fi fi-rr-settings ms-1"></i></button>
                     }
