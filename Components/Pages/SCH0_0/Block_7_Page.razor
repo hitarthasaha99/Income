@@ -567,7 +567,7 @@
 
         Debug.WriteLine($"FSU Submitted: {SessionStorage.FSU_Submitted}, Selection Done: {SessionStorage.selection_done}");
 
-        if(SessionStorage.FSU_Submitted || SessionStorage.selection_done)
+        if(SessionStorage.selection_done)
         {
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             return;
