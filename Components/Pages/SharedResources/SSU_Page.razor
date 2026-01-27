@@ -393,6 +393,17 @@
 			//Need to branch off submission logic for ENM, SSO and DS here
 			if (currentRole == SessionStorage.UserRole.JSO)
 			{
+				var sch00warnings = await dQ.GetWarningList(schedule: "0");
+
+				if (sch00warnings != null && sch00warnings.Count > 0)
+				{
+					sch00warnings = sch00warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+					if (sch00warnings.Any(x => x.warning_status == 1 || x.warning_status == 3))
+					{
+						toastService.ShowError("Warnings in SCH0 need to be resolved before submission");
+						return;
+					}
+				}
 				var result = await ValidateSubmissionJSO(hhd_list);
 				if (result != null)
 				{
@@ -472,6 +483,17 @@
 			}
 			else if(currentRole == SessionStorage.UserRole.SSO)
 			{
+				var sch00warnings = await dQ.GetWarningList(schedule: "0");
+
+				if (sch00warnings != null && sch00warnings.Count > 0)
+				{
+					sch00warnings = sch00warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+					if (mode == SubmissionMode.sso_to_ds && sch00warnings.Any(x => x.warning_status == 2 || x.warning_status == 3))
+					{
+						toastService.ShowError("Warnings in SCH0 need to be resolved / accepted before submission to DS");
+						return;
+					}
+				}
 				var result = await ValidateSubmissionStatusSSO(hhd_list, mode);
 				if (result != null)
 				{
@@ -488,6 +510,7 @@
 						preloadService.Show(SpinnerColor.Info, "Submitting data");
 
 						Submission_Model data = new();
+						data.IncomeSch00WarningList = await dQ.GetWarningList(schedule: "0");
 						data.IncomeSchHISDto = [];
 
 						foreach (var hhd in hhd_list)
@@ -648,6 +671,7 @@
 									// {
 									// 	await dQ.SaveAsync<Tbl_Warning>(warning);
 									// }
+									//HHD warnings
 									var existingWarnings = await dQ.GetWarningList(hhd.Block_7_3.GetValueOrDefault());
 									foreach (var item in existingWarnings)
 									{
@@ -656,6 +680,19 @@
 									foreach (var warning in incomingWarningList)
 									{
 										await dQ.InsertAsync<Tbl_Warning>(warning);
+									}
+									var sch00Warnings = await dQ.GetWarningList(schedule: "0");
+									if (sch00Warnings != null && sch00Warnings.Count > 0)
+									{
+										foreach (var item in sch00Warnings)
+										{
+											await dQ.HardDeleteEntryAsync<Tbl_Warning>(item.id);
+										}
+									}
+									//SCH00 warnings
+									foreach(var warning in received_data.IncomeSch00WarningList)
+									{
+										await dQ.SaveAsync<Tbl_Warning>(warning);
 									}
 								}
 
@@ -784,7 +821,19 @@
 				var block_11b = await dQ.FetchListAsync<Tbl_Block_11b>() ?? new();
 				var block_A = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
 				var block_B = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_B>();
+				var sch00warnings = await dQ.GetWarningList(schedule: "0");
 				var warnings = await dQ.FetchListAsync<Tbl_Warning>() ?? new();
+
+				// if (sch00warnings != null && sch00warnings.Count > 0)
+				// {
+				// 	sch00warnings = sch00warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
+				// 	if (sch00warnings.Any(x => x.warning_status == 1 || x.warning_status == 3))
+				// 	{
+				// 		toastService.ShowError("Warnings in SCH0 need to be resolved before submission");
+				// 		return new Dictionary<int, List<string>>();
+				// 	}
+				// }
+
 				if (warnings != null && warnings.Count > 0)
 				{
 					warnings = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();

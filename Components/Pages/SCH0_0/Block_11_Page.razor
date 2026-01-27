@@ -223,7 +223,7 @@
                 } *@
 
                 @{
-                    if (ShowValidateButton)
+                    if (ShowSubmitButton)
                     {
                         if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                         {
@@ -272,8 +272,9 @@
     // }
 
     private string? timeTakenError;
-    private bool ShowValidateButton;
 
+    private bool ShowValidateButton;
+    private bool ShowSubmitButton;
     protected override async Task OnInitializedAsync()
     {
 
@@ -291,11 +292,13 @@
 
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                ShowValidateButton = fsu != null && (fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 || fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 11) && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() is (12 or 0 or 11);
+                ShowValidateButton = fsu != null && (fsu.lookupFsuSubmitStatus == 12 || ((fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 || fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 11) && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() is (12 or 0 or 11)));
+                ShowSubmitButton = fsu != null && (fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 || fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 11) && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() is (12 or 0 or 11);
             }
             else
             {
-                ShowValidateButton = fsu != null && fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() == 21;
+                ShowValidateButton = fsu != null && ((fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() == 21) || (fsu.lookupFsuSubmitStatus == 21));
+                ShowSubmitButton = fsu != null && fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() == 21;
             }
             if (block_1 != null)
             {
@@ -629,7 +632,7 @@
                     toastService.ShowError("Atleast one warning needs to be resolved before submission");
                     return;
                 }
-                
+
                 if(lookup_sub_submit_status == 12)
                 {
                     toastService.ShowError("SCH00 has already been referred back to ENM");
@@ -693,6 +696,7 @@
                 fsu.lookup_fsu_sub_submit_status = payload.lookup_fsu_sub_submit_status;
                 await commonQueries.UpdateFSU(fsu);
                 ShowValidateButton = false;
+                ShowSubmitButton = false;
                 StateHasChanged();
             }
             else
