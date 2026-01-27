@@ -68,21 +68,9 @@
 
     protected override void OnInitialized()
     {
-        MainPage.OnBack = () =>
-        {
-            var path = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-
-            if (path.StartsWith("login"))
-            {
-#if ANDROID
-                Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
-#endif
-                return true; // back handled
-            }
-
-            return false; // allow normal back
-        };
+        MainPage.OnBack = null;
     }
+
 
     public void Dispose()
     {
