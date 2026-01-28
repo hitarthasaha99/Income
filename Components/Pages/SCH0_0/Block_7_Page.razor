@@ -642,13 +642,17 @@
 
             if (confirmation)
             {
-                
+
                 var savedWarnings = await SCH_0_0_Queries.GetWarningTableDataForWarningCode(
                     SessionStorage.SelectedFSUId,
                     SessionStorage.selected_hhd_id,
                     "0",
                     "W025(i)"
                 );
+                if(savedWarnings != null && savedWarnings.Count > 0)
+                {
+                    savedWarnings = savedWarnings.Where(x => x.is_deleted == null || x.is_deleted == false).ToList();
+                }
                 if (savedWarnings != null && savedWarnings.Count > 0)
                 {
                     foreach (var warn in savedWarnings)

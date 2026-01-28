@@ -653,6 +653,16 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+
+                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && (x.warning_code == "W025(i)" || x.warning_code == "W024(ii)")).ToListAsync();
+                        if (warnings != null && warnings.Count > 0)
+                        {
+                            foreach (var warning in warnings)
+                            {
+                                await DeleteWarningAsync(warning.id);
+                            }
+                        }
+                        await _database.Table<Tbl_Warning>().DeleteAsync(x => x.fsu_id == fsuID);
                         var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
                         if (fsuRecord != null)
                         {
@@ -760,6 +770,14 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && (x.warning_code == "W025(i)" || x.warning_code == "W024(ii)")).ToListAsync();
+                        if (warnings != null && warnings.Count > 0)
+                        {
+                            foreach (var warning in warnings)
+                            {
+                                await DeleteWarningAsync(warning.id);
+                            }
+                        }
                         var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
                         if (fsuRecord != null)
                         {
