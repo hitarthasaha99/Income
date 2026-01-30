@@ -713,6 +713,10 @@
         if (int.TryParse(e.Value?.ToString(), out var v))
         {
             block_7B.item_10 = v;
+            if(block_7B.item_10 != 4)
+            {
+                block_7B.remarks = null;
+            }
             item_9_warning = string.Empty;
         }
         else
@@ -812,9 +816,9 @@
             CheckItem6Warning();
             if (!string.IsNullOrEmpty(item_9_warning))
             {
-                warningVM.AddWarning(item_9_warning, "HIS", "7B", "7B.9", warningCode: "" ,SessionStorage.selected_hhd_id);
+                warningVM.AddWarning(item_9_warning, "NHIS", "7B", "7B.9", warningCode: "" ,SessionStorage.selected_hhd_id);
             }
-            await warningVM.SaveWarningAsync("HIS", "7B");
+            await warningVM.SaveWarningAsync("NHIS", "7B");
 
             if (block_1 != null)
             {

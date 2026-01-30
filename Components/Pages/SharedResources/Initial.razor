@@ -14,8 +14,7 @@
     {
         preloadService.Show(SpinnerColor.Light, "We are setting up things ready for you.... Please Wait .........");
 
-        ConfigService.EnvironmentName = AppEnvironment.QA;
-        Console.WriteLine("comment");
+        ConfigService.EnvironmentName = AppEnvironment.Staging;
         await ConfigService.LoadAsync();
         if (CommonConfig.APIIncomeURL == "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/")
         {

@@ -316,6 +316,7 @@
                     field_work_end_date = DateTime.Now,
                     fsu_id = SelectedFsuId,
                     enumerator_name = SessionStorage.user_name,
+                    supervisor_name = fsu?.supervisor ?? ""
                 };
             }
             else
@@ -335,6 +336,14 @@
                 {
                     tbl_Sch_0_0_FieldOperation.supervisor_name = SessionStorage.user_name;
                 }
+                if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)
+                {
+                    if (string.IsNullOrEmpty(tbl_Sch_0_0_FieldOperation.supervisor_name))
+                    {
+                        tbl_Sch_0_0_FieldOperation.supervisor_name = fsu?.supervisor;
+                    }
+                }
+
             }
 
             remarks_block_9_10_yes = !string.IsNullOrEmpty(block_1?.EnumeratorRemarks) || !string.IsNullOrEmpty(block_1?.SupervisorRemarks);

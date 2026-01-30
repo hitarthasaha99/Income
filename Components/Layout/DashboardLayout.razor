@@ -144,7 +144,11 @@
                 return;
             } 
             preloadService.Hide();
-            NavigationManager.NavigateTo("/login", replace: true);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Application.Current.MainPage = new MainPage();
+            });
+
         }
         else
         {

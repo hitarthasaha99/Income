@@ -1,7 +1,109 @@
 ﻿@inherits LayoutComponentBase
 @inject IToastService toastService
+@inject BackButtonService BackService
+@inject NavigationManager Nav
+@inject NavigationHistoryService NavHistory
+
 <div class="page">
     @Body
     <BlazoredToasts />
     <Preload LoadingText="Loading..." />
 </div>
+
+@code {
+    private DateTime _lastBackPress = DateTime.MinValue;
+    private readonly TimeSpan _exitInterval = TimeSpan.FromSeconds(2);
+
+    protected override void OnInitialized()
+    {
+        BackService.HandleBackRequested = HandleBack;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            TrackCurrentUri();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        TrackCurrentUri();
+    }
+
+    private void TrackCurrentUri()
+    {
+        var uri = Nav.ToBaseRelativePath(Nav.Uri).Split('?')[0].TrimEnd('/').ToLowerInvariant();
+        NavHistory.Track(uri);
+    }
+
+
+    private bool HandleBack()
+    {
+        var uri = Nav.ToBaseRelativePath(Nav.Uri)
+                     .Split('?')[0]
+                     .TrimEnd('/')
+                     .ToLowerInvariant();
+
+        // -------------------------
+        // SSU page: redirect to fsulist and reset history
+        // -------------------------
+        if (uri == "dashboard/his/ssu_page")
+        {
+            Nav.NavigateTo("/dashboard/fsulist", replace: true);
+            NavHistory.ResetTo("fsulist"); // ✅ reset stack
+            return true; // block Android
+        }
+
+        // -------------------------
+        // Login: double tap exit, reset history when first visited
+        // -------------------------
+        if (uri == "login")
+        {
+            NavHistory.ResetTo("login"); // optional, in case user came from deep link
+
+            var now = DateTime.Now;
+            if ((now - _lastBackPress) < _exitInterval)
+            {
+                return false; // allow Android exit
+            }
+            else
+            {
+                _lastBackPress = now;
+                ShowToast("Press back again to exit");
+                return true; // block first tap
+            }
+        }
+
+        // -------------------------
+        // FSU list: exit immediately, reset history
+        // -------------------------
+        if (uri == "dashboard/fsulist")
+        {
+            NavHistory.ResetTo("fsulist"); // optional
+            return true; // let Android exit
+        }
+
+        // -------------------------
+        // Other pages: go back in Blazor history
+        // -------------------------
+        if (NavHistory.CanGoBack())
+        {
+            var prev = NavHistory.GoBack();
+            Nav.NavigateTo(prev, replace: true);
+            return true; // block Android
+        }
+
+        // Fallback: let Android handle it (exit app)
+        return false;
+    }
+
+
+    private void ShowToast(string message)
+    {
+#if ANDROID
+        Android.Widget.Toast.MakeText(Platform.CurrentActivity, message, Android.Widget.ToastLength.Short)?.Show();
+#endif
+    }
+}

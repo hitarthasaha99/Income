@@ -414,9 +414,9 @@
 
             if (!string.IsNullOrEmpty(item_9_1_warning))
             {
-                warning_VM.AddWarning(item_9_1_warning, "HIS", "9A", "9.1", "W063", SessionStorage.selected_hhd_id);
+                warning_VM.AddWarning(item_9_1_warning, "NHIS", "9A", "9.1", "W063", SessionStorage.selected_hhd_id);
             }
-            await warning_VM.SaveWarningAsync("HIS", "9A");
+            await warning_VM.SaveWarningAsync("NHIS", "9A");
 
             if (!is_go_next)
             {

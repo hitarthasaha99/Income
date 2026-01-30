@@ -342,14 +342,14 @@
 
             if (!string.IsNullOrEmpty(item_1_warning))
             {
-                warningVM.AddWarning(item_1_warning, "HIS", "8", "1", "W057" ,SessionStorage.selected_hhd_id);
+                warningVM.AddWarning(item_1_warning, "NHIS", "8", "1", "W057" ,SessionStorage.selected_hhd_id);
             }
             if (!string.IsNullOrEmpty(item_2_warning))
             {
-                warningVM.AddWarning(item_2_warning, "HIS", "8", "2", "W058" ,SessionStorage.selected_hhd_id);
+                warningVM.AddWarning(item_2_warning, "NHIS", "8", "2", "W058" ,SessionStorage.selected_hhd_id);
             }
             
-            await warningVM.SaveWarningAsync("HIS", "8");
+            await warningVM.SaveWarningAsync("NHIS", "8");
 
             if (!is_go_next)
             {

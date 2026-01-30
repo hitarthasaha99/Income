@@ -577,7 +577,7 @@ namespace Income.Database.Queries
                     {
                         await _database.Table<Tbl_Sch_0_0_Block_2_1>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_2_2>().DeleteAsync(x => x.fsu_id == fsuID);
-                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID && x.is_sub_unit == true);
+                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
 
                     }
 
@@ -614,7 +614,12 @@ namespace Income.Database.Queries
                         }
                         if (option == 3)
                         {
-                            await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID && x.is_sub_unit == false);
+                            await _database.ExecuteAsync(
+                                    @"DELETE FROM Tbl_Sch_0_0_Block_3
+                                      WHERE fsu_id = ?
+                                        AND is_sub_unit = 0",
+                                    fsuID
+                                );
                         }
                         await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
@@ -653,6 +658,16 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+
+                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && (x.warning_code == "W025(i)" || x.warning_code == "W024(ii)")).ToListAsync();
+                        if (warnings != null && warnings.Count > 0)
+                        {
+                            foreach (var warning in warnings)
+                            {
+                                await DeleteWarningAsync(warning.id);
+                            }
+                        }
+                        await _database.Table<Tbl_Warning>().DeleteAsync(x => x.fsu_id == fsuID);
                         var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
                         if (fsuRecord != null)
                         {
@@ -686,7 +701,7 @@ namespace Income.Database.Queries
                     {
                         await _database.Table<Tbl_Sch_0_0_Block_2_1>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_2_2>().DeleteAsync(x => x.fsu_id == fsuID);
-                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID && x.is_sub_unit == true);
+                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
 
                     }
 
@@ -722,7 +737,15 @@ namespace Income.Database.Queries
                             tbl_Sch_0_0_FieldOperation.field_work_end_date = null;
                             await SaveBlock2(tbl_Sch_0_0_FieldOperation);
                         }
-                        await _database.Table<Tbl_Sch_0_0_Block_3>().DeleteAsync(x => x.fsu_id == fsuID);
+                        if (option == 3)
+                        {
+                            await _database.ExecuteAsync(
+                                    @"DELETE FROM Tbl_Sch_0_0_Block_3
+                                      WHERE fsu_id = ?
+                                        AND is_sub_unit = 0",
+                                    fsuID
+                                );
+                        }
                         await _database.Table<Tbl_Sch_0_0_Block_7>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Sch_0_0_Block_5>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Warning>().DeleteAsync(x => x.fsu_id == fsuID);
@@ -760,6 +783,14 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
+                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && (x.warning_code == "W025(i)" || x.warning_code == "W024(ii)")).ToListAsync();
+                        if (warnings != null && warnings.Count > 0)
+                        {
+                            foreach (var warning in warnings)
+                            {
+                                await DeleteWarningAsync(warning.id);
+                            }
+                        }
                         var fsuRecord = await _database.Table<Tbl_Fsu_List>().Where(fsu => fsu.fsu_id == fsuID).FirstOrDefaultAsync();
                         if (fsuRecord != null)
                         {
@@ -1160,6 +1191,19 @@ namespace Income.Database.Queries
             }
         }
 
+        public async Task<List<Tbl_Sch_0_0_Block_7>> GetBlock7DataByFSUID(int fsuID)
+        {
+            try
+            {
+                List<Tbl_Sch_0_0_Block_7>? data_set = await _database.QueryAsync<Tbl_Sch_0_0_Block_7>("SELECT * FROM Tbl_Sch_0_0_Block_7 WHERE fsu_id = ? AND tenant_id = ? AND (is_deleted IS NULL OR is_deleted = 0)", fsuID, SessionStorage.tenant_id);
+                return data_set != null && data_set.Count > 0 ? data_set : new();
+            }
+            catch (Exception ex)
+            {
+                return new List<Tbl_Sch_0_0_Block_7>();
+            }
+        }
+
         public async Task<List<Tbl_Sch_0_0_Block_7>> GetBlock7DataWithDeleted()
         {
             try
@@ -1523,7 +1567,7 @@ namespace Income.Database.Queries
             try
             {
                 var hhd = await _database.Table<Tbl_Sch_0_0_Block_7>()
-                    .Where(x => x.fsu_id == fsuID && x.Block_7_3 == hhd_id)
+                    .Where(x => x.fsu_id == fsuID && x.Block_7_3 == hhd_id && (x.is_deleted == null || x.is_deleted == false))
                     .FirstOrDefaultAsync();
                 if (hhd != null)
                 {
@@ -4099,7 +4143,7 @@ namespace Income.Database.Queries
 
 
 
-        public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "HIS")
+        public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "NHIS")
         {
             try
             {

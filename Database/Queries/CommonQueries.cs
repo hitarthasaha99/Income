@@ -351,6 +351,33 @@ namespace Income.Database.Queries
                 await _database.DeleteAllAsync<Tbl_Sch_0_0_Block_7>();               
                 await _database.DeleteAllAsync<Tbl_Fsu_List>();
                 await _database.DeleteAllAsync<Tbl_Visited_Blocks>();
+                await _database.DeleteAllAsync<Tbl_Warning>();
+
+                await _database.DeleteAllAsync<Tbl_Block_1>();
+                await _database.DeleteAllAsync<Tbl_Block_3>();
+                await _database.DeleteAllAsync<Tbl_Block_4>();
+                await _database.DeleteAllAsync<Tbl_Block_4_Q5>();
+                await _database.DeleteAllAsync<Tbl_Block_5>();
+                await _database.DeleteAllAsync<Tbl_Block_6>();
+                await _database.DeleteAllAsync<Tbl_Block_7a>();
+                await _database.DeleteAllAsync<Tbl_Block_7a_1>();
+                await _database.DeleteAllAsync<Tbl_Block_7b>();
+                await _database.DeleteAllAsync<Tbl_Block_7c>();
+                await _database.DeleteAllAsync<Tbl_Block_7c_NIC>();
+                await _database.DeleteAllAsync<Tbl_Block_7c_Q10>();
+                await _database.DeleteAllAsync<Tbl_Block_7d>();
+                await _database.DeleteAllAsync<Tbl_Block_8>();
+                await _database.DeleteAllAsync<Tbl_Block_8_Q6>();
+                await _database.DeleteAllAsync<Tbl_Block_9a>();
+                await _database.DeleteAllAsync<Tbl_Block_9b>();
+                await _database.DeleteAllAsync<Tbl_Block_10>();
+                await _database.DeleteAllAsync<Tbl_Block_11a>();
+                await _database.DeleteAllAsync<Tbl_Block_11b>();
+                await _database.DeleteAllAsync<Tbl_Block_A>();
+                await _database.DeleteAllAsync<Tbl_Block_B>();
+                await _database.DeleteAllAsync<Tbl_Block_FieldOperation>();
+
+
                 await _database.ExecuteAsync("COMMIT");
                 return;
             }

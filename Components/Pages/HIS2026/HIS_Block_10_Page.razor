@@ -119,7 +119,7 @@
                                                 </label>
                                             </td>
                                             <td>Milk & milk products</td>
-                                                <td>Last 30 days</td>
+                                                <td>Last 7 days</td>
                                                 <td>
                                                     <input type="number" class="form-control form-control-sm no-spinner"
                                                             value="@model.item_4"
@@ -511,7 +511,7 @@
                                                 </label>
                                             </td>
                                         <td>
-                                            Total expenditure = sum (Q10.1: 10.2) /7×30 + {sum (Q10.3:
+                                            Total expenditure = sum (Q10.1: 10.2 + Q10.4) /7×30 + {sum (Q10.3 + Q10.5:
                                             Q10.12) + Q10.91 + Q10.92} + {sum (Q10.13: Q10.22) +
                                             Q10.93}/365×30
                                         </td>
@@ -720,17 +720,17 @@
     
     public void handleCalculate()
     {
-        // 1. Weekly Items (Q10.1 - Q10.2) -> Normalize to 30 days
+        // 1. Weekly Items (Q10.1: Q10.2 + Q10.4) -> Normalize to 30 days
         decimal weeklySum =
             (decimal)(model.item_1 ?? 0) +
-            (decimal)(model.item_2 ?? 0);
+            (decimal)(model.item_2 ?? 0) +
+            (decimal)(model.item_4 ?? 0);
 
         decimal weeklyToMonthly = (weeklySum / 7m) * 30m;
 
         // 2. Monthly Items (Q10.3 - Q10.12) + Q10.91 + Q10.92
         decimal monthlySum =
             (decimal)(model.item_3 ?? 0) +
-            (decimal)(model.item_4 ?? 0) +
             (decimal)(model.item_5 ?? 0) +
             (decimal)(model.item_6 ?? 0) +
             (decimal)(model.item_7 ?? 0) +

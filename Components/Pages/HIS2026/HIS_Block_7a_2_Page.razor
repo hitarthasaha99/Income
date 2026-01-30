@@ -574,6 +574,10 @@
             if (int.TryParse(selectedOther, out int result))
             {
                 block_7A.item_7 = result;
+                if (result != 5)
+                {
+                    block_7A.remarks = null;
+                }
             }
             else
             {

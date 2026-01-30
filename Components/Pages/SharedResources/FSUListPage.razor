@@ -116,7 +116,7 @@
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">NHIS</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
 
-                                            @if (SessionStorage.env == SessionStorage.Environment.Development)
+                                            @if (SessionStorage.env == SessionStorage.Environment.Development || (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.BBS.20")))
                                             {
                                                 <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
                                             }
@@ -165,7 +165,13 @@
         //preloadService.Show(SpinnerColor.Light, "Checking for updates, Please hang on....");
         //CheckAPKVersion();
         SessionStorage.ShowGenerateButton = SessionStorage.env == SessionStorage.Environment.Development ||
-        (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.DEL.31" or "ENM.DEL.32" or "ENM.DEL.33" or "ENM.DEL.34" or "ENM.DEL.35"));
+        (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.BBS.20" or "ENM.DEL.31" or "ENM.DEL.32" or "ENM.DEL.33" or "ENM.DEL.34" or "ENM.DEL.35"));
+        preloadService.Show(
+        SpinnerColor.Light,
+        "We are fetching data from central database for seamless offline experience, Please hang on...."
+    );
+
+        await Task.Yield();          
         await Fsu_Load();
     }
 
@@ -211,7 +217,7 @@
                 if (currentFSU != null)
                 {
 
-                    var fsuHouses = currentFSU.fsuHouses.Where(x => x.is_deleted == false);
+                    var fsuHouses = currentFSU.fsuHouses?.Where(x => (x.is_deleted == null || x.is_deleted == false));
                     var validStatuses = new HashSet<int> { 12, 21, 22, 31, 32 };
 
                     var hhdIdsToDelete = fsuHouses?
@@ -643,9 +649,7 @@
                 {
                     var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(response);
                     CheckFSUSubstitution(fsu_list);
-                    preloadService.Hide();
                     //CheckFSUUpdateListingDone(fsu_list);
-                    preloadService.Show(SpinnerColor.Light, "We are fetching data from central database for seamless offline experience, Please hang on....");
 
                     if (fsu_list != null && fsu_list.Count > 0)
                     {
@@ -653,7 +657,7 @@
                         temp_fsu_list = new();
                         foreach (var item in fsu_list)
                         {
-                            item.fsuHouses = item.fsuHouses != null ? item.fsuHouses.Where(x => x.is_deleted == false).ToList() : new List<fsu_houses>();
+                            item.fsuHouses = item.fsuHouses != null ? item.fsuHouses.Where(x => (x.is_deleted == null || x.is_deleted == false)).ToList() : new List<fsu_houses>();
                             var OldFsuData = await dB.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(item.fsu_id);
                             if(checkDownload)
                             {
@@ -683,13 +687,22 @@
                             {
                                 int pendingHouses = 0;
                                 int totalHouses = 0;
+                                List<Tbl_Sch_0_0_Block_7> dataList = await dB.GetBlock7DataByFSUID(item.fsu_id);
+                                int count = 0;
+                                foreach (var hhd in dataList)
+                                {
+                                    if (hhd.isSelected == true && hhd.status != "SUBSTITUTED" && hhd.SSS_household_id.GetValueOrDefault() != 0)
+                                    {
+                                        count++;
+                                    }
+                                }
                                 if (item.fsuHouses != null && item.fsuHouses.Count > 0)
                                 {
                                     pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 0 || x.lookup_submit_status == 11 || x.lookup_submit_status == 12);
                                     totalHouses = item.fsuHouses.Count();
                                 }
-                                item.completed_hhd = pendingHouses;
-                                item.total_hhd = totalHouses;
+                                item.completed_hhd = (item.fsuHouses != null && item.fsuHouses.Count > 0) ? (count - (totalHouses - pendingHouses)) : count;
+                                item.total_hhd = (dataList != null && dataList.Count > 0) ? count : 0;
                             }
                             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                             {
@@ -795,6 +808,10 @@
             temp_fsu_list = new List<Tbl_Fsu_List>();
             StateHasChanged();
             return;
+        }
+        finally
+        {
+            preloadService.Hide();
         }
     }
 

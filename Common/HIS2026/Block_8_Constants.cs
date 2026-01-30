@@ -48,7 +48,7 @@ namespace Income.Common.HIS2026
             new() { id = 33, title = "Matribhasha Satyagrahi Pension Scheme - Haryana" },
             new() { id = 34, title = "Allowance to Eunuchs Scheme" },
             new() { id = 35, title = "Leprosy Pension Scheme" },
-            new() { id = 36, title = "Other cash transfer from government (e.g., DBT for LPG purchase)" }
+            new() { id = 36, title = "Other cash transfer from government" }
         ];
 
     }

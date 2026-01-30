@@ -26,7 +26,7 @@
             <!-- 🔹 Sticky Top Action Header -->
             <div class="card-header">
                 <h3 class="card-title">
-                    <span class="text-primary me-2">[Block 7]</span>List of households and selection of households for Schedule on HIS
+                    <span class="text-primary me-2">[Block 7]</span>List of households and selection of households for Schedule on NHIS
                 </h3>
                 <div class="card-tools" hidden="@SessionStorage.selection_done">
                     <div class="d-flex align-items-center" hidden="@SessionStorage.selection_done">
@@ -61,7 +61,7 @@
                             <th style="min-width:50px;">Household Type</th>
                             <th style="min-width:250px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
                             <th style="min-width:200px;">Usual monthly consumption expenditure of the household (Rs.)</th>
-                            @* <th style="min-width:100px;">SSS number for Schedule HIS 2026</th>
+                            @* <th style="min-width:100px;">SSS number for Schedule NHIS 2026</th>
                             <th style="min-width:40px;">Selected</th> *@
                         </tr>
                     </thead>
@@ -370,6 +370,7 @@
     int originalSrl = 0;
     bool isAdd = false;
     string modalHeader = string.Empty;
+    Tbl_Sch_0_0_Block_7? backupObject = null;
 
     bool HideInsertBtn = false;
 
@@ -565,7 +566,9 @@
         if (block_1_obj.id != Guid.Empty)
             await SCH_0_0_Queries.SaveBlock1(block_1_obj);
 
-        if(SessionStorage.FSU_Submitted || SessionStorage.selection_done)
+        Debug.WriteLine($"FSU Submitted: {SessionStorage.FSU_Submitted}, Selection Done: {SessionStorage.selection_done}");
+
+        if(SessionStorage.selection_done)
         {
             NavigationManager.NavigateTo("/dashboard/sch0.0/block_7_selection");
             return;
@@ -595,7 +598,7 @@
                 var pop = Math.Round(block_4.approximate_population_su.GetValueOrDefault());
                 if(!isWithin5Percent)
                 {
-                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {pop}.\n\n";
+                    firstWarning = $"W025(i) : Population mismatch:" + $"{total_listed_population} should be within ±5% of {pop}.";
                 }
             }
         }
@@ -620,7 +623,7 @@
                 isWithin5Percent = total_listed_population >= lowerLimit && total_listed_population <= upperLimit;
                 if (!isWithin5Percent)
                 {
-                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {sDPop}";
+                    firstWarning = $"W025(i) : Population mismatch:" + $"{total_listed_population} should be within ±5% of {sDPop}";
                 }
             }
         }
@@ -640,13 +643,17 @@
 
             if (confirmation)
             {
-                
+
                 var savedWarnings = await SCH_0_0_Queries.GetWarningTableDataForWarningCode(
                     SessionStorage.SelectedFSUId,
                     SessionStorage.selected_hhd_id,
                     "0",
                     "W025(i)"
                 );
+                if(savedWarnings != null && savedWarnings.Count > 0)
+                {
+                    savedWarnings = savedWarnings.Where(x => x.is_deleted == null || x.is_deleted == false).ToList();
+                }
                 if (savedWarnings != null && savedWarnings.Count > 0)
                 {
                     foreach (var warn in savedWarnings)
@@ -745,6 +752,7 @@
                 if (data != null)
                 {
                     fields = data.ShallowCopy();
+                    backupObject = data.ShallowCopy();
                     originalSrl = data.Block_7_3.GetValueOrDefault();
                     // Recreate EditContext for the new model
                     if (fields.Block_7_5 > 30)
@@ -773,6 +781,7 @@
                     editContext.OnFieldChanged += ClearFieldErrorsOnChange;
 
                     await AddModal.ShowAsync();
+
                 }
             }
             else
@@ -855,6 +864,7 @@
     /// <returns></returns>
     async Task HandleAddRow()
     {
+        bool resetSelection = false;
         var block_5_obj = fields;
         if (block_5_obj != null)
         {
@@ -867,7 +877,48 @@
             {
                 block_5_obj.UMPCE = null;
             }
+            if(modalHeader == "Insert Household")
+            {
+                block_5_obj.Block_7_1 = block_5_obj.Block_7_1.GetValueOrDefault() > 0 ? (block_5_obj.Block_7_1.GetValueOrDefault() - 1) : 0;
+
+                if (block_5_obj.is_household == 2)
+                {
+                    block_5_obj.Block_7_3 = block_5_obj.Block_7_3.GetValueOrDefault() > 0 ? (block_5_obj.Block_7_3.GetValueOrDefault() - 1) : 0;
+                }
+                else
+                {
+                    block_5_obj.Block_7_3 = 0;
+                }
+            }
+            if (!isAdd)
+            {
+                if (backupObject != null && (block_5_obj.Block_7_6.GetValueOrDefault() != backupObject.Block_7_6.GetValueOrDefault() 
+                || block_5_obj.Block_7_7.GetValueOrDefault() != backupObject.Block_7_7.GetValueOrDefault() || block_5_obj.Block_7_8.GetValueOrDefault() != backupObject.Block_7_8.GetValueOrDefault()
+                || block_5_obj.Block_7_9.GetValueOrDefault() != backupObject.Block_7_9.GetValueOrDefault()) && ListItems.Where(x => x.is_household == 2).Any(x => x.SSS != 0))
+                {
+                    var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+                    var confirmation = await dialog.ShowAsync(
+                        title: "Alert",
+                        message1: "This action will reset SSS formation.",
+                        message2: "Do you want to continue?",
+                        confirmDialogOptions: options
+                    );
+
+                    if (!confirmation)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        resetSelection = true;
+                    }
+                }
+            }
             await SCH_0_0_Queries.SaveUpdateSCH0Block7(block_5_obj);
+            if (resetSelection)
+            {
+                await SCH_0_0_Queries.ResetSelection();
+            }
             await SCH_0_0_Queries.ReserializeHHD();
             if (block_5_obj.Block_7_5 > 30)
             {
