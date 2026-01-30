@@ -687,13 +687,22 @@
                             {
                                 int pendingHouses = 0;
                                 int totalHouses = 0;
+                                List<Tbl_Sch_0_0_Block_7> dataList = await dB.GetBlock7DataByFSUID(item.fsu_id);
+                                int count = 0;
+                                foreach (var hhd in dataList)
+                                {
+                                    if (hhd.isSelected == true && hhd.status != "SUBSTITUTED" && hhd.SSS_household_id.GetValueOrDefault() != 0)
+                                    {
+                                        count++;
+                                    }
+                                }
                                 if (item.fsuHouses != null && item.fsuHouses.Count > 0)
                                 {
                                     pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 0 || x.lookup_submit_status == 11 || x.lookup_submit_status == 12);
                                     totalHouses = item.fsuHouses.Count();
                                 }
-                                item.completed_hhd = pendingHouses;
-                                item.total_hhd = totalHouses;
+                                item.completed_hhd = (item.fsuHouses != null && item.fsuHouses.Count > 0) ? (count - (totalHouses - pendingHouses)) : count;
+                                item.total_hhd = (dataList != null && dataList.Count > 0) ? count : 0;
                             }
                             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                             {

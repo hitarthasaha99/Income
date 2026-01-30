@@ -6,7 +6,6 @@
 @inject IJSRuntime jsRuntime
 @inject ILoggingService loggingService
 @inject NetworkService commonService
-@implements IDisposable
 
 <section class="login-bg py-3 py-md-5">
 	<div class="container">
@@ -66,16 +65,16 @@
     ConfirmDialog data_deletion_ref = default;
     string version_code = "V " + CommonConfig.APP_VERSION;
 
-    protected override void OnInitialized()
-    {
-        MainPage.OnBack = null;
-    }
+    // protected override void OnInitialized()
+    // {
+    //     MainPage.OnBack = null;
+    // }
 
 
-    public void Dispose()
-    {
-        MainPage.OnBack = null;
-    }
+    // public void Dispose()
+    // {
+    //     MainPage.OnBack = null;
+    // }
 
     void GoBack()
     {

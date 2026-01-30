@@ -597,7 +597,7 @@
                 var pop = Math.Round(block_4.approximate_population_su.GetValueOrDefault());
                 if(!isWithin5Percent)
                 {
-                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {pop}.\n\n";
+                    firstWarning = $"W025(i) : Population mismatch:" + $"{total_listed_population} should be within ±5% of {pop}.\n\n";
                 }
             }
         }
@@ -622,7 +622,7 @@
                 isWithin5Percent = total_listed_population >= lowerLimit && total_listed_population <= upperLimit;
                 if (!isWithin5Percent)
                 {
-                    firstWarning = $"W025(i) : Population mismatch:\n" + $"{total_listed_population} should be within ±5% of {sDPop}";
+                    firstWarning = $"W025(i) : Population mismatch:" + $"{total_listed_population} should be within ±5% of {sDPop}";
                 }
             }
         }
