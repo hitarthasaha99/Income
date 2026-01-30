@@ -34,7 +34,7 @@ namespace Income.Validators.HIS2026
             RuleFor(x => x.item_4)
                 .NotNull()
                 .WithMessage("H061: Invalid Entry, please check the entry")
-                .InclusiveBetween(0, 12)
+                .Must(v => v >= 0d && v <= 12d)
                 .WithMessage("H061: Invalid Entry, please check the entry");
 
             // 4. item_5 should be >= 0

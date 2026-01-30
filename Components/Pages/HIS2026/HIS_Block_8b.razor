@@ -8,6 +8,7 @@
 @using Income.Viewmodels
 @using System.Linq.Expressions
 @using System.Reflection
+@using System.Globalization
 @inject IJSRuntime JSRuntime
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
@@ -205,7 +206,7 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">4</span> No. of months for which benefits received by all the beneficiaries of the household in last 365 days
                             </label>
-                            <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@fields?.item_4" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
+                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@fields?.item_4" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)"
                                     @oninput="e =>
                                     {
                                         UpdateFieldAndValidate(() => fields.item_4, e);
@@ -299,29 +300,55 @@
         StateHasChanged();
     }
 
-    private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
+    private void UpdateFieldAndValidate<T>(Expression<Func<T?>> field, ChangeEventArgs e)
+    where T : struct
     {
         var identifier = FieldIdentifier.Create(field);
+        T? value = null;
 
-        // Try parse
-        int? value = null;
-        if (!string.IsNullOrWhiteSpace(e.Value?.ToString()) &&
-            int.TryParse(e.Value?.ToString(), out var v))
+        var input = e.Value?.ToString();
+
+        if (!string.IsNullOrWhiteSpace(input))
         {
-            value = v;
+            try
+            {
+                object? parsed = null;
+
+                if (typeof(T) == typeof(int))
+                {
+                    if (int.TryParse(input, out var i))
+                        parsed = i;
+                }
+                else if (typeof(T) == typeof(double))
+                {
+                    if (double.TryParse(
+                            input,
+                            NumberStyles.AllowDecimalPoint,
+                            CultureInfo.InvariantCulture,
+                            out var d))
+                    {
+                        parsed = Math.Round(d, 1);
+                    }
+                }
+
+                if (parsed != null)
+                    value = (T)parsed;
+            }
+            catch
+            {
+                value = null;
+            }
         }
 
-        // 1️⃣ Update the actual model field
+        // Update model
         var memberExpr = (MemberExpression)field.Body;
         var prop = (PropertyInfo)memberExpr.Member;
         prop.SetValue(fields, value);
 
-        // 2️⃣ Clear previous errors
         messageStore?.Clear(identifier);
-
-        // 3️⃣ Notify Blazor validation system
         editContext?.NotifyFieldChanged(identifier);
     }
+
 
     private async Task OnShowModalClick(string mode = "", Tbl_Block_8_Q6? data = null)
     {

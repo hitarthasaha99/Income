@@ -16,7 +16,7 @@ namespace Income.Database.Models.HIS_2026
         public int? serial_number { get; set; }
         public int? item_2 { get; set; }
         public int? item_3 { get; set; }
-        public int? item_4 { get; set; }
+        public double? item_4 { get; set; }
         public int? item_5 { get; set; }
         public bool isUpdated { get; set; } = false;
     }

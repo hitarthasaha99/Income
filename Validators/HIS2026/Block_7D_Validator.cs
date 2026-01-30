@@ -22,7 +22,7 @@ namespace Income.Validators.HIS2026
                 RuleFor(x => x.item_4)
                 .NotNull()
                 .GreaterThan(0)
-                .LessThanOrEqualTo(100)
+                .LessThan(100)
                 .WithMessage("H055: Invalid entry, please check the entry");
             });
         }
