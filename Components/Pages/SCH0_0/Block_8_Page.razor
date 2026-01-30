@@ -262,11 +262,11 @@
         sector = SessionStorage.FSU_Sector;
         if (SessionStorage.FSU_Sector == 1)
         {
-            schedule_name = "HIS - Rural Sector\n(Feb 2026 - Jan 2027)";
+            schedule_name = "NHIS - Rural Sector\n(Feb 2026 - Jan 2027)";
         }
         else
         {
-            schedule_name = "HIS - Urban Sector\n(Feb 2026 - Jan 2027)";
+            schedule_name = "NHIS - Urban Sector\n(Feb 2026 - Jan 2027)";
         }
 
         var response = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);

@@ -180,7 +180,7 @@ namespace Income.Viewmodels
         }
 
 
-        public async Task<List<Tbl_Warning?>> GetAllWarning(string schedule = "HIS")
+        public async Task<List<Tbl_Warning?>> GetAllWarning(string schedule = "NHIS")
         {
             List<Tbl_Warning?> warningList = new List<Tbl_Warning?>();
             try

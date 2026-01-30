@@ -441,10 +441,10 @@
                 //CheckItem9Warning();
                 if (fields.item_7_12.GetValueOrDefault() < 0 && !fields.item_7_13.HasValue)
                 {
-                    warningVM.AddWarning(item_9_warning, "HIS", "7C", "7C.9", warningCode: "" ,SessionStorage.selected_hhd_id);
+                    warningVM.AddWarning(item_9_warning, "NHIS", "7C", "7C.9", warningCode: "" ,SessionStorage.selected_hhd_id);
                 }
                 
-                await warningVM.SaveWarningAsync("HIS", "7C");
+                await warningVM.SaveWarningAsync("NHIS", "7C");
                 int saved = await dB.Save_SCH_HIS_Block7C(fields);
                 if (saved > 0)
                 {

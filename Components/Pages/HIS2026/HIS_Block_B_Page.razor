@@ -229,9 +229,9 @@
             }
             if (!string.IsNullOrEmpty(warning))
             {
-                warning_VM.AddWarning(warning, "HIS", "B", "B4", "W085" ,SessionStorage.selected_hhd_id);
+                warning_VM.AddWarning(warning, "NHIS", "B", "B4", "W085" ,SessionStorage.selected_hhd_id);
             }
-            await warning_VM.SaveWarningAsync("HIS", "B");
+            await warning_VM.SaveWarningAsync("NHIS", "B");
             NavigationManager.NavigateTo("dashboard/his/block_12");
         }
         catch (Exception ex)

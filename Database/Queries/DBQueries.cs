@@ -4143,7 +4143,7 @@ namespace Income.Database.Queries
 
 
 
-        public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "HIS")
+        public async Task<List<Tbl_Warning>> GetWarningList(int hhd_id = 0, string schedule = "NHIS")
         {
             try
             {

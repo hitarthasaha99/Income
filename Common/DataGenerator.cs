@@ -1148,14 +1148,14 @@ namespace Income.Common
             // Weekly (Q10.1–Q10.2)
             decimal weeklySum =
                 (decimal)(block10.item_1 ?? 0) +
-                (decimal)(block10.item_2 ?? 0);
+                (decimal)(block10.item_2 ?? 0) +
+                (decimal)(block10.item_4 ?? 0);
 
             decimal weeklyToMonthly = (weeklySum / 7m) * 30m;
 
             // Monthly (Q10.3–Q10.12 + Q10.91 + Q10.92)
             decimal monthlySum =
                 (decimal)(block10.item_3 ?? 0) +
-                (decimal)(block10.item_4 ?? 0) +
                 (decimal)(block10.item_5 ?? 0) +
                 (decimal)(block10.item_6 ?? 0) +
                 (decimal)(block10.item_7 ?? 0) +
