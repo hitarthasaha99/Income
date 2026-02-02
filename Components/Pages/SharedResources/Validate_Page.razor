@@ -308,6 +308,7 @@
                                     <div class="form-group mx-3 w-100">
                                         <input type="text"
                                                class="form-control"
+                                               maxlength="2000"
                                                placeholder="Enter Remarks"
                                                value="@GetRemarks(top.id)"
                                                @oninput="e => SetRemarks(top.id, e.Value?.ToString())"

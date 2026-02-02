@@ -48,7 +48,8 @@ namespace Income
 
             //builder.Services.AddValidatorsFromAssemblyContaining<Block_0_1_Validator>();
             //builder.Services.AddFluentValidationAutoValidation();
-
+            builder.Services.AddSingleton(sp =>
+    HttpClientFactoryPinned.Create(CommonConfig.CommonAPIPostAddress));
 
             builder.Services.AddSingleton<IGlobalExceptionHandler, GlobalExceptionHandler>();
             builder.Services.AddSingleton<ILoggingService, LoggingService>();

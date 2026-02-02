@@ -672,7 +672,7 @@
             data.IncomeSch00block_5 = isJSO ? await DBQueries.FetchSCH0Block5Data() : null;
             data.IncomeSch00block_7 = isJSO ? await DBQueries.GetBlock7DataWithDeleted() : null;
             data.IncomeSch00FieldOp = await DBQueries.FetchBlock2();
-            data.IncomeSch00WarningList = await DBQueries.GetWarningList(schedule: "0");
+            data.IncomeSch00WarningList = await DBQueries.GetWarningListForSCH0(SessionStorage.SelectedFSUId);
 
             string json = JsonConvert.SerializeObject(data);
             Upsert_Model payload = new()
