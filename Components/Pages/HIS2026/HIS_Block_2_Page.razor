@@ -418,7 +418,7 @@
     void CheckMobileNumber()
     {
         item_7_warning = string.Empty;
-        if(block_2?.informant_mobile?.Length != 10)
+        if(block_2?.informant_mobile?.Length != 10 && block_2?.informant_mobile != "999")
         {
             item_7_warning = "W083(i): Mobile number needs to be 10 digits long";
         }
