@@ -4140,6 +4140,37 @@ namespace Income.Database.Queries
         }
 
 
+        public async Task<List<Tbl_Warning>> GetWarningListForSCH0(int fsuID)
+        {
+            try
+            {
+                List<Tbl_Warning> warnings;
+                List<Tbl_Warning> remarks = [];
+                warnings = await _database.Table<Tbl_Warning>()
+                        .Where(x =>
+                            x.fsu_id == fsuID &&
+                            (x.schedule == "0"))
+                        .ToListAsync();
+
+                foreach (var warning in warnings)
+                {
+                    var children = await _database.Table<Tbl_Warning>()
+                        .Where(x => x.parent_comment_id == warning.id)
+                        .ToListAsync();
+
+                    if (children != null && children.Count > 0)
+                    {
+                        remarks.AddRange(children);
+                    }
+                }
+                warnings.AddRange(remarks);
+                return warnings;
+            }
+            catch (Exception ex)
+            {
+                return new List<Tbl_Warning>();
+            }
+        }
 
 
 
@@ -4151,12 +4182,11 @@ namespace Income.Database.Queries
 
                 if (schedule == "0")
                 {
-                    warnings = await _database.Table<Tbl_Warning>()
-                        .Where(x =>
-                            x.fsu_id == SessionStorage.SelectedFSUId &&
-                            (x.schedule == "0" || x.schedule == "" || x.schedule == null) &&
-                            (x.is_deleted == false || x.is_deleted == null))
-                        .ToListAsync();
+                    warnings = await GetWarningListForSCH0(SessionStorage.SelectedFSUId);
+                    if (warnings != null && warnings.Count > 0)
+                    {
+                        warnings = warnings.Where(x => x.is_deleted == null || x.is_deleted == false).ToList();
+                    }
                 }
                 else
                 {

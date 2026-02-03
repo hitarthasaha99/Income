@@ -648,7 +648,7 @@
                 if (response != null)
                 {
                     var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(response);
-                    CheckFSUSubstitution(fsu_list);
+                    await CheckFSUSubstitution(fsu_list);
                     //CheckFSUUpdateListingDone(fsu_list);
 
                     if (fsu_list != null && fsu_list.Count > 0)
@@ -862,7 +862,7 @@
         }
     }
 
-    private async void CheckFSUSubstitution(List<Tbl_Fsu_List>? result)
+    private async Task CheckFSUSubstitution(List<Tbl_Fsu_List>? result)
     {
         try
         {

@@ -86,8 +86,9 @@ namespace Income.Services
                         var response = await client.PostAsync(apiURL, content);
                         if (response != null)
                         {
+#if DEBUG
                             await WriteJsonToFileAsync(json, endpoint: action, code:response.StatusCode.ToString()); // still store uncompressed json locally
-
+#endif
                         }
 
                         if (!response.IsSuccessStatusCode)

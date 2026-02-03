@@ -438,7 +438,7 @@
 						data.IncomeSch00block_5 = await dQ.FetchSCH0Block5Data();
 						data.IncomeSch00block_7 = await dQ.GetBlock7DataWithDeleted();
 						data.IncomeSch00FieldOp = await dQ.FetchBlock2();
-						data.IncomeSch00WarningList = await dQ.GetWarningList(schedule: "0");
+						data.IncomeSch00WarningList = await dQ.GetWarningListForSCH0(SessionStorage.SelectedFSUId);
 
 						foreach(var hhd in hhd_list)
 						{
