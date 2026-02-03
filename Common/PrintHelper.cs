@@ -70,43 +70,28 @@ namespace Income.Common
         string reportType { get; set; } = string.Empty;
         byte[]? generatedDoc2026 = null;
 
-        //int hhdId = 0;
-        //public PrintHelper(ScheduleZeroDatabase _scheduleZeroDatabase, ScheduleTenOFourDatabase sch104Db)
-        //{
-        //    _ScheduleZeroDatabase = _scheduleZeroDatabase;
-        //    _sch104Db = sch104Db;
-        //}
-        public async Task<int> GenerateReportAsync(int FsuId , string reportType)
+        public async Task<int> GenerateReportAsync(int FsuId, string reportType)
         {
             try
             {
-                //hhdId = HhdId;
-                string printDir;
-                string downloadsDir;
-                var fileName = $"{FsuId}.docx";
-
-                //Stream templateStream;
-                Stream sch00TemplateStream=null;
-                Stream sch26TemplateStream=null;
-
+                Stream sch00TemplateStream = null;
+                Stream sch26TemplateStream = null;
 
 #if WINDOWS
-        // Access from Resources/Template folder in Windows
         var templatePath = Path.Combine(AppContext.BaseDirectory, "Resources", "Template", "IncomeSch00Template.docx");
         var template2026Path = Path.Combine(AppContext.BaseDirectory, "Resources", "Template", "TemplateHis2026.docx");
+        
         if (reportType == "Sch00")
-            {
-                sch00TemplateStream = File.OpenRead(templatePath);
-            }
-            else
-            {
-                sch00TemplateStream = File.OpenRead(templatePath);
-                sch26TemplateStream = File.OpenRead(template2026Path);
-            }
-        //sch00TemplateStream = File.OpenRead(templatePath);
-        //sch26TemplateStream = File.OpenRead(template2026Path);
+        {
+            sch00TemplateStream = File.OpenRead(templatePath);
+        }
+        else
+        {
+            sch00TemplateStream = File.OpenRead(templatePath);
+            sch26TemplateStream = File.OpenRead(template2026Path);
+        }
 #else
-                if (reportType=="Sch00")
+                if (reportType == "Sch00")
                 {
                     sch00TemplateStream = await FileSystem.OpenAppPackageFileAsync("Resources/Template/IncomeSch00Template.docx");
                 }
@@ -115,55 +100,50 @@ namespace Income.Common
                     sch00TemplateStream = await FileSystem.OpenAppPackageFileAsync("Resources/Template/IncomeSch00Template.docx");
                     sch26TemplateStream = await FileSystem.OpenAppPackageFileAsync("Resources/Template/TemplateHis2026.docx");
                 }
-                   
 #endif
-               
-                    var generatedDoc00 = await FillDocument00(sch00TemplateStream);
+
+                var generatedDoc00 = await FillDocument00(sch00TemplateStream);
                 if (generatedDoc00 == null || generatedDoc00.Length == 0)
                     return 0;
+
+                byte[] generatedDoc2026 = null;
                 if (reportType != "Sch00")
                 {
-                     generatedDoc2026 = await FillDocument26(sch26TemplateStream);
-
+                    generatedDoc2026 = await FillDocument26(sch26TemplateStream);
                     if (generatedDoc2026 == null || generatedDoc2026.Length == 0)
                         return 0;
                 }
-               
+
                 string fsuId = SessionStorage.SelectedFSUId.ToString();
                 string datePart = DateTime.Now.ToString("ddMMMyyyy_HH.mm", CultureInfo.InvariantCulture);
-                //string datePart = DateTime.Now.ToString("ddMMMyyyy_HHmmss", CultureInfo.InvariantCulture);
 
                 string SCH00fileName = $"Income_Sch 00_{fsuId}_{datePart}.docx";
                 string SCH2026fileName = $"Income_Sch 2026_{fsuId}_{datePart}.docx";
+
 #if WINDOWS
-                downloadsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
+        string downloadsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        string printDir = Path.Combine(downloadsDir, "Print");
+        
+        if (!Directory.Exists(printDir))
+            Directory.CreateDirectory(printDir);
+        
+        string targetPath00 = GetUniqueFilePath(printDir, SCH00fileName);
+        await File.WriteAllBytesAsync(targetPath00, generatedDoc00);
+        
+        if (reportType != "Sch00")
+        {
+            string targetPath2026 = GetUniqueFilePath(printDir, SCH2026fileName);
+            await File.WriteAllBytesAsync(targetPath2026, generatedDoc2026);
+        }
 #elif ANDROID
-                downloadsDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)?.AbsolutePath ?? string.Empty;
-#else
-                downloadsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-#endif
-                //printDir = Path.Combine(downloadsDir, "Print");
-                //if (!Directory.Exists(printDir))
-                //    Directory.CreateDirectory(printDir);
+                // Save to public Documents/Print folder - NO PERMISSION NEEDED on API 33+
+                await SaveToPublicDocumentsAsync(SCH00fileName, generatedDoc00);
 
-                string baseDir = GetDocumentsPath();
-                printDir = Path.Combine(baseDir, "Print");
-
-                if (!Directory.Exists(printDir))
-                    Directory.CreateDirectory(printDir);
-
-                //string targetPath00 = Path.Combine(printDir, SCH00fileName);
-                //await File.WriteAllBytesAsync(targetPath00, generatedDoc00);
-                string targetPath00 = GetUniqueFilePath(printDir, SCH00fileName);
-                await File.WriteAllBytesAsync(targetPath00, generatedDoc00);
                 if (reportType != "Sch00")
                 {
-                    //string targetPath2026 = Path.Combine(printDir, SCH2026fileName);
-                    //await File.WriteAllBytesAsync(targetPath2026, generatedDoc2026);
-                    string targetPath2026 = GetUniqueFilePath(printDir, SCH2026fileName);
-                    await File.WriteAllBytesAsync(targetPath2026, generatedDoc2026);
+                    await SaveToPublicDocumentsAsync(SCH2026fileName, generatedDoc2026);
                 }
+#endif
 
                 return 1;
             }
@@ -172,6 +152,84 @@ namespace Income.Common
                 Debug.WriteLine($"Error generating report: {ex.Message}");
                 return 0;
             }
+        }
+
+#if ANDROID
+        private async Task SaveToPublicDocumentsAsync(string fileName, byte[] content)
+        {
+            try
+            {
+                var context = Android.App.Application.Context;
+                var contentResolver = context.ContentResolver;
+
+                // Create ContentValues for the new file
+                var contentValues = new Android.Content.ContentValues();
+                contentValues.Put(Android.Provider.MediaStore.IMediaColumns.DisplayName, fileName);
+                contentValues.Put(Android.Provider.MediaStore.IMediaColumns.MimeType,
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
+                // Save to Documents/Print folder in public storage
+                // This will be: /storage/emulated/0/Documents/Print/
+                contentValues.Put(Android.Provider.MediaStore.IMediaColumns.RelativePath,
+                    Android.OS.Environment.DirectoryDocuments + "/Print");
+
+                // Insert into MediaStore (no permission needed on API 33+)
+                var uri = contentResolver.Insert(
+                    Android.Provider.MediaStore.Files.GetContentUri("external"),
+                    contentValues);
+
+                if (uri != null)
+                {
+                    // Write the file content
+                    using (var outputStream = contentResolver.OpenOutputStream(uri))
+                    {
+                        if (outputStream != null)
+                        {
+                            await outputStream.WriteAsync(content, 0, content.Length);
+                            await outputStream.FlushAsync();
+                        }
+                    }
+
+                    Debug.WriteLine($"File saved to /storage/emulated/0/Documents/Print/{fileName}");
+
+                    // Show notification to user
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        Android.Widget.Toast.MakeText(
+                            context,
+                            $"Report saved to Documents/Print",
+                            Android.Widget.ToastLength.Long
+                        )?.Show();
+                    });
+                }
+                else
+                {
+                    Debug.WriteLine("Failed to create file in MediaStore");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error saving to Documents: {ex.Message}");
+                throw;
+            }
+        }
+#endif
+
+       
+
+        private async Task ShowFilesSavedNotification(string path)
+        {
+#if ANDROID
+            // Show toast notification
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                Android.Widget.Toast.MakeText(
+                    Android.App.Application.Context,
+                    $"Reports saved to Documents/Print folder",
+                    Android.Widget.ToastLength.Long
+                )?.Show();
+            });
+#endif
         }
 
         private static string GetUniqueFilePath(string directory, string fileName)
