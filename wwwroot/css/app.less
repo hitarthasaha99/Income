@@ -86,7 +86,7 @@ a,
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url('../images/loginbg_tourism.jpg');
+  background: url('../images/bg-login.svg');
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
@@ -348,16 +348,16 @@ input[type="radio"] {
   align-items: center;
 
   &.btn-primary {
-    background-color: @SitePrimary !important;
-    border-color: @SitePrimary;
+    background-color: @successColor_1 !important;
+    border-color: @successColor_1;
 
     &:hover {
-      background-color: @SiteDarkPrimary !important;
-      border-color: @SiteDarkPrimary;
+      background-color: @successDarkColor !important;
+      border-color: @successDarkColor;
     }
     &.disabled,&:disabled {
-        background-color: lighten(@SitePrimary, 25%);
-        border-color: lighten(@SitePrimary, 25%);
+        background-color: lighten(@successColor_1, 25%);
+        border-color: lighten(@successColor_1, 25%);
         color: lighten(@baseColor, 60%);
         cursor: not-allowed;
         opacity: 0.65;
@@ -366,11 +366,11 @@ input[type="radio"] {
     }
   &.btn-outline-primary {
     background-color:@baseColor;
-    border: 1px solid @SitePrimary;
-    color: @SitePrimary;
+    border: 1px solid @successColor_1;
+    color: @successColor_1;
     &:hover {
-      background-color: @SiteDarkPrimary !important;
-      border-color: @SiteDarkPrimary;
+      background-color: @successDarkColor !important;
+      border-color: @successDarkColor;
       color: @baseColor;
     }
   }
