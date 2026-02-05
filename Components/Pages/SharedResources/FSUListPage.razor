@@ -19,14 +19,14 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h3 class="page-heading m-0">FSU List</h3>
         <div class="ms-auto">
-            <NavLink class="btn btn-sm btn-dark text-white d-flex align-items-center" onclick="@(async() => await Fsu_Load())">Reload <i class="fi fi-rr-rotate-right ms-2"></i></NavLink>
+            <NavLink class="btn btn-sm btn-outline-light d-flex align-items-center" onclick="@(async() => await Fsu_Load())">Reload Data<i class="fi fi-rr-rotate-right ms-2"></i></NavLink>
         </div>
     </div>
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">FSU List</h3>
             <div class="card-tools">
-                <input class="form-control" placeholder="Search..." @oninput="@((ChangeEventArgs e) => HandleSearch(e))" />
+                <input class="form-control form-control-sm" placeholder="Search..." @oninput="@((ChangeEventArgs e) => HandleSearch(e))" />
             </div>
         </div>
         <div class="card-body p-0">
@@ -40,7 +40,7 @@
                             } *@
                             <th>subround</th>
                             <th>fsu id</th>
-                            <th>location details</th>
+                            <th style="min-width:200px;">location details</th>
                             <th>frame population</th>
                             <th>status</th>
                             <th>action</th>
@@ -58,11 +58,11 @@
                                     } *@
                                     <td>@item.subrnd</td>
                                     <td>@item.fsu_id</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
+                                    <td style="min-width:200px;">
+                                        <div class="d-flex align-items-start">
                                             <i style="font-size: 20px;" class="fi fi-ss-marker text-danger"></i>
                                             <div class="ms-2 text-secondary">
-                                                <p class="m-0 fst-italic">Village/ Town - <span class="text-primary">@item.fsuname</span></p>
+                                                <p class="m-0">FSU - <b class="text-primary">@item.fsuname</b></p>
                                                 <div class="d-flex flex-column">
                                                     <p class="m-0 fs-13"><span class="fst-italic">IV Unit - </span> <span class="text-primary">@item.iv_unit</span></p>
                                                     <p class="mb-0 fs-13"><span class="fst-italic">Block - </span><span class="text-primary">@item.block</span></p>
@@ -86,6 +86,7 @@
                                                 {
                                                     message = "SCH0.0 Referred back by SUP";
                                                 }
+                                               
                                             }
                                             else
                                             {
@@ -93,39 +94,74 @@
                                             }
                                             bool noTotal = item.total_hhd == 0;
                                             bool noCompleted = item.completed_hhd == 0;
-                                            string badgeClass = noTotal? "" :  noCompleted ? "badge-success" : "badge-warning";
+                                            string badgeClass = noTotal? "" :  noCompleted ? "badge-success" : "badge-warning text-dark";
                                         }
                                         @if(!onlysch00submitted)
                                         {
                                             <div class="badge @badgeClass">
                                                 @(noTotal ? "-" : $"{item.completed_hhd}/{item.total_hhd}")
                                             </div>
+                                            <div class="d-flex align-items-center fs-12 text-mutes mt-2">
+                                                <span class="bubble-dot bg-warning me-1"></span> In-Progress
+                                            </div>
                                         }
                                         else
                                         {
+                                           
                                             <div class="badge badge-success">
                                                 @message
                                             </div>
                                         }
+                                       
+                                        <div class="d-flex align-items-center fs-12 text-muted mt-2">
+                                            <i class="bi bi-circle-fill text-muted me-1 fs-7"></i> Pending
+                                        </div>
+                                       
 
                                     </td>
-                                        
-                                    <td>
-                                        <div class="btn-group" role="group" aria-label="Basic outlined example">
-                                            <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
-                                            <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">NHIS</NavLink>
-                                            <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
 
-                                            @if (SessionStorage.env == SessionStorage.Environment.Development || (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.BBS.20")))
-                                            {
-                                                <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
-                                            }
-                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.lookupFsuSubmitStatus != 32)
-                                            {
-                                                <NavLink @onclick="@(() => HandleFinalSubmisssion(item))" class="btn btn-sm btn-outline-primary">Final Submit<i class="bi bi-cloud-upload ms-1"></i></NavLink>
-                                            }
-                                            
+                                    <td style="min-width:20px;">
+                                        <div class="d-flex align-items-center">
+                                            <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                            <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH 0.0</NavLink>
+                                            <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">SCH 33.1</NavLink>
                                         </div>
+                                            <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-link text-muted"><i class="bi bi-download"></i> </NavLink>
+                                        @* <div class="dropdown">
+                                            <button class="btn btn-link text-muted border-0"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical fs-5"></i>
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <NavLink @onclick="@(() => DownloadFSUData(item))" class="dropdown-item"><i class="bi bi-download me-1"></i> Download</NavLink>
+                                                </li>
+
+                                                @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.lookupFsuSubmitStatus != 32)
+                                                {
+                                                    <li>
+                                                        <NavLink @onclick="@(() => HandleFinalSubmisssion(item))" class="dropdown-item">Final Submit<i class="bi bi-cloud-upload me-1"></i></NavLink>
+                                                        </li>
+                                                  
+                                                }
+                                               
+                                                <li><hr class="dropdown-divider"></li>
+                                                @if (SessionStorage.env == SessionStorage.Environment.Development || (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.BBS.20")))
+                                                {
+                                                    <li>
+                                                        <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="dropdown-item text-danger"><i class="bi bi-x-square me-1"></i> Clear Data</NavLink>
+                                                        </li>
+                                                   
+                                                }
+                                              
+                                            </ul>
+                                        </div> *@
+                                        </div>
+                                        
+
                                     </td>
                                 </tr>
                             }

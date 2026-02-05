@@ -15,7 +15,125 @@
     <CommonContentHeader @ref="_header" SelectedFsuId="@SelectedFsuId"
                          survey_time="@survey_time" />
     <ConfirmDialog @ref="dialog" />
-
+    @* block-1*@
+    <div class="card custom-card">
+        <div class="card-header">
+            <h3 class="card-title"><span class="text-primary fw-bolder me-2">[1]</span>Identification of sample household</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">1</span>Sector (Rural only)</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">2</span>Type of Sample (Central -1, State -2)</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">3</span>State/U.T. Name</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">4</span>District Name</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">5</span>Name of Sub-District/Tehsil/Town</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">6</span>Village Name</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">7</span>Investigator Unit Number/Block Number:</label>
+                        <input type="text" class="form-control" value="NA" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">8</span>Sample Sub-Unit (SU) Number</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">9</span>Round Number</label>
+                        <input type="text" class="form-control" value="81" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">10</span>Schedule number</label>
+                        <input type="text" class="form-control" value="33.1" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">11</span>Serial Number of Sample FSU</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">12</span>Sample Sub-Division Number</label>
+                        <input type="text" class="form-control" value="" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">13</span>Second Stage Stratum Number</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="form-badge">14</span>Sample Household Number</label>
+                        <input type="text" class="form-control" disabled />
+                    </div>
+                </div>
+           
+            <div class="col-sm-6">
+                <div class="mb-3">
+                    <label class="form-label"><span class="form-badge">15</span>Survey Code</label>
+                    <select class="form-select">
+                        <option value="">-- Select --</option>
+                        <option value="1">1 - Household surveyed: Original</option>
+                        <option value="2">2 - Substitute</option>
+                        <option value="3">3 - Casualty</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                    <div class="mb-3">
+                    <label class="form-label"><span class="form-badge">16</span>Reason for substitution/casualty of the original household </label>
+                    <select class="form-select">
+                        <option value="">-- Select --</option>
+                        <option value="1">1 - Informant busy</option>
+                        <option value="2">2 - Members away from home</option>
+                        <option value="3">3 - Informant non-cooperative</option>
+                        <option value="9">9 - Others</option>
+                    </select>
+                    <div id="emailHelp" class="form-text">If code 2 or 3 in item 15</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
     <div class="card custom-card">
         <div class="card-header">
             <h3 class="card-title">
@@ -188,6 +306,7 @@
         </div>
         </fieldset>
     </div>
+
 </div>
 
 <div class="footer">

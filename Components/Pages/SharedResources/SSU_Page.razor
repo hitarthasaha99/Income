@@ -20,7 +20,7 @@
 	<ErrorPopup @ref="errorPopup" ErrorDict="errorDict"></ErrorPopup>
 	<!-- Page Header (Outside Card) -->
 	<div class="d-flex align-items-center my-3">
-		<i class="fi fi-rr-arrow-left me-2 fs-5"
+		<i class="fi fi-rr-angle-left me-2 fs-5"
 		   style="cursor:pointer;"
 		   @onclick="GoBack">
 		</i>
@@ -35,7 +35,7 @@
 				Selected Sampling Units list
 			</h3>
 			<div class="card-tools">
-				<button class="btn btn-primary" @onclick="HandlePrint">
+				<button class="btn btn-secondary btn-sm" @onclick="HandlePrint">
 					<i class="fi fi-rr-print me-1"></i> Print
 				</button>
 			</div>
@@ -95,7 +95,7 @@
 												{
 													@if (item.isSelected == true)
 													{
-														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="me-3"><i class="fi fi-rr-arrow-right"></i></NavLink>
+														<NavLink @onclick="@(() => HandleStartSurvey(item))" class="btn btn-outline-primary btn-sm"><i class="fi fi-rr-arrow-right"></i></NavLink>
 													}
 													@* <NavLink @onclick="@(() => HandleComments(item))"><i class="fi fi-rr-comment-alt"></i></NavLink> *@
 												}
@@ -182,7 +182,7 @@
 		<div class="col-sm-6">
 			<div class="d-flex">
 				<NavLink class="btn btn-outline-secondary me-2" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</NavLink>
-				<NavLink class="btn btn-success me-2" onclick="@Validate">Validate<i class="fi fi-rr-memo-circle-check ms-1"></i></NavLink>
+				<NavLink class="btn btn-outline-success me-2" onclick="@Validate">Validate<i class="fi fi-rr-memo-circle-check ms-1"></i></NavLink>
 				@* <NavLink class="btn btn-outline-primary disabled">Download<i class="fi fi-rr-download ms-1"></i></NavLink> *@
 			</div>
 		</div>
