@@ -310,48 +310,50 @@
 
     async Task Save(bool is_go_next = false)
     {
-        try
-        {
-            if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-                NavigationManager.NavigateTo("/dashboard/his/block_4_2");
-                return;
-            }
-            bool isValid = Validate();
-            if (isValid)
-            {
-                CheckWarnings();
-                if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
-                {
-                    warningVM.AddWarning(Block_4_1_ErrorMessage, "NHIS", "4_1", "1" , warningCode:"W013(ii)" ,SessionStorage.selected_hhd_id);
-                }
-                await warningVM.SaveWarningAsync("NHIS", "4_1");
-                var saved = await dQ.Save_SCH_HIS_Block4(block_4);
-                if (saved > 0)
-                {
-                    if(is_go_next)
-                    {
-                        NavigationManager.NavigateTo("/dashboard/his/block_4_2");
-                    }
-                    else
-                    {
-                        toastService.ShowSuccess("Data saved succesfully");
-                    }
-                }
-                else
-                {
-                    toastService.ShowError("Unable to save");
-                }
-            }
-            else
-            {
-                toastService.ShowError("Please address pending errors");
-            }
-        }
-        catch (Exception ex)
-        {
+        // try
+        // {
+        //     if(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        //     {
+        //         NavigationManager.NavigateTo("/dashboard/his/block_4_2");
+        //         return;
+        //     }
+        //     bool isValid = Validate();
+        //     if (isValid)
+        //     {
+        //         CheckWarnings();
+        //         if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
+        //         {
+        //             warningVM.AddWarning(Block_4_1_ErrorMessage, "NHIS", "4_1", "1" , warningCode:"W013(ii)" ,SessionStorage.selected_hhd_id);
+        //         }
+        //         await warningVM.SaveWarningAsync("NHIS", "4_1");
+        //         var saved = await dQ.Save_SCH_HIS_Block4(block_4);
+        //         if (saved > 0)
+        //         {
+        //             if(is_go_next)
+        //             {
+        //                 NavigationManager.NavigateTo("/dashboard/his/block_4_2");
+        //             }
+        //             else
+        //             {
+        //                 toastService.ShowSuccess("Data saved succesfully");
+        //             }
+        //         }
+        //         else
+        //         {
+        //             toastService.ShowError("Unable to save");
+        //         }
+        //     }
+        //     else
+        //     {
+        //         toastService.ShowError("Please address pending errors");
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
 
-        }
+        // }
+        NavigationManager.NavigateTo("/dashboard/his/block_4_2");
+
     }
 
     //Warning message validators

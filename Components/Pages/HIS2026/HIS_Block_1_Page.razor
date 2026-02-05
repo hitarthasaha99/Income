@@ -490,198 +490,199 @@
 
     public async Task HandleSubmit(bool is_go_next)
     {
-        if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
-        {
-            if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
-            {
-                NavigationManager.NavigateTo("/dashboard/his/block_12");
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/dashboard/his/block_3");
-            }
-            return;
-        }
+        // if (SessionStorage.role_name != CommonConstants.ROLE_NAME_JSO)
+        // {
+        //     if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
+        //     {
+        //         NavigationManager.NavigateTo("/dashboard/his/block_12");
+        //     }
+        //     else
+        //     {
+        //         NavigationManager.NavigateTo("/dashboard/his/block_3");
+        //     }
+        //     return;
+        // }
 
-        if (existingSurveyCode == 3 && block_1.survey_code == 3)
-        {
-            NavigationManager.NavigateTo("/dashboard/his/block_12");
-            return;
-        }
+        // if (existingSurveyCode == 3 && block_1.survey_code == 3)
+        // {
+        //     NavigationManager.NavigateTo("/dashboard/his/block_12");
+        //     return;
+        // }
 
-        if (block_1.survey_code == null)
-        {
-            toastService.ShowError("H001: Please select a survey code");
-            return;
-        }
+        // if (block_1.survey_code == null)
+        // {
+        //     toastService.ShowError("H001: Please select a survey code");
+        //     return;
+        // }
 
-        if (is_remarks_visible && string.IsNullOrWhiteSpace(block_1.substitution_reason_remark))
-        {
-            toastService.ShowError("Please provide a reason before proceeding");
-            return;
-        }
+        // if (is_remarks_visible && string.IsNullOrWhiteSpace(block_1.substitution_reason_remark))
+        // {
+        //     toastService.ShowError("Please provide a reason before proceeding");
+        //     return;
+        // }
 
-        if (block_1.survey_code == 9)
-        {
-            if(block_1.substitution_reason == null)
-            {
-                toastService.ShowError("H002: Invalid Entry, please check Block-1, item-13");
-                return;
-            }
-            var block_3_exists = await dQ.Fetch_SCH_HIS_Block3(block_1.hhd_id.GetValueOrDefault());
-            if (block_3_exists != null && block_3_exists.Count > 0)
-            {
-                var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
-                var confirmation = await dialog.ShowAsync(
-                    title: "Alert",
-                    message1: "This will delete any existing block data for this household.",
-                    message2: "Do you want to proceed?",
-                    confirmDialogOptions: options);
+        // if (block_1.survey_code == 9)
+        // {
+        //     if(block_1.substitution_reason == null)
+        //     {
+        //         toastService.ShowError("H002: Invalid Entry, please check Block-1, item-13");
+        //         return;
+        //     }
+        //     var block_3_exists = await dQ.Fetch_SCH_HIS_Block3(block_1.hhd_id.GetValueOrDefault());
+        //     if (block_3_exists != null && block_3_exists.Count > 0)
+        //     {
+        //         var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        //         var confirmation = await dialog.ShowAsync(
+        //             title: "Alert",
+        //             message1: "This will delete any existing block data for this household.",
+        //             message2: "Do you want to proceed?",
+        //             confirmDialogOptions: options);
 
-                if (!confirmation)
-                {
-                    return;
-                }
-            }
+        //         if (!confirmation)
+        //         {
+        //             return;
+        //         }
+        //     }
 
-            var service = new HouseholdSelectionService();
-            var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
-            var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
-            var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
-            if (nextHousehold == null)
-            {
-                toastService.ShowError("No substitute household available. Please mark this household as casualty");
-                return;
-            }
-            else
-            {
-                nextHousehold.SSS_household_id = current_hhd.SSS_household_id;
-                nextHousehold.status = "SUBSTITUTE";
-                nextHousehold.isSelected = true;
-                nextHousehold.isSubstitute = true;
+        //     var service = new HouseholdSelectionService();
+        //     var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+        //     var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+        //     var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
+        //     if (nextHousehold == null)
+        //     {
+        //         toastService.ShowError("No substitute household available. Please mark this household as casualty");
+        //         return;
+        //     }
+        //     else
+        //     {
+        //         nextHousehold.SSS_household_id = current_hhd.SSS_household_id;
+        //         nextHousehold.status = "SUBSTITUTE";
+        //         nextHousehold.isSelected = true;
+        //         nextHousehold.isSubstitute = true;
 
-                current_hhd.SSS_household_id = 0;
-                current_hhd.status = "SUBSTITUTED";
-                current_hhd.hhdStatus = null;
-                current_hhd.isSelected = true;
-                current_hhd.SubstitutionCount += 1;
+        //         current_hhd.SSS_household_id = 0;
+        //         current_hhd.status = "SUBSTITUTED";
+        //         current_hhd.hhdStatus = null;
+        //         current_hhd.isSelected = true;
+        //         current_hhd.SubstitutionCount += 1;
 
-                await dQ.Update_SCH0_0_Block_7(current_hhd);
-                await dQ.Update_SCH0_0_Block_7(nextHousehold);
-                await dQ.Save_SCH_HIS_Block1(block_1);
-                await commonQueries.DeleteBlockDataForCasulaty();
-                await _header?.ReloadVisitedBlocksAsync();
+        //         await dQ.Update_SCH0_0_Block_7(current_hhd);
+        //         await dQ.Update_SCH0_0_Block_7(nextHousehold);
+        //         await dQ.Save_SCH_HIS_Block1(block_1);
+        //         await commonQueries.DeleteBlockDataForCasulaty();
+        //         await _header?.ReloadVisitedBlocksAsync();
 
-                await service.ReassignSSSHouseholdIds(current_hhd.SSS);
-                NavigationManager.NavigateTo("/dashboard/his/ssu_page");
-                return;
-            }
-        }
+        //         await service.ReassignSSSHouseholdIds(current_hhd.SSS);
+        //         NavigationManager.NavigateTo("/dashboard/his/ssu_page");
+        //         return;
+        //     }
+        // }
 
-        if (block_1.survey_code == 3)
-        {
-            if (block_1.substitution_reason == null)
-            {
-                toastService.ShowError("H002: Invalid Entry, please check Block-1, item-13");
-                return;
-            }
+        // if (block_1.survey_code == 3)
+        // {
+        //     if (block_1.substitution_reason == null)
+        //     {
+        //         toastService.ShowError("H002: Invalid Entry, please check Block-1, item-13");
+        //         return;
+        //     }
 
-            var block_3_exists = await dQ.Fetch_SCH_HIS_Block3(block_1.hhd_id.GetValueOrDefault());
-            if (block_3_exists != null && block_3_exists.Count > 0)
-            {
-                var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
-                var confirmation = await dialog.ShowAsync(
-                    title: "Alert",
-                    message1: "This will delete any existing block data for this household.",
-                    message2: "Do you want to proceed?",
-                    confirmDialogOptions: options);
+        //     var block_3_exists = await dQ.Fetch_SCH_HIS_Block3(block_1.hhd_id.GetValueOrDefault());
+        //     if (block_3_exists != null && block_3_exists.Count > 0)
+        //     {
+        //         var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        //         var confirmation = await dialog.ShowAsync(
+        //             title: "Alert",
+        //             message1: "This will delete any existing block data for this household.",
+        //             message2: "Do you want to proceed?",
+        //             confirmDialogOptions: options);
 
-                if (!confirmation)
-                {
-                    return;
-                }
-            }
+        //         if (!confirmation)
+        //         {
+        //             return;
+        //         }
+        //     }
 
-            var service = new HouseholdSelectionService();
+        //     var service = new HouseholdSelectionService();
 
-            var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
-            var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
-            var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
-            if (nextHousehold != null)
-            {
-                toastService.ShowError("Substitute household is available. Please select substitute household instead of marking as casualty");
-                return;
-            }
-            current_hhd.status = "CASUALTY";
-            current_hhd.isSelected = true;
-            current_hhd.isCasualty = true;
-            current_hhd.SSS_household_id = 0;
-            await dQ.Update_SCH0_0_Block_7(current_hhd);
-            await service.ReassignSSSHouseholdIds(current_hhd.SSS);
-            toastService.ShowInfo("Household has been marked as casualty");
-            await commonQueries.DeleteBlockDataForCasulaty();
-            await _header?.ReloadVisitedBlocksAsync();
-        }
+        //     var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+        //     var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+        //     var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
+        //     if (nextHousehold != null)
+        //     {
+        //         toastService.ShowError("Substitute household is available. Please select substitute household instead of marking as casualty");
+        //         return;
+        //     }
+        //     current_hhd.status = "CASUALTY";
+        //     current_hhd.isSelected = true;
+        //     current_hhd.isCasualty = true;
+        //     current_hhd.SSS_household_id = 0;
+        //     await dQ.Update_SCH0_0_Block_7(current_hhd);
+        //     await service.ReassignSSSHouseholdIds(current_hhd.SSS);
+        //     toastService.ShowInfo("Household has been marked as casualty");
+        //     await commonQueries.DeleteBlockDataForCasulaty();
+        //     await _header?.ReloadVisitedBlocksAsync();
+        // }
 
-        if(block_1.survey_code == 1)
-        {
-            block_1.substitution_reason = null;
-            if(existingSurveyCode == 3)
-            {
-                await commonQueries.DeleteVisitedBlocksAsync(
-                SessionStorage.SelectedFSUId,
-                blockTitles: new[]
-                {
-                    CommonEnum.his_block_12.ToString(),
-                },
-                hhdId: SessionStorage.selected_hhd_id);
-                var currentHHD = await dQ.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
-                if (currentHHD != null)
-                {
-                    currentHHD.status = "";
-                    await dQ.Update_SCH0_0_Block_7(currentHHD);
-                }
-                if (block_1 != null)
-                {
-                    block_1.Block13_14Timestamp = null;
-                    block_1.block_12_remark = string.Empty;
-                    block_1.block_13_remark = string.Empty;
-                }
-                var block_2 = await dQ.Fetch_SCH_HIS_Block2(SessionStorage.selected_hhd_id);
-                if (block_2 != null)
-                {
-                    block_2.total_time = null;
-                    block_2.informant_serial = null;
-                    block_2.informant_name = null;
-                    await dQ.SaveAsync<Tbl_Block_FieldOperation>(block_2);
-                }
-                await _header?.ReloadVisitedBlocksAsync();
-            }
-        }
+        // if(block_1.survey_code == 1)
+        // {
+        //     block_1.substitution_reason = null;
+        //     if(existingSurveyCode == 3)
+        //     {
+        //         await commonQueries.DeleteVisitedBlocksAsync(
+        //         SessionStorage.SelectedFSUId,
+        //         blockTitles: new[]
+        //         {
+        //             CommonEnum.his_block_12.ToString(),
+        //         },
+        //         hhdId: SessionStorage.selected_hhd_id);
+        //         var currentHHD = await dQ.GetCurrentHHD(SessionStorage.SelectedFSUId, SessionStorage.selected_hhd_id);
+        //         if (currentHHD != null)
+        //         {
+        //             currentHHD.status = "";
+        //             await dQ.Update_SCH0_0_Block_7(currentHHD);
+        //         }
+        //         if (block_1 != null)
+        //         {
+        //             block_1.Block13_14Timestamp = null;
+        //             block_1.block_12_remark = string.Empty;
+        //             block_1.block_13_remark = string.Empty;
+        //         }
+        //         var block_2 = await dQ.Fetch_SCH_HIS_Block2(SessionStorage.selected_hhd_id);
+        //         if (block_2 != null)
+        //         {
+        //             block_2.total_time = null;
+        //             block_2.informant_serial = null;
+        //             block_2.informant_name = null;
+        //             await dQ.SaveAsync<Tbl_Block_FieldOperation>(block_2);
+        //         }
+        //         await _header?.ReloadVisitedBlocksAsync();
+        //     }
+        // }
 
-        var response = await dQ.Save_SCH_HIS_Block1(block_1);
-        if (response != 1)
-        {
-            toastService.ShowError("Getting error while deleting record, Please try again!");
-            return;
-        }
-        else
-        {
-            toastService.ShowSuccess("Data saved successfully!");
-            if (is_go_next)
-            {
-                if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
-                {
-                    NavigationManager.NavigateTo("/dashboard/his/block_12");
-                    return;
-                }
-                else
-                {
-                    NavigationManager.NavigateTo("/dashboard/his/block_3");
-                }
-            }
-        }
-        return;
+        // var response = await dQ.Save_SCH_HIS_Block1(block_1);
+        // if (response != 1)
+        // {
+        //     toastService.ShowError("Getting error while deleting record, Please try again!");
+        //     return;
+        // }
+        // else
+        // {
+        //     toastService.ShowSuccess("Data saved successfully!");
+        //     if (is_go_next)
+        //     {
+        //         if (block_1.survey_code.ToString() == CommonConstants.LOOKUP_SURVEY_CODE_HDD_3)
+        //         {
+        //             NavigationManager.NavigateTo("/dashboard/his/block_12");
+        //             return;
+        //         }
+        //         else
+        //         {
+        //             NavigationManager.NavigateTo("/dashboard/his/block_3");
+        //         }
+        //     }
+        // }
+        // return;
+        NavigationManager.NavigateTo("/dashboard/his/block_3");
 
     }
 

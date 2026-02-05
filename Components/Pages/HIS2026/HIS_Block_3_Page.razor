@@ -1562,22 +1562,22 @@
 
     async void HandleSubmit(string action = "")
     {
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-        {
-            NavigationManager.NavigateTo("/dashboard/his/block_4_1");
-            return;
-        }
+        // if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        // {
+        //     NavigationManager.NavigateTo("/dashboard/his/block_4_1");
+        //     return;
+        // }
 
-        if(block3Members.Count == 0)
-        {
-            toastService.ShowError("Please add a member before proceeding");
-            return;
-        }
+        // if(block3Members.Count == 0)
+        // {
+        //     toastService.ShowError("Please add a member before proceeding");
+        //     return;
+        // }
 
-        if (block_1 != null)
-        {
-            await DBQueries.SaveAsync<Tbl_Block_1>(block_1);
-        }
+        // if (block_1 != null)
+        // {
+        //     await DBQueries.SaveAsync<Tbl_Block_1>(block_1);
+        // }
         NavigationManager.NavigateTo("/dashboard/his/block_4_1");
 
 
