@@ -43,13 +43,14 @@
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
       <AndroidPackageFormat>apk</AndroidPackageFormat>
       <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationVersion>8</ApplicationVersion>
       <PublishTrimmed>True</PublishTrimmed>
       <RunAOTCompilation>True</RunAOTCompilation>
 		<AndroidLinkMode>SdkOnly</AndroidLinkMode>
 		<AndroidEnableProguard>true</AndroidEnableProguard>
 		<AndroidEnableR8>true</AndroidEnableR8>
 		<AndroidLinkTool>r8</AndroidLinkTool>
+		<ApplicationTitle>Agriculture </ApplicationTitle>
     </PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net9.0-android'">
@@ -58,19 +59,22 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
       <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationVersion>8</ApplicationVersion>
       <RunAOTCompilation>False</RunAOTCompilation>
+      <ApplicationTitle>Agriculture </ApplicationTitle>
 		
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
       <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationVersion>8</ApplicationVersion>
+      <ApplicationTitle>Agriculture </ApplicationTitle>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
       <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
-      <ApplicationVersion>7</ApplicationVersion>
+      <ApplicationVersion>8</ApplicationVersion>
+      <ApplicationTitle>Agriculture </ApplicationTitle>
     </PropertyGroup>
 
     <ItemGroup>
@@ -78,7 +82,7 @@
         <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#ffffff" />
 
         <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg"  Color="#D9FF9A" BaseSize="128,128" />
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#D9FF9A" BaseSize="128,128" />
 
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />

@@ -19,7 +19,8 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h3 class="page-heading m-0">FSU List</h3>
         <div class="ms-auto">
-            <NavLink class="btn btn-sm btn-outline-light d-flex align-items-center" onclick="@(async() => await Fsu_Load())">Reload Data<i class="fi fi-rr-rotate-right ms-2"></i></NavLink>
+            @* <NavLink class="btn btn-sm btn-outline-light d-flex align-items-center" onclick="@(async() => await Fsu_Load())">Reload Data<i class="fi fi-rr-rotate-right ms-2"></i></NavLink> *@
+            <NavLink class="btn btn-sm btn-outline-light d-flex align-items-center">Reload Data<i class="fi fi-rr-rotate-right ms-2"></i></NavLink>
         </div>
     </div>
     <div class="card custom-card">
@@ -109,12 +110,15 @@
                                         {
                                            
                                             <div class="badge badge-success">
-                                                @message
+                                                @message fghfg
                                             </div>
                                         }
                                        
                                         <div class="d-flex align-items-center fs-12 text-muted mt-2">
                                             <i class="bi bi-circle-fill text-muted me-1 fs-7"></i> Pending
+                                        </div>
+                                        <div class="d-flex align-items-center fs-12 text-success mt-2">
+                                            <i class="bi bi-circle-fill text-success me-1 fs-7"></i> Submitted
                                         </div>
                                        
 
@@ -123,8 +127,9 @@
                                     <td style="min-width:20px;">
                                         <div class="d-flex align-items-center">
                                             <div class="btn-group" role="group" aria-label="Basic outlined example">
-                                            <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH 0.0</NavLink>
-                                            <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">SCH 33.1</NavLink>
+                                            @* <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH 0.0</NavLink> *@
+                                                <NavLink  class="btn btn-sm btn-outline-primary">SCH 0.0</NavLink>
+                                                <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">SCH 33.1</NavLink>
                                         </div>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-link text-muted"><i class="bi bi-download"></i> </NavLink>
                                         @* <div class="dropdown">

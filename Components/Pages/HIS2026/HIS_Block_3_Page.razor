@@ -52,7 +52,7 @@
         <div class="card-body p-0">
             <div class="table-responsive table-wrapper">
                 <!-- Table displaying household members -->
-                <table class="table table-striped table-bordered mb-0 fixed-column">
+                @* <table class="table table-striped table-bordered mb-0 fixed-column">
                     <thead>
                         <tr>
                             <th class="text-center col-1" rowspan="3">Action</th>
@@ -150,24 +150,228 @@
                             </tr>
                         </tbody>
                     }
+                </table> *@
+                <table class="table table-striped table-bordered mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th rowspan="3">Sl. No.</th>
+                            <th rowspan="3">Name of the member</th>
+                            <th rowspan="3" style="min-width: 115px;">Relation to head (code)</th>
+                            <th rowspan="3" style="min-width: 115px;">Gender (code)</th>
+                            <th rowspan="3">Age (years)<br />[Completed number of years of age]</th>
+                            <th rowspan="3">Highest level of education(code)</th>
+                            <th rowspan="3">Whether attended any formal training in agriculture? (yes - 1,no - 2)</th>
+                            <th colspan="7" class="text-center">During the period July - December 2025</th>
+                        </tr>
+                        <tr>
+                            <th colspan="2" class="text-center">Principal activity</th>
+                            <th colspan="2" class="text-center">Subsidiary economic activity</th>
+                            <th rowspan="2">Earnings from wages/ salaried employment (received or receivable)<sup class="text-danger mx-1">#</sup> (Rs.)</th>
+                            <th rowspan="2">Earnings from pension/remittances (received or receivable)<sup class="text-danger mx-1">#</sup>(Rs.)</th>
+                            <th rowspan="2" style="min-width: 110px;">Income from rent of leased out land (Rs.)<sup class="text-danger ms-1">#*</sup></th>
+                        </tr>
+                        <tr>
+                            <th style="min-width: 200px;">Status(code)</th>
+                            <th style="min-width: 110px;">NIC-2025 code (2-digits)</th>
+                            <th style="min-width: 200px;">Status(code)</th>
+                            <th style="min-width: 110px;">NIC-2025 code (2-digits)</th>
+                        </tr>
+                        <tr>
+                            <th>(1)</th>
+                            <th>(2)</th>
+                            <th>(3)</th>
+                            <th>(4)</th>
+                            <th>(5)</th>
+                            <th>(6)</th>
+                            <th>(7)</th>
+                            <th>(8)</th>
+                            <th>(9)</th>
+                            <th>(10)</th>
+                            <th>(11)</th>
+                            <th>(12)</th>
+                            <th>(13)</th>
+                            <th>(14)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Saiket Ray</td>
+                            <td>
+                                1 - self
+                            </td>
+                            <td>
+                                1 - Male
+                            </td>
+                            <td>
+                                56
+                            </td>
+                            <td>
+                                11 - Graduate
+                            </td>
+                            <td>
+                                1 - Yes
+                            </td>
+                            <td>
+                                31 - Worked as regular salaried / wage employee
+                            </td>
+                            <td>
+                                11
+                            </td>
+                            <td>
+                                92 - Attended domestic duties only
+                            </td>
+                            <td>
+                                11
+                            </td>
+                            <td>
+                                50000
+                            </td>
+                            <td>
+                                0
+                            </td>
+                            <td>
+                                10000
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Saini Ray</td>
+                            <td>
+                                2 - spouse of head
+                            </td>
+                            <td>
+                                2 - Female
+                            </td>
+                            <td>
+                                52
+                            </td>
+                            <td>
+                                11 - Graduate
+                            </td>
+                            <td>
+                                1 - Yes
+                            </td>
+                            <td>
+                                31 - Worked as regular salaried / wage employee
+                            </td>
+                            <td>
+                                78
+                            </td>
+                            <td>
+                                92 - Attended domestic duties only
+                            </td>
+                            <td>
+                                78
+                            </td>
+                            <td>
+                                55000
+                            </td>
+                            <td>
+                                1000
+                            </td>
+                            <td>
+                                10000
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Saiket Ray</td>
+                            <td>
+                                1 - self
+                            </td>
+                            <td>
+                                1 - Male
+                            </td>
+                            <td>
+                                56
+                            </td>
+                            <td>
+                                11 - Graduate
+                            </td>
+                            <td>
+                                1 - Yes
+                            </td>
+                            <td>
+                                31 - Worked as regular salaried / wage employee
+                            </td>
+                            <td>
+                                11
+                            </td>
+                            <td>
+                                92 - Attended domestic duties only
+                            </td>
+                            <td>
+                                11
+                            </td>
+                            <td>
+                                50000
+                            </td>
+                            <td>
+                                0
+                            </td>
+                            <td>
+                                10000
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Saini Ray</td>
+                            <td>
+                                2 - spouse of head
+                            </td>
+                            <td>
+                                2 - Female
+                            </td>
+                            <td>
+                                52
+                            </td>
+                            <td>
+                                11 - Graduate
+                            </td>
+                            <td>
+                                1 - Yes
+                            </td>
+                            <td>
+                                31 - Worked as regular salaried / wage employee
+                            </td>
+                            <td>
+                                78
+                            </td>
+                            <td>
+                                92 - Attended domestic duties only
+                            </td>
+                            <td>
+                                78
+                            </td>
+                            <td>
+                                55000
+                            </td>
+                            <td>
+                                1000
+                            </td>
+                            <td>
+                                10000
+                            </td>
+                        </tr>
+                        
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-<!-- 🔹 Footer Navigation (Always visible) -->
-<div class="footer">
     <!-- Remarks textarea -->
-    <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
-        <div class="card custom-card">
-            <div class="card-header">
-                <h3 class="card-title">Remarks</h3>
-            </div>
-            <div class="card-body">
-                <textarea maxlength="500" class="form-control" id="remarksTextarea" rows="2" placeholder="Enter remarks here.." @bind="block_1.block_3_remark" oninput="validateRemarks(event)"></textarea>
-            </div>
+     <div class="card custom-card">
+    <div class="card-body">
+            <label class="form-label">Remarks</label>
+            <textarea maxlength="500" type="text"  class="form-control is_sso w-100"placeholder="Enter your remarks here..." rows="2" oninput="validateRemarks(event)"></textarea>
+      
+    </div>
         </div>
-    </fieldset>
+<!-- 🔹 Footer Navigation (Always visible) -->
+<div class="footer pb-3">
+
     <div class="row">
         <div class="col-sm-6">
             <div class="d-flex">
@@ -187,7 +391,7 @@
 </div>
 
 
-<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown">
+<Modal @ref="AddModal" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false" >
     <HeaderTemplate>
         <h5 class="modal-title"><span class="text-primary me-1">[Block 3]</span>@((isAdd ? "Add Member" : "Update Member"))</h5>
     </HeaderTemplate>
@@ -199,7 +403,7 @@
                     <div class="row">
 
                         <!-- 1. Serial Number -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label class="form-label">
                                     <span class="form-badge">1</span> Sl no.
@@ -209,7 +413,7 @@
                         </div>
 
                         <!-- 2. Name of Member input -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label class="form-label">
                                     <span class="form-badge">2</span> Name of Member
@@ -231,7 +435,7 @@
                         </div>
 
                         <!-- 3. Relation to head -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label class="form-label">
                                     <span class="form-badge">3.</span> Relation to head (code)
@@ -263,7 +467,7 @@
                         </div>
 
                         <!-- 4. Gender -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label class="form-label">
                                     <span class="form-badge">4.</span> Gender (code)
@@ -290,7 +494,7 @@
                         </div>
 
                         <!-- 5. Age -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label class="form-label">
                                     <span class="form-badge">5</span> Age (years)
@@ -323,7 +527,7 @@
                     </div>
 
                         <!-- 6. Marital status -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label class="form-label">
                                     <span class="form-badge">6</span> Marital status (code)
@@ -355,7 +559,7 @@
                         </div>
 
                         <!-- 7. Education -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label class="form-label">
                                     <span class="form-badge">7</span> Highest level of education
@@ -395,7 +599,7 @@
                                     <h6 class="fw-bold">Activity status (During 30 days)</h6>
                                     <div class="row">
                                         <!-- Item 8 -->
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">
                                                     <span class="form-badge">8</span> Primary
@@ -413,7 +617,7 @@
                                         </div>
 
                                         <!-- Item 9 -->
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-6">
                                             <div>
                                                 <label class="form-label">
                                                     <span class="form-badge">9</span> Secondary
@@ -451,7 +655,7 @@
                                     <h6 class="fw-bold">Activity status (During 365 days)</h6>
                                     <div class="row">
                                         <!-- Item 10 -->
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label">
                                                     <span class="form-badge">10</span> Primary
@@ -470,7 +674,7 @@
                                         </div>
 
                                         <!-- Item 11 -->
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-6">
                                             <div>
                                                 <label class="form-label">
                                                     <span class="form-badge">11</span> Secondary

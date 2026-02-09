@@ -19,7 +19,7 @@
         <div class="main-content">
             <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId"
                                  survey_time="@survey_time" />
-            <div class="card custom-card">
+            @* <div class="card custom-card">
                 <div class="card-header">
                     <h3 class="card-title"><span class="text-primary me-2">[4]</span>Household Characteristics</h3>
                     @if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
@@ -32,7 +32,7 @@
                 </div>
                 <fieldset disabled="@(SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)">
                 <div class="row px-3 pt-3 pb-1">
-                    <!--4.1-->
+                   
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label">
@@ -47,7 +47,7 @@
                             }
                         </div>
                     </div>
-                    <!--4.2-->
+                  
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label">
@@ -69,7 +69,7 @@
                             }
                         </div>
                     </div>
-                    <!--4.3-->
+                    
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label class="form-label">
@@ -93,7 +93,7 @@
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    <!--4.4-->
+                  
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered mb-0">
                             <thead>
@@ -191,9 +191,333 @@
                     </div>
                 </div>
                 </fieldset>
+            </div> *@
+
+            @* block-4*@
+            <div class="card custom-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <span class="text-primary me-2">[4]</span>Household characteristics
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered mb-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Sl. No.</th>
+                                    <th>Item Description</th>
+                                    <th>Code/ Entry</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Household Size</td>
+                                    <td>Auto-populated from Block 3</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Religion</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Hinduism</option>
+                                            <option value="2">2 - Islam</option>
+                                            <option value="3">3 - Christianity</option>
+                                            <option value="4">4 - Sikhism</option>
+                                            <option value="5">5 - Jainism</option>
+                                            <option value="6">6 - Buddhism</option>
+                                            <option value="7">7 - Zoroastrianism</option>
+                                            <option value="9">9 - Others</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Social Group</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Scheduled Tribe (ST)</option>
+                                            <option value="2">2 - Scheduled Caste (SC)</option>
+                                            <option value="3">3 - Other Backward Class (OBC)</option>
+                                            <option value="9">9 - Others</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>
+                                        Household Classification
+                                        (to be determined based on the source of major income of the household):
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Self-employment in crop production</option>
+                                            <option value="2">2 - Self-employment in farming of animals</option>
+                                            <option value="3">3 - Self-employment in other agricultural activities</option>
+                                            <option value="4">4 - Self-employment in non-agricultural enterprise</option>
+                                            <option value="5">5 - Regular wage / salaried earning in agriculture</option>
+                                            <option value="6">6 - Regular wage / salaried earning in non-agriculture</option>
+                                            <option value="7">7 - Casual labour in agriculture</option>
+                                            <option value="8">8 - Casual labour in non-agriculture</option>
+                                            <option value="9">9 - Others (pensioners, remittance recipients, students, domestic duties, etc.)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Usual consumer expenditure in a month for household purposes out of purchase (including online purchase) of goods and services excluding items like clothing, footwear. (Rs.) (A) </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>Imputed value of usual consumption in a month from home grown stock like, rice, cereals, pulses, vegetables, milk, firewood, chips, cow dung, etc. (Rs.) (B)</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>Imputed value of usual consumption in a month from wages in kind, free collection, gifts, etc. (Rs.) (C)</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>Expenditure on purchase (including online purchase) of items like clothing, footwear etc during last 365 days. (Rs.) (D)</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>Expenditure on purchase (including online purchase) of household durables during last 365 days. (Rs.) (E)</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>10</td>
+                                    <td>Household’s usual monthly consumer expenditure. (Rs.) [A+B+C+((D+E)/12)]</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" disabled />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td>Value of agricultural production from self- employment activities during the last 365 days (less than or equal to Rs.7000/--1, more than Rs.7000/--2)</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <p class="mb-0 fw-bold">Items 12 - 25 are to be filled in for code 2 in item 11</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>12</td>
+                                    <td>Dwelling unit </td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Owned</option>
+                                            <option value="2">2 - Hired</option>
+                                            <option value="3">3 - No dwelling unit</option>
+                                            <option value="9">9 - Others</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>13</td>
+                                    <td>
+                                        <span class="fw-bold">For code 1, 2 or 9 in item 12,</span>
+
+                                        Type of structure
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Katcha</option>
+                                            <option value="2">2 - Semi-pucca</option>
+                                            <option value="3">3 - Pucca</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>14</td>
+                                    <td>Whether any of the household member possesses VB-G RAM G job card?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>15</td>
+                                    <td><span class="fw-bold me-1">If code 1 in item 14,</span>whether undertook any work under VB-G RAM G scheme during the last 365 days?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>16</td>
+                                    <td>Whether any of the household member is a member of registered farmers’ organisation?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>17</td>
+                                    <td>Whether the household possesses any Kisan Credit Card?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>18</td>
+                                    <td>Whether the household possess Soil Health Card? </td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>19</td>
+                                    <td><span class="fw-bold me-1">If code 1 in item 18,</span>Whether fertilizer, manure, soil amendments applied to field as per recommendations of Soil Health Card? </td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>20</td>
+                                    <td>Whether the household possess Animal Health Card (Nakul Swasthya Patra)?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>21</td>
+                                    <td>Whether any micro irrigation method for irrigation is used by the household?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Sprinkler irrigation</option>
+                                            <option value="2">2 - Drip irrigation</option>
+                                            <option value="3">3 - Both (Sprinkler & Drip)</option>
+                                            <option value="4">4 - None</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>22</td>
+                                    <td>Whether the household is a beneficiary of any Central/ State Government financial assistance scheme related to agriculture income augmentation during AY 2025-26?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>23</td>
+                                    <td>Whether the household accesses hired machinery through Custom Hiring Centre/ Farm Machinery Bank/ Rental services?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>24</td>
+                                    <td>Whether the household practices any of these specialized farming techniques -i) Organic farming, ii) Protected Farming, iii) Precision Farming techniques (Site-Specific Crop Management)?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>25</td>
+                                    <td>Whether the household has experienced any crop loss during AY 2025-26?</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="">-- Select --</option>
+                                            <option value="1">1 - Yes</option>
+                                            <option value="2">2 - No</option>
+                                        </select>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3">
+                                        <p class="mb-0 fw-bold">Note: AY 2025-26: July 2025 - June 2026</p>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="footer">
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="col-12">
+                    <label class="form-label"><span class="form-badge bg-gradiant-secondary">17</span>Remarks</label>
+                    <textarea maxlength="500" type="text" class="form-control is_sso w-100" @bind="block_1.block_1_remark" placeholder="Enter your remarks here..." rows="2" oninput="validateRemarks(event)"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="footer pb-3">
             <div class="row">
                 <div class="col-sm-6">
                     <button class="btn btn-outline-secondary" onclick="@GoBack"><i class="fi fi-rr-angle-left me-1"></i>Back</button>
@@ -206,7 +530,8 @@
                                 <i class="fi fi-rr-disk me-1"></i>Save
                             </button>
                         }
-                        <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
+                        @* <NavLink class="btn btn-primary" @onclick="@(() => Save(true))">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink> *@
+                        <NavLink class="btn btn-primary">Next<i class="fi fi-rr-angle-right ms-1"></i></NavLink>
                     </div>
                 </div>
             </div>
