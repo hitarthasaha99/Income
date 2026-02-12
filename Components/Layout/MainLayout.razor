@@ -91,6 +91,10 @@
         if (NavHistory.CanGoBack())
         {
             var prev = NavHistory.GoBack();
+            if (string.IsNullOrEmpty(prev))
+            {
+                return false;
+            }
             Nav.NavigateTo(prev, replace: true);
             return true; // block Android
         }

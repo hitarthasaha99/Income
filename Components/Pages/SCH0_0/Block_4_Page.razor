@@ -35,7 +35,7 @@
                         <label for="" class="form-label">
                             <span class="form-badge">2</span> Approximate population of the SU
                         </label>
-                        <input disabled="@(DisableEdit)" type="number" class="form-control form-control-sm no-spinner" id="" value="@block_4.approximate_population_su" @oninput="HandleChange">
+                            <input disabled="@(DisableEdit)" onbeforeinput="if (event.data && !/^\d+$/.test(event.data)) event.preventDefault();" type="number" class="form-control form-control-sm no-spinner" id="" value="@block_4.approximate_population_su" @oninput="HandleChange">
                     </div>
                 </div>
                 <div class="col-sm-6">

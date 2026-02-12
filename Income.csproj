@@ -133,6 +133,12 @@
       </MauiAsset>
     </ItemGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+      <PackageReference Include="Xamarin.AndroidX.DocumentFile">
+        <Version>1.1.0.2</Version>
+      </PackageReference>
+    </ItemGroup>
+
 	<Target Name="ObfuscateAfterPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'&#xD;&#xA;                AND '$(TargetFramework)'=='net9.0-windows10.0.19041.0'">
 
 		<!-- Run Obfuscar -->

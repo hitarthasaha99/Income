@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Income.Services
 {
-    // Services/BackButtonService.cs
     public class BackButtonService
     {
         public Func<bool>? HandleBackRequested;
