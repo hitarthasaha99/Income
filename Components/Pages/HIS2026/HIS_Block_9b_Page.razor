@@ -78,6 +78,7 @@
                                                    @oninput="e =>
                                                    {
                                                        UpdateFieldAndValidate(() => block_9b.item_5_1_3, e);
+                                                       CheckCSP65();
                                                    }" />
                                               <ValidationMessage For="@(() => block_9b.item_5_1_3)" />
                                           </td>
@@ -86,6 +87,7 @@
                                                      @oninput="e =>
                                                    {
                                                        UpdateFieldAndValidate(() => block_9b.item_5_1_4, e);
+                                                       CheckCSP65();
                                                    }" />
                                               <ValidationMessage For="@(() => block_9b.item_5_1_4)" />
                                           </td>
@@ -106,6 +108,7 @@
                                                     @oninput="e =>
                                                 {
                                                     UpdateFieldAndValidate(() => block_9b.item_5_2_3, e);
+                                                       CheckCSP65();
                                                 }" />
                                             <ValidationMessage For="@(() => block_9b.item_5_2_3)" />
                                         </td>
@@ -114,6 +117,7 @@
                                                     @oninput="e =>
                                                 {
                                                     UpdateFieldAndValidate(() => block_9b.item_5_2_4, e);
+                                                       CheckCSP65();
                                                 }" />
                                             <ValidationMessage For="@(() => block_9b.item_5_2_4)" />
                                         </td>
@@ -134,6 +138,7 @@
                                                     @oninput="e =>
                                                 {
                                                     UpdateFieldAndValidate(() => block_9b.item_5_3_3, e);
+                                                       CheckCSP65();
                                                 }" />
                                             <ValidationMessage For="@(() => block_9b.item_5_3_3)" />
                                         </td>
@@ -142,6 +147,7 @@
                                                     @oninput="e =>
                                                 {
                                                     UpdateFieldAndValidate(() => block_9b.item_5_3_4, e);
+                                                       CheckCSP65();
                                                 }" />
                                             <ValidationMessage For="@(() => block_9b.item_5_3_4)" />
                                         </td>
@@ -155,7 +161,20 @@
                                         </td>
                                     </tr>
                                 </tbody>
+                                @if (!string.IsNullOrEmpty(item_9_5_warning))
+                                {
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4">
+                                                <div class="alert custom-alert alert-success" role="alert">
+                                                    @item_9_5_warning
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                }
                             </table>
+                            
                         </fieldset>
 
                     </div>
@@ -274,6 +293,7 @@
     bool isAdd;
     DateTime survey_time = DateTime.Now;
     string remarks = string.Empty;
+    string item_9_5_warning = string.Empty;
     string item_9_6_warning = string.Empty;
     CommentModal commentModal = default!;
 
@@ -288,7 +308,7 @@
         MemberList = await dB.Fetch_SCH_HIS_Block3(SessionStorage.selected_hhd_id);
         block_9b = await dB.Fetch_SCH_HIS_Block9B(SessionStorage.selected_hhd_id);
         block_1 = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
-
+        CheckCSP65();
         if (block_9b == null)
         {
             block_9b = new();
@@ -355,6 +375,36 @@
 
     }
 
+    void CheckCSP65()
+    {
+        try
+        {
+            item_9_5_warning = string.Empty;
+            bool condition = MemberList.Any(b =>
+                    b.item_8 == 10 ||
+                    b.item_9 == 10 ||
+                    b.item_10 == 10 ||
+                    b.item_11 == 10);
+
+            if (condition && block_9b != null)
+            {
+                bool valid =
+                    (block_9b.item_5_1_3 > 0 && block_9b.item_5_1_4 > 0) ||
+                    (block_9b.item_5_2_3 > 0 && block_9b.item_5_2_4 > 0) ||
+                    (block_9b.item_5_3_3 > 0 && block_9b.item_5_3_4 > 0);
+
+                if (!valid)
+                {
+                    item_9_5_warning = "W065: Please check the entry recorded against cols. 8-11";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+
     void CheckWarning()
     {
         item_9_6_warning = string.Empty;
@@ -408,6 +458,11 @@
                 {
                     await dB.SaveAsync<Tbl_Block_1>(block_1);
                 }
+            }
+
+            if (!string.IsNullOrEmpty(item_9_5_warning))
+            {
+                warning_VM.AddWarning(item_9_5_warning, "NHIS", "9B", "9.5", "W065", SessionStorage.selected_hhd_id);
             }
 
             if (!string.IsNullOrEmpty(item_9_6_warning))

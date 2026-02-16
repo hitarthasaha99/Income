@@ -46,28 +46,29 @@ namespace Income.Validators.HIS2026
             // ---------------------------------------------------------
             // 3. If ANY Block3.item_8/9/10/11 == 10,
             //    Then: (1_3 & 1_4) OR (2_3 & 2_4) OR (3_3 & 3_4) MUST be > 0
+            // TURNED INTO A WARNING AS PER FOD FEEDBACK
             // ---------------------------------------------------------
-            RuleFor(x => x).Custom((model, context) =>
-            {
-                bool condition = _block3List.Any(b =>
-                    b.item_8 == 10 ||
-                    b.item_9 == 10 ||
-                    b.item_10 == 10 ||
-                    b.item_11 == 10);
+            //RuleFor(x => x).Custom((model, context) =>
+            //{
+            //    bool condition = _block3List.Any(b =>
+            //        b.item_8 == 10 ||
+            //        b.item_9 == 10 ||
+            //        b.item_10 == 10 ||
+            //        b.item_11 == 10);
 
-                if (condition)
-                {
-                    bool valid =
-                        (model.item_5_1_3 > 0 && model.item_5_1_4 > 0) ||
-                        (model.item_5_2_3 > 0 && model.item_5_2_4 > 0) ||
-                        (model.item_5_3_3 > 0 && model.item_5_3_4 > 0);
+            //    if (condition)
+            //    {
+            //        bool valid =
+            //            (model.item_5_1_3 > 0 && model.item_5_1_4 > 0) ||
+            //            (model.item_5_2_3 > 0 && model.item_5_2_4 > 0) ||
+            //            (model.item_5_3_3 > 0 && model.item_5_3_4 > 0);
 
-                    if (!valid)
-                    {
-                        context.AddFailure("H065: Please check the entry recorded against cols. 8-11");
-                    }
-                }
-            });
+            //        if (!valid)
+            //        {
+            //            context.AddFailure("H065: Please check the entry recorded against cols. 8-11");
+            //        }
+            //    }
+            //});
 
             // ---------------------------------------------------------
             // 4. item_6 and item_7: not null AND >= 0

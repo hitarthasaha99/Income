@@ -305,7 +305,10 @@
                                                     step="any"
                                                     Disabled="@(sector == 2)"
                                                     oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10)"
-                                                    onkeypress="return /^(\d+(\.\d{0,3})?)?$/.test(event.target.value + event.key)" />
+                                                 onkeypress="const v=this.value,k=event.key;
+                                                            if(!/[\d.]/.test(k))return false;if(k==='.'&&(v.includes('.')||v===''))return false;
+                                                            if(v.includes('.')&&v.split('.')[1].length>=3)return false;
+                                                            return /^\d*\.?\d{0,3}$/.test(v+k)" />
                                     <ValidationMessage For="@(() => fields.Block_7_8)" />
                                 </div>
                             </div>

@@ -332,7 +332,7 @@
 				{
 					if(item.hhdStatus == 15 && !(await Block2Present(item)) && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
 					{
-						item.hhdStatus = 0;
+						item.hhdStatus = 11;
 					}
 
 					if (item.hhdStatus is 0 && (await Block1Present(item)) && SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)

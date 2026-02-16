@@ -1,0 +1,126 @@
+﻿<div class="searchable-select @(IsDisabled ? "disabled" : "")">
+    <div class="search-input-wrapper">
+        <input type="text"
+               class="form-control @CssClass"
+               placeholder="@Placeholder"
+               @bind="searchText"
+               @bind:event="oninput"
+               @onfocus="OnFocus"
+               @onblur="OnBlur"
+               disabled="@IsDisabled"
+               autocomplete="off" />
+        <span class="dropdown-icon">▼</span>
+    </div>
+
+    @if (isOpen && !IsDisabled)
+    {
+        <div class="dropdown-list">
+            @if (filteredItems.Any())
+            {
+                @foreach (var item in filteredItems)
+                {
+                    <div class="dropdown-item @(item.id == SelectedValue ? "selected" : "")"
+                         @onmousedown="() => SelectItem(item)"
+                         @onmousedown:preventDefault>
+                        @item.title
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="dropdown-item disabled">No results found</div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string SelectedValue { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> SelectedValueChanged { get; set; }
+    [Parameter] public List<(string id, string title)> Items { get; set; } = new();
+    [Parameter] public bool IsDisabled { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Select or search...";
+    [Parameter] public string CssClass { get; set; } = "";
+
+    private string searchText = string.Empty;
+    private bool isOpen = false;
+    private List<(string id, string title)> filteredItems = new();
+
+    protected override void OnParametersSet()
+    {
+        filteredItems = Items;
+
+        // Set display text if there's a selected value
+        if (!string.IsNullOrEmpty(SelectedValue))
+        {
+            var selected = Items.FirstOrDefault(x => x.id == SelectedValue);
+            if (selected != default)
+            {
+                searchText = selected.title;
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        filteredItems = Items;
+    }
+
+    private void OnFocus()
+    {
+        isOpen = true;
+        searchText = string.Empty; // Clear on focus to show all options
+        filteredItems = Items;
+    }
+
+    private async Task OnBlur()
+    {
+        // Delay to allow click events to fire
+        await Task.Delay(200);
+        isOpen = false;
+
+        // Restore selected text if nothing was selected
+        if (!string.IsNullOrEmpty(SelectedValue))
+        {
+            var selected = Items.FirstOrDefault(x => x.id == SelectedValue);
+            if (selected != default)
+            {
+                searchText = selected.title;
+            }
+        }
+        else
+        {
+            searchText = string.Empty;
+        }
+    }
+
+    private async Task SelectItem((string id, string title) item)
+    {
+        SelectedValue = item.id;
+        searchText = item.title;
+        isOpen = false;
+        await SelectedValueChanged.InvokeAsync(item.id);
+    }
+
+    private void FilterItems()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            filteredItems = Items;
+        }
+        else
+        {
+            filteredItems = Items
+                .Where(x => x.title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            FilterItems();
+        }
+    }
+}

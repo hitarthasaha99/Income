@@ -6,11 +6,13 @@
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Income.Validators.HIS2026
+@using Income.Viewmodels
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Linq.Expressions
 @using System.Reflection
 @inject IJSRuntime JSRuntime
 @inject ILoggingService loggingService
+@inject Warning_VM warning_VM
 @inject IValidator<Tbl_Block_11a> Validator
 
 @if (editContext !=null)
@@ -64,6 +66,7 @@
                                                     {
                                                         UpdateFieldAndValidate(() => selectBlock11A.item_1, e);
                                                         q11_1Condition(e);
+                                                        ValidateCSP72();
                                                     }">
                                                     <option value="">-Select-</option>
                                                     <option value="1">1-yes</option>
@@ -105,11 +108,13 @@
                                             Whether transfers paid to other households in the form of family support payments (such as alimony, child and parental support) during last 365 days? (yes - 1, no – 2)
                                         </td>
                                         <td>
-                                                <select class="form-select form-select-sm" value="@selectBlock11A.item_3" disabled="@(!isQ11_3Enable)"
+                                                <select class="form-select form-select-sm" value="@selectBlock11A.item_3"
                                         
                                                 @onchange="e =>
-                                                {UpdateFieldAndValidate(() => selectBlock11A.item_3, e);
-                                                        q11_3Condition(e);
+                                                {
+                                                    UpdateFieldAndValidate(() => selectBlock11A.item_3, e);
+                                                    q11_3Condition(e);
+                                                    ValidateCSP72();
                                                 }">                                                                                                                                                     
                                                 <option value="">-Select-</option>
                                                 <option value="1">1-yes</option>
@@ -172,6 +177,18 @@
                                         </td>
                                     </tr>
                                 </tbody>
+                                @if(!string.IsNullOrEmpty(csp_72_warning))
+                                {
+                                    <tfoot>
+                                      <tr>
+                                        <td colspan="4">
+                                            <div class="alert custom-alert alert-success" role="alert">
+                                                @csp_72_warning
+                                            </div>
+                                        </td>
+                                      </tr>
+                                  </tfoot>
+                                }
                             </table>
                         </fieldset>
                     </div>
@@ -241,11 +258,12 @@
     private bool isQ11_2Enable = false;
     private bool isQ11_3Enable = false;
     private bool isQ11_4_5Enable = false;
+    private string csp_72_warning = string.Empty;
     CommentModal commentModal = default!;
 
     async Task GoBack()
     {
-                NavigationManager.NavigateTo("/dashboard/his/block_10");
+        NavigationManager.NavigateTo("/dashboard/his/block_10");
 
         // await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
@@ -289,6 +307,7 @@
             {
                 isQ11_4_5Enable = true;
             }
+            ValidateCSP72();
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
             block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
@@ -296,7 +315,7 @@
             {
                 survey_time = selectBlock11A.survey_timestamp.GetValueOrDefault();
             }
-            
+
             StateHasChanged();
 
         }
@@ -304,7 +323,7 @@
         {
             await loggingService.LogError("HIS_Block_11a_Page", ex);
         }
-        
+
     }
 
     private void UpdateFieldAndValidate(Expression<Func<int?>> field, ChangeEventArgs e)
@@ -414,6 +433,22 @@
         }
     }
 
+    private void ValidateCSP72()
+    {
+        try
+        {
+            csp_72_warning = string.Empty;
+            if (selectBlock11A != null && selectBlock11A.item_1.GetValueOrDefault() == 1 && selectBlock11A.item_3.GetValueOrDefault() == 1)
+            {
+                csp_72_warning = $"W072: Invalid Entry, please check the entry";
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+
 
     private async Task SaveAsync(bool is_go_next = false)
     {
@@ -446,6 +481,12 @@
                 if (saved > 0)
                 {
                     toastService.ShowSuccess("Saved successfully");
+
+                    if (!string.IsNullOrEmpty(csp_72_warning))
+                    {
+                        warning_VM.AddWarning(csp_72_warning, "NHIS", "11A", "1", "W072", SessionStorage.selected_hhd_id);
+                    }
+                    await warning_VM.SaveWarningAsync("NHIS", "11A");
                 }
                 else
                 {
