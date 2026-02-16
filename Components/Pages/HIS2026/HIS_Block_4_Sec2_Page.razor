@@ -15,6 +15,8 @@
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_4_Q5> Validator
 @inject ILoggingService loggingService
+@inject IJSRuntime JS
+
 
 <NavigationLock OnBeforeInternalNavigation="ConfirmNavigation" />
 
@@ -174,7 +176,8 @@
                             </label>
 
                             @* //select2 *@
-                            <select id="mySelect" class="form-select is_sso mb-3"
+                            <select id="mySelect"
+                                    class="form-control"
                                     value="@fields.NicCode"
                                     @onchange="OnNicCodeChanged"
                                     disabled="@(DisableNICInput)">
@@ -186,7 +189,8 @@
                             </select>
 
 
-                            <select class="form-select is_sso"
+
+                            @* <select class="form-select is_sso"
                                     value="@fields.NicCode"
                                     @onchange="OnNicCodeChanged"
                                     disabled="@(DisableNICInput)">
@@ -195,7 +199,7 @@
                                 {
                                     <option value="@item.id">@item.title</option>
                                 }
-                            </select>
+                            </select> *@
                             <ValidationMessage For="@(() => fields.NicCode)" />
                         </div>
                     </div>
@@ -255,13 +259,7 @@
 
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("initializeSelect2", "mySelect");
-        }
-    }
+    
     EditContext editContext = default!;
     ValidationMessageStore messageStore = default!;
     Modal AddModal = default!;
@@ -284,6 +282,7 @@
     Tbl_Block_4_Q5? copy = null;
     private ConfirmDialog dialog = default!;
     bool isAdd = false;
+
 
     async void Validate()
     {
@@ -435,6 +434,9 @@
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;
                 await AddModal.ShowAsync();
+                // Initialize Select2 after modal is shown
+                await Task.Delay(50); // Small delay to ensure modal DOM is ready
+                await JSRuntime.InvokeVoidAsync("initializeSelect2ForModal", "mySelect");
             }
             else if (action == "UPDATE")
             {
@@ -453,6 +455,9 @@
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;
                 await AddModal.ShowAsync();
+                // Initialize Select2 after modal is shown
+                await Task.Delay(50); // Small delay to ensure modal DOM is ready
+                await JSRuntime.InvokeVoidAsync("initializeSelect2ForModal", "mySelect");
             }
             else if (action == "CLOSE")
             {
