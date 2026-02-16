@@ -187,4 +187,9 @@ window.registerOutsideClickHandler = (dotNetHelper, dropdownElement) => {
     });
 };
 
-
+window.initSelect2 = (element) => {
+    $(element).select2();
+};
+window.initializeSelect2 = (id) => {
+    $("#" + id).select2();
+};

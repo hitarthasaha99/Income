@@ -172,6 +172,20 @@
                             <label class="form-label">
                                 <span class="form-badge">3</span> NIC code (2-digit)
                             </label>
+
+                            @* //select2 *@
+                            <select id="mySelect" class="form-select is_sso mb-3"
+                                    value="@fields.NicCode"
+                                    @onchange="OnNicCodeChanged"
+                                    disabled="@(DisableNICInput)">
+                                <option value="">Select</option>
+                                @foreach (var item in Block_4_Constants.NIC_CODES)
+                                {
+                                    <option value="@item.id">@item.title</option>
+                                }
+                            </select>
+
+
                             <select class="form-select is_sso"
                                     value="@fields.NicCode"
                                     @onchange="OnNicCodeChanged"
@@ -241,6 +255,13 @@
 
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "mySelect");
+        }
+    }
     EditContext editContext = default!;
     ValidationMessageStore messageStore = default!;
     Modal AddModal = default!;
