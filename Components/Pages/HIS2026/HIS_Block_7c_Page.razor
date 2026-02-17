@@ -174,20 +174,7 @@
                         <!-- NIC code -->
                         <div class="mb-3">
                             <label class="form-label"><span class="form-badge">3</span>NIC code (2-digit)</label>
-                            @* //select2 *@
-                            <select @ref="mySelectRef" class="form-select is_sso mb-3"
-                                    value="@fields.NicCode"
-                                    disabled="@(SessionStorage.FSU_Submitted)"
-                                    @onchange="OnNicCodeChanged">
-                                <option value="">Select</option>
-                                @foreach (var item in NICCodes)
-                                {
-                                    <option value="@item.id">@item.title</option>
-                                }
-                            </select>
-
-
-                            <select class="form-select is_sso"
+                            <select id="mySelect" class="customSelect is_sso"
                                     value="@fields.NicCode"
                                     disabled="@(SessionStorage.FSU_Submitted)"
                                     @onchange="OnNicCodeChanged">
@@ -235,13 +222,6 @@
               Block="7C_1" />
 
 @code {
-    private ElementReference mySelectRef;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-
-        await JSRuntime.InvokeVoidAsync("initSelect2", mySelectRef);
-    }
     DateTime survey_time = DateTime.Now;
     Modal AddModal = default!;
     Tbl_Block_7c_NIC fields = new();
@@ -392,6 +372,9 @@
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;
                 await AddModal.ShowAsync();
+                // Initialize Select2 after modal is shown
+                await Task.Delay(50); // Small delay to ensure modal DOM is ready
+                await JSRuntime.InvokeVoidAsync("initializeSelect2ForModal", "mySelect");
             }
             else if (action == "UPDATE")
             {
@@ -400,6 +383,9 @@
                 messageStore = new ValidationMessageStore(editContext);
                 editContext.OnFieldChanged += EditContext_OnFieldChanged;
                 await AddModal.ShowAsync();
+                // Initialize Select2 after modal is shown
+                await Task.Delay(50); // Small delay to ensure modal DOM is ready
+                await JSRuntime.InvokeVoidAsync("initializeSelect2ForModal", "mySelect");
             }
             else if (action == "CLOSE")
             {

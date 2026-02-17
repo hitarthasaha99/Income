@@ -146,23 +146,11 @@
             </div>
         </div>
     </div>
-    <select id="mySelect" class="form-control">
-        <option value="1">Apple</option>
-        <option value="2">Banana</option>
-        <option value="3">Mango</option>
-    </select>
 </div>
 
 <ConfirmDialog @ref="dialog" />
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-              await JSRuntime.InvokeVoidAsync("initializeSelect2ForModal", "mySelect");
-        }
-    }
     List<Tbl_Fsu_List> tbl_Fsu_List = new();
     List<Tbl_Fsu_List> temp_fsu_list = new();
     CommonQueries commonQueries = new();
