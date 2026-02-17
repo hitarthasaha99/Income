@@ -187,4 +187,34 @@ window.registerOutsideClickHandler = (dotNetHelper, dropdownElement) => {
     });
 };
 
+// Replace the standalone function at the bottom with:
+window.initializeSelect2ForModal = function (elementId) {
+    var $select = $('#' + elementId);
+
+    // Destroy existing Select2 instance if it exists
+    if ($select.data('select2')) {
+        $select.select2('destroy');
+    }
+
+    // Initialize Select2
+    $select.select2({
+        placeholder: 'Select',
+        allowClear: true,
+        width: '100%',
+        dropdownParent: $('#' + elementId).closest('.modal') // Important for modals!
+    });
+
+    // Trigger Blazor's onchange when Select2 changes
+    $select.on('select2:select', function (e) {
+        var event = new Event('change', { bubbles: true });
+        this.dispatchEvent(event);
+    });
+
+    $select.on('select2:clear', function (e) {
+        var event = new Event('change', { bubbles: true });
+        this.dispatchEvent(event);
+    });
+}
+
+
 

@@ -213,7 +213,21 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">2</span> Crop code (4 digits)
                             </label>
-                            <select disabled="@SessionStorage.FSU_Submitted" class="form-select" value="@block_7_1?.code"
+                            @* //select2 *@
+                            <select id="mySelect" disabled="@SessionStorage.FSU_Submitted" class="form-select" value="@block_7_1?.code"
+                                    @onchange="e =>
+                                    {
+                                        UpdateFieldAndValidate(() => block_7_1.code, e);
+                                    }">
+                                <option value="">Select</option>
+                                @foreach (var item in Block_7_1_Constants.CropCodes)
+                                {
+                                    <option value="@item.id">@item.title</option>
+                                }
+                            </select>
+
+
+                            @* <select disabled="@SessionStorage.FSU_Submitted" class="form-select" value="@block_7_1?.code"
                                     @onchange="e =>
                                     {
                                         UpdateFieldAndValidate(() => block_7_1.code, e);
@@ -223,7 +237,7 @@
                                 {
                                     <option value="@item.id">@item.title</option>
                                 }
-                            </select>
+                            </select> *@
                             <ValidationMessage For="@(() => block_7_1.code)" />
 
                         </div>
@@ -563,6 +577,9 @@
             }
         }
         await modal.ShowAsync();
+        // Initialize Select2 after modal is shown
+        await Task.Delay(50); // Small delay to ensure modal DOM is ready
+        await JSRuntime.InvokeVoidAsync("initializeSelect2ForModal", "mySelect");
     }
 
     private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
