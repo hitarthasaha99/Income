@@ -22,11 +22,6 @@ using Income.Database.Queries;
 using BootstrapBlazor.Components;
 using Income.Common.HIS2026;
 using DocumentFormat.OpenXml;
-#if ANDROID
-using Income.Platforms.Android;
-using AndroidX.DocumentFile.Provider;
-#endif
-
 
 namespace Income.Common
 {
@@ -106,15 +101,7 @@ namespace Income.Common
                     sch26TemplateStream = await FileSystem.OpenAppPackageFileAsync("Resources/Template/TemplateHis2026.docx");
                 }
 #endif
-#if ANDROID
-                var uri = SAFService.Restore();
 
-                if (uri == null)
-                {
-                    SAFService.LaunchFolderPicker(Platform.CurrentActivity!);
-                    return 0; // wait until user selects
-                }
-#endif
                 var generatedDoc00 = await FillDocument00(sch00TemplateStream);
                 if (generatedDoc00 == null || generatedDoc00.Length == 0)
                     return 0;
@@ -149,20 +136,12 @@ namespace Income.Common
             await File.WriteAllBytesAsync(targetPath2026, generatedDoc2026);
         }
 #elif ANDROID
-                //// Save to public Documents/Print folder - NO PERMISSION NEEDED on API 33+
-                //await SaveToPublicDocumentsAsync(SCH00fileName, generatedDoc00);
-
-                //if (reportType != "Sch00")
-                //{
-                //    await SaveToPublicDocumentsAsync(SCH2026fileName, generatedDoc2026);
-                //}
-
                 // Save to public Documents/Print folder - NO PERMISSION NEEDED on API 33+
-                await SaveUsingSAFAsync(SCH00fileName, generatedDoc00);
+                await SaveToPublicDocumentsAsync(SCH00fileName, generatedDoc00);
 
                 if (reportType != "Sch00")
                 {
-                    await SaveUsingSAFAsync(SCH2026fileName, generatedDoc2026);
+                    await SaveToPublicDocumentsAsync(SCH2026fileName, generatedDoc2026);
                 }
 #endif
 
@@ -174,42 +153,6 @@ namespace Income.Common
                 return 0;
             }
         }
-
-        private async Task SaveUsingSAFAsync(string fileName, byte[] content)
-        {
-#if ANDROID
-            var context = Android.App.Application.Context;
-
-            var treeUri = SAFService.Restore();
-            if (treeUri == null)
-                throw new Exception("Storage location not selected.");
-
-            var root = DocumentFile.FromTreeUri(context, treeUri);
-
-            // Ensure PLFS exists
-            var plfs = root.FindFile("PLFS");
-            if (plfs == null || !plfs.IsDirectory)
-                plfs = root.CreateDirectory("PLFS");
-
-            // Ensure Print exists
-            var print = plfs.FindFile("Print");
-            if (print == null || !print.IsDirectory)
-                print = plfs.CreateDirectory("Print");
-
-            // Replace file if already exists (optional)
-            var existing = print.FindFile(fileName);
-            existing?.Delete();
-
-            var file = print.CreateFile(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                fileName);
-
-            using var stream = context.ContentResolver.OpenOutputStream(file.Uri);
-            await stream.WriteAsync(content, 0, content.Length);
-            await stream.FlushAsync();
-#endif
-        }
-
 
 #if ANDROID
         private async Task SaveToPublicDocumentsAsync(string fileName, byte[] content)
@@ -272,7 +215,7 @@ namespace Income.Common
         }
 #endif
 
-
+       
 
         private async Task ShowFilesSavedNotification(string path)
         {
