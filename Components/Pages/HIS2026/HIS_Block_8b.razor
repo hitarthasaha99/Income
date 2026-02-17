@@ -172,7 +172,7 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">2</span> Name of the scheme
                             </label>
-                            <select disabled="@SessionStorage.FSU_Submitted" class="form-select form-select-sm" value="@fields?.item_2"
+                                <select id="mySelect" disabled="@SessionStorage.FSU_Submitted" value="@fields?.item_2"
                                     @onchange="e =>
                                     {
                                         UpdateFieldAndValidate(() => fields.item_2, e);
@@ -375,6 +375,9 @@
             }
         }
         await modal.ShowAsync();
+        // Initialize Select2 after modal is shown
+        await Task.Delay(50); // Small delay to ensure modal DOM is ready
+        await JSRuntime.InvokeVoidAsync("initializeSelect2ForModal", "mySelect");
     }
 
     private void EditContext_OnFieldChanged(object? sender, FieldChangedEventArgs e)
