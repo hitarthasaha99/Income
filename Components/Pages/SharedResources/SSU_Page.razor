@@ -453,7 +453,7 @@
 						string json = JsonConvert.SerializeObject(data);
 						Upsert_Model payload = new()
 						{
-							lookup_fsu_submit_status = 21,
+							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -534,7 +534,7 @@
 						string json = JsonConvert.SerializeObject(data);
 						Upsert_Model payload = new()
 						{
-							lookup_fsu_submit_status = mode == SubmissionMode.sso_to_ds? 31 : 12,
+							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -589,7 +589,7 @@
 						string json = JsonConvert.SerializeObject(data);
 						Upsert_Model payload = new()
 						{
-							lookup_fsu_submit_status = 22,
+							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -623,6 +623,116 @@
 			preloadService.Hide();
 		}
 	}
+
+	private async Task<int> CalculateLookupStatus(List<Tbl_Sch_0_0_Block_7> selectedHHDList)
+	{
+		try
+		{
+			// 1️⃣ Get latest Block 7 data (if needed elsewhere)
+			var data = await dQ.GetBlock7Data(SessionStorage.SelectedFSUId);
+
+			if (data == null || data.Count == 0)
+				return 0;
+
+			// 2️⃣ Fetch FSU list from API (read-only usage)
+			var fsu_response = await networkService.GetAsync(
+				CommonConfig.APIIncomeURL,
+				$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
+
+			if (fsu_response == null)
+				return 0;
+
+			var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(fsu_response);
+			var currentFSU = fsu_list?.FirstOrDefault(x => x.fsu_id == SessionStorage.SelectedFSUId);
+
+			if (currentFSU == null)
+				return 0;
+
+			int existingFSUStatus = currentFSU.lookupFsuSubmitStatus.GetValueOrDefault();
+
+			var fsuHouseList = currentFSU.fsuHouses?
+				.Where(x => x.is_deleted == null || x.is_deleted == false)
+				.ToList() ?? new List<fsu_houses>();
+
+			// ------------------------------------------------------------------
+			// 3️⃣ Build dictionary from existing server households
+			// ------------------------------------------------------------------
+			var fsuHouseDict = fsuHouseList.ToDictionary(x => x.hhd_id, x => x);
+
+			// ------------------------------------------------------------------
+			// 4️⃣ Add ALL households from selectedHHDList (no selection check)
+			//     This is only an in-memory reconciliation.
+			// ------------------------------------------------------------------
+			foreach (var hh in selectedHHDList)
+			{
+				if (hh.Block_7_3 == null)
+					continue;
+
+				int hhdId = hh.Block_7_3.Value;
+
+				if (!fsuHouseDict.ContainsKey(hhdId))
+				{
+					// Add locally (NO API CALL as requested)
+					var newHouse = new fsu_houses
+					{
+						id = Guid.NewGuid(),
+						tenant_id = SessionStorage.tenant_id,
+						fsu_id = SessionStorage.SelectedFSUId,
+						hhd_id = hhdId,
+						survey_id = SessionStorage.surveyId,
+						lookup_submit_status = hh.hhdStatus.GetValueOrDefault(),
+						is_deleted = false
+					};
+
+					fsuHouseDict.Add(hhdId, newHouse);
+				}
+			}
+
+			// ------------------------------------------------------------------
+			// 5️⃣ Now evaluate ONLY the actually selected households
+			// ------------------------------------------------------------------
+			var selected = data
+				.Where(x => x.isSelected && x.status != "SUBSTITUTED" && x.Block_7_3 != null)
+				.ToList();
+
+			if (selected.Count == 0)
+				return existingFSUStatus;
+
+			// ------------------------------------------------------------------
+			// 6️⃣ Check if all selected households exist in merged dictionary
+			// ------------------------------------------------------------------
+			int matchedCount = selected.Count(h => fsuHouseDict.ContainsKey(h.Block_7_3.GetValueOrDefault()));
+
+			if (matchedCount != selected.Count)
+			{
+				// Some selected HH missing → do NOT alter FSU status
+				return existingFSUStatus;
+			}
+
+			// ------------------------------------------------------------------
+			// 7️⃣ Check whether all selected HH have same lookup status
+			// ------------------------------------------------------------------
+			var distinctStatuses = selected
+				.Select(h => fsuHouseDict[h.Block_7_3.GetValueOrDefault()].lookup_submit_status)
+				.Distinct()
+				.ToList();
+
+			if (distinctStatuses.Count == 1)
+			{
+				// All same → derive status from households
+				return distinctStatuses.First();
+			}
+
+			// Mixed statuses → retain existing FSU status
+			return existingFSUStatus;
+		}
+		catch
+		{
+			// Fail-safe: never change status on error
+			return 0;
+		}
+	}
+
 
 	private async Task Sync(Tbl_Sch_0_0_Block_7 hhd)
 	{

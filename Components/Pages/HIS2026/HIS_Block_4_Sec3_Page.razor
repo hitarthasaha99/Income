@@ -257,7 +257,7 @@
                                     class="form-control is_sso no-spinner"
                                     value="@block_4.item_12"
                                     @oninput="OnItem12Changed"
-                                           onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
+                                    onkeypress="if (this.value.length >= 10) return false; return /^[0-9]$/.test(event.key);"
                                     disabled="@(SessionStorage.FSU_Submitted)" />
                             <ValidationMessage For="@(() => block_4.item_12)" />
                         </div>
