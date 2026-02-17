@@ -1,8 +1,10 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
 using AndroidX.Activity;
+using Income.Platforms.Android;
 using Income.Services;
 using Microsoft.Maui;
 
@@ -36,6 +38,16 @@ namespace Income
             }
 
             return base.DispatchKeyEvent(e);
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == SAFService.RequestCode && resultCode == Result.Ok)
+            {
+                SAFService.OnFolderPicked(this, data);
+            }
         }
     }
 }

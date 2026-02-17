@@ -386,6 +386,17 @@
 
         if (existingSurveyCode == 3 && block_1.survey_code == 3)
         {
+            var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
+            var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+            if (current_hhd != null)
+            {
+                current_hhd.status = "CASUALTY";
+                current_hhd.isSelected = true;
+                current_hhd.isCasualty = true;
+                current_hhd.SSS_household_id = 0;
+                await dQ.Update_SCH0_0_Block_7(current_hhd);
+            }
+            
             NavigationManager.NavigateTo("/dashboard/his/block_12");
             return;
         }
