@@ -13,10 +13,10 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>Income</ApplicationTitle>
+        <ApplicationTitle>Income(RailTel)</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.tuteck.income</ApplicationId>
+        <ApplicationId>com.tuteck.incomeraintel</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -36,14 +36,14 @@
         <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
         <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
         <GenerateTestArtifacts>True</GenerateTestArtifacts>
-        <AppInstallerUri>C:\NSSO\Income\</AppInstallerUri>
+        <AppInstallerUri>C:\NSSO\IncomeRailtel\</AppInstallerUri>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
       <AndroidPackageFormat>apk</AndroidPackageFormat>
-      <ApplicationDisplayVersion>1.0.31</ApplicationDisplayVersion>
-      <ApplicationVersion>31</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
       <PublishTrimmed>True</PublishTrimmed>
       <RunAOTCompilation>True</RunAOTCompilation>
 		<AndroidLinkMode>SdkOnly</AndroidLinkMode>
@@ -57,25 +57,24 @@
 	</ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.31</ApplicationDisplayVersion>
-      <ApplicationVersion>31</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
       <RunAOTCompilation>False</RunAOTCompilation>
 		
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.31</ApplicationDisplayVersion>
-      <ApplicationVersion>31</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
-      <ApplicationDisplayVersion>1.0.31</ApplicationDisplayVersion>
-      <ApplicationVersion>31</ApplicationVersion>
+      <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
+      <ApplicationVersion>1</ApplicationVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#ffffff" />
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -96,6 +95,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Resources\AppIcon\appicon.svg" />
       <None Remove="Resources\Template\IncomeSch00Template.docx" />
       <None Remove="Resources\Template\TemplateHis2026.docx" />
     </ItemGroup>
@@ -137,6 +137,10 @@
       <PackageReference Include="Xamarin.AndroidX.DocumentFile">
         <Version>1.1.0.2</Version>
       </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiIcon Include="Resources\AppIcon\appicon.svg" />
     </ItemGroup>
 
 	<Target Name="ObfuscateAfterPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'&#xD;&#xA;                AND '$(TargetFramework)'=='net9.0-windows10.0.19041.0'">
