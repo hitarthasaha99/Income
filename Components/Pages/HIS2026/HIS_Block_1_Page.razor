@@ -123,6 +123,20 @@
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
+                            <span class="form-badge">11.1</span>Whether the detailed schedule is self-compiled by the household in paper schedule?
+                        </label>
+                        <select class="form-select" disabled="@SessionStorage.FSU_Submitted"
+                                value="@block_1.field_11_1"
+                                @onchange="@((ChangeEventArgs e) => Field11_1Changed(e))">
+                            <option value="">Select</option>
+                            <option value="1">Yes - 1</option>
+                            <option value="2">No - 2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">
                             <span class="form-badge">12</span>@Loc["survey_code"]
                         </label>
                         <select class="form-select is_sso" disabled="@(SessionStorage.FSU_Submitted)" value="@block_1.survey_code" @onchange="@((ChangeEventArgs e) => SurveyCodeSelectionChanged(e))">
@@ -158,11 +172,26 @@
 
                         <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (SessionStorage.FSU_Submitted)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
                             <option value="">Select</option>
-                            @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
+                            @if (block_1.field_11_1 == 1)
                             {
-                                @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                                @* field 11.1 = Yes: show self-compiled schedule reasons *@
+                                @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON_SELF_COMPILED != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON_SELF_COMPILED.Count > 0)
                                 {
-                                    <option value="@item.id">@item.title</option>
+                                    @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON_SELF_COMPILED)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                @* field 11.1 = No or not set: show default reasons *@
+                                @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
+                                {
+                                    @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
                                 }
                             }
                         </select>
@@ -261,10 +290,19 @@
         block_1.block_1_remark = string.Empty;
     }
 
+    public void Field11_1Changed(ChangeEventArgs args)
+    {
+        block_1.field_11_1 = string.IsNullOrEmpty(args.Value?.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
+        // Reset field 13 whenever field 11.1 changes, as the available options change
+        block_1.substitution_reason = null;
+        is_remarks_visible = false;
+    }
+
     public void SubstitutionReasonChanged(ChangeEventArgs args)
     {
         block_1.substitution_reason = string.IsNullOrEmpty(args.Value.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
-        if (block_1.substitution_reason == 9)
+        // Show remarks textbox when "Others" is selected (code 9 or -9)
+        if (block_1.substitution_reason == 9 || block_1.substitution_reason == -9)
         {
             is_remarks_visible = true;
         }
