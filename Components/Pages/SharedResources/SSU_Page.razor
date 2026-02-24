@@ -687,6 +687,11 @@
 
 					fsuHouseDict.Add(hhdId, newHouse);
 				}
+				else
+				{
+					// Update existing entry
+					fsuHouseDict[hhdId].lookup_submit_status = hh.hhdStatus.GetValueOrDefault();
+				}
 			}
 
 			// ------------------------------------------------------------------
@@ -1014,7 +1019,7 @@
 
 					if (block_4 != null)
 					{
-						if (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault() && (block_7a_1 == null || (block_7a_1 != null && block_7a_1.Count == 0)))
+						if ((block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault()) && (block_7a_1 == null || (block_7a_1 != null && block_7a_1.Count == 0)))
 						{
 							errors.Add($"H037: Please enter atleast one crop code");
 						}

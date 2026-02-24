@@ -120,20 +120,25 @@
                         <input type="text" class="form-control is_sso" disabled value="@block_1.sample_hhd_number">
                     </div>
                 </div>
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <span class="form-badge">11.1</span>Whether the detailed schedule is self-compiled by the household in paper schedule?
-                        </label>
-                        <select class="form-select" disabled="@SessionStorage.FSU_Submitted"
-                                value="@block_1.field_11_1"
-                                @onchange="@((ChangeEventArgs e) => Field11_1Changed(e))">
-                            <option value="">Select</option>
-                            <option value="1">Yes - 1</option>
-                            <option value="2">No - 2</option>
-                        </select>
-                    </div>
-                </div>
+
+                @if (q11_1_applicable)
+                    {
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="form-badge">11.1</span>Whether the detailed schedule is self-compiled by the household in paper schedule?
+                                </label>
+                                <select class="form-select" disabled="@SessionStorage.FSU_Submitted"
+                                        value="@block_1.field_11_1"
+                                        @onchange="@((ChangeEventArgs e) => Field11_1Changed(e))">
+                                    <option value="">Select</option>
+                                    <option value="1">Yes - 1</option>
+                                    <option value="2">No - 2</option>
+                                </select>
+                            </div>
+                        </div>
+                    }
+                    
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
@@ -273,6 +278,7 @@
     private CommonContentHeader? _header;
     int existingSurveyCode = 0;
     DataGenerator dataGenerator = new DataGenerator();
+    bool q11_1_applicable = false;
 
     public void SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
@@ -342,6 +348,7 @@
         }
         var row = await dQ.GetSelectedSubUnit(SessionStorage.SelectedFSUId.ToString());
 
+        var sch_0_block_1_res = await dQ.FetchBlock1();
 
         var response = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id) ?? new();
         if (response.id != Guid.Empty)
@@ -365,7 +372,6 @@
         }
         else
         {
-            var sch_0_block_1_res = await dQ.FetchBlock1();
             var GetSelectedSUNumber = await dQ.FetchSCH0Block2_2Data();
             var GetSelectedSubDivision = await dQ.FetchSCH0Block5Data();
             block_1 = new();
@@ -392,6 +398,7 @@
                 block_1.survey_code = 2;
             }
         }
+        q11_1_applicable = sch_0_block_1_res?.Block_1_5.ToString() == "2";
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
             block_uri = "/dashboard/his/block0_1",
@@ -434,8 +441,14 @@
                 current_hhd.SSS_household_id = 0;
                 await dQ.Update_SCH0_0_Block_7(current_hhd);
             }
-            
+
             NavigationManager.NavigateTo("/dashboard/his/block_12");
+            return;
+        }
+
+        if (q11_1_applicable && block_1.field_11_1 == null)
+        {
+            toastService.ShowError("Please select an option from Q11.1");
             return;
         }
 
