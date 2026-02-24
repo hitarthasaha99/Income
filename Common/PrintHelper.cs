@@ -736,7 +736,7 @@ namespace Income.Common
                     ReplaceCellText(cells[31], population.ToString());
                     if (SessionStorage.FSU_Sector == 1)
                     {
-                        ReplaceCellText(cells[30], "HIS - Rural Sector\n(Feb 2026 - Jan 2027)");
+                        ReplaceCellText(cells[30], "HIS - Rural Sector\n(April 2026 - March 2027)");
                         ReplaceCellText(cells[32], "11");
                         ReplaceCellText(cells[41], "12");
                         ReplaceCellText(cells[50], "21");
@@ -748,7 +748,7 @@ namespace Income.Common
                     }
                     else
                     {
-                        ReplaceCellText(cells[30], "HIS - Urban Sector\n(Feb 2026 - Jan 2027))");
+                        ReplaceCellText(cells[30], "HIS - Urban Sector\n(April 2026 - March 2027))");
                         ReplaceCellText(cells[32], "11");
                         ReplaceCellText(cells[41], "121");
                         ReplaceCellText(cells[50], "122");
