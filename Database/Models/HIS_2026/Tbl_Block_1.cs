@@ -34,6 +34,7 @@ namespace Income.Database.Models.HIS_2026
         public int? sample_sub_division_number { get; set; }
         public int? sss_number { get; set; }
         public int? sample_hhd_number { get; set; }
+        public int? field_11_1 { get; set; }
         public int? survey_code { get; set; }
         public int? substitution_reason { get; set; }
         public string? substitution_reason_remark { get; set; }
