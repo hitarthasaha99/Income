@@ -490,6 +490,16 @@
             var service = new HouseholdSelectionService();
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
             var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+            //var original_hhd = hhd_list.Where(x => x.Block_7_3 == current_hhd.SubstitutedForID).FirstOrDefault();
+            if (current_hhd != null && current_hhd.SubstitutedForID.GetValueOrDefault() != 0)
+            {
+                var block_1_original_hhd = await dQ.Fetch_SCH_HIS_Block1(current_hhd.SubstitutedForID.GetValueOrDefault());
+                if (block_1_original_hhd != null && block_1_original_hhd.field_11_1.GetValueOrDefault() == 1)
+                {
+                    toastService.ShowError("Substitution is not allowed for this household");
+                    return;
+                }
+            }
             var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
             if (nextHousehold == null)
             {
