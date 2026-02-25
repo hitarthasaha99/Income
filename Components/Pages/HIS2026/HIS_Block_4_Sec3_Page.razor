@@ -15,6 +15,7 @@
 @inject Warning_VM warningVM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_4> Validator
+@inject ILoggingService Logger
 
 
 @if (editContext != null)
@@ -569,7 +570,7 @@
         }
         catch (Exception ex)
         {
-
+            Logger.LogError("Block 4_3", ex);
         }
     }
 
@@ -642,7 +643,7 @@
         }
         catch (Exception ex)
         {
-
+            Logger.LogError("Block 4_3", ex);
         }
     }
 
@@ -788,7 +789,7 @@
         }
         catch (Exception ex)
         {
-
+            Logger.LogError("Block 4_3", ex);
         }
     }
 

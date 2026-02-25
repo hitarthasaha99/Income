@@ -632,7 +632,7 @@
         }
         catch (Exception ex)
         {
-
+            await loggingService.LogError("Block 7a_1", ex);
         }
     }
 
@@ -697,7 +697,7 @@
         }
         catch (Exception ex)
         {
-            
+            loggingService.LogError("Block 7a_1", ex);
         }
     }
     async Task ConfirmforNavigation(LocationChangingContext context)

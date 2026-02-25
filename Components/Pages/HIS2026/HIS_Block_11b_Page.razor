@@ -10,6 +10,7 @@
 @using System.Reflection
 @inject IJSRuntime JSRuntime
 @inject IValidator<Tbl_Block_11b> Validator
+@inject ILoggingService loggingService
 
 
 <div class="main-content">
@@ -423,7 +424,7 @@
         }
         catch (Exception ex)
         {
-            
+            await loggingService.LogError("Block 11b", ex);
         }
 
     }

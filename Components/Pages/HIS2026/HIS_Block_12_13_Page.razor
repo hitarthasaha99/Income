@@ -157,6 +157,7 @@
         }
         catch (Exception ex)
         {
+            await Logger.LogError("Block 12_13", ex);
             toastService.ShowError("An error occurred while saving the data. Please try again.");
         }
         finally

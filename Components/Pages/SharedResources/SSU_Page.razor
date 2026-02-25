@@ -275,7 +275,7 @@
 		}
 		catch (Exception ex)
 		{
-
+			loggingService.LogError("SSUPage", ex);
 		}
 	}
 
@@ -347,7 +347,7 @@
 		}
 		catch (Exception ex)
 		{
-
+			await loggingService.LogError("SSUPage", ex);
 		}
 	}
 
@@ -613,9 +613,9 @@
 			}
 
 		}
-		catch
+		catch(Exception ex)
 		{
-
+			await loggingService.LogError("SSUPage", ex);
 		}
 		finally
 		{
@@ -868,7 +868,7 @@
 		}
 		catch (Exception ex)
 		{
-
+			await loggingService.LogError("SSU Page - SyncFSUHouseStatus", ex);
 		}
 		finally
 		{
