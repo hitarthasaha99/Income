@@ -16,6 +16,7 @@
 @inject Warning_VM warningVM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7b> Validator
+@inject ILoggingService loggingService
 
 
 <div class="main-content">
@@ -703,7 +704,7 @@
         }
         catch (Exception ex)
         {
-
+            loggingService.LogError("Block 7b", ex);
         }
 
     }
@@ -834,7 +835,7 @@
         }
         catch (Exception ex)
         {
-
+            await loggingService.LogError("Block 7b", ex);
         }
     }
 

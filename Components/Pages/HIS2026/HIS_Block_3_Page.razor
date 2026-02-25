@@ -634,9 +634,9 @@
 
             }
         }
-        catch
+        catch (Exception ex)
         {
-
+            await loggingService.LogError("Block 3", ex);
         }
 
         StateHasChanged();

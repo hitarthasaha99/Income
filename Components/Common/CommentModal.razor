@@ -1,5 +1,6 @@
 ﻿@using Income.Database.Models.Common
 @inject IToastService toastService
+@inject ILoggingService loggingService
 
 <Modal @ref="ModalRef"
        Title="Comment"
@@ -238,7 +239,7 @@
         }
         catch (Exception ex)
         {
-
+            await loggingService.LogError("CommentModal", ex);
         }
         finally
         {

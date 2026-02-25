@@ -9,6 +9,7 @@
 @using System.Linq.Expressions
 @using System.Reflection
 @inject IJSRuntime JSRuntime
+@inject ILoggingService loggingService
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SelectedFsuId" survey_time="@survey_time" />
@@ -142,7 +143,7 @@
         }
         catch (Exception ex)
         {
-            
+            loggingService.LogError("Block 12", ex);
         }
         
     }

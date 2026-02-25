@@ -16,6 +16,7 @@
 @inject Warning_VM warningVM
 @inject LocalizationService Loc
 @inject IValidator<Tbl_Block_7c> Validator
+@inject ILoggingService loggingService
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
@@ -354,7 +355,7 @@
         }
         catch (Exception ex)
         {
-
+            loggingService.LogError("Block 7c_3", ex);
         }
 
     }
@@ -472,7 +473,7 @@
         }
         catch (Exception ex)
         {
-
+            await loggingService.LogError("Block 7c_3", ex);
         }
     }
 }

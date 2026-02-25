@@ -12,6 +12,7 @@
 @inject IToastService toastService
 @inject Warning_VM warningVM
 @inject LocalizationService Loc
+@inject ILoggingService Logger
 
 @if (block_4 != null)
 {
@@ -350,7 +351,7 @@
         }
         catch (Exception ex)
         {
-
+            await Logger.LogError("Block 4_1", ex);
         }
     }
 
@@ -367,7 +368,7 @@
         }
         catch (Exception ex)
         {
-
+            Logger.LogError("Block 4_1", ex);
         }
     }
 

@@ -8,6 +8,7 @@
 @inject Warning_VM Warning_VM
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject ILoggingService loggingService
 
 <div class="my-2">
     <CommonContentHeader 
@@ -567,9 +568,9 @@
                     break;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            loggingService.LogError("ValidatePage", ex);
         }
     }
 

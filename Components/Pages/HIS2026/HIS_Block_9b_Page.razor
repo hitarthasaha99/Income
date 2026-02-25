@@ -15,6 +15,7 @@
 @inject Comment_vm comment_vm
 @inject Warning_VM warning_VM
 @inject LocalizationService Loc
+@inject ILoggingService loggingService
 
 <div class="main-content">
     <CommonContentHeader SelectedFsuId="@SessionStorage.SelectedFSUId" survey_time="@survey_time" />
@@ -401,7 +402,7 @@
         }
         catch (Exception ex)
         {
-            
+            loggingService.LogError("Block 9b", ex);
         }
     }
 
@@ -481,7 +482,7 @@
         }
         catch (Exception ex)
         {
-
+            await loggingService.LogError("Block 9b", ex);
         }
     }
 }
