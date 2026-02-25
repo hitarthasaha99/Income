@@ -2690,8 +2690,14 @@ namespace Income.Database.Queries
                 if (response != null && response.Count > 0)
                 {
                     return response
-                            .OrderBy(x => x.addedByUser == true) // false & null first, true last
-                            .ToList();
+                    // Grouping: false/null first, true last
+                    .OrderBy(x => x.addedByUser == true)
+
+                    // Inside each group: serial_member ascending, nulls last
+                    .ThenBy(x => x.serial_member.HasValue ? 0 : 1)
+                    .ThenBy(x => x.serial_member)
+
+                    .ToList();
                 }
                 else
                 {
@@ -2755,8 +2761,14 @@ namespace Income.Database.Queries
                 if (response != null)
                 {
                     return response
-                            .OrderBy(x => x.addedByUser == true) // false & null first, true last
-                            .ToList();
+                        // Grouping: false/null first, true last
+                        .OrderBy(x => x.addedByUser == true)
+
+                        // Inside each group: serial_member ascending, nulls last
+                        .ThenBy(x => x.serial_member.HasValue ? 0 : 1)
+                        .ThenBy(x => x.serial_member)
+
+                        .ToList();
                 }
                 else
                 {

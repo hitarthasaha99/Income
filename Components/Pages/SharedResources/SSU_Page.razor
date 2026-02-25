@@ -511,6 +511,7 @@
 
 						Submission_Model data = new();
 						data.IncomeSch00WarningList = await dQ.GetWarningList(schedule: "0");
+						data.IncomeSch00block0 = await dQ.FetchBlock1();
 						data.IncomeSchHISDto = [];
 
 						foreach (var hhd in hhd_list)
@@ -534,7 +535,7 @@
 						string json = JsonConvert.SerializeObject(data);
 						Upsert_Model payload = new()
 						{
-							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
+							lookup_fsu_submit_status = mode == SubmissionMode.sso_to_jso ? 12 : await CalculateLookupStatus(hhd_list),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -589,7 +590,7 @@
 						string json = JsonConvert.SerializeObject(data);
 						Upsert_Model payload = new()
 						{
-							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
+							lookup_fsu_submit_status = mode == SubmissionMode.ds_to_sso ? 22 : await CalculateLookupStatus(hhd_list),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -628,13 +629,13 @@
 	{
 		try
 		{
-			// 1️⃣ Get latest Block 7 data (if needed elsewhere)
+			// 1️. Get latest Block 7 data (if needed elsewhere)
 			var data = await dQ.GetBlock7Data(SessionStorage.SelectedFSUId);
 
 			if (data == null || data.Count == 0)
 				return 0;
 
-			// 2️⃣ Fetch FSU list from API (read-only usage)
+			// 2️. Fetch FSU list from API (read-only usage)
 			var fsu_response = await networkService.GetAsync(
 				CommonConfig.APIIncomeURL,
 				$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
@@ -655,12 +656,12 @@
 				.ToList() ?? new List<fsu_houses>();
 
 			// ------------------------------------------------------------------
-			// 3️⃣ Build dictionary from existing server households
+			// 3️. Build dictionary from existing server households
 			// ------------------------------------------------------------------
 			var fsuHouseDict = fsuHouseList.ToDictionary(x => x.hhd_id, x => x);
 
 			// ------------------------------------------------------------------
-			// 4️⃣ Add ALL households from selectedHHDList (no selection check)
+			// 4️. Add ALL households from selectedHHDList (no selection check)
 			//     This is only an in-memory reconciliation.
 			// ------------------------------------------------------------------
 			foreach (var hh in selectedHHDList)
@@ -686,10 +687,15 @@
 
 					fsuHouseDict.Add(hhdId, newHouse);
 				}
+				else
+				{
+					// Update existing entry
+					fsuHouseDict[hhdId].lookup_submit_status = hh.hhdStatus.GetValueOrDefault();
+				}
 			}
 
 			// ------------------------------------------------------------------
-			// 5️⃣ Now evaluate ONLY the actually selected households
+			// 5️. Now evaluate ONLY the actually selected households
 			// ------------------------------------------------------------------
 			var selected = data
 				.Where(x => x.isSelected && x.status != "SUBSTITUTED" && x.Block_7_3 != null)
@@ -699,7 +705,7 @@
 				return existingFSUStatus;
 
 			// ------------------------------------------------------------------
-			// 6️⃣ Check if all selected households exist in merged dictionary
+			// 6️. Check if all selected households exist in merged dictionary
 			// ------------------------------------------------------------------
 			int matchedCount = selected.Count(h => fsuHouseDict.ContainsKey(h.Block_7_3.GetValueOrDefault()));
 
@@ -710,7 +716,7 @@
 			}
 
 			// ------------------------------------------------------------------
-			// 7️⃣ Check whether all selected HH have same lookup status
+			// 7️. Check whether all selected HH have same lookup status
 			// ------------------------------------------------------------------
 			var distinctStatuses = selected
 				.Select(h => fsuHouseDict[h.Block_7_3.GetValueOrDefault()].lookup_submit_status)
@@ -964,7 +970,7 @@
 							bool hhd_exists = fsuHouseList.Any(x => x.hhd_id == hhd.Block_7_3);
 							if (hhd_exists && hhd.hhdStatus != 12)
 							{
-                                errors.Add("Data for this household already exists on server. Please download again to update the current status.");
+								errors.Add("Data for this household already exists on server. Please download again to update the current status.");
 							}
 						}
 					}
@@ -1013,10 +1019,10 @@
 
 					if (block_4 != null)
 					{
-						// if (!block_4.item_4_1.GetValueOrDefault() && !block_4.item_4_2.GetValueOrDefault() && (block_7a_1.Count != 0 || block_7a != null))
-						// {
-						// 	errors.Add($"H037: Block 7a is applicable only when Block 4.4 Sl. no. 1 and/or 2 are checked");
-						// }
+						if ((block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault()) && (block_7a_1 == null || (block_7a_1 != null && block_7a_1.Count == 0)))
+						{
+							errors.Add($"H037: Please enter atleast one crop code");
+						}
 
 						// if (!block_4.item_4_3.GetValueOrDefault() && !block_4.item_4_4.GetValueOrDefault() && !block_4.item_4_5.GetValueOrDefault() && !block_4.item_4_6.GetValueOrDefault() && (block_7b != null))
 						// {
@@ -1027,6 +1033,11 @@
 					if (!block_1.household_income.HasValue)
 					{
 						errors.Add($"Block 12 : Household income slab has not been selected");
+					}
+
+					if (block_7d != null && block_7d.Count > 0 && block_7d.Any(x => x.item_3 == null))
+					{
+						errors.Add($"Block 7D: Please address all entries before submitting");
 					}
 				}
 
