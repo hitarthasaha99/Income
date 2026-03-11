@@ -101,6 +101,8 @@ namespace Income.Viewmodels.SCH0_0
             };
             await CommonQueries.InsertVisitedBlock(vb);
             block_0_1 = await SCH_0_0_Queries.FetchBlock1();
+            var hhd_list = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+
             if (block_0_1 == null)
             {
                 block_0_1 = new Tbl_Sch_0_0_Block_0_1();
@@ -156,7 +158,7 @@ namespace Income.Viewmodels.SCH0_0
                 Block_1_17_Selected = block_0_1.Block_1_17 != null ? CommonList.LOOKUP_CONST_SUBSTITUTION_REASON.FirstOrDefault(x => x.id == Convert.ToInt16(block_0_1.Block_1_17))?.title : string.Empty;
                 ShowItem17 = block_0_1.Block_1_17 != null;
                 ShowItem17RemarksField = ShowItem17 && block_0_1.Block_1_17.GetValueOrDefault() == 9;
-                DisableItem16 = SessionStorage.FSU_Submitted || SessionStorage.hamlet_selection_done || SessionStorage.subdivision_selection_done || SessionStorage.selection_done;
+                DisableItem16 = (hhd_list != null && hhd_list.Count != 0) || SessionStorage.FSU_Submitted || SessionStorage.hamlet_selection_done || SessionStorage.subdivision_selection_done || SessionStorage.selection_done;
                 if (block_0_1.Block_1_16.GetValueOrDefault() is (2 or 3 or 5 or 6 or 7))
                 {
                     DisablePopulation = true;
@@ -165,7 +167,7 @@ namespace Income.Viewmodels.SCH0_0
                 {
                     if (!SessionStorage.FSU_Submitted)
                     {
-                        DisablePopulation = SessionStorage.hamlet_selection_done || SessionStorage.subdivision_selection_done || SessionStorage.selection_done;
+                        DisablePopulation = (hhd_list != null && hhd_list.Count != 0) || SessionStorage.hamlet_selection_done || SessionStorage.subdivision_selection_done || SessionStorage.selection_done;
                     }
                     else
                     {

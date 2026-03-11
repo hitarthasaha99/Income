@@ -331,6 +331,7 @@
                     {
                         tbl_Sch_0_0_FieldOperation.field_work_end_date = DateTime.Now;
                     }
+                    _ = WarningsPresent();
                 }
                 if(SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                 {
@@ -422,11 +423,11 @@
         {
             tbl_Sch_0_0_FieldOperation.time_taken = value;
             //Warning - if time < 5
-            // if ((surveyCode == 1 || surveyCode == 4) && value < 5)
-            // {
-            //     StatusClass = "text-success";
-            //     StatusMessage = "W000: Time taken should be > 5 hours";
-            // }
+            if ((surveyCode == 1 || surveyCode == 4) && (value < 5 || value > 60))
+            {
+                StatusClass = "text-success";
+                StatusMessage = "W011(v): Please re-check the entry";
+            }
             //For zero case - time should be < 5
             if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && (value >= 5))
             {
@@ -461,12 +462,12 @@
                     StatusMessage = "H011 (iii): Time taken cannot be blank or zero";
                     StatusClass = "text-danger";
                 }
-                //(vi) surveycode = 1 or 4 -> time should be between 5 and 60
-                if (tbl_Sch_0_0_FieldOperation.time_taken < 5 || tbl_Sch_0_0_FieldOperation.time_taken > 60)
-                {
-                    StatusMessage = "H011 (v): Time taken must be between 5 and 60 hours";
-                    StatusClass = "text-danger";
-                }
+                // //(vi) surveycode = 1 or 4 -> time should be between 5 and 60
+                // if (tbl_Sch_0_0_FieldOperation.time_taken < 5 || tbl_Sch_0_0_FieldOperation.time_taken > 60)
+                // {
+                //     StatusMessage = "H011 (v): Time taken must be between 5 and 60 hours";
+                //     StatusClass = "text-danger";
+                // }
             }
             return !string.IsNullOrEmpty(StatusMessage);
         }
@@ -483,11 +484,11 @@
             StatusMessage = string.Empty;
             int value = tbl_Sch_0_0_FieldOperation.time_taken.GetValueOrDefault();
             //Warning - if time < 5
-            // if ((surveyCode == 1 || surveyCode == 4) && value < 5)
-            // {
-            //     StatusClass = "text-success";
-            //     StatusMessage = "W000: Time taken should be > 5 hours";
-            // }
+            if ((surveyCode == 1 || surveyCode == 4) && (value < 5 || value > 60))
+            {
+                StatusClass = "text-success";
+                StatusMessage = "W011(v): Please re-check the entry";
+            }
             //For zero case - time should be < 5
             if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
             {
@@ -509,6 +510,7 @@
         {
             if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
+                warningVM._tempWarnings.Clear();
                 bool isInvalid = HardChecksFailed();
                 if (isInvalid)
                 {
@@ -517,7 +519,22 @@
                 }
                 if (WarningsPresent())
                 {
-                    warningVM.AddWarning(StatusMessage, "0", "11", "3", warningCode: "W011(vi)");
+                    warningVM.AddWarning(StatusMessage, "0", "11", "3", warningCode: StatusMessage.Split(':')[0]);
+                }
+                else
+                {
+                    var savedWarnings = await DBQueries.GetWarningTableDataForBlock(
+                    SessionStorage.SelectedFSUId,
+                    0,
+                    "0",
+                    "11");
+                    if (savedWarnings != null && savedWarnings.Count > 0)
+                    {
+                        foreach (var warn in savedWarnings)
+                        {
+                            await DBQueries.DeleteWarningAsync(warn.id);
+                        }
+                    }
                 }
                 var res = await DBQueries.SaveBlock2(tbl_Sch_0_0_FieldOperation);
                 if (res.GetValueOrDefault() > 0)
@@ -525,7 +542,7 @@
                     block_0_1.remarks_block_11 = remarks;
                     await DBQueries.SaveBlock1(block_0_1);
                     //await warningVM.SaveWarningAsync(false, warningVM.WarningList, "0", "11", 0);
-                    await DBQueries.UpsertWarningAsync(warningVM.WarningList);
+                    await DBQueries.UpsertWarningAsync(warningVM._tempWarnings);
                     toastService.ShowSuccess("Data saved successfully");
                     StateHasChanged();
                     if (is_go_next)

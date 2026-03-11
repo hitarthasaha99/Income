@@ -92,7 +92,7 @@ namespace Income.Validators.HIS2026
                     RuleFor(x => x.item_12)
                         .NotNull()
                         .WithMessage("H024: Invalid Entry, Please check the entry")
-                        .GreaterThan(0)
+                        .GreaterThan(100)
                         .WithMessage("H024: Invalid Entry, Please check the entry");
 
                     // item_13: required (string)
@@ -119,7 +119,7 @@ namespace Income.Validators.HIS2026
                     RuleFor(x => x.item_17)
                     .NotNull()
                     .WithMessage("H029: Invalid Entry, Please check the entry")
-                    .GreaterThanOrEqualTo(500)
+                    .GreaterThanOrEqualTo(0)
                     .WithMessage("H029: Invalid Entry, Please check the entry");
 
                 });

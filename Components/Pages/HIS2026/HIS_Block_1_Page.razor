@@ -360,12 +360,14 @@
             {
                 var location = string.IsNullOrEmpty(SessionStorage.location) ? await function.fetchGeoLocation() : SessionStorage.location;
                 block_1.survey_coordinates = string.IsNullOrEmpty(block_1.survey_coordinates) ? location : block_1.survey_coordinates;
+                survey_time = block_1.survey_timestamp.GetValueOrDefault();
                 SessionStorage.location = block_1.survey_coordinates;
             }
             else
             {
                 SessionStorage.location = block_1.survey_coordinates;
                 SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
+                survey_time = block_1.survey_timestamp.GetValueOrDefault();
             }
             is_remarks_visible = block_1.substitution_reason == 9 ? true : false;
             existingSurveyCode = block_1.survey_code.GetValueOrDefault();
