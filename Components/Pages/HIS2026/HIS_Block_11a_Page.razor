@@ -310,10 +310,7 @@
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
             block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-                survey_time = selectBlock11A.survey_timestamp.GetValueOrDefault();
-            }
+            survey_time = selectBlock11A.survey_timestamp.GetValueOrDefault();
 
             StateHasChanged();
 

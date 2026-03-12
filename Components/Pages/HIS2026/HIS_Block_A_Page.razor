@@ -217,6 +217,7 @@
                 block_A.item_6 = A6;
                 block_A.item_7 = A7;
                 block_A.item_8 = A8;
+                survey_time = block_A.survey_timestamp.GetValueOrDefault();
                 await dB.SaveAsync<Tbl_Block_A>(block_A);
             }
         }
@@ -232,6 +233,7 @@
             var block_A = await dB.FetchSingleForFsuAndHhdAsync<Tbl_Block_A>();
             survey_time = block_A?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;
         }
+
         StateHasChanged();
     }
 

@@ -625,14 +625,18 @@
         await LoadData();
         try
         {
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            if(block3Members != null && block3Members.Count > 0)
             {
                 survey_time = block3Members
-                                .OrderByDescending(x => x.survey_timestamp)
+                                .OrderBy(x => x.survey_timestamp)
                                 .Select(x => (DateTime?)x.survey_timestamp)
                                 .FirstOrDefault().GetValueOrDefault();
-
             }
+            else
+            {
+                survey_time = DateTime.Now;
+            }
+
         }
         catch
         {

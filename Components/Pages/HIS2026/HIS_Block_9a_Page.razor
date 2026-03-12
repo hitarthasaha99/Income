@@ -323,10 +323,7 @@
         };
 
         await commonQueries.InsertVisitedBlock(vb);
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-        {
-            survey_time = block_9a.survey_timestamp.GetValueOrDefault();
-        }
+        survey_time = block_9a.survey_timestamp.GetValueOrDefault();
         StateHasChanged();
     }
 

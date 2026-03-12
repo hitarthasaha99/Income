@@ -22,7 +22,7 @@ namespace Income.Database.Models.Common
         public Guid? survey_id { get; set; } = SessionStorage.surveyId;
         public bool? is_deleted { get; set; } = false;
         public int? survey_duration_in_seconds { get; set; }
-        public DateTime? survey_timestamp { get; set; }
+        public DateTime? survey_timestamp { get; set; } = DateTime.Now;
         public Guid? _ref { get; set; }
         [JsonProperty("Id")]
         [JsonIgnore]

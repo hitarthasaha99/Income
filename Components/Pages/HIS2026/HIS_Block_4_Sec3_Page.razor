@@ -471,10 +471,8 @@
             messageStore = new ValidationMessageStore(editContext);
             editContext.OnFieldChanged += EditContext_OnFieldChanged;
 
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-                survey_time = block_4.survey_timestamp.GetValueOrDefault();
-            }
+            survey_time = block_4.survey_timestamp.GetValueOrDefault();
+
 
         }
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks

@@ -269,13 +269,16 @@
 
         await LoadData();
         await commonQueries.InsertVisitedBlock(vb);
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        if (NICFields.Count > 0)
         {
             survey_time = NICFields
-                            .OrderByDescending(x => x.survey_timestamp)
+                            .OrderBy(x => x.survey_timestamp)
                             .Select(x => (DateTime?)x.survey_timestamp)
                             .FirstOrDefault().GetValueOrDefault();
-
+        }
+        else
+        {
+            survey_time = DateTime.Now;
         }
         StateHasChanged();
     }

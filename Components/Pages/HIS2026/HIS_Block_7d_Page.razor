@@ -263,6 +263,19 @@
                                     ? int.Parse(x.display_serial_number.Split('.')[1])
                                     : 0)
                                 .ToList();
+
+                if (Block7DList != null && Block7DList.Count > 0)
+                {
+                    survey_time = Block7DList
+                            .OrderBy(x => x.survey_timestamp)
+                            .Select(x => (DateTime?)x.survey_timestamp)
+                            .FirstOrDefault().GetValueOrDefault();
+
+                }
+                else
+                {
+                    survey_time = DateTime.Now;
+                }
             }
             else
             {
