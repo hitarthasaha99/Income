@@ -148,7 +148,7 @@
 <Modal @ref="modal" IsVerticallyCentered="true" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
     <HeaderTemplate>
         <h5 class="modal-title">
-            <span class="text-primary me-1">[Block 8 - item - 8.6]</span>
+            <span class="text-primary me-1">[Block 8 - Q8.6]</span>
             @((isAdd ? "Add Details" : "Update Details"))
         </h5>
     </HeaderTemplate>
@@ -210,7 +210,7 @@
                                        type="number"
                                        class="form-control form-control-sm no-spinner"
                                        value="@fields?.item_4"
-                                       onkeypress="return /^\d*$/.test(event.target.value + event.key)"
+                                       onbeforeinput="if(event.data && !/^\d+$/.test(event.data)){event.preventDefault();}"
                                        @oninput="e =>
                                        {
                                            UpdateFieldAndValidate(() => fields.item_4, e);

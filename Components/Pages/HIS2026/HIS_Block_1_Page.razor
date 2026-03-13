@@ -412,6 +412,7 @@
         {
             survey_time = block_1.survey_timestamp.GetValueOrDefault();
         }
+        
         await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }

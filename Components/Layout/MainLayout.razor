@@ -35,7 +35,10 @@
     private void TrackCurrentUri()
     {
         var uri = Nav.ToBaseRelativePath(Nav.Uri).Split('?')[0].TrimEnd('/').ToLowerInvariant();
-        NavHistory.Track(uri);
+        if (!string.IsNullOrEmpty(uri))
+        {
+            NavHistory.Track(uri);
+        }
     }
 
 
