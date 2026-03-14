@@ -55,7 +55,7 @@
         </div>
         <div class="row px-3 py-2 border-bottom">
             <div class="col">
-                For Agricultural Establishment engaged in crop cultivation (includes production of cereals, pulses, oilseeds, cash-crops, vegetables, fruits, spices, flowers etc. <span class="text-primary">(entry against any one or more of S. nos. 1-2 of Q4.4 of Block 4 is selected)</span>
+                For Agricultural Establishment engaged in crop cultivation (includes production of cereals, pulses, oilseeds, cash-crops, vegetables, fruits, spices, flowers etc.) 
             </div>
         </div>
         <div class="row px-3 py-2">
@@ -390,7 +390,7 @@
     DateTime survey_time = DateTime.Now;
     private ConfirmDialog dialog = default!;
     private string Block_7_ConfirmNavigation { get; set; } = string.Empty;
-    
+
 
     async void GoBack()
     {
@@ -403,7 +403,7 @@
     {
         block_4 = await dB.Fetch_SCH_HIS_Block4(SessionStorage.selected_hhd_id);
         codeListEntryNeeded = block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault());
-        
+
 
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
@@ -413,15 +413,16 @@
         };
         await LoadData();
         await commonQueries.InsertVisitedBlock(vb);
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        if (ActivityList != null && ActivityList.Count > 0)
         {
-            if (ActivityList != null)
-            {
-                survey_time = ActivityList
-                            .OrderByDescending(x => x.survey_timestamp)
-                            .Select(x => (DateTime?)x.survey_timestamp)
-                            .FirstOrDefault().GetValueOrDefault();
-            }
+            survey_time = ActivityList
+                        .OrderBy(x => x.survey_timestamp)
+                        .Select(x => (DateTime?)x.survey_timestamp)
+                        .FirstOrDefault().GetValueOrDefault();
+        }
+        else
+        {
+            survey_time = DateTime.Now;
         }
         StateHasChanged();
     }

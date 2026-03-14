@@ -271,6 +271,15 @@ namespace Income.Common
             new Tbl_Lookup { id = 9, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON_HHD, title = "Others - 09"},
         };
 
+        
+        public List<Tbl_Lookup> LOOKUP_CONST_HHD_SUBSTITUTION_REASON_SELF_COMPILED = new List<Tbl_Lookup>
+        {
+            new Tbl_Lookup { id = -1, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON_HHD, title = "Non-cooperative in self-compilation - 1"},
+            new Tbl_Lookup { id = -2, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON_HHD, title = "Members away from home while collecting filled-in schedule - 2"},
+            new Tbl_Lookup { id = -3, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON_HHD, title = "Incomplete schedule - 3"},
+            new Tbl_Lookup { id = -9, lookup_type = CommonConstants.LOOKUP_SUBSTITUTION_REASON_HHD, title = "Others - 9"},
+        };
+
         public List<Tbl_Lookup> LOOKUP_CONST_STATUS_LIST = new()
         {
             new Tbl_Lookup { id = 0, lookup_type = CommonConstants.LOOKUP_CAPI_SUBMIT_STATUS, title = "Original"},

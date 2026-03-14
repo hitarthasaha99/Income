@@ -120,6 +120,25 @@
                         <input type="text" class="form-control is_sso" disabled value="@block_1.sample_hhd_number">
                     </div>
                 </div>
+
+                @if (q11_1_applicable)
+                    {
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="form-badge">11.1</span>Whether the detailed schedule is self-compiled by the household in paper schedule?
+                                </label>
+                                <select class="form-select" disabled="@SessionStorage.FSU_Submitted"
+                                        value="@block_1.field_11_1"
+                                        @onchange="@((ChangeEventArgs e) => Field11_1Changed(e))">
+                                    <option value="">Select</option>
+                                    <option value="1">Yes - 1</option>
+                                    <option value="2">No - 2</option>
+                                </select>
+                            </div>
+                        </div>
+                    }
+                    
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">
@@ -158,11 +177,26 @@
 
                         <select class="form-select w-100 is_sso" value="@block_1.substitution_reason" disabled="@((is_substitution_reason_disable || (SessionStorage.FSU_Submitted)))" @onchange="@((ChangeEventArgs e) => SubstitutionReasonChanged(e))">
                             <option value="">Select</option>
-                            @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
+                            @if (block_1.field_11_1 == 1)
                             {
-                                @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                                @* field 11.1 = Yes: show self-compiled schedule reasons *@
+                                @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON_SELF_COMPILED != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON_SELF_COMPILED.Count > 0)
                                 {
-                                    <option value="@item.id">@item.title</option>
+                                    @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON_SELF_COMPILED)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                @* field 11.1 = No or not set: show default reasons *@
+                                @if (commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON != null && commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON.Count > 0)
+                                {
+                                    @foreach (var item in commonList.LOOKUP_CONST_HHD_SUBSTITUTION_REASON)
+                                    {
+                                        <option value="@item.id">@item.title</option>
+                                    }
                                 }
                             }
                         </select>
@@ -244,6 +278,7 @@
     private CommonContentHeader? _header;
     int existingSurveyCode = 0;
     DataGenerator dataGenerator = new DataGenerator();
+    bool q11_1_applicable = false;
 
     public void SurveyCodeSelectionChanged(ChangeEventArgs args)
     {
@@ -261,10 +296,19 @@
         block_1.block_1_remark = string.Empty;
     }
 
+    public void Field11_1Changed(ChangeEventArgs args)
+    {
+        block_1.field_11_1 = string.IsNullOrEmpty(args.Value?.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
+        // Reset field 13 whenever field 11.1 changes, as the available options change
+        block_1.substitution_reason = null;
+        is_remarks_visible = false;
+    }
+
     public void SubstitutionReasonChanged(ChangeEventArgs args)
     {
         block_1.substitution_reason = string.IsNullOrEmpty(args.Value.ToString()) ? null : Convert.ToInt32(args.Value.ToString());
-        if (block_1.substitution_reason == 9)
+        // Show remarks textbox when "Others" is selected (code 9 or -9)
+        if (block_1.substitution_reason == 9 || block_1.substitution_reason == -9)
         {
             is_remarks_visible = true;
         }
@@ -304,6 +348,7 @@
         }
         var row = await dQ.GetSelectedSubUnit(SessionStorage.SelectedFSUId.ToString());
 
+        var sch_0_block_1_res = await dQ.FetchBlock1();
 
         var response = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id) ?? new();
         if (response.id != Guid.Empty)
@@ -315,19 +360,20 @@
             {
                 var location = string.IsNullOrEmpty(SessionStorage.location) ? await function.fetchGeoLocation() : SessionStorage.location;
                 block_1.survey_coordinates = string.IsNullOrEmpty(block_1.survey_coordinates) ? location : block_1.survey_coordinates;
+                survey_time = block_1.survey_timestamp.GetValueOrDefault();
                 SessionStorage.location = block_1.survey_coordinates;
             }
             else
             {
                 SessionStorage.location = block_1.survey_coordinates;
                 SessionStorage.survey_timestamp = (DateTime)block_1.survey_timestamp;
+                survey_time = block_1.survey_timestamp.GetValueOrDefault();
             }
             is_remarks_visible = block_1.substitution_reason == 9 ? true : false;
             existingSurveyCode = block_1.survey_code.GetValueOrDefault();
         }
         else
         {
-            var sch_0_block_1_res = await dQ.FetchBlock1();
             var GetSelectedSUNumber = await dQ.FetchSCH0Block2_2Data();
             var GetSelectedSubDivision = await dQ.FetchSCH0Block5Data();
             block_1 = new();
@@ -354,6 +400,7 @@
                 block_1.survey_code = 2;
             }
         }
+        q11_1_applicable = sch_0_block_1_res?.Block_1_5.ToString() == "2";
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
         {
             block_uri = "/dashboard/his/block0_1",
@@ -365,6 +412,7 @@
         {
             survey_time = block_1.survey_timestamp.GetValueOrDefault();
         }
+        
         await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
@@ -396,8 +444,14 @@
                 current_hhd.SSS_household_id = 0;
                 await dQ.Update_SCH0_0_Block_7(current_hhd);
             }
-            
+
             NavigationManager.NavigateTo("/dashboard/his/block_12");
+            return;
+        }
+
+        if (q11_1_applicable && block_1.field_11_1 == null)
+        {
+            toastService.ShowError("Please select an option from Q11.1");
             return;
         }
 
@@ -439,6 +493,16 @@
             var service = new HouseholdSelectionService();
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
             var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+            //var original_hhd = hhd_list.Where(x => x.Block_7_3 == current_hhd.SubstitutedForID).FirstOrDefault();
+            if (current_hhd != null && current_hhd.SubstitutedForID.GetValueOrDefault() != 0)
+            {
+                var block_1_original_hhd = await dQ.Fetch_SCH_HIS_Block1(current_hhd.SubstitutedForID.GetValueOrDefault());
+                if (block_1_original_hhd != null && block_1_original_hhd.field_11_1.GetValueOrDefault() == 1)
+                {
+                    toastService.ShowError("Substitution is not allowed for this household");
+                    return;
+                }
+            }
             var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
             if (nextHousehold == null)
             {

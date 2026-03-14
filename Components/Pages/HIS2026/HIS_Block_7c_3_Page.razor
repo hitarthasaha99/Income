@@ -43,7 +43,7 @@
                 </div>
                 <div class="row px-3 py-2">
                     <div class="col">
-                        For Non-Agricultural Establishment <span class="text-primary">(entry against col. 8 or col. 9 is code 2 for at least one member of the household) </span>
+                        For Non-Agricultural Establishment
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -59,7 +59,9 @@
                                     </td>
                                     <td>
                                         Imputed value of goods consumed (out of total production through the activity as mentioned in Q 7.9) by the household during last month
-                                        or
+                                        <br />
+                                        and/or
+                                        <br />
                                         Imputed value of goods / services (out of total production through the activity as mentioned in Q 7.9) bartered to other households during last month (in whole no. of Rs.)
                                     </td>
                                     <td>
@@ -251,10 +253,8 @@
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
 
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-        {
-            survey_time = fields.survey_timestamp.GetValueOrDefault();
-        }
+        survey_time = fields.survey_timestamp.GetValueOrDefault();
+
         StateHasChanged();
     }
 

@@ -266,8 +266,8 @@
                                             <td>
                                                 <input type="number" class="form-control form-control-sm no-spinner"
                                                         value="@model.item_11"
-                                                        onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
-                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_11, e); handleCalculate(); }" />
+                                                        onkeypress="return /^-?\d*$/.test(event.target.value + event.key)"
+                                                        @oninput="e => { UpdateFieldAndValidate(() => model.item_11, e); }" />
 
                                                 <ValidationMessage For="@(() => model.item_11)" />
                                             </td>
@@ -511,9 +511,9 @@
                                                 </label>
                                             </td>
                                         <td>
-                                            Total expenditure = sum (Q10.1: 10.2 + Q10.4) /7×30 + {sum (Q10.3 + Q10.5:
-                                            Q10.12) + Q10.91 + Q10.92} + {sum (Q10.13: Q10.22) +
-                                            Q10.93}/365×30
+                                            Total expenditure = [{sum (Q10.1: 10.2) + Q10.4)} / 7 x 30] + 
+                                            {Q 10.3 + Q 10.5 + Q 10.91 + sum (Q 10.6: Q 10.10 + Q 10.12 + Q 10.92} + 
+                                            [{ sum (Q 10.13: Q 10.22) + Q 10.93} / 365 x 30]
                                         </td>
                                             <td class="text-center">-</td>
                                             @* <td>
@@ -629,10 +629,7 @@
             block_code = CommonEnum.his_block_10.ToString(),
         };
         await commonQueries.InsertVisitedBlock(vb);
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && model != null)
-        {
-            survey_time = model.survey_timestamp.GetValueOrDefault();
-        }
+        survey_time = model.survey_timestamp.GetValueOrDefault();
        
         StateHasChanged();
     }
@@ -737,7 +734,6 @@
             (decimal)(model.item_8 ?? 0) +
             (decimal)(model.item_9 ?? 0) +
             (decimal)(model.item_10 ?? 0) +
-            (decimal)(model.item_11 ?? 0) +
             (decimal)(model.item_12 ?? 0) +
             (decimal)(model.item_10_91 ?? 0) +
             (decimal)(model.item_10_92 ?? 0);

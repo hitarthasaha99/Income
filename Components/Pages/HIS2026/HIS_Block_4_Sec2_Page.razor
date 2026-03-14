@@ -64,7 +64,7 @@
                             <tr>
                                 <th style="min-width:50px;" class="text-center">S. No.</th>
                                 <th>Description of Activity</th>
-                                <th style="min-width:100px;">NIC Code (2 digit)</th>
+                                <th style="min-width:100px;">NIC 2025 Code (2 digit)</th>
                                 <th style="min-width:130px;">Seasonal? (Yes – 1 / No – 2)</th>
                                 <th style="min-width:100px;">Months of Operation (last 365 days)</th>
                                 <th style="min-width:100px;">Action</th>
@@ -172,7 +172,7 @@
                         <!-- NIC code -->
                         <div class="mb-3">
                             <label class="form-label">
-                                <span class="form-badge">3</span> NIC code (2-digit)
+                                <span class="form-badge">3</span> NIC 2025 Code (2-digit)
                             </label>
 
                             @* //select2 *@
@@ -340,10 +340,8 @@
                 }
             }
 
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-                survey_time = block_4.survey_timestamp.GetValueOrDefault();
-            }
+            survey_time = block_4.survey_timestamp.GetValueOrDefault();
+
         }
         else
         {

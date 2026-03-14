@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+		  xmlns:tools="http://schemas.android.com/tools">
 	<application
 		android:allowBackup="false"
+		android:exported="false"
 		android:icon="@mipmap/appicon"
 		android:supportsRtl="true">
 	</application>
@@ -13,10 +15,41 @@
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+                     tools:ignore="QueryAllPackagesPermission" />
 
 	<queries>
 		<intent>
 			<action android:name="android.media.action.IMAGE_CAPTURE" />
 		</intent>
+	</queries>
+
+	<!-- Queries declaration for known root/security apps (Android 11+) -->
+	<queries>
+		<!-- Root Management Apps -->
+		<package android:name="com.topjohnwu.magisk" />
+		<package android:name="eu.chainfire.supersu" />
+		<package android:name="com.noshufou.android.su" />
+		<package android:name="com.koushikdutta.superuser" />
+		<package android:name="com.kingroot.kinguser" />
+
+		<!-- Root Hiding Apps -->
+		<package android:name="com.devadvance.rootcloak" />
+		<package android:name="com.devadvance.rootcloakplus" />
+		<package android:name="com.amphoras.hidemyroot" />
+
+		<!-- Framework Apps -->
+		<package android:name="de.robv.android.xposed.installer" />
+		<package android:name="com.saurik.substrate" />
+
+		<!-- Lucky Patcher -->
+		<package android:name="com.dimonvideo.luckypatcher" />
+		<package android:name="com.chelpus.lackypatch" />
+
+		<!-- Google Play Services -->
+		<package android:name="com.google.android.gms" />
+
+		<!-- Google Play Store -->
+		<package android:name="com.android.vending" />
 	</queries>
 </manifest>

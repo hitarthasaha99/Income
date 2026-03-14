@@ -33,11 +33,11 @@
                 @if(!SessionStorage.selection_done)
                 {
                     <div class="d-flex align-items-center mt-3">
-                        <button class="btn btn-outline-primary d-flex align-items-center me-2" hidden=@SessionStorage.FSU_Submitted @onclick="@(() => FileHandler("CAMERA"))"><i class="fi fi-rr-camera me-2"></i>Open Camera</button>
-                        <button class="btn btn-primary d-flex align-items-center me-2" hidden=@SessionStorage.FSU_Submitted @onclick="@(() => FileHandler("GALLERY"))"><i class="fi fi-ss-mode-landscape me-2"></i>Choose from gallery</button>
+                        <button class="btn btn-outline-primary d-flex align-items-center me-2" disabled="@disableEdit" hidden=@SessionStorage.FSU_Submitted @onclick="@(() => FileHandler("CAMERA"))"><i class="fi fi-rr-camera me-2"></i>Open Camera</button>
+                        <button class="btn btn-primary d-flex align-items-center me-2" disabled="@disableEdit" hidden=@SessionStorage.FSU_Submitted @onclick="@(() => FileHandler("GALLERY"))"><i class="fi fi-ss-mode-landscape me-2"></i>Choose from gallery</button>
                         @if (!string.IsNullOrEmpty(file.file_image_source))
                         {
-                            <button class="btn btn-danger d-flex align-items-center p-2 px-3" hidden=@SessionStorage.FSU_Submitted @onclick="DeleteFile"><i class="fi fi-rr-trash fs-5"></i></button>
+                             <button class="btn btn-danger d-flex align-items-center p-2 px-3" disabled="@disableEdit" hidden=@SessionStorage.FSU_Submitted @onclick="DeleteFile"><i class="fi fi-rr-trash fs-5"></i></button>
                         }
                     </div>
                 }
@@ -93,6 +93,7 @@
     Tbl_Sch_0_0_Block_0_1 block_0_1 = new();
     private ConfirmDialog dialog = default!;
     SKBitmap sKBitmap = new SKBitmap();
+    private bool disableEdit = false;
     async void GoBack()
     {
         // await JSRuntime.InvokeVoidAsync("__handleGoBack");
@@ -120,7 +121,7 @@
                     NavigationManager.NavigateTo("/dashboard/sch0.0/block_2_2U");
                 }
             }
-            
+
         }
     }
 
@@ -136,6 +137,11 @@
         block_heading = is_sub_unit ? "sketch map of sub-division formation" : "Sketch map of sub-units (SU) formation";
         await CommonQueries.InsertVisitedBlock(vb);
         block_0_1 = await SCH_0_0_Querie.FetchBlock1();
+        var hhd_list = await SCH_0_0_Querie.GetBlock7Data(SessionStorage.SelectedFSUId);
+        if (hhd_list != null && hhd_list.Count > 0)
+        {
+            disableEdit = true;
+        }
         if (is_sub_unit)
         {
             remarks = block_0_1?.remarks_block_6;

@@ -120,6 +120,8 @@
         block_2_2 = await Queries.FetchSCH0Block2_2Data() ?? new();
         block_4 = await Queries.GetBlock4() ?? null;
         block_5 = await Queries.FetchSCH0Block5Data();
+        var hhd_list = await Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+
         var selected_su = block_2_2.Find(k => k.IsChecked == true);
 
         if(block_4 == null)
@@ -161,7 +163,7 @@
             }
             else
             {
-                DisableEdit = block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
+                DisableEdit = (hhd_list != null && hhd_list.Count > 0) || block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             }
 
             if(!DisableEdit)
@@ -169,31 +171,34 @@
                 return;
             }
 
-            if (selected_su != null)
+            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                block_4.sample_su_number = selected_su?.serial_number;
-                var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
-                block_4.approximate_population_su = (int)calc;
-                block_0_1.approximate_population_su = (int)calc;
-                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
-                block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
-                block_0_1.number_of_sub_division_of_su_to_be_formed = block_4.number_of_sub_division_of_su_to_be_formed;
-                block_0_1.sample_su_number = selected_su?.serial_number;
+                if (selected_su != null)
+                {
+                    block_4.sample_su_number = selected_su?.serial_number;
+                    var calc = (selected_su?.Percentage / 100) * block_0_1.Block_1_14;
+                    block_4.approximate_population_su = (int)calc;
+                    block_0_1.approximate_population_su = (int)calc;
+                    int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.approximate_population_su.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+                    block_4.number_of_sub_division_of_su_to_be_formed = subDivisions == 0 ? 1 : subDivisions;
+                    block_0_1.number_of_sub_division_of_su_to_be_formed = block_4.number_of_sub_division_of_su_to_be_formed;
+                    block_0_1.sample_su_number = selected_su?.serial_number;
+                }
+                else
+                {
+                    int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.Block_1_14.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
+                    block_4.sample_su_number = 1;
+                    block_4.approximate_population_su = block_0_1.Block_1_14;
+                    block_4.number_of_sub_division_of_su_to_be_formed = subDivisions;
+                    block_0_1.approximate_population_su = block_0_1.Block_1_14;
+                    block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
+                    block_0_1.sample_su_number = 1;
+                }
             }
-            else
-            {
-                int subDivisions = CommonFunction.CalculateNoOfSubDivisions(block_0_1.state_code, block_0_1.Block_1_14.GetValueOrDefault(), block_0_1.Block_1_5.GetValueOrDefault(), block_0_1.Block_1_7!);
-                block_4.sample_su_number = 1;
-                block_4.approximate_population_su = block_0_1.Block_1_14;
-                block_4.number_of_sub_division_of_su_to_be_formed = subDivisions;
-                block_0_1.approximate_population_su = block_0_1.Block_1_14;
-                block_0_1.number_of_sub_division_of_su_to_be_formed = subDivisions;
-                block_0_1.sample_su_number = 1;
-            }
+
         }
-
         remarks = block_0_1?.remarks_block_4;
-
+        
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             survey_time = block_4?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;

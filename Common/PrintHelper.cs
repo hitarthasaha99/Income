@@ -736,7 +736,7 @@ namespace Income.Common
                     ReplaceCellText(cells[31], population.ToString());
                     if (SessionStorage.FSU_Sector == 1)
                     {
-                        ReplaceCellText(cells[30], "HIS - Rural Sector\n(Feb 2026 - Jan 2027)");
+                        ReplaceCellText(cells[30], "HIS - Rural Sector\n(April 2026 - March 2027)");
                         ReplaceCellText(cells[32], "11");
                         ReplaceCellText(cells[41], "12");
                         ReplaceCellText(cells[50], "21");
@@ -748,7 +748,7 @@ namespace Income.Common
                     }
                     else
                     {
-                        ReplaceCellText(cells[30], "HIS - Urban Sector\n(Feb 2026 - Jan 2027))");
+                        ReplaceCellText(cells[30], "HIS - Urban Sector\n(April 2026 - March 2027))");
                         ReplaceCellText(cells[32], "11");
                         ReplaceCellText(cells[41], "121");
                         ReplaceCellText(cells[50], "122");
@@ -2089,9 +2089,9 @@ namespace Income.Common
 
                 if (cells.Count < 9)
                     continue;
-
+                var crop = Block_7_1_Constants.CropCodes.FirstOrDefault(x => x.id == item.code);
                 ReplaceCellText(cells[0], item.serial_number.ToString());
-                ReplaceCellText(cells[1], item.code?.ToString() ?? "");
+                ReplaceCellText(cells[1], crop?.title ?? "");
                 ReplaceCellText(cells[2], (item.whetherCropSold == 1 ? "Yes" : "No"));
                 ReplaceCellText(cells[3], (item.unit == 1? "Kg" : item.unit == 2 ? "No." : ""));
                 ReplaceCellText(cells[4], item.item_4?.ToString() ?? "");
@@ -2401,7 +2401,7 @@ namespace Income.Common
             // Last row assumed as template (blank)
             TableRow templateRow = rows.Last();
 
-            foreach (var item in list.OrderBy(x => x.serial_number))
+            foreach (var item in list.OrderBy(x => x.display_serial_number))
             {
                 var row = new TableRow();
 

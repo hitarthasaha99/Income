@@ -22,7 +22,7 @@ namespace Income.Validators.HIS2026
             RuleFor(x => x.item_8).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
             RuleFor(x => x.item_9).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
             RuleFor(x => x.item_10).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
-            RuleFor(x => x.item_11).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
+            RuleFor(x => x.item_11).NotNull().WithMessage("H068: Invalid entry, please check the entry").WithMessage("H068: Invalid entry, please check the entry");
             RuleFor(x => x.item_12).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
             RuleFor(x => x.item_13).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
             RuleFor(x => x.item_14).NotNull().WithMessage("H068: Invalid entry, please check the entry").GreaterThanOrEqualTo(0).WithMessage("H068: Invalid entry, please check the entry");
