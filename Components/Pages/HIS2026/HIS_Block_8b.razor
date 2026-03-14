@@ -148,7 +148,7 @@
 <Modal @ref="modal" IsVerticallyCentered="true" Size="ModalSize.ExtraLarge" Fullscreen="ModalFullscreen.LargeDown" CloseOnEscape="false" UseStaticBackdrop="true" ShowCloseButton="false">
     <HeaderTemplate>
         <h5 class="modal-title">
-            <span class="text-primary me-1">[Block 8 - item - 8.6]</span>
+            <span class="text-primary me-1">[Block 8 - Q8.6]</span>
             @((isAdd ? "Add Details" : "Update Details"))
         </h5>
     </HeaderTemplate>
@@ -206,11 +206,15 @@
                             <label for="" class="form-label">
                                 <span class="form-badge">4</span> No. of months for which benefits received by all the beneficiaries of the household in last 365 days
                             </label>
-                                <input disabled="@SessionStorage.FSU_Submitted" type="number" class="form-control form-control-sm no-spinner" value="@fields?.item_4" onkeypress="return /^(\d+(\.\d?)?)?$/.test(event.target.value + event.key)"
-                                    @oninput="e =>
-                                    {
-                                        UpdateFieldAndValidate(() => fields.item_4, e);
-                                    }">
+                                <input disabled="@SessionStorage.FSU_Submitted"
+                                       type="number"
+                                       class="form-control form-control-sm no-spinner"
+                                       value="@fields?.item_4"
+                                       onbeforeinput="if(event.data && !/^\d+$/.test(event.data)){event.preventDefault();}"
+                                       @oninput="e =>
+                                       {
+                                           UpdateFieldAndValidate(() => fields.item_4, e);
+                                       }">
                                 <ValidationMessage For="@(() => fields.item_4)" />
                         </div>
                     </div>
@@ -289,13 +293,16 @@
         };
         await LoadData();
         await commonQueries.InsertVisitedBlock(vb);
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        if (SchemeList != null && SchemeList.Count > 0)
         {
             survey_time = SchemeList
-                            .OrderByDescending(x => x.survey_timestamp)
+                            .OrderBy(x => x.survey_timestamp)
                             .Select(x => (DateTime?)x.survey_timestamp)
                             .FirstOrDefault().GetValueOrDefault();
-
+        }
+        else
+        {
+            survey_time = DateTime.Now;
         }
         StateHasChanged();
     }

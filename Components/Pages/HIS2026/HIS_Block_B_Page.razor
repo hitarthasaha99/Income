@@ -200,7 +200,7 @@
                 block_B.item_2 = B2;
                 block_B.item_3 = B3;
                 block_B.item_4 = B4;
-
+                survey_time = block_B.survey_timestamp.GetValueOrDefault();
                 await dB.SaveAsync<Tbl_Block_B>(block_B);
             }
         }

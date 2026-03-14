@@ -53,13 +53,13 @@
                             <th class="col-1 text-center" style="min-width: 185px;">Action</th>
                             <th class="col-2" style="left: 183px;">Srl.No.</th>
                             <th style="min-width:50px;">House Number</th>
-                            <th style="min-width:170px;">Is the house used only for non-residential purposes? (yes-1, no-2)</th>
+                            <th style="min-width:170px;">Is the house/structure used only for non-residential purposes? (yes-1, no-2)</th>
                             <th style="min-width:70px;">Household Serial Number</th>
                             <th style="min-width:100px;">Name of the head of the household</th>
                             <th style="min-width:50px;">Household Size</th>
                             <th style="min-width:170px;">Highest education level attained among the household members</th>
                             <th style="min-width:50px;">Household Type</th>
-                            <th style="min-width:250px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey</th>
+                                <th style="min-width:250px;">Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</th>
                             <th style="min-width:200px;">Usual monthly consumption expenditure of the household (Rs.)</th>
                             @* <th style="min-width:100px;">SSS number for Schedule NHIS 2026</th>
                             <th style="min-width:40px;">Selected</th> *@
@@ -199,7 +199,7 @@
                             <!-- Is Household -->
                             <div class="col-sm-12">
                                 <div class="mb-3">
-                                    <label class="form-label"><span class="form-badge">2</span>Is the house used only for non-residential purposes? (yes-1, no-2)</label>
+                                    <label class="form-label"><span class="form-badge">2</span>Is the house/structure used only for non-residential purposes? (yes-1, no-2)</label>
                                     <InputSelect class="form-select" @bind-Value="fields.is_household" oninput="@(((ChangeEventArgs e) => OnIsHouseholdChanged(e)))">
                                         <option value="">- Select -</option>
                                         @if (commonList?.LOOKUP_CONST_YES_NO != null)
@@ -300,16 +300,22 @@
                             <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                                 <div class="mb-3">
                                     <label class="form-label"><span class="form-badge">8</span>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</label>
-                                    <InputNumber class="form-control no-spinner"
-                                                    @bind-Value="fields.Block_7_8"
+                                    <input class="form-control no-spinner"
+                                                    value="@fields.Block_7_8"
                                                     step="any"
-                                                    Disabled="@(sector == 2)"
-                                                    oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10)"
+                                                    disabled="@(sector == 2)"
+                                                    @oninput="OnItem8Input"
                                                  onkeypress="const v=this.value,k=event.key;
                                                             if(!/[\d.]/.test(k))return false;if(k==='.'&&(v.includes('.')||v===''))return false;
                                                             if(v.includes('.')&&v.split('.')[1].length>=3)return false;
                                                             return /^\d*\.?\d{0,3}$/.test(v+k)" />
                                     <ValidationMessage For="@(() => fields.Block_7_8)" />
+                                        @if (!string.IsNullOrEmpty(item_8_warning))
+                                        {
+                                            <div class="text-success mt-1 fw-bold">
+                                                @item_8_warning
+                                            </div>
+                                        }
                                 </div>
                             </div>
 
@@ -323,17 +329,16 @@
                                                     value="@fields.Block_7_9"
                                            @oninput="OnMonthlyExpInputText" />
                                     <ValidationMessage For="@(() => fields.Block_7_9)" />
+                                    @if (!string.IsNullOrEmpty(item_9_warning))
+                                    {
+                                        <div class="text-success mt-1 fw-bold">
+                                            @item_9_warning
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
 
-                        @* <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                            <button type="button" class="btn btn-outline-primary"
-                                    @onclick="@(() => HandleModal("CLOSE"))">
-                                Close
-                            </button>
-                        </div> *@
                     </fieldset>
                 </EditForm>
             }
@@ -374,6 +379,8 @@
     bool isAdd = false;
     string modalHeader = string.Empty;
     Tbl_Sch_0_0_Block_7? backupObject = null;
+    string item_8_warning = string.Empty;
+    string item_9_warning = string.Empty;
 
     bool HideInsertBtn = false;
 
@@ -461,11 +468,28 @@
 
         editContext?.NotifyFieldChanged(
     FieldIdentifier.Create(() => fields.Block_7_9));
+        CheckItem9Warning();
 
         StateHasChanged();
     }
 
+    void CheckItem8Warning()
+    {
+        item_8_warning = string.Empty;
+        if (fields.Block_7_8.HasValue && fields.Block_7_8.Value > 100)
+        {
+            item_8_warning = $"W022(ii): Please re-check the entry";
+        }
+    }
 
+    void CheckItem9Warning()
+    {
+        item_9_warning = string.Empty;
+        if(fields.Block_7_9.HasValue && fields.Block_7_9.Value < 120)
+        {
+            item_9_warning = $"W022(iii): Please re-check the entry";
+        }
+    }
 
     private void OnIsHouseholdChanged(ChangeEventArgs e)
     {
@@ -488,9 +512,7 @@
             else
                 fields.Block_7_3 = originalSrl + 1;
         }
-
     }
-
 
     private async Task LoadData()
     {
@@ -829,6 +851,24 @@
         StateHasChanged();
     }
 
+    private void OnItem8Input(ChangeEventArgs e)
+    {
+        string input = e.Value?.ToString() ?? string.Empty;
+
+        if (double.TryParse(input, out double value))
+        {
+            fields.Block_7_8 = value;
+        }
+        else
+        {
+            fields.Block_7_8 = null; // if your model allows nullable double
+        }
+        editContext?.NotifyFieldChanged(
+    FieldIdentifier.Create(() => fields.Block_7_8));
+        CheckItem8Warning();
+        StateHasChanged();
+    }
+
 
     private void OnHHDSizeInput(ChangeEventArgs e)
     {
@@ -923,6 +963,7 @@
                 await SCH_0_0_Queries.ResetSelection();
             }
             await SCH_0_0_Queries.ReserializeHHD();
+            //W024
             if (block_5_obj.Block_7_5 > 30)
             {
                 warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W024(ii)");
@@ -944,6 +985,53 @@
                     }
                 }
             }
+            //W022(ii)
+            CheckItem8Warning();
+            if (!string.IsNullOrEmpty(item_8_warning))
+            {
+                warningVM.AddWarning(item_8_warning, "0", "7", "8", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W022(ii)");
+                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_3.GetValueOrDefault());
+            }
+            else
+            {
+                var savedWarnings = await SCH_0_0_Queries.GetWarningTableDataForWarningCode(
+                    SessionStorage.SelectedFSUId,
+                    block_5_obj.Block_7_3.GetValueOrDefault(),
+                    "0",
+                    "W022(ii)"
+                );
+                if (savedWarnings != null && savedWarnings.Count > 0)
+                {
+                    foreach (var warn in savedWarnings)
+                    {
+                        await SCH_0_0_Queries.DeleteWarningAsync(warn.id);
+                    }
+                }
+            }
+            //W024(iii)
+            CheckItem9Warning();
+            if (!string.IsNullOrEmpty(item_9_warning))
+            {
+                warningVM.AddWarning(item_9_warning, "0", "7", "9", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W022(iii)");
+                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_3.GetValueOrDefault());
+            }
+            else
+            {
+                var savedWarnings = await SCH_0_0_Queries.GetWarningTableDataForWarningCode(
+                    SessionStorage.SelectedFSUId,
+                    block_5_obj.Block_7_3.GetValueOrDefault(),
+                    "0",
+                    "W022(iii)"
+                );
+                if (savedWarnings != null && savedWarnings.Count > 0)
+                {
+                    foreach (var warn in savedWarnings)
+                    {
+                        await SCH_0_0_Queries.DeleteWarningAsync(warn.id);
+                    }
+                }
+            }
+
         }
         await AddModal.HideAsync();
         await LoadData();

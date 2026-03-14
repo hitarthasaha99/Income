@@ -310,10 +310,7 @@
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
             block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-                survey_time = selectBlock11A.survey_timestamp.GetValueOrDefault();
-            }
+            survey_time = selectBlock11A.survey_timestamp.GetValueOrDefault();
 
             StateHasChanged();
 
@@ -371,13 +368,13 @@
                 messageStore.Clear(item2Field);
             }
 
-            if (!isQ11_3Enable)
-            {
-                selectBlock11A.item_3 = null;
-                selectBlock11A.item_4 = null;
-                selectBlock11A.item_5 = null;
-                isQ11_4_5Enable = false;
-            }
+            // if (!isQ11_3Enable)
+            // {
+            //     selectBlock11A.item_3 = null;
+            //     selectBlock11A.item_4 = null;
+            //     selectBlock11A.item_5 = null;
+            //     isQ11_4_5Enable = false;
+            // }
         }
         else
         {

@@ -113,6 +113,14 @@ namespace Income.Validators.HIS2026
                                 "item_4",
                                 "H040(iv): Invalid entry, please check the entry");
                         }
+
+                        // (v) item_5 <= item_4
+                        if (item5 > item4)
+                        {
+                            context.AddFailure(
+                                "item_5",
+                                "H040(v): Invalid entry, please check the entry");
+                        }
                     });
             });
         }

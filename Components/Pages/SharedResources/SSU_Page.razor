@@ -1265,7 +1265,7 @@
 				if (block_2.date_of_scrutiny == null || block_2.date_of_scrutiny == DateTime.MinValue)
 				{
 					block_2.date_of_scrutiny = DateTime.Now;
-                }
+				}
 			}
 			var warnings = await dQ.FetchListAsync<Tbl_Warning>(DBQueries.DeleteFilter.IncludeAll) ?? new();
 
@@ -1465,13 +1465,22 @@
 		SessionStorage.sss = data.SSS;
 		SessionStorage.hhd_head = data.Block_7_4 ?? "";
 
+		var response = await dQ.Fetch_SCH_HIS_Block1(SessionStorage.selected_hhd_id);
+		if (response != null)
+		{
+			SessionStorage.location = response.survey_coordinates;
+		}
+
 		if (name == CommonConstants.ROLE_NAME_JSO)
 		{
 			if (data.hhdStatus == 0 || data.hhdStatus == 11 || data.hhdStatus == 15)
 			{
 
 				preloadService.Show(SpinnerColor.Light, "Fetching location details...");
-				SessionStorage.location = await funcs.fetchGeoLocation();
+				if (string.IsNullOrEmpty(SessionStorage.location))
+				{
+					SessionStorage.location = await funcs.fetchGeoLocation();
+				}
 				preloadService.Show(SpinnerColor.Light, "Updating location details...");
 				//await dQ.SaveHhdStatus(data.Block_7_3, 10, SessionStorage.SelectedFSUId);
 				preloadService.Hide();
@@ -1489,7 +1498,10 @@
 				else if (data.hhdStatus == 12 && data.needDownload == 0)
 				{
 					preloadService.Show(SpinnerColor.Light, "Fetching location details...");
-					SessionStorage.location = await funcs.fetchGeoLocation();
+					if (string.IsNullOrEmpty(SessionStorage.location))
+					{
+						SessionStorage.location = await funcs.fetchGeoLocation();
+					}
 					preloadService.Show(SpinnerColor.Light, "Updating location details...");
 					preloadService.Hide();
 					SessionStorage.FSU_Submitted = false;

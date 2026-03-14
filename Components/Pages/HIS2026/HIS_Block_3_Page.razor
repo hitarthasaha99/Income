@@ -507,7 +507,7 @@
                         <div class="col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">
-                                    <span class="form-badge">12</span> Beneficiary of govt scheme (yes-1 / no-2)
+                                <span class="form-badge">12</span> Beneficiary of any Central/State Government social assistance scheme* as on date of survey (yes - 1/ no - 2)
                                 <span style="font-size:0.9em;">(Cash Transfer only)</span>
                                 </label>
 
@@ -625,14 +625,18 @@
         await LoadData();
         try
         {
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            if(block3Members != null && block3Members.Count > 0)
             {
                 survey_time = block3Members
-                                .OrderByDescending(x => x.survey_timestamp)
+                                .OrderBy(x => x.survey_timestamp)
                                 .Select(x => (DateTime?)x.survey_timestamp)
                                 .FirstOrDefault().GetValueOrDefault();
-
             }
+            else
+            {
+                survey_time = DateTime.Now;
+            }
+
         }
         catch
         {
@@ -752,7 +756,7 @@
         CheckItem10Warning();
         CheckItem11Warning();
         ClearItem12Error();
-        CheckItem12Warning();
+        //CheckItem12Warning();
     }
 
 
@@ -851,7 +855,7 @@
         else
             newMember.item_12 = null;
 
-        CheckItem12Warning();
+        //CheckItem12Warning();
         // Refresh UI
         StateHasChanged();
     }
@@ -1373,7 +1377,7 @@
         CheckItem9Warning();
         CheckItem10Warning();
         CheckItem11Warning();
-        CheckItem12Warning();
+        //CheckItem12Warning();
         CheckSpouseMaritalWarning();
     }
 
@@ -1488,7 +1492,7 @@
         CheckItem9Warning();
         CheckItem10Warning();
         CheckItem11Warning();
-        CheckItem12Warning();
+        //CheckItem12Warning();
 
         if(!string.IsNullOrEmpty(genderWarning))
         {
@@ -1530,10 +1534,10 @@
         {
             warningVM.AddWarning(item_11Warning, "NHIS", "3", "11", warningCode: item_11Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
         }
-        if (!string.IsNullOrEmpty(item_12Warning))
-        {
-            warningVM.AddWarning(item_12Warning, "NHIS", "3", "12", warningCode: item_12Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
-        }
+        // if (!string.IsNullOrEmpty(item_12Warning))
+        // {
+        //     warningVM.AddWarning(item_12Warning, "NHIS", "3", "12", warningCode: item_12Warning.Split(':')[0].Trim(), SessionStorage.selected_hhd_id, newMember.serial_no.GetValueOrDefault());
+        // }
         await warningVM.SaveWarningAsync("NHIS", "3", newMember.serial_no.GetValueOrDefault());
 
         await DBQueries.Save_SCH_HIS_Block3(newMember);

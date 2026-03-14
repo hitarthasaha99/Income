@@ -253,10 +253,8 @@
         messageStore = new ValidationMessageStore(editContext);
         editContext.OnFieldChanged += EditContext_OnFieldChanged;
 
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-        {
-            survey_time = fields.survey_timestamp.GetValueOrDefault();
-        }
+        survey_time = fields.survey_timestamp.GetValueOrDefault();
+
         StateHasChanged();
     }
 

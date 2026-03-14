@@ -438,15 +438,16 @@
             }
         }      
 
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        if (block6Members != null && block6Members.Count > 0)
         {
-            if (block6Members != null)
-            {
-                survey_time = block6Members
-                            .OrderByDescending(x => x.survey_timestamp)
-                            .Select(x => (DateTime?)x.survey_timestamp)
-                            .FirstOrDefault().GetValueOrDefault();
-            }
+            survey_time = block6Members
+                        .OrderBy(x => x.survey_timestamp)
+                        .Select(x => (DateTime?)x.survey_timestamp)
+                        .FirstOrDefault().GetValueOrDefault();
+        }
+        else
+        {
+            survey_time = DateTime.Now;
         }
 
         StateHasChanged();

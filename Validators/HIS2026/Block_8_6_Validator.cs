@@ -40,9 +40,21 @@ namespace Income.Validators.HIS2026
             // 4. item_5 should be >= 0
             RuleFor(x => x.item_5)
                 .NotNull()
-                .WithMessage("H062: Invalid Entry, please check the entry")
+                .WithMessage("H062(i): Invalid Entry, please check the entry")
                 .GreaterThanOrEqualTo(0)
-                .WithMessage("H062: Invalid Entry, please check the entry");
+                .WithMessage("H062(i): Invalid Entry, please check the entry");
+
+            // 5. If item_4 > 0 then item_5 must be > 0
+            RuleFor(x => x.item_5)
+                .GreaterThan(0)
+                .When(x => x.item_4 > 0)
+                .WithMessage("H062(ii): Invalid entry, please recheck the entry");
+
+            // 6. If item_5 > 0 then item_4 must be > 0
+            RuleFor(x => x.item_4)
+                .GreaterThan(0)
+                .When(x => x.item_5 > 0)
+                .WithMessage("H062(ii): Invalid entry, please recheck the entry");
         }
     }
 }

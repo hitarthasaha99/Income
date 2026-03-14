@@ -44,7 +44,8 @@
                         <div class="mb-3">
                             <label class="form-label">
                                 <span class="form-badge">6</span>
-                                Own any land (within the country)?
+                                        Does the household own any land (within the country) as on the date of survey?
+                                        (consider all land that is owned and / or leased out by the household)
                             </label>
                             <select class="form-select is_sso"
                                     value="@block_4?.item_6"
@@ -76,7 +77,13 @@
                                     onbeforeinput="return !event.data ||(/^\d|\.$/.test(event.data) && /^(\d{0,10}(\.\d{0,3})?)$/.test(event.target.value + event.data))"
                                     disabled="@(block_4?.item_6 != 1 || (SessionStorage.FSU_Submitted))" />
                             <ValidationMessage For="@(() => block_4.item_7)" />
-                        </div>
+                            @if (!string.IsNullOrEmpty(Item7WarningMessage))
+                                    {
+                                        <div class="form-text text-success" style="white-space: pre-line;">
+                                            @Item7WarningMessage
+                                        </div>
+                                    }
+                                </div>
                     </div>
                     <!--4.8-->
                     <div class="col-sm-12">
@@ -416,6 +423,7 @@
     private int selectedLoanPurpose;
     private double? LoanRepaymentAmount;
 
+    private string Item7WarningMessage = string.Empty;
     private string Item8WarningMessage = string.Empty;
     private string Item10WarningMessage = string.Empty;
     private string Item14WarningMessage = string.Empty;
@@ -464,10 +472,8 @@
             messageStore = new ValidationMessageStore(editContext);
             editContext.OnFieldChanged += EditContext_OnFieldChanged;
 
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-                survey_time = block_4.survey_timestamp.GetValueOrDefault();
-            }
+            survey_time = block_4.survey_timestamp.GetValueOrDefault();
+
 
         }
         Tbl_Visited_Blocks vb = new Tbl_Visited_Blocks
@@ -479,6 +485,7 @@
         block_4_nic_list = await dQ.Fetch_SCH_HIS_Block4_NICList();
         block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
         await commonQueries.InsertVisitedBlock(vb);
+        CheckWarningForItem7();
         CheckWarningForItem8();
         CheckWarningForItem10();
         CheckItem14Warning();
@@ -522,6 +529,7 @@
             block_4.item_7 = result;
             editContext?.NotifyFieldChanged(
             FieldIdentifier.Create(() => block_4.item_7));
+            CheckWarningForItem7();
         }
         else
         {
@@ -543,6 +551,22 @@
         //Warnings for Item 8
         CheckWarningForItem8();
         StateHasChanged();
+    }
+
+    void CheckWarningForItem7()
+    {
+        try
+        {
+            Item7WarningMessage = string.Empty;
+            if (block_4 != null && block_4.item_7.HasValue && block_4.item_7.Value > 100)
+            {
+                Item7WarningMessage = $"W019(ii): Please recheck the value";
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 
     void CheckWarningForItem8()
@@ -690,7 +714,7 @@
         else
         {
             block_4.item_13 = int.Parse(value);
-            
+
             editContext?.NotifyFieldChanged(
             FieldIdentifier.Create(() => block_4.item_13));
         }
@@ -870,10 +894,16 @@
             editContext.NotifyValidationStateChanged();
             if (result.IsValid)
             {
+                CheckWarningForItem7();
                 CheckWarningForItem8();
                 CheckWarningForItem10();
                 CheckItem14Warning();
                 CheckWarningForItem16();
+
+                if (!string.IsNullOrEmpty(Item7WarningMessage))
+                {
+                    warningVM.AddWarning(Item7WarningMessage, "NHIS", "4_3", "7", warningCode: "W019(ii)", SessionStorage.selected_hhd_id);
+                }
 
                 if (!string.IsNullOrEmpty(Item8WarningMessage))
                 {

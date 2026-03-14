@@ -98,7 +98,7 @@
             EnumeratorRemarks = block_1.block_12_remark ?? string.Empty;
             SupervisorRemarks = block_1.block_13_remark ?? string.Empty;
         }
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && block_1 != null)
+        if (block_1 != null)
         {
             survey_time = block_1.Block13_14Timestamp.GetValueOrDefault();
         }

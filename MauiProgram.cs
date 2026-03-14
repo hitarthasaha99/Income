@@ -58,6 +58,9 @@ namespace Income
 
             builder.Services.AddBlazoredToast();
 
+            // Register security services
+            builder.Services.AddSingleton<IRootDetectionService, RootDetectionService>();
+
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

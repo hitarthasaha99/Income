@@ -120,6 +120,8 @@
         block_2_2 = await Queries.FetchSCH0Block2_2Data() ?? new();
         block_4 = await Queries.GetBlock4() ?? null;
         block_5 = await Queries.FetchSCH0Block5Data();
+        var hhd_list = await Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+
         var selected_su = block_2_2.Find(k => k.IsChecked == true);
 
         if(block_4 == null)
@@ -161,7 +163,7 @@
             }
             else
             {
-                DisableEdit = block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
+                DisableEdit = (hhd_list != null && hhd_list.Count > 0) || block_0_1.Block_1_15 <= 1 || SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO;
             }
 
             if(!DisableEdit)
@@ -193,10 +195,10 @@
                     block_0_1.sample_su_number = 1;
                 }
             }
-            
+
         }
         remarks = block_0_1?.remarks_block_4;
-
+        
         if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
         {
             survey_time = block_4?.survey_timestamp.GetValueOrDefault() ?? DateTime.Now;

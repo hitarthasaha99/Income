@@ -1355,6 +1355,17 @@ namespace Income.Database.Queries
                     {
                         int deleted = await _database.DeleteAsync(exists);
                     }
+                    var savedWarnings = await GetWarningTableDataForHHDID(
+                    SessionStorage.SelectedFSUId,
+                    exists.Block_7_3.GetValueOrDefault());
+
+                    if (savedWarnings != null && savedWarnings.Count > 0)
+                    {
+                        foreach (var warn in savedWarnings)
+                        {
+                            await DeleteWarningAsync(warn.id);
+                        }
+                    }
                     await ReserializeHHD();
                     return 1;
                 }
@@ -4265,6 +4276,10 @@ namespace Income.Database.Queries
         public async Task<List<Tbl_Warning>> GetWarningTableDataForWarningCode(int fsuId, int hddId, string schedule, string code)
         {
             return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && x.schedule == schedule && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && x.warning_code == code && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
+        }
+        public async Task<List<Tbl_Warning>> GetWarningTableDataForHHDID(int fsuId, int hddId)
+        {
+            return await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuId && x.hhd_id == hddId && (x.parent_comment_id == Guid.Empty || x.parent_comment_id == null) && (x.is_deleted == false || x.is_deleted == null)).ToListAsync();
         }
 
         public async Task<List<Tbl_Warning>> GetChildCommentsAsync(Guid parentId)
