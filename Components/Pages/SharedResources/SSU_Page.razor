@@ -453,7 +453,7 @@
 						string json = JsonConvert.SerializeObject(data);
 						Upsert_Model payload = new()
 						{
-							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
+							lookup_fsu_submit_status = 21,
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
