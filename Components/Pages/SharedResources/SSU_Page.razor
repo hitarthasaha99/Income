@@ -13,7 +13,6 @@
 @inject ILoggingService loggingService
 @inject PrintHelper PrintHelper
 
-
 <div class="main-content">
 
 	<ConfirmDialog @ref="dialog" />
@@ -217,7 +216,14 @@
 	</div>	
 </div>
 <script src="js/download.js"></script>
+<script src="js/audio.js"></script>
+<audio id="errorAudio1">
+    <source src="audio/error1.mp3" type="audio/mpeg">
+</audio>
 
+<audio id="errorAudio2">
+    <source src="audio/error2.mp3" type="audio/mpeg">
+</audio>
 
 @code {
 	int SelectedFsuId = SessionStorage.SelectedFSUId;
@@ -235,8 +241,17 @@
 	Dictionary<int, List<string>> errorDict = new();
 	bool isSyncing = false;
 	public string reportType { get; set; } = string.Empty;
+	private static readonly Random _rand = new();
+	private int _lastPlayed = -1;
 
 	private ErrorPopup? errorPopup;
+
+	private ElementReference audioRef;
+
+	[Inject] IJSRuntime JS { get; set; }
+
+	private bool hasPlayed = false;
+
 
 	enum SubmissionMode
 	{
@@ -411,6 +426,19 @@
 					if (!allEmpty)
 					{
 						toastService.ShowError("Error while validating");
+
+						int next;
+						do
+						{
+							next = _rand.Next(2);
+						} while (next == _lastPlayed);
+
+						_lastPlayed = next;
+
+						var audioId = next == 0 ? "errorAudio1" : "errorAudio2";
+
+						await JS.InvokeVoidAsync("playAudio", audioId);
+
 						errorDict = result;
 						errorPopup?.ShowPopup();
 						return;
