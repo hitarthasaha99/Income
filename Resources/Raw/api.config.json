@@ -37,9 +37,9 @@
 
     "Production": {
       "BaseUrls": {
-        "Post": "https://esigma.mospi.gov.in/apIIncome/",
-        "Income": "https://esigma.mospi.gov.in/apiIncome/api/SURVEY/v1/",
-        "Common": "https://esigma.mospi.gov.in/apiCommon/api/SURVEY/"
+        "Post": "https://hsd.esigma.mospi.gov.in/INCOME/api/",
+        "Income": "https://hsd.esigma.mospi.gov.in/INCOME/api/api/SURVEY/v1/",
+        "Common": "https://hsd.esigma.mospi.gov.in/INCOME/api/api/SURVEY/"
       },
       "Routes": {
         "Login": "v1/UtilityMaster/AuthenticateSurveyUserAsync",
