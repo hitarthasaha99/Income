@@ -299,9 +299,23 @@
 
     async Task GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_9a");
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_9a");
+            return;
+        }
+        if (!string.IsNullOrEmpty(item_9_5_warning))
+        {
+            warning_VM.AddWarning(item_9_5_warning, "NHIS", "9B", "9.5", "W065", SessionStorage.selected_hhd_id);
+        }
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        if (!string.IsNullOrEmpty(item_9_6_warning))
+        {
+            warning_VM.AddWarning(item_9_6_warning, "NHIS", "9B", "9.6", "W067", SessionStorage.selected_hhd_id);
+        }
+        await warning_VM.SaveWarningAsync("NHIS", "9B");
+        int saved = await dB.Save_SCH_HIS_Block9B(block_9b);
+
     }
     protected override async Task OnInitializedAsync()
     {

@@ -112,7 +112,7 @@
                                                 <ValidationMessage For="@(() => model.item_3)" />
                                             </td>
                                         </tr>
-                                        <tr class="row-light-blue">
+                                    <tr class="row-light-success">
                                             <td>
                                                 <label class="form-label mb-0">
                                                     <span class="form-badge me-0">Q10.4</span>
@@ -594,11 +594,22 @@
     DBQueries dQ = new DBQueries();
     private Tbl_Block_1? block_1 = new();
     CommentModal commentModal = default!;
+
     async Task GoBack()
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+             NavigationManager.NavigateTo("/dashboard/his/block_9b");
+             return;
+        }
+
+        if (block_1 != null)
+        {
+            await dQ.SaveAsync<Tbl_Block_1>(block_1);
+        }
+        int saved = await dQ.Save_SCH_HIS_Block10(model);
         NavigationManager.NavigateTo("/dashboard/his/block_9b");
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
 
     protected async override Task OnInitializedAsync()

@@ -83,7 +83,7 @@
                                 <label class="form-label">
                                     <span class="form-badge">3</span>@Loc["inminutes"]
                                 </label>
-                                <input type="number" class="form-control is_sso" value="@block_2?.total_time"
+                                    <input type="number" class="form-control is_sso" value="@block_2?.total_time" onkeypress="return /^(\d*)$/.test(event.target.value + event.key)"
                                        @oninput="e =>
                                        {
                                            UpdateFieldAndValidate(() => block_2.total_time, e);

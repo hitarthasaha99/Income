@@ -32,11 +32,13 @@
                     <div class="d-flex align-items-center" hidden="@SessionStorage.selection_done">
                         @if (SessionStorage.ShowGenerateButton)
                         {
-                            <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
+                            @* <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
                                 <i class="fi fi-rr-settings me-1"></i>Generate
-                            </button> 
+                            </button>  *@
                         }
-                        
+                        <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
+                                <i class="fi fi-rr-settings me-1"></i>Generate
+                         </button> 
                         <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                             <i class="fi fi-rr-plus me-1"></i>Add
                         </button>
@@ -424,13 +426,17 @@
             ListItems = new();
             ListItems = response.OrderBy(x => x.Block_7_1).ToList();
             HideInsertBtn = ListItems.Any(x => x.SSS != 0);
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+            if (ListItems != null && ListItems.Count > 0)
             {
                 survey_time = ListItems
                                 .OrderByDescending(x => x.survey_timestamp)
                                 .Select(x => (DateTime?)x.survey_timestamp)
                                 .FirstOrDefault().GetValueOrDefault();
 
+            }
+            else
+            {
+                survey_time = DateTime.Now;
             }
             StateHasChanged();
         }

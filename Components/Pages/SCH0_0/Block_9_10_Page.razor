@@ -101,7 +101,7 @@
             SupervisorRemarks = tbl_Sch_0_0_Block_0_1.SupervisorRemarks ?? string.Empty;
         }
 
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && tbl_Sch_0_0_Block_0_1 != null)
+        if (tbl_Sch_0_0_Block_0_1 != null)
         {
             survey_time = tbl_Sch_0_0_Block_0_1.Block9_10Timestamp.GetValueOrDefault();
         }

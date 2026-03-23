@@ -220,10 +220,25 @@
 
     async void GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
+            return;
+        }
+        
+        if (block_1 != null)
+        {
+            await dB.SaveAsync<Tbl_Block_1>(block_1);
+        }
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
-        return;
+        if (fields.item_7_12.GetValueOrDefault() < 0 && !fields.item_7_13.HasValue)
+        {
+            warningVM.AddWarning(item_9_warning, "NHIS", "7C", "7C.9", warningCode: "", SessionStorage.selected_hhd_id);
+        }
+
+        await warningVM.SaveWarningAsync("NHIS", "7C");
+        int saved = await dB.Save_SCH_HIS_Block7C(fields);
+        NavigationManager.NavigateTo("/dashboard/his/block_7c_2");
     }
 
     protected override async Task OnInitializedAsync()

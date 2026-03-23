@@ -164,9 +164,29 @@
 
     async Task GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
+            return;
+        }
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        if (block_1 != null)
+        {
+            await dQ.SaveAsync<Tbl_Block_1>(block_1);
+        }
+
+        foreach (var item in Block7DList)
+        {
+            try
+            {
+                await dQ.Save_SCH_HIS_Block7D_List(item);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Update_Block7D error: {ex.Message}");
+            }
+        }
+        NavigationManager.NavigateTo("/dashboard/his/block_7c_3");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

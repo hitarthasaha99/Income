@@ -262,9 +262,27 @@
 
     async Task GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_10");
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_10");
+            return;
+        }
+        if (block_1 != null)
+        {
+            await dQ.SaveAsync<Tbl_Block_1>(block_1);
+        }
+        int saved = await dQ.Save_SCH_HIS_Block11a(selectBlock11A);
+        if (saved > 0)
+        {
+            toastService.ShowSuccess("Saved successfully");
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
+            if (!string.IsNullOrEmpty(csp_72_warning))
+            {
+                warning_VM.AddWarning(csp_72_warning, "NHIS", "11A", "1", "W072", SessionStorage.selected_hhd_id);
+            }
+            await warning_VM.SaveWarningAsync("NHIS", "11A");
+        }
+        NavigationManager.NavigateTo("/dashboard/his/block_10");
     }
 
     async Task OpenModal()

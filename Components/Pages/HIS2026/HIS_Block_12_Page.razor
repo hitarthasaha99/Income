@@ -121,10 +121,20 @@
         StateHasChanged();
     }
 
-    void GoBack()
+    async Task GoBack()
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_11b");
+            return;
+        }
+        if (block_1 != null)
+        {
+            block_1.block_12_1_remark = remarks;
+            await dB.SaveAsync<Tbl_Block_1>(block_1);
+        }
+
         NavigationManager.NavigateTo("/dashboard/his/block_11b");
-        return;
     }
 
     private void OnIncomeChanged(ChangeEventArgs e)

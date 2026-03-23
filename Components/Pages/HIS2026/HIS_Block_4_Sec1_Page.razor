@@ -451,11 +451,25 @@
         StateHasChanged();
     }
 
-    async void GoBack()
+    async Task GoBack()
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_3");
+            return;
+        }
+        CheckWarnings();
+        if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
+        {
+            warningVM.AddWarning(Block_4_1_ErrorMessage, "NHIS", "4_1", "1", warningCode: "W013(ii)", SessionStorage.selected_hhd_id);
+        }
+        if (!string.IsNullOrEmpty(Block_4_4_ErrorMessage))
+        {
+            warningVM.AddWarning(Block_4_4_ErrorMessage, "NHIS", "4_1", "4", warningCode: "W016", SessionStorage.selected_hhd_id);
+        }
+        await warningVM.SaveWarningAsync("NHIS", "4_1");
+        var saved = await dQ.Save_SCH_HIS_Block4(block_4);
         NavigationManager.NavigateTo("/dashboard/his/block_3");
-
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 }

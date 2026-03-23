@@ -168,12 +168,16 @@
             StateHasChanged();
             return;
         }
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        if (block_5 != null && block_5.Count > 0)
         {
             survey_time = block_5
                 .OrderByDescending(x => x.survey_timestamp)
                 .Select(x => (DateTime?)x.survey_timestamp)
                 .FirstOrDefault().GetValueOrDefault();
+        }
+        else
+        {
+            survey_time = DateTime.Now;
         }
         return;
     }
@@ -215,7 +219,7 @@
                     return;
                 }
 
-                warningVM.AddWarning("W017(iii): All the sub-units need to have more or less equal population", "0", "5", "3", warningCode: "W017(iii)");
+                warningVM.AddWarning("W017(iii): All the sub-divisions need to have more or less equal population", "0", "5", "3", warningCode: "W017(iii)");
                 await warningVM.SaveWarningAsync("0", "5", 0);
             }
             Random num = new Random();
