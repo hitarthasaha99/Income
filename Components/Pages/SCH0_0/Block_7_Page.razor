@@ -36,9 +36,9 @@
                                 <i class="fi fi-rr-settings me-1"></i>Generate
                             </button>  *@
                         }
-                        <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
+                        @* <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
                                 <i class="fi fi-rr-settings me-1"></i>Generate
-                         </button> 
+                         </button>  *@
                         <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                             <i class="fi fi-rr-plus me-1"></i>Add
                         </button>
@@ -523,9 +523,9 @@
     private async Task LoadData()
     {
         var response = await SCH_0_0_Queries.GetBlock7Data(SessionStorage.SelectedFSUId);
+        ListItems?.Clear();
         if (response != null && response.Count > 0)
         {
-            ListItems?.Clear();
             ListItems?.AddRange(response.OrderBy(x => x.Block_7_1).ToList());
             StateHasChanged();
         }

@@ -508,7 +508,10 @@
         var value = e.Value?.ToString();
 
         if (string.IsNullOrEmpty(value))
+        {
             block_4.item_6 = null;
+            block_4.item_7 = null;
+        }
         else
         {
             block_4.item_6 = int.Parse(value);

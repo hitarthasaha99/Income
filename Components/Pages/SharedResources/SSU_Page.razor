@@ -1,7 +1,9 @@
 ﻿@page "/dashboard/his/ssu_page"
+@using FluentValidation
 @using Income.Database.Models.Common
 @using Income.Database.Models.HIS_2026
 @using Income.Database.Models.SCH0_0
+@using Income.Validators.HIS2026
 @using Income.Viewmodels
 @layout Income.Components.Layout.DashboardLayout
 @inject NavigationManager NavigationManager
@@ -12,6 +14,14 @@
 @inject Warning_VM warningVM
 @inject ILoggingService loggingService
 @inject PrintHelper PrintHelper
+@inject IValidator<Tbl_Block_4> Block4Validator
+@inject IValidator<Tbl_Block_7a> Block7AValidator
+@inject IValidator<Tbl_Block_7b> Block7BValidator
+@inject IValidator<Tbl_Block_7c> Block7CValidator
+@inject IValidator<Tbl_Block_8> Block8Validator
+@inject IValidator<Tbl_Block_9a> Block9AValidator
+@inject IValidator<Tbl_Block_10> Block10Validator
+@inject IValidator<Tbl_Block_11a> Block11Validator
 
 
 <div class="main-content">
@@ -776,6 +786,7 @@
 								hhd.needDownload = 0;
 								await dQ.Update_SCH0_0_Block_7(hhd);
 
+								var block1 = currentHHD.IncomeBlock1;
 								var block2 = currentHHD.IncomeBlockFieldOp;
 								var incomingWarningList = currentHHD.IncomeWarningList;
 
@@ -810,6 +821,11 @@
 									{
 										await dQ.SaveAsync<Tbl_Warning>(warning);
 									}
+								}
+
+								if (block1 != null)
+								{
+									await dQ.SaveAsync<Tbl_Block_1>(block1);
 								}
 
 								if(block2 != null)
@@ -895,6 +911,64 @@
 
 		// Return everything after the comma → pure base64 string
 		return dataUri.Substring(commaIndex + 1);
+	}
+
+	private async Task<List<string>> Block4HardCheck(Tbl_Block_4 block_4)
+	{
+		try
+		{
+			List<string> errors = new();
+			if (block_4 != null)
+			{
+				if (block_4.item_2 == null)
+				{
+					errors.Add($"H014: Invalid Entry, Please check the entry");
+				}
+				if (block_4.item_3 == null)
+				{
+					errors.Add($"H015: Invalid Entry, Please check the entry");
+				}
+
+				var result = await Block4Validator.ValidateAsync(block_4, options => options.IncludeRuleSets("Page3"));
+				if (result != null && !result.IsValid)
+				{
+					foreach (var failure in result.Errors)
+					{
+						errors.Add(failure.ErrorMessage);
+					}
+				}
+
+			}
+			return errors;
+		}
+		catch (Exception ex)
+		{
+			return new List<string>();
+		}
+	}
+
+	private async Task<List<string>> ValidateBlock<T>(T block, IValidator<T> validator)
+	{
+		try
+		{
+			List<string> errors = new();
+
+			if (block != null && validator != null)
+			{
+				var result = validator.Validate(block);
+
+				if (result != null && !result.IsValid)
+				{
+					errors.AddRange(result.Errors.Select(e => e.ErrorMessage));
+				}
+			}
+
+			return errors;
+		}
+		catch
+		{
+			return new List<string>();
+		}
 	}
 
 	private async Task<Dictionary<int, List<string>>?> ValidateSubmissionJSO(List<Tbl_Sch_0_0_Block_7> hhd_list)
@@ -987,6 +1061,101 @@
 					errors.Add($"Block 1 data not found for HHD Serial {hhd.Block_7_3}");
 				}
 
+				var block4checks = await Block4HardCheck(block_4);
+				if (block4checks != null && block4checks.Count > 0)
+				{
+					errors.AddRange(block4checks);
+				}
+
+				var block7aErrors = await ValidateBlock(block_7a, Block7AValidator);
+				if (block7aErrors.Any())
+				{
+					errors.AddRange(block7aErrors);
+				}
+
+				bool codeListEntryNeeded = block_4 != null && (block_4.item_4_3.GetValueOrDefault() ||
+								block_4.item_4_4.GetValueOrDefault() || block_4.item_4_5.GetValueOrDefault() || block_4.item_4_6.GetValueOrDefault());
+
+				if (block_7b != null)
+				{
+					bool hasAnyValueGreaterThanZero =
+									new int?[]
+									{
+										block_7b.item_6_1,
+										block_7b.item_6_2,
+										block_7b.item_6_3,
+										block_7b.item_6_4,
+										block_7b.item_6_5,
+										block_7b.item_6_6,
+										block_7b.item_6_7,
+										block_7b.item_6_8,
+										block_7b.item_6_9,
+										block_7b.item_6_10,
+										block_7b.item_6_11,
+										block_7b.item_6_12
+									}.Any(x => x.HasValue && x.Value > 0);
+
+					if (codeListEntryNeeded && !hasAnyValueGreaterThanZero)
+					{
+						errors.Add("Atleast one entry is needed for Q7.6");
+					}
+				}
+
+
+				if(codeListEntryNeeded)
+				{
+					var block7bErrors = await ValidateBlock(block_7b, Block7BValidator);
+					if (block7bErrors.Any())
+					{
+						errors.AddRange(block7bErrors);
+					}
+				}
+
+				var block7cErrors = await ValidateBlock(block_7c, Block7CValidator);
+				if (block7cErrors.Any())
+				{
+					errors.AddRange(block7cErrors);
+				}
+
+				var block8Errors = await ValidateBlock(block_8, Block8Validator);
+				if (block8Errors.Any())
+				{
+					errors.AddRange(block8Errors);
+				}
+
+				var block9aErrors = await ValidateBlock(block_9a, Block9AValidator);
+				if (block9aErrors.Any())
+				{
+					errors.AddRange(block9aErrors);
+				}
+
+				var block10Errors = await ValidateBlock(block_10, Block10Validator);
+				if (block10Errors.Any())
+				{
+					errors.AddRange(block10Errors);
+				}
+
+				var block11Errors = await ValidateBlock(block_11a, Block11Validator);
+				if (block11Errors.Any())
+				{
+					errors.AddRange(block11Errors);
+				}
+
+				if (block_9b != null)
+				{
+					var validator = new Block_9b_Validator(block_3);
+					var validation = validator.Validate(block_9b);
+
+					foreach (var error in validation.Errors)
+					{
+						if (error.ErrorMessage != null)
+						{
+							errors.Add(error.ErrorMessage);
+						}
+					}
+				}
+				
+
 				if (block_2 == null)
 				{
 					errors.Add($"Block 2 data not found for HHD Serial {hhd.Block_7_3}");
@@ -1012,7 +1181,7 @@
 							var items = new[] { block_4?.item_4_1, block_4?.item_4_2, block_4?.item_4_3, block_4?.item_4_4, block_4?.item_4_5, block_4?.item_4_6 };
 							if (!items.Any(x => x == true))
 							{
-								errors.Add($"H016: Please check the entry recorded against col.s 8-11 , block 3 for HHD Serial {hhd.Block_7_3}");
+								errors.Add($"H016: Please check the entry recorded against col.s 8-11 , block 3");
 							}
 						}
 					}

@@ -312,7 +312,7 @@
                             .OrderByDescending(x => x.survey_timestamp)
                             .Select(x => (DateTime?)x.survey_timestamp)
                             .FirstOrDefault().GetValueOrDefault();  
-                            
+
                     RowList = Block7DList.Select(x => x.serial_number.GetValueOrDefault()).Distinct().ToList();
                 }
 
@@ -667,6 +667,7 @@
         else
         {
             entry.item_3 = null;
+            entry.item_4 = null;
         }
         ValidateRow(entry);
     }

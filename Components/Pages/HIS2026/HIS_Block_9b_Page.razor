@@ -315,7 +315,7 @@
         }
         await warning_VM.SaveWarningAsync("NHIS", "9B");
         int saved = await dB.Save_SCH_HIS_Block9B(block_9b);
-
+        NavigationManager.NavigateTo("/dashboard/his/block_9a");
     }
     protected override async Task OnInitializedAsync()
     {
