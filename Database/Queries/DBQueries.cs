@@ -659,7 +659,7 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
 
-                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && (x.warning_code == "W025(i)" || x.warning_code == "W024(ii)")).ToListAsync();
+                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && (x.warning_code == "W025(i)")).ToListAsync();
                         if (warnings != null && warnings.Count > 0)
                         {
                             foreach (var warning in warnings)
@@ -783,7 +783,7 @@ namespace Income.Database.Queries
                         await _database.Table<Tbl_Block_11a>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_11b>().DeleteAsync(x => x.fsu_id == fsuID);
                         await _database.Table<Tbl_Block_FieldOperation>().DeleteAsync(x => x.fsu_id == fsuID);
-                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && (x.warning_code == "W025(i)" || x.warning_code == "W024(ii)")).ToListAsync();
+                        var warnings = await _database.Table<Tbl_Warning>().Where(x => x.fsu_id == fsuID && x.warning_code == "W025(i)").ToListAsync();
                         if (warnings != null && warnings.Count > 0)
                         {
                             foreach (var warning in warnings)

@@ -218,11 +218,26 @@
                     var fsuHouses = currentFSU.fsuHouses?.Where(x => (x.is_deleted == null || x.is_deleted == false));
                     var validStatuses = new HashSet<int> { 12, 21, 22, 31, 32 };
 
-                    var hhdIdsToDelete = fsuHouses?
-                                        .Where(h => validStatuses.Contains(h.lookup_submit_status))
-                                        .Select(h => h.hhd_id)
-                                        .Distinct()
-                                        .ToList();
+                    // var hhdIdsToDelete = fsuHouses?
+                    //                     .Where(h => validStatuses.Contains(h.lookup_submit_status))
+                    //                     .Select(h => h.hhd_id)
+                    //                     .Distinct()
+                    //                     .ToList();
+
+                    List<int> hhdIdsToDelete = new();
+                    if (fsuHouses != null)
+                    {
+                        foreach (var house in fsuHouses)
+                        {
+                            if (validStatuses.Contains(house.lookup_submit_status))
+                            {
+                                if (!hhdIdsToDelete.Contains(house.hhd_id))
+                                {
+                                    hhdIdsToDelete.Add(house.hhd_id);
+                                }
+                            }
+                        }
+                    }
 
                     var statusFlags = new Dictionary<int, bool>
                                 {
@@ -245,7 +260,24 @@
                                 );
 
                     // Fire all calls in parallel
-                    var results = await Task.WhenAll(downloadTasks.Values);
+                    //var results = await Task.WhenAll(downloadTasks.Values);
+
+                    var results = new List<string>();
+                    foreach (var taskKvp in downloadTasks)
+                    {
+                        try
+                        {
+                            var result = await taskKvp.Value;
+                            if (!string.IsNullOrEmpty(result))
+                            {
+                                results.Add(result);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            loggingService.LogError($"Failed to download data for status {taskKvp.Key}: {ex.Message}");
+                        }
+                    }
 
                     var sch00data = results.FirstOrDefault(r => !string.IsNullOrEmpty(r)) ?? string.Empty;
 
