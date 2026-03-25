@@ -145,7 +145,117 @@ namespace Income.Viewmodels
             }
         }
 
+        public async Task SaveWarningAsyncSCH00(string schedule, string block, int hhd_id ,int serial = 0, string warningCode = "")
+        {
+            try
+            {
+                // Fetch all saved warnings for this block + schedule + hhd
+                var savedWarnings = await dQ.GetWarningTableDataForBlock(
+                    SessionStorage.SelectedFSUId,
+                    hhd_id,
+                    schedule,
+                    block
+                );
 
+                if (savedWarnings.Count > 0)
+                {
+                    savedWarnings = savedWarnings.Where(w => w.warning_code == warningCode).ToList();
+                }
+
+                if (serial != 0)
+                {
+                    savedWarnings = savedWarnings.Where(w => w.serial_number == serial).ToList();
+                }
+
+                // Convert lists to comparison keys
+                var currentKeys = _tempWarnings
+                    .Select(w => $"{w.item_no}::{w.serial_number}")
+                    .ToHashSet();
+
+                var savedKeys = savedWarnings
+                    .Select(w => $"{w.item_no}::{w.serial_number}")
+                    .ToHashSet();
+
+                // -----------------------------------------
+                // INSERT NEW WARNINGS
+                // -----------------------------------------
+                var warningsToInsert = _tempWarnings
+                    .Where(w => !savedKeys.Contains($"{w.item_no}::{w.serial_number}"))
+                    .ToList();
+
+                foreach (var warn in warningsToInsert)
+                {
+                    warn.id = Guid.NewGuid();
+                    warn.created_on = DateTime.Now;
+                    warn.updated_at = null;
+                    warn.is_deleted = false;
+
+                    await dQ.SaveAsync<Tbl_Warning>(warn);
+                }
+
+                // -----------------------------------------
+                // DELETE REMOVED WARNINGS (AND THEIR CHILD COMMENTS)
+                // -----------------------------------------
+                var warningsToDelete = savedWarnings
+                    .Where(w => !currentKeys.Contains($"{w.item_no}::{w.serial_number}"))
+                    .ToList();
+
+                //            var warningsToDelete = savedWarnings
+                //.Where(saved =>
+                //    !_tempWarnings.Any(current =>
+                //        current.item_no == saved.item_no &&
+                //        current.schedule == saved.schedule
+                //    )
+                //)
+                //.ToList();
+
+
+                foreach (var warn in warningsToDelete)
+                {
+                    // -----------------------------------------
+                    // 1. DELETE CHILD COMMENTS FIRST
+                    // -----------------------------------------
+                    var childComments = await dQ.GetChildCommentsAsync(warn.id);
+
+                    foreach (var child in childComments)
+                    {
+                        if (SessionStorage.FSU_Submitted == true)
+                        {
+                            child.is_deleted = true;
+                            child.updated_at = DateTime.Now;
+                            await dQ.SaveAsync<Tbl_Warning>(child);
+                        }
+                        else
+                        {
+                            await dQ.DeleteEntryAsync<Tbl_Warning>(child.id);
+                        }
+                    }
+
+                    // -----------------------------------------
+                    // 2. DELETE THE PARENT WARNING
+                    // -----------------------------------------
+                    if (SessionStorage.FSU_Submitted == true)
+                    {
+                        warn.is_deleted = true;
+                        warn.updated_at = DateTime.Now;
+                        await dQ.SaveAsync<Tbl_Warning>(warn);
+                    }
+                    else
+                    {
+                        await dQ.DeleteEntryAsync<Tbl_Warning>(warn.id);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // log if needed
+            }
+            finally
+            {
+                _tempWarnings.Clear();
+                WarningList.Clear();
+            }
+        }
 
         public async Task DeleteWarning(string schedule, string block, int serialNo)
         {

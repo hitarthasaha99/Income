@@ -66,7 +66,6 @@
                                                     {
                                                         UpdateFieldAndValidate(() => selectBlock11A.item_1, e);
                                                         q11_1Condition(e);
-                                                        ValidateCSP72();
                                                     }">
                                                     <option value="">-Select-</option>
                                                     <option value="1">1-yes</option>
@@ -113,7 +112,6 @@
                                                 {
                                                     UpdateFieldAndValidate(() => selectBlock11A.item_3, e);
                                                     q11_3Condition(e);
-                                                    ValidateCSP72();
                                                 }">                                                                                                                                                     
                                                 <option value="">-Select-</option>
                                                 <option value="1">1-yes</option>
@@ -176,18 +174,7 @@
                                         </td>
                                     </tr>
                                 </tbody>
-                                @if(!string.IsNullOrEmpty(csp_72_warning))
-                                {
-                                    <tfoot>
-                                      <tr>
-                                        <td colspan="4">
-                                            <div class="alert custom-alert alert-success" role="alert">
-                                                @csp_72_warning
-                                            </div>
-                                        </td>
-                                      </tr>
-                                  </tfoot>
-                                }
+                                
                             </table>
                         </fieldset>
                     </div>
@@ -324,7 +311,6 @@
             {
                 isQ11_4_5Enable = true;
             }
-            ValidateCSP72();
             editContext = new EditContext(selectBlock11A);
             messageStore = new ValidationMessageStore(editContext);
             block_1 = await dQ.FetchSingleForFsuAndHhdAsync<Tbl_Block_1>() ?? null;
@@ -444,22 +430,6 @@
             messageStore.Clear(item5Field);
 
             editContext.NotifyValidationStateChanged();
-        }
-    }
-
-    private void ValidateCSP72()
-    {
-        try
-        {
-            csp_72_warning = string.Empty;
-            if (selectBlock11A != null && selectBlock11A.item_1.GetValueOrDefault() == 1 && selectBlock11A.item_3.GetValueOrDefault() == 1)
-            {
-                csp_72_warning = $"W072: Invalid Entry, please check the entry";
-            }
-        }
-        catch (Exception ex)
-        {
-            
         }
     }
 

@@ -463,7 +463,7 @@
 						string json = JsonConvert.SerializeObject(data);
 						Upsert_Model payload = new()
 						{
-							lookup_fsu_submit_status = 21,
+							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -1067,10 +1067,23 @@
 					errors.AddRange(block4checks);
 				}
 
-				var block7aErrors = await ValidateBlock(block_7a, Block7AValidator);
-				if (block7aErrors.Any())
+				bool block7ahardcheck =  block_4 != null && (block_4.item_4_1.GetValueOrDefault() || block_4.item_4_2.GetValueOrDefault());
+
+				if (block7ahardcheck)
 				{
-					errors.AddRange(block7aErrors);
+					var block7aErrors = await ValidateBlock(block_7a, Block7AValidator);
+					if (block7aErrors.Any())
+					{
+						errors.AddRange(block7aErrors);
+					}
+					if (block_7a != null && block_7a.item_6 < 0 && !block_7a.item_7.HasValue)
+					{
+						errors.Add("Block 7A: Please provide a reason before proceeding");
+					}
+					if (block_7a != null && block_7a.item_7.GetValueOrDefault() == 5 && string.IsNullOrWhiteSpace(block_7a.remarks))
+					{
+						errors.Add("Block 7A : Please provide a remark before proceeding");
+					}
 				}
 
 				bool codeListEntryNeeded = block_4 != null && (block_4.item_4_3.GetValueOrDefault() ||
@@ -1109,12 +1122,26 @@
 					{
 						errors.AddRange(block7bErrors);
 					}
+					if (block_7b != null && block_7b.item_9 < 0)
+					{
+						if (block_7b.item_10 == 4 && string.IsNullOrWhiteSpace(block_7b.remarks))
+						{
+							errors.Add($"Block 7B: Please specify remarks for 'Others'") ;
+						}
+					}
 				}
 
 				var block7cErrors = await ValidateBlock(block_7c, Block7CValidator);
 				if (block7cErrors.Any())
 				{
-					errors.AddRange(block7cErrors);
+					errors.AddRange(block7cErrors);				
+				}
+				if (block_7c != null && block_7c.item_7_12.GetValueOrDefault() < 0)
+				{
+					if (block_7c.item_7_13 == 4 && string.IsNullOrWhiteSpace(block_7c.remarks))
+					{
+						errors.Add($"Block 7C: Please specify remarks for 'Others'");
+					}
 				}
 
 				var block8Errors = await ValidateBlock(block_8, Block8Validator);

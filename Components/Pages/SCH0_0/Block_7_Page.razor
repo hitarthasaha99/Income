@@ -36,9 +36,7 @@
                                 <i class="fi fi-rr-settings me-1"></i>Generate
                             </button>  *@
                         }
-                        @* <button class="btn btn-outline-primary me-2" @onclick="@(() => Generate())">
-                                <i class="fi fi-rr-settings me-1"></i>Generate
-                         </button>  *@
+                        
                         <button class="btn btn-primary" @onclick="@(() => HandleModal("ADD"))">
                             <i class="fi fi-rr-plus me-1"></i>Add
                         </button>
@@ -973,7 +971,7 @@
             if (block_5_obj.Block_7_5 > 30)
             {
                 warningVM.AddWarning("W024 (ii): Household size is greater than 30", "0", "7", "5", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W024(ii)");
-                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_3.GetValueOrDefault());
+                await warningVM.SaveWarningAsyncSCH00("0", "7", block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W024(ii)");
             }
             else
             {
@@ -996,7 +994,7 @@
             if (!string.IsNullOrEmpty(item_8_warning))
             {
                 warningVM.AddWarning(item_8_warning, "0", "7", "8", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W022(ii)");
-                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_3.GetValueOrDefault());
+                await warningVM.SaveWarningAsyncSCH00("0", "7", block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W022(ii)");
             }
             else
             {
@@ -1014,12 +1012,12 @@
                     }
                 }
             }
-            //W024(iii)
+            //W022(iii)
             CheckItem9Warning();
             if (!string.IsNullOrEmpty(item_9_warning))
             {
                 warningVM.AddWarning(item_9_warning, "0", "7", "9", hhdNo: block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W022(iii)");
-                await warningVM.SaveWarningAsync("0", "7", block_5_obj.Block_7_3.GetValueOrDefault());
+                await warningVM.SaveWarningAsyncSCH00("0", "7", block_5_obj.Block_7_3.GetValueOrDefault(), warningCode: "W022(iii)");
             }
             else
             {
