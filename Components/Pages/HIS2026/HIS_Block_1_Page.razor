@@ -584,6 +584,7 @@
             current_hhd.isCasualty = true;
             current_hhd.SSS_household_id = 0;
             await dQ.Update_SCH0_0_Block_7(current_hhd);
+            block_1.sample_hhd_number = 0;
             await service.ReassignSSSHouseholdIds(current_hhd.SSS);
             toastService.ShowInfo("Household has been marked as casualty");
             await commonQueries.DeleteBlockDataForCasulaty();
