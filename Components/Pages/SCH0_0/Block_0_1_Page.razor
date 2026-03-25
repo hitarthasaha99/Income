@@ -317,7 +317,7 @@
                     if (framePop > 0)
                     {
                         double change = ((double)(value - framePop) / framePop) * 100;
-                        if (Math.Abs(change) >= 20)
+                        if (Math.Abs(change) > 20)
                         {
                             IsBlock_1_14_ErrorMessageVisible = true;
                             Block_1_14_ErrorMessage =
