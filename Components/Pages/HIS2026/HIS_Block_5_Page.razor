@@ -634,9 +634,11 @@
             await JSRuntime.InvokeVoidAsync(
                 "window.allowAlphaNumSpace", remarksRef);
         }
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeStickyTableHeaders", ".table-wrapper");
+        }
     }
-
-
     async void GoBack()
     {
         NavigationManager.NavigateTo("/dashboard/his/block_4_3");
