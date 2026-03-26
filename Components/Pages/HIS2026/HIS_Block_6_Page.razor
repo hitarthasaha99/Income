@@ -51,7 +51,7 @@
         <div class="card-body p-0">
             <div class="table-responsive table-wrapper">
                 <!-- Table displaying household members -->
-                <table class="table table-striped table-bordered mb-0 fixed-column">
+                <table class="table table-striped table-bordered mb-0 fixed-column align-middle">
                     <thead>
                         <tr>
                             <th rowspan="2" class="col-1 text-center">Action</th>
@@ -386,6 +386,14 @@
     string SerialMemberError = string.Empty;
     private ConfirmDialog dialog = default!;
     private string Block_6_ConfirmNavigation { get; set; } = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeStickyTableHeaders", ".table-wrapper");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

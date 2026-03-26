@@ -609,6 +609,13 @@
         // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeStickyTableHeaders", ".table-wrapper");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

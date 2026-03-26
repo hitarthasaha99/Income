@@ -33,8 +33,8 @@
         </div>
         @* Card Body *@
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped mb-0 text-center">
+            <div class="table-responsive table-wrapper">
+                <table class="table table-bordered table-striped mb-0 text-center align-middle">
                     <thead>
                         <tr>
                             <th>S.no.of the member</th>
@@ -209,6 +209,13 @@
         return;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeStickyTableHeaders", ".table-wrapper");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

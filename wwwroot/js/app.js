@@ -217,4 +217,24 @@ window.initializeSelect2ForModal = function (elementId) {
 }
 
 
+//Table header fix
+window.initializeStickyTableHeaders = function (wrapperSelector) {
+    const wrapper = document.querySelector(wrapperSelector);
+    if (!wrapper) return;
+
+    const rows = wrapper.querySelectorAll("thead tr");
+
+    let offset = 0;
+
+    rows.forEach(row => {
+        const height = row.offsetHeight;
+
+        const ths = row.querySelectorAll("th");
+        ths.forEach(th => {
+            th.style.top = offset + "px";
+        });
+
+        offset += height;
+    });
+};
 
