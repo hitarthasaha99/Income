@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
     <link href="_content/Blazor.Bootstrap/blazor.bootstrap.css" rel="stylesheet" />
-    <link href="libs/select2/css/select2.min.css" rel="stylesheet"/>
+    <link href="libs/select2/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="Income.styles.css" />
     <link rel="icon" href="data:,">
@@ -18,8 +18,6 @@
     <script src="js/app.js"></script>
     <script src="js/inputFilter.js"></script>
     <script src="js/noEmoji.js"></script>
-    <script src="js/NetworkService/interceptor.js"></script>
-    <script src="js/NetworkService/NetworkService.js"></script>
 </head>
 
 <body>
@@ -40,7 +38,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script>
     <!--<script src="js/HIS_Block_3_Js/His_block_3.js"></script>-->
-
     <!--Model class Close after save-->
     <script>
         window.closeModal = function (id) {
@@ -68,6 +65,42 @@
                 || (v.length > 0 && e.data === ' ');
         }
 
+    </script>
+
+    <script>
+        function validateHeadName(event, currentValue) {
+            let newValue = currentValue;
+
+            if (event.inputType === "insertText" && event.data) {
+                const start = event.target.selectionStart;
+                const end = event.target.selectionEnd;
+
+                newValue =
+                    currentValue.slice(0, start) +
+                    event.data +
+                    currentValue.slice(end);
+            }
+            else if (event.inputType === "insertFromPaste") {
+                const paste = (event.clipboardData || window.clipboardData).getData("text");
+                const start = event.target.selectionStart;
+                const end = event.target.selectionEnd;
+
+                newValue =
+                    currentValue.slice(0, start) +
+                    paste +
+                    currentValue.slice(end);
+            }
+            else {
+                return true;
+            }
+
+            if (!/^[A-Za-z ]*$/.test(newValue)) {
+                event.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
     </script>
 
 </body>

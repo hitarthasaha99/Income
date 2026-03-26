@@ -8,6 +8,13 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if ANDROID
+using Android.Content;
+using Android.Provider;
+using Android.OS;
+using Java.IO;
+#endif
+using File = System.IO.File; // File
 
 namespace Income.Common
 {
@@ -293,38 +300,19 @@ namespace Income.Common
         {
             try
             {
-                string documentsPath = string.Empty;
-
-#if ANDROID
-                await RequestPermissionsAsync();
-                documentsPath = Android.OS.Environment
-                    .GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)?
-                    .AbsolutePath ?? string.Empty;
-#endif
-
-#if WINDOWS
-        documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-#endif
-
-                if (string.IsNullOrEmpty(documentsPath))
-                {
-                    documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                }
-
-                // Main export folder
-                string exportFolder = Path.Combine(documentsPath, "Income_EXPORT");
-                Directory.CreateDirectory(exportFolder);
+                string basePath = FileSystem.AppDataDirectory;
 
                 string timestamp = DateTime.Now.ToString("dd_MMM_yyyy_HH-mm-ss");
 
-                // TEMP folder to put files BEFORE zipping
-                string tempExport = Path.Combine(exportFolder, $"TEMP_{timestamp}");
+                // ===============================
+                // TEMP folder (inside app storage)
+                // ===============================
+                string tempExport = Path.Combine(basePath, $"TEMP_{timestamp}");
                 Directory.CreateDirectory(tempExport);
 
                 // ===============================
-                // 1. Copy Income.db3 into TEMP
+                // 1. Copy DB
                 // ===============================
-
                 string dbName = "Income.db3";
                 string sourceDbPath = Path.Combine(FileSystem.AppDataDirectory, dbName);
 
@@ -334,12 +322,14 @@ namespace Income.Common
                 string tempDbPath = Path.Combine(tempExport, $"Income_{timestamp}.db3");
                 File.Copy(sourceDbPath, tempDbPath, true);
 
-
                 // ===============================
-                // 2. Copy SubmissionJSON folder into TEMP
+                // 2. Copy SubmissionJSON
                 // ===============================
-
-                string submissionJsonFolder = Path.Combine(documentsPath, "Income_Logs", "SubmissionJSON");
+                string submissionJsonFolder = Path.Combine(
+                    FileSystem.AppDataDirectory,
+                    "Income_Logs",
+                    "SubmissionJSON"
+                );
 
                 if (Directory.Exists(submissionJsonFolder))
                 {
@@ -347,32 +337,52 @@ namespace Income.Common
                     CopyDirectory(submissionJsonFolder, tempSubmissionJson);
                 }
 
-
                 // ===============================
-                // 3. Create ZIP
+                // 3. Create ZIP in app storage
                 // ===============================
-
                 string zipFileName = $"Income_Export_{SessionStorage.user_name}_{timestamp}.zip";
-                string zipFilePath = Path.Combine(exportFolder, zipFileName);
+                string localZipPath = Path.Combine(basePath, zipFileName);
 
-                if (File.Exists(zipFilePath))
-                    File.Delete(zipFilePath);
+                if (File.Exists(localZipPath))
+                    File.Delete(localZipPath);
 
                 ZipFile.CreateFromDirectory(
                     tempExport,
-                    zipFilePath,
+                    localZipPath,
                     CompressionLevel.Optimal,
-                    includeBaseDirectory: false
+                    false
                 );
 
-
-                // ===============================
-                // 4. Delete TEMP folder (but keep ZIP)
-                // ===============================
-
+                // Cleanup temp
                 Directory.Delete(tempExport, true);
 
-                return $"{CommonConstants.SUCCESS_TEXT}: Export created at {zipFilePath}";
+#if ANDROID
+        // ===============================
+        // 4. Save to PUBLIC Documents using MediaStore
+        // ===============================
+        var context = Android.App.Application.Context;
+        var resolver = context.ContentResolver;
+
+        ContentValues values = new ContentValues();
+        values.Put(MediaStore.IMediaColumns.DisplayName, zipFileName);
+        values.Put(MediaStore.IMediaColumns.MimeType, "application/zip");
+        values.Put(MediaStore.IMediaColumns.RelativePath, Android.OS.Environment.DirectoryDocuments + "/Income_EXPORT");
+
+        var uri = resolver.Insert(MediaStore.Files.GetContentUri("external"), values);
+
+        if (uri == null)
+            return "Failed to create file in MediaStore";
+
+        using (var outputStream = resolver.OpenOutputStream(uri))
+        using (var inputStream = File.OpenRead(localZipPath))
+        {
+            await inputStream.CopyToAsync(outputStream);
+        }
+
+        return $"{CommonConstants.SUCCESS_TEXT}: Saved to Documents/Income_EXPORT/{zipFileName}";
+#else
+                return $"{CommonConstants.SUCCESS_TEXT}: Export created at {localZipPath}";
+#endif
             }
             catch (Exception ex)
             {

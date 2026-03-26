@@ -19,7 +19,6 @@ using System.Globalization;
 using Color = DocumentFormat.OpenXml.Wordprocessing.Color;
 using FontSize = DocumentFormat.OpenXml.Wordprocessing.FontSize;
 using Income.Database.Queries;
-using BootstrapBlazor.Components;
 using Income.Common.HIS2026;
 using DocumentFormat.OpenXml;
 
