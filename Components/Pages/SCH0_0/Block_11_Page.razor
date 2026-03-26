@@ -355,10 +355,7 @@
 
             remarks_block_11 = !string.IsNullOrEmpty(block_1?.remarks_block_11);
 
-            if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
-            {
-                survey_time = tbl_Sch_0_0_FieldOperation.survey_timestamp.GetValueOrDefault();
-            }
+            survey_time = tbl_Sch_0_0_FieldOperation.survey_timestamp.GetValueOrDefault();
 
             StateHasChanged();
             return;
@@ -426,7 +423,7 @@
             if ((surveyCode == 1 || surveyCode == 4) && (value < 5 || value > 60))
             {
                 StatusClass = "text-success";
-                StatusMessage = "W011(v): Please re-check the entry";
+                StatusMessage = $"W011(v): Time entered is {value}. Please re-check the entry";
             }
             //For zero case - time should be < 5
             if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && (value >= 5))
@@ -487,7 +484,7 @@
             if ((surveyCode == 1 || surveyCode == 4) && (value < 5 || value > 60))
             {
                 StatusClass = "text-success";
-                StatusMessage = "W011(v): Please re-check the entry";
+                StatusMessage = $"W011(v): Time entered is {value}. Please re-check the entry";
             }
             //For zero case - time should be < 5
             if ((surveyCode == 2 || surveyCode == 3 || surveyCode == 5 || surveyCode == 6 || surveyCode == 7) && value > 5)
@@ -541,8 +538,41 @@
                 {
                     block_0_1.remarks_block_11 = remarks;
                     await DBQueries.SaveBlock1(block_0_1);
-                    //await warningVM.SaveWarningAsync(false, warningVM.WarningList, "0", "11", 0);
-                    await DBQueries.UpsertWarningAsync(warningVM._tempWarnings);
+
+                    //Need to manually check for the existing warning
+                    var savedWarnings = await DBQueries.GetWarningTableDataForBlock(
+                                    SessionStorage.SelectedFSUId,
+                                    0,
+                                    "0",
+                                    "11");
+
+                    if (savedWarnings != null && savedWarnings.Count > 0)
+                    {
+                        int currentTime = tbl_Sch_0_0_FieldOperation.time_taken.GetValueOrDefault();
+
+                        foreach (var warn in savedWarnings)
+                        {
+                            if (!string.IsNullOrEmpty(warn.warning_message))
+                            {
+                                var match = System.Text.RegularExpressions.Regex.Match(
+                                    warn.warning_message,
+                                    @"Time entered is (\d+)"
+                                );
+
+                                if (match.Success)
+                                {
+                                    int extractedValue = int.Parse(match.Groups[1].Value);
+
+                                    if (extractedValue != currentTime)
+                                    {
+                                        await DBQueries.DeleteWarningAsync(warn.id);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    await warningVM.SaveWarningAsync("0", "11");
                     toastService.ShowSuccess("Data saved successfully");
                     StateHasChanged();
                     if (is_go_next)

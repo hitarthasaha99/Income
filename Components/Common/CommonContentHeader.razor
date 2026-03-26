@@ -127,7 +127,7 @@
         //Time = survey_time != null ? survey_time.GetValueOrDefault().ToString("dd-MM-yyyy HH:mm:ss") : DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
 
         // **Part 2: Asynchronous Location Load**
-        if (string.IsNullOrEmpty(SessionStorage.location) && ShowVisitedBlock == true)
+        if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO && string.IsNullOrEmpty(SessionStorage.location) && ShowVisitedBlock == true)
         {
             // 2. Set loading state to true and immediately call StateHasChanged()
             isLocationLoading = true;

@@ -147,7 +147,7 @@
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">SSS</h3>
                                         <p class="text-danger mb-0">
-                                            @(top?.SSS)
+                                            @(top?.SSS == 0 ? "-" : top?.SSS)
                                         </p>
                                     </div>
                                 </div>
@@ -179,7 +179,7 @@
                                     <div class="list d-flex align-items-center mb-3">
                                         <h3 class="mb-0 me-2">Item</h3>
                                         <p class="text-danger mb-0">
-                                            @(top?.item_no)
+                                            @(top?.item_no == "0" ? "-" : top?.item_no)
                                         </p>
                                     </div>
                                 </div>

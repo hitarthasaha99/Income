@@ -14,17 +14,20 @@
     {
         preloadService.Show(SpinnerColor.Light, "We are setting up things ready for you.... Please Wait .........");
 
-        ConfigService.EnvironmentName = AppEnvironment.Production;
+        ConfigService.EnvironmentName = AppEnvironment.Staging;
         await ConfigService.LoadAsync();
-        if (CommonConfig.APIIncomeURL == "https://stagesurvey1.esigma.mospi.gov.in/APIIncome/api/SURVEY/v1/")
+        if (ConfigService.EnvironmentName == AppEnvironment.QA)
         {
             SessionStorage.env = SessionStorage.Environment.Development;
         }
-        if (CommonConfig.APIIncomeURL == "http://115.124.119.108:83/ApiIncome/api/SURVEY/v1/" || CommonConfig.APIIncomeURL == "https://stagehsd.esigma.mospi.gov.in/income/api/api/SURVEY/v1/")
+        if (ConfigService.EnvironmentName == AppEnvironment.Staging)
         {
             SessionStorage.env = SessionStorage.Environment.Staging;
         }
-
+        if (ConfigService.EnvironmentName == AppEnvironment.Production)
+        {
+            SessionStorage.env = SessionStorage.Environment.Production;
+        }
         var user_details = await CommonQueries.GetUserDetailsAsync()!;
         if (user_details == null)
         {

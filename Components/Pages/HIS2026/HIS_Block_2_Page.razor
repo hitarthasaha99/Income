@@ -83,8 +83,8 @@
                                 <label class="form-label">
                                     <span class="form-badge">3</span>@Loc["inminutes"]
                                 </label>
-                                <input type="number" class="form-control is_sso" value="@block_2?.total_time"
-                                       @oninput="e =>
+                                    <input type="number" class="form-control no-spinner is_sso" value="@block_2?.total_time" onbeforeinput="return /^(\d*)$/.test(event.target.value + (event.data ?? ''))"
+                                           @oninput="e =>
                                        {
                                            UpdateFieldAndValidate(() => block_2.total_time, e);
                                        }">
@@ -102,7 +102,7 @@
                                 <label class="form-label">
                                     <span class="form-badge">4</span>@Loc["number"]
                                 </label>
-                                <input type="number" class="form-control is_sso" value="@block_2?.number_of_enumerators"
+                                    <input type="number" class="form-control no-spinner is_sso" value="@block_2?.number_of_enumerators" onbeforeinput="return /^(\d*)$/.test(event.target.value + (event.data ?? ''))"
                                        @oninput="e =>
                                        {
                                            UpdateFieldAndValidate(() => block_2.number_of_enumerators, e);

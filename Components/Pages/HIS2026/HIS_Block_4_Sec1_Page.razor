@@ -115,7 +115,7 @@
                                     <td>
                                         <div class="siteCustomCheckbox">
                                             <label>
-                                                    <input type="checkbox" checked="@block_4.item_4_1" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_1 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                                    <input type="checkbox" checked="@block_4.item_4_1" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_1 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) ) )" />
                                             </label>
                                         </div>
                                     </td>
@@ -126,7 +126,7 @@
                                     <td>
                                         <div class="siteCustomCheckbox">
                                             <label>
-                                                    <input type="checkbox" checked="@block_4.item_4_2" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_2 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                                    <input type="checkbox" checked="@block_4.item_4_2" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_2 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) ) )" />
                                             </label>
                                         </div>
                                     </td>
@@ -137,7 +137,7 @@
                                     <td>
                                         <div class="siteCustomCheckbox">
                                             <label>
-                                                    <input type="checkbox" checked="@block_4.item_4_3" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_3 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                                    <input type="checkbox" checked="@block_4.item_4_3" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_3 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) ) )" />
                                             </label>
                                         </div>
                                     </td>
@@ -148,7 +148,7 @@
                                     <td>
                                         <div class="siteCustomCheckbox">
                                             <label>
-                                                    <input type="checkbox" checked="@block_4.item_4_4" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_4 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                                    <input type="checkbox" checked="@block_4.item_4_4" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_4 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12)) )" />
                                             </label>
                                         </div>
                                     </td>
@@ -159,7 +159,7 @@
                                     <td>
                                         <div class="siteCustomCheckbox">
                                             <label>
-                                                    <input type="checkbox" checked="@block_4.item_4_5" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_5 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                                    <input type="checkbox" checked="@block_4.item_4_5" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_5 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) ) )" />
                                             </label>
                                         </div>
                                     </td>
@@ -170,7 +170,7 @@
                                     <td>
                                         <div class="siteCustomCheckbox">
                                             <label>
-                                                    <input type="checkbox" checked="@block_4.item_4_6" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_6 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12) && Q4Needed ) )" />
+                                                    <input type="checkbox" checked="@block_4.item_4_6" @onchange="(e) => OnBlock4Changed(e, v => block_4.item_4_6 = v)" class="is_sso" disabled="@( !( (hhdStatus == 0 || hhdStatus == 11 || hhdStatus == 12)) )" />
                                             </label>
                                         </div>
                                     </td>
@@ -451,11 +451,25 @@
         StateHasChanged();
     }
 
-    async void GoBack()
+    async Task GoBack()
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_3");
+            return;
+        }
+        CheckWarnings();
+        if (!string.IsNullOrEmpty(Block_4_1_ErrorMessage))
+        {
+            warningVM.AddWarning(Block_4_1_ErrorMessage, "NHIS", "4_1", "1", warningCode: "W013(ii)", SessionStorage.selected_hhd_id);
+        }
+        if (!string.IsNullOrEmpty(Block_4_4_ErrorMessage))
+        {
+            warningVM.AddWarning(Block_4_4_ErrorMessage, "NHIS", "4_1", "4", warningCode: "W016", SessionStorage.selected_hhd_id);
+        }
+        await warningVM.SaveWarningAsync("NHIS", "4_1");
+        var saved = await dQ.Save_SCH_HIS_Block4(block_4);
         NavigationManager.NavigateTo("/dashboard/his/block_3");
-
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 }

@@ -286,9 +286,18 @@
 
     async Task GoBack()
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_8b");
+            return;
+        }
+        if (!string.IsNullOrEmpty(item_9_1_warning))
+        {
+            warning_VM.AddWarning(item_9_1_warning, "NHIS", "9A", "9.1", "W063", SessionStorage.selected_hhd_id);
+        }
+        await warning_VM.SaveWarningAsync("NHIS", "9A");
+        int saved = await dB.Save_SCH_HIS_Block9a(block_9a);
         NavigationManager.NavigateTo("/dashboard/his/block_8b");
-
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
 
     void CheckWarning()

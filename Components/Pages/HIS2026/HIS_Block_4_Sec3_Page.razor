@@ -508,7 +508,10 @@
         var value = e.Value?.ToString();
 
         if (string.IsNullOrEmpty(value))
+        {
             block_4.item_6 = null;
+            block_4.item_7 = null;
+        }
         else
         {
             block_4.item_6 = int.Parse(value);
@@ -864,11 +867,75 @@
         editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => block_4.item_17));
     }
 
-    async void GoBack()
+    async Task GoBack()
     {
-        NavigationManager.NavigateTo("/dashboard/his/block_4_2");
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_4_2");
+        }
+        CheckWarningForItem7();
+        CheckWarningForItem8();
+        CheckWarningForItem10();
+        CheckItem14Warning();
+        CheckWarningForItem16();
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
+        if (!string.IsNullOrEmpty(Item7WarningMessage))
+        {
+            warningVM.AddWarning(Item7WarningMessage, "NHIS", "4_3", "7", warningCode: "W019(ii)", SessionStorage.selected_hhd_id);
+        }
+
+        if (!string.IsNullOrEmpty(Item8WarningMessage))
+        {
+            var warnings = Item8WarningMessage
+                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var warning in warnings)
+            {
+                warningVM.AddWarning(
+                    warning.Trim(),
+                    "NHIS",
+                    "4_3",
+                    "8",
+                    warningCode: warning.Split(':')[0].Trim(),
+                    SessionStorage.selected_hhd_id
+                );
+            }
+        }
+
+        if (!string.IsNullOrEmpty(Item10WarningMessage))
+        {
+            var warnings = Item10WarningMessage
+                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var warning in warnings)
+            {
+                warningVM.AddWarning(
+                    warning.Trim(),
+                    "NHIS",
+                    "4_3",
+                    "10",
+                    warningCode: warning.Split(':')[0].Trim(),
+                    SessionStorage.selected_hhd_id
+                );
+            }
+        }
+
+        if (!string.IsNullOrEmpty(Item14WarningMessage))
+        {
+            warningVM.AddWarning(Item14WarningMessage, "NHIS", "4_3", "14", warningCode: "W026", SessionStorage.selected_hhd_id);
+        }
+
+        if (!string.IsNullOrEmpty(Item16WarningMessage))
+        {
+            warningVM.AddWarning(Item16WarningMessage, "NHIS", "4_3", "16", warningCode: "W028(ii)", SessionStorage.selected_hhd_id);
+        }
+        await warningVM.SaveWarningAsync("NHIS", "4_3");
+        int save = await dQ.Save_SCH_HIS_Block4(block_4);
+        if (block_1 != null)
+        {
+            await dQ.SaveAsync<Tbl_Block_1>(block_1);
+        }
+        NavigationManager.NavigateTo("/dashboard/his/block_4_2");
         return;
     }
 

@@ -317,7 +317,7 @@
                     if (framePop > 0)
                     {
                         double change = ((double)(value - framePop) / framePop) * 100;
-                        if (Math.Abs(change) >= 20)
+                        if (Math.Abs(change) > 20)
                         {
                             IsBlock_1_14_ErrorMessageVisible = true;
                             Block_1_14_ErrorMessage =
@@ -351,7 +351,6 @@
     async void GoBack()
     {
         NavigationManager.NavigateTo("/dashboard/fsulist");
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 
@@ -364,7 +363,7 @@
         {
             CheckWarning();
         }
-        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO && block_0_1_VM.block_0_1 != null)
+        if (block_0_1_VM.block_0_1 != null)
         {
             survey_time = block_0_1_VM.block_0_1.survey_timestamp.GetValueOrDefault();
         }

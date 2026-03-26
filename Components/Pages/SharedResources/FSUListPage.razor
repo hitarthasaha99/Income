@@ -76,7 +76,7 @@
                                         @{
                                             bool onlysch00submitted = false;
                                             var message = string.Empty;
-                                            if(item.lookupFsuSubmitStatus == 80)
+                                            if(item.lookupFsuSubmitStatus == 80 && item.fsuHouses != null && item.fsuHouses.Count == 0)
                                             {
                                                 onlysch00submitted = true;
                                                 if (item.lookup_fsu_sub_submit_status == 21)
@@ -117,8 +117,8 @@
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">NHIS</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
 
-                                            <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
-                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.lookupFsuSubmitStatus != 32)
+                                          <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
+                                          @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.lookupFsuSubmitStatus != 32)
                                             {
                                                 <NavLink @onclick="@(() => HandleFinalSubmisssion(item))" class="btn btn-sm btn-outline-primary">Final Submit<i class="bi bi-cloud-upload ms-1"></i></NavLink>
                                             }
@@ -760,8 +760,8 @@
                 {
                     foreach (var item in fsus)
                     {
-
-                        List<Tbl_Sch_0_0_Block_7> dataList = await dB.GetBlock7Data(item.fsu_id);
+                        List<Tbl_Sch_0_0_Block_7> dataList = [];
+                        dataList = await dB.GetBlock7DataByFSUID(item.fsu_id);
                         int count = 0;
                         foreach (var Item in dataList)
                         {
@@ -772,23 +772,45 @@
                         }
                         item.total_hhd = count;
                         var houses = item.fsu_houses != null ? JsonConvert.DeserializeObject<List<fsu_houses>>(item.fsu_houses) : new();
-                        if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_JSO || SessionStorage.role_name == CommonConstants.USER_CODE_JSO2))
+                        
+                        if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                         {
-                            item.completed_hhd = (item.total_hhd - (item.submittedbyEnumaretorToSuperviosr + item.submiitedbySuperviosrToDs + item.returntoSuperviosrbyDS));
+                            int pendingHouses = 0;
+                            int totalHouses = 0;
+                            
+                            item.fsuHouses = houses;
+                            if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                            {
+                                pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 0 || x.lookup_submit_status == 11 || x.lookup_submit_status == 12);
+                                totalHouses = item.fsuHouses.Count();
+                            }
+                            item.completed_hhd = (item.fsuHouses != null && item.fsuHouses.Count > 0) ? (count - (totalHouses - pendingHouses)) : count;
+                            item.total_hhd = (dataList != null && dataList.Count > 0) ? count : 0;
                         }
-                        else if ((SessionStorage.role_name == CommonConstants.ROLE_NAME_SSO))
+                        if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
                         {
-                            item.completed_hhd = (item.submittedbyEnumaretorToSuperviosr + item.returntoSuperviosrbyDS);
+                            int pendingHouses = 0;
+                            int totalHouses = 0;
+                            if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                            {
+                                pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 21 || x.lookup_submit_status == 22);
+                                totalHouses = item.fsuHouses.Count();
+                            }
+                            item.completed_hhd = pendingHouses;
+                            item.total_hhd = totalHouses;
                         }
-                        else if (SessionStorage.role_name == CommonConstants.ROLE_NAME_DS)
+                        if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)
                         {
-                            item.completed_hhd = (item.submiitedbySuperviosrToDs);
+                            int pendingHouses = 0;
+                            int totalHouses = 0;
+                            if (item.fsuHouses != null && item.fsuHouses.Count > 0)
+                            {
+                                pendingHouses = item.fsuHouses.Count(x => x.lookup_submit_status == 31);
+                                totalHouses = item.fsuHouses.Count();
+                            }
+                            item.completed_hhd = pendingHouses;
+                            item.total_hhd = totalHouses;
                         }
-                        else
-                        {
-                            item.completed_hhd = 0;
-                        }
-                        item.completed_hhd = int.TryParse(item.completed_hhd?.ToString(), out int result) ? result : item.total_hhd;
                         tbl_Fsu_List.Add(item);
                         temp_fsu_list.Add(item);
                     }

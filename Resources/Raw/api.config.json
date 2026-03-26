@@ -22,7 +22,7 @@
       "BaseUrls": {
         "Post": "https://stagehsd.esigma.mospi.gov.in/income/api/",
         "Income": "https://stagehsd.esigma.mospi.gov.in/income/api/api/SURVEY/v1/",
-        "Common": "https://stagehsd.esigma.mospi.gov.in/apicommon/api/SURVEY/"
+        "Common": "https://stagehsd.esigma.mospi.gov.in/income/api/api/SURVEY/"
       },
       "Routes": {
         "Login": "v1/UtilityMaster/AuthenticateSurveyUserAsync",
@@ -32,7 +32,7 @@
         "Logout": "v1/UtilityMaster/LogoutUser?v_userName=",
         "UpdateListing": "RemoveIncomeCapiDetails"
       },
-      "APP_VERSION": "1.0.8"
+      "APP_VERSION": "1.0.9"
     },
 
     "Production": {

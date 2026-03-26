@@ -561,9 +561,25 @@
 
     async void GoBack()
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7a_2");
+            return;
+        }
+        CheckItem6Warning();
+        if (!string.IsNullOrEmpty(item_9_warning))
+        {
+            warningVM.AddWarning(item_9_warning, "NHIS", "7B", "7B.9", warningCode: "", SessionStorage.selected_hhd_id);
+        }
+        await warningVM.SaveWarningAsync("NHIS", "7B");
+
+        if (block_1 != null)
+        {
+            await dB.SaveAsync<Tbl_Block_1>(block_1);
+        }
+        int saved = await dB.Save_SCH_HIS_Block7B(block_7B);
         NavigationManager.NavigateTo("/dashboard/his/block_7a_2");
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
         return;
     }
 

@@ -227,9 +227,30 @@
 
     async Task GoBack()
     {
+        if (SessionStorage.GetUserRole() != SessionStorage.UserRole.JSO)
+        {
+            NavigationManager.NavigateTo("/dashboard/his/block_7d");
+            return;
+        }
+        if (!string.IsNullOrEmpty(item_1_warning))
+        {
+            warningVM.AddWarning(item_1_warning, "NHIS", "8", "1", "W057", SessionStorage.selected_hhd_id);
+        }
+        if (!string.IsNullOrEmpty(item_2_warning))
+        {
+            warningVM.AddWarning(item_2_warning, "NHIS", "8", "2", "W058", SessionStorage.selected_hhd_id);
+        }
+
+        await warningVM.SaveWarningAsync("NHIS", "8");
+
+        if (block_1 != null)
+        {
+            await dB.SaveAsync<Tbl_Block_1>(block_1);
+        }
+        int saved = await dB.Save_SCH_HIS_Block8(model);
+
         NavigationManager.NavigateTo("/dashboard/his/block_7d");
 
-        // await JSRuntime.InvokeVoidAsync("__handleGoBack");
     }
 
     protected override async Task OnInitializedAsync()

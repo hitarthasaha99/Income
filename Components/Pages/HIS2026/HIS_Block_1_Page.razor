@@ -236,7 +236,7 @@
                 @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
                 {
                     <NavLink class="btn btn-outline-primary me-2 is_sso action" @onclick="@(() => HandleSubmit(false))"><i class="fi fi-rr-disk me-1"></i>Save</NavLink>
-                    @if (SessionStorage.env == SessionStorage.Environment.Development || (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.BBS.20")))
+                    @if (SessionStorage.env == SessionStorage.Environment.Production || (SessionStorage.env == SessionStorage.Environment.Staging && SessionStorage.user_name is ("ENM.DDN.36" or "ENM.KLK.69" or "ENM.BBS.20")))
                     {
                         <button class="btn btn-primary me-2" @onclick="@(() => Generate())">Generate<i class="fi fi-rr-settings ms-1"></i></button>
                     }
@@ -412,7 +412,7 @@
         {
             survey_time = block_1.survey_timestamp.GetValueOrDefault();
         }
-        
+
         await commonQueries.InsertVisitedBlock(vb);
         StateHasChanged();
     }
@@ -562,8 +562,19 @@
 
             var hhd_list = await dQ.Get_SCH0_0_Block_5A_HouseHoldBy_FSUP(SessionStorage.SelectedFSUId);
             var current_hhd = hhd_list.Where(x => x.Block_7_3 == SessionStorage.selected_hhd_id).FirstOrDefault();
+            bool selfCompiled = false;
+
+            if (current_hhd != null && current_hhd.SubstitutedForID.GetValueOrDefault() != 0)
+            {
+                var block_1_original_hhd = await dQ.Fetch_SCH_HIS_Block1(current_hhd.SubstitutedForID.GetValueOrDefault());
+                if (block_1_original_hhd != null && block_1_original_hhd.field_11_1.GetValueOrDefault() == 1)
+                {
+                    selfCompiled = true;
+                }
+            }
+
             var nextHousehold = service.FindSubstitute(hhd_list, current_hhd);
-            if (nextHousehold != null)
+            if (nextHousehold != null && !selfCompiled)
             {
                 toastService.ShowError("Substitute household is available. Please select substitute household instead of marking as casualty");
                 return;
@@ -573,6 +584,7 @@
             current_hhd.isCasualty = true;
             current_hhd.SSS_household_id = 0;
             await dQ.Update_SCH0_0_Block_7(current_hhd);
+            block_1.sample_hhd_number = 0;
             await service.ReassignSSSHouseholdIds(current_hhd.SSS);
             toastService.ShowInfo("Household has been marked as casualty");
             await commonQueries.DeleteBlockDataForCasulaty();
