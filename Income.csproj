@@ -50,7 +50,8 @@
 		<AndroidEnableProguard>true</AndroidEnableProguard>
 		<AndroidEnableR8>true</AndroidEnableR8>
 		<AndroidLinkTool>r8</AndroidLinkTool>
-    </PropertyGroup>
+		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
+	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net9.0-android'">
 		<ProguardConfiguration Include="proguard-rules.pro" />

@@ -14,7 +14,7 @@
     {
         preloadService.Show(SpinnerColor.Light, "We are setting up things ready for you.... Please Wait .........");
 
-        ConfigService.EnvironmentName = AppEnvironment.Staging;
+        ConfigService.EnvironmentName = AppEnvironment.Production;
         await ConfigService.LoadAsync();
         if (ConfigService.EnvironmentName == AppEnvironment.QA)
         {

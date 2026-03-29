@@ -304,7 +304,10 @@ namespace Income.Viewmodels
                     foreach (var item in selected_HHdList)
                     {
                         List<Tbl_Warning> data = await dQ.GetWarningList(item.Block_7_3.GetValueOrDefault(), schedule: schedule);
-                        warningList.AddRange(data);
+                        if (data != null && data.Count > 0)
+                        {
+                            warningList.AddRange(data.Where(x => x.schedule != "0"));
+                        }
                     }
                 }
                     

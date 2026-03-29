@@ -427,21 +427,23 @@ namespace Income.Database.Queries
 
                 foreach (var table in tables)
                 {
+                    bool isWarningTable = table == typeof(Tbl_Warning);
+
                     if (submitted)
                     {
-                        // Soft delete → set is_deleted = 1
                         string query =
                             $"UPDATE {table.Name} SET is_deleted = 1 " +
-                            $"WHERE fsu_id = ? AND hhd_id = ?";
+                            $"WHERE fsu_id = ? AND hhd_id = ?" +
+                            (isWarningTable ? " AND schedule != '0'" : "");
 
                         await _database.ExecuteAsync(query, fsuId, hhdId);
                     }
                     else
                     {
-                        // Hard delete → remove records
                         string query =
                             $"DELETE FROM {table.Name} " +
-                            $"WHERE fsu_id = ? AND hhd_id = ?";
+                            $"WHERE fsu_id = ? AND hhd_id = ?" +
+                            (isWarningTable ? " AND schedule != '0'" : "");
 
                         await _database.ExecuteAsync(query, fsuId, hhdId);
                     }

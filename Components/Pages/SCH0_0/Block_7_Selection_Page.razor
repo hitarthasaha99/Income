@@ -382,7 +382,10 @@
             if(SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
                 AllowUpdateListing = tbl_Fsu_List.updatelistingcount == 0 && ListItems != null && ListItems.Any(x => x.isSelected);
-                if (tbl_Fsu_List.lookup_fsu_sub_submit_status == 21 || tbl_Fsu_List.lookupFsuSubmitStatus is (21 or 22 or 12 or 30 or 31 or 32))
+                var fsuHouses = string.IsNullOrWhiteSpace(tbl_Fsu_List.fsu_houses)
+        ? new List<fsu_houses>()
+        : JsonConvert.DeserializeObject<List<fsu_houses>>(tbl_Fsu_List.fsu_houses) ?? new List<fsu_houses>();
+                if (tbl_Fsu_List.lookup_fsu_sub_submit_status == 21 || tbl_Fsu_List.lookupFsuSubmitStatus is (21 or 22 or 12 or 30 or 31 or 32) || fsuHouses.Count > 0)
                 {
                     AllowUpdateListing = false;
                 }

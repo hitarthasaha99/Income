@@ -297,8 +297,12 @@
             }
             else
             {
-                ShowValidateButton = fsu != null && ((fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() == 21) || (fsu.lookupFsuSubmitStatus == 21));
-                ShowSubmitButton = fsu != null && fsu.lookupFsuSubmitStatus.GetValueOrDefault() == 80 && fsu.lookup_fsu_sub_submit_status.GetValueOrDefault() == 21;
+                ShowValidateButton = true;
+                ShowSubmitButton = true;
+                if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS)
+                {
+                    ShowSubmitButton = false;
+                }
             }
             if (block_1 != null)
             {
@@ -641,16 +645,47 @@
 
             int lookup_submit_status = 0;
             int lookup_sub_submit_status = 0;
-            var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+            List<fsu_houses> fsuHouseList = [];
+            string message = string.Empty;
+
+            //var fsu = await commonQueries.FetchFsuByFsuId(SessionStorage.SelectedFSUId);
+
+            var fsu_response = await networkService.GetAsync(
+                CommonConfig.APIIncomeURL,
+                $"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
+
+            if (fsu_response == null)
+            {
+                toastService.ShowError("Unable to fetch FSU data. Please try again.");
+                return;
+            }
+
+            var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(fsu_response);
+            var fsu = fsu_list?.FirstOrDefault(x => x.fsu_id == SessionStorage.SelectedFSUId);
+
             if (fsu != null)
             {
                 lookup_submit_status = fsu.lookupFsuSubmitStatus.GetValueOrDefault();
                 lookup_sub_submit_status = fsu.lookup_fsu_sub_submit_status.GetValueOrDefault();
+                fsuHouseList = fsu.fsuHouses?
+                .Where(x => x.is_deleted == null || x.is_deleted == false)
+                .ToList() ?? new List<fsu_houses>();
+
             }
 
-            if (new int [] {21,12,22,31,32}.Contains(lookup_submit_status))
+            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.JSO)
             {
-                toastService.ShowInfo("Household data has already been submitted. Cannot allow SCH00 referback.");
+                message = "Cannot allow SCH00 submission.";
+            }
+
+            if (SessionStorage.GetUserRole() == SessionStorage.UserRole.SSO)
+            {
+                message = "Cannot allow SCH00 referback.";
+            }
+
+            if (new int [] {21,12,22,31,32}.Contains(lookup_submit_status) || (fsuHouseList.Count > 0))
+            {
+                toastService.ShowInfo($"Household data has already been submitted. {message}");
                 return;
             }
             var all_warnings = await DBQueries.GetWarningList(schedule: "0");
