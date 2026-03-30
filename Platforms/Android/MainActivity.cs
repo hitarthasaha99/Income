@@ -22,13 +22,13 @@ namespace Income
             Window.SetSoftInputMode(Android.Views.SoftInput.AdjustResize);
 
             // Initialize root detection service
-            _rootDetectionService = new RootDetectionService();
+            //_rootDetectionService = new RootDetectionService();
 
-            // Perform root check on startup
-            Task.Run(async () =>
-            {
-                await CheckDeviceRoot();
-            });
+            //// Perform root check on startup
+            //Task.Run(async () =>
+            //{
+            //    await CheckDeviceRoot();
+            //});
         }
 
         private async Task CheckDeviceRoot()
