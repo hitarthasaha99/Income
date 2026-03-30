@@ -1,5 +1,4 @@
-﻿using BootstrapBlazor.Components;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using Income.Common;
 using Income.Database.Models.Common;
 using Income.Database.Models.SCH0_0;
@@ -305,7 +304,10 @@ namespace Income.Viewmodels
                     foreach (var item in selected_HHdList)
                     {
                         List<Tbl_Warning> data = await dQ.GetWarningList(item.Block_7_3.GetValueOrDefault(), schedule: schedule);
-                        warningList.AddRange(data);
+                        if (data != null && data.Count > 0)
+                        {
+                            warningList.AddRange(data.Where(x => x.schedule != "0"));
+                        }
                     }
                 }
                     

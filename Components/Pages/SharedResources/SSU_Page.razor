@@ -464,6 +464,7 @@
 						Upsert_Model payload = new()
 						{
 							lookup_fsu_submit_status = await CalculateLookupStatus(hhd_list),
+							lookup_fsu_sub_submit_status = await CalculateLookupSubStatus(),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -546,6 +547,7 @@
 						Upsert_Model payload = new()
 						{
 							lookup_fsu_submit_status = mode == SubmissionMode.sso_to_jso ? 12 : await CalculateLookupStatus(hhd_list),
+							lookup_fsu_sub_submit_status = await CalculateLookupSubStatus(),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -585,6 +587,7 @@
 						preloadService.Show(SpinnerColor.Info, "Submitting data");
 						Submission_Model data = new();
 						data.IncomeSchHISDto = [];
+						data.IncomeSch00WarningList = await dQ.GetWarningList(schedule: "0");
 
 						foreach (var hhd in hhd_list)
 						{
@@ -601,6 +604,7 @@
 						Upsert_Model payload = new()
 						{
 							lookup_fsu_submit_status = mode == SubmissionMode.ds_to_sso ? 22 : await CalculateLookupStatus(hhd_list),
+							lookup_fsu_sub_submit_status = await CalculateLookupSubStatus(),
 							fsu_id = SessionStorage.SelectedFSUId.ToString(),
 							submitted_json_data = json,
 							survey_id = SessionStorage.surveyId,
@@ -749,6 +753,33 @@
 		}
 	}
 
+	private async Task<int> CalculateLookupSubStatus()
+	{
+		try
+		{
+			var fsu_response = await networkService.GetAsync(
+				CommonConfig.APIIncomeURL,
+				$"{CommonConfig.FETCH_FSU_LIST_BY_USER_ID}{SessionStorage.__user_id}&v_surveyId={SessionStorage.surveyId}&v_lookup_submit_status=0&v_refer_back=0");
+
+			if (fsu_response == null)
+				return 0;
+
+			var fsu_list = JsonConvert.DeserializeObject<List<Tbl_Fsu_List>>(fsu_response);
+			var currentFSU = fsu_list?.FirstOrDefault(x => x.fsu_id == SessionStorage.SelectedFSUId);
+
+			if (currentFSU == null)
+				return 0;
+
+			int existingFSUStatus = currentFSU.lookup_fsu_sub_submit_status.GetValueOrDefault();
+
+			return existingFSUStatus;
+		}
+		catch
+		{
+			// Fail-safe: never change status on error
+			return 0;
+		}
+	}
 
 	private async Task Sync(Tbl_Sch_0_0_Block_7 hhd)
 	{
@@ -1181,7 +1212,7 @@
 						}
 					}
 				}
-				
+
 
 				if (block_2 == null)
 				{
@@ -1500,6 +1531,8 @@
 				SessionStorage.SelectedFSUId = hhd.fsu_id;
 				SessionStorage.selected_hhd_id = hhd.Block_7_3.GetValueOrDefault();
 				var warnings = await dQ.FetchListAsync<Tbl_Warning>() ?? new();
+				var sch00warnings = await dQ.GetWarningList(schedule: "0");
+
 				if (submissionMode == SubmissionMode.sso_to_jso)
 				{
 					//If referring back to JSO, SSO needs to have rejected atleast one warning
@@ -1512,7 +1545,7 @@
 
 						if (hasPendingWarning)
 						{
-							errors.Add("Please address all pending warnings");
+							errors.Add("Please address all pending warnings for this household");
 						}
 
 						if (!rejectedWarnings)
@@ -1534,6 +1567,16 @@
 				if (submissionMode == SubmissionMode.sso_to_ds)
 				{
 					//If submitting to DS, SSO needs to have accepted all warnings
+					if (sch00warnings.Count > 0)
+					{
+						var parents = sch00warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);
+						bool pendingWarnings = parents.Any(x => x.warning_status == 3 || x.warning_status == 2);
+						if (pendingWarnings)
+						{
+							errors.Add("Need to accept all SCH00 warnings before submission");
+							errorDict.Add(hhd.Block_7_3.GetValueOrDefault(), errors);
+						}
+					}
 					if (warnings.Count > 0)
 					{
 						var parents = warnings.Where(x => x.parent_comment_id == null || x.parent_comment_id == Guid.Empty);

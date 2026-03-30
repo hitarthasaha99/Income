@@ -116,9 +116,8 @@
                                             <NavLink @onclick="@(() => HandleSelection("sch0.0", item.fsu_id))" class="btn btn-sm btn-outline-primary">SCH0.0</NavLink>
                                             <NavLink @onclick="@(() => HandleSelection("his", item.fsu_id))" class="btn btn-sm btn-primary">NHIS</NavLink>
                                             <NavLink @onclick="@(() => DownloadFSUData(item))" class="btn btn-sm btn-outline-primary">Download<i class="bi bi-download ms-1"></i></NavLink>
-
-                                          <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
-                                          @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.lookupFsuSubmitStatus != 32)
+@*                                             <NavLink @onclick="@(() => DoUpdateListing(item.fsu_id))" class="btn btn-sm btn-outline-primary">Clear Data<i class="bi bi-x-square ms-1"></i></NavLink>
+ *@                                            @if (SessionStorage.GetUserRole() == SessionStorage.UserRole.DS && item.lookupFsuSubmitStatus != 32)
                                             {
                                                 <NavLink @onclick="@(() => HandleFinalSubmisssion(item))" class="btn btn-sm btn-outline-primary">Final Submit<i class="bi bi-cloud-upload ms-1"></i></NavLink>
                                             }

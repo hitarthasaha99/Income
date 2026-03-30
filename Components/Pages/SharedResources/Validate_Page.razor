@@ -45,7 +45,7 @@
             SessionStorage.UserRole.SSO => top.warning_status switch
             {
                 1 or 2 => "warningWrap",
-                4 => "acceptedWrap",
+                4 or 5 => "acceptedWrap",
                 3 => "dangerWrap",
                 _ => ""
             },
@@ -316,12 +316,12 @@
                                                                              && top?.warning_status == 4)" />
                                     </div>
 
-                                        <button type="button"
-                                                class="btn btn-primary"
-                                                @onclick="() => Validate(top)">
-                                            Submit
-                                        </button>
-
+                                    <button type="button"
+                                                        class="btn btn-primary"
+                                                        @onclick="() => Validate(top)">
+                                                    Submit
+                                                </button>
+                                        
                                     </div>
                                 </EditForm>
 
@@ -623,7 +623,7 @@
                 ParentWarning = WarningList.Where(x => (x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty) && (x?.warning_status == 3 || x?.warning_status == 1 || x?.warning_status == 2 || x?.warning_status == 4)).ToList();
             }
             // ParentWarning = WarningList.Where(x => x?.parent_comment_id == null || x.parent_comment_id == Guid.Empty).ToList();
-            ChildWarning = WarningList.Where(item => item.parent_comment_id != null).OrderBy(x => x.created_on).ToList();
+            ChildWarning = WarningList.Where(item => item.parent_comment_id != null).OrderBy(x => x.serial_number).ToList();
             StateHasChanged();
             return;
         }

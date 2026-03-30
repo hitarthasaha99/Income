@@ -1,5 +1,4 @@
 ﻿using Blazored.Toast.Services;
-using BootstrapBlazor.Components;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.EMMA;
@@ -4037,6 +4036,32 @@ namespace Income.Database.Queries
                 var query = _database.Table<T>()
                     .Where(x => x.fsu_id == SessionStorage.SelectedFSUId)
                     .Where(x => x.hhd_id == SessionStorage.selected_hhd_id);
+
+                // apply delete filter
+                query = filter switch
+                {
+                    DeleteFilter.ExcludeDeleted => query.Where(x => x.is_deleted == null || x.is_deleted == false),
+                    DeleteFilter.OnlyDeleted => query.Where(x => x.is_deleted == true),
+                    DeleteFilter.IncludeAll => query,
+                    _ => query
+                };
+
+                return await query.ToListAsync();
+            }
+            catch
+            {
+                return new List<T>();
+            }
+        }
+
+        public async Task<List<T>> FetchWarningListAsync<T>(
+    DeleteFilter filter = DeleteFilter.ExcludeDeleted)
+    where T : Tbl_Base, IHISModel, new()
+        {
+            try
+            {
+                var query = _database.Table<T>()
+                    .Where(x => x.fsu_id == SessionStorage.SelectedFSUId);
 
                 // apply delete filter
                 query = filter switch

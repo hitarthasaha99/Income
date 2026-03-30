@@ -7,6 +7,7 @@
 @using Income.Validators.SCH0_0
 @using System.Diagnostics
 @using Income.Viewmodels
+@using System.Text.RegularExpressions
 @layout Income.Components.Layout.DashboardLayout
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -229,9 +230,9 @@
                                     <InputText class="form-control"
                                                maxlength="50"
                                                onbeforeinput="if (event.data && /[^A-Za-z ]/.test(event.data)) { event.preventDefault(); }"
-                                                onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
-                                                @bind-Value="fields.Block_7_4"
-                                                @oninput="OnHeadNameInput"/>
+                                               onkeypress="return /^[A-Za-z ]*$/.test(event.target.value + event.key)"
+                                               @bind-Value="fields.Block_7_4"
+                                               @oninput="OnHeadNameInput" />
                                     <ValidationMessage For="@(() => fields.Block_7_4)" />
                                 </div>
                             </div>
@@ -300,15 +301,13 @@
                             <div class="col-sm-12" hidden="@(fields.is_household == 1)">
                                 <div class="mb-3">
                                     <label class="form-label"><span class="form-badge">8</span>Total amount of land owned (possessed or leased out) by the household as on the date of the survey (in acres in three places of decimal) – ((for rural only) code 1 in item 5 of Block 1)</label>
-                                    <input class="form-control no-spinner"
+                                    <input type="number" class="form-control no-spinner"
                                                     value="@fields.Block_7_8"
                                                     step="any"
                                                     disabled="@(sector == 2)"
-                                                    @oninput="OnItem8Input"
-                                                 onkeypress="const v=this.value,k=event.key;
-                                                            if(!/[\d.]/.test(k))return false;if(k==='.'&&(v.includes('.')||v===''))return false;
-                                                            if(v.includes('.')&&v.split('.')[1].length>=3)return false;
-                                                            return /^\d*\.?\d{0,3}$/.test(v+k)" />
+                                           onbeforeinput="return !event.data ||(/^\d|\.$/.test(event.data) && /^(\d{0,10}(\.\d{0,3})?)$/.test(event.target.value + event.data))"
+                                           @oninput="OnItem8Input"
+                                            />
                                     <ValidationMessage For="@(() => fields.Block_7_8)" />
                                         @if (!string.IsNullOrEmpty(item_8_warning))
                                         {
@@ -352,7 +351,6 @@
 </GlobalErrorBoundary>
 
 
-
 @code {
     EditContext editContext;
     int SelectedFsuId = SessionStorage.SelectedFSUId;
@@ -386,6 +384,7 @@
 
     CommonFunction commonFunctions = new();
     bool is_error = false;
+
 
     async Task GoBack()
     {
@@ -915,6 +914,12 @@
         var block_5_obj = fields;
         if (block_5_obj != null)
         {
+            if (!string.IsNullOrEmpty(block_5_obj.Block_7_4) &&
+    !Regex.IsMatch(block_5_obj.Block_7_4, @"^[A-Za-z ]*$"))
+            {
+                toastService.ShowError("Household head / structure name must alphabetic");
+                return;
+            }
             if (block_5_obj.Block_7_5.HasValue && block_5_obj.Block_7_5.Value > 0 &&
         block_5_obj.Block_7_9.HasValue)
             {

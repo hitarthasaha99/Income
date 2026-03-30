@@ -39,9 +39,9 @@ namespace Income.Validators.HIS2026
             // ---------------------------------------------------------
             // 2. item_5_1_3, 5_2_3, 5_3_3 must be <= 12
             // ---------------------------------------------------------
-            RuleFor(x => x.item_5_1_3).LessThanOrEqualTo(12).WithMessage(msg64ii);
-            RuleFor(x => x.item_5_2_3).LessThanOrEqualTo(12).WithMessage(msg64ii);
-            RuleFor(x => x.item_5_3_3).LessThanOrEqualTo(12).WithMessage(msg64ii);
+            RuleFor(x => x.item_5_1_3).GreaterThanOrEqualTo(0).WithMessage(msg64ii);
+            RuleFor(x => x.item_5_2_3).GreaterThanOrEqualTo(0).WithMessage(msg64ii);
+            RuleFor(x => x.item_5_3_3).GreaterThanOrEqualTo(0).WithMessage(msg64ii);
 
             // ---------------------------------------------------------
             // 3. If ANY Block3.item_8/9/10/11 == 10,
